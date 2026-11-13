@@ -109,3 +109,9 @@ def test_source_iteration_dependent_min_sum_scale_is_explicit():
     script="""require('./web/research/decoder-display.js');console.log(JSON.stringify(DecoderDisplay.describe({configuration:{effective_configuration:{family:'binary_css',check_rule:'min_sum',message_resolution:'float64',v2c_damping:0,max_iterations:162,alpha_schedule:'1-2**(-iteration)',prior:'p',noise_model:'x_only'}}})));"""
     value=json.loads(subprocess.check_output(['node','-e',script],cwd=ROOT,text=True))
     assert 'αₜ = 1 − 2⁻ᵗ' in value['label'] and 'T = 162' in value['label']
+
+
+def test_inferred_budget_is_distinguished_from_an_explicit_source_setting():
+    script="""require('./web/research/decoder-display.js');console.log(JSON.stringify(DecoderDisplay.describe({configuration:{effective_configuration:{family:'binary_css',check_rule:'sum_product',message_resolution:'float64',max_iterations:100,budget_status:'curve_inferred_not_source_specified'}}})));"""
+    value=json.loads(subprocess.check_output(['node','-e',script],cwd=ROOT,text=True))
+    assert 'T = 100' in value['label'] and 'budget = inferred' in value['label']

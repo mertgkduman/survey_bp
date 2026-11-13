@@ -56,6 +56,7 @@ def test_speed_only_after_simultaneous_paired_regret_guard():
 def test_damping_is_old_message_weight_and_preserves_physical_stream(family):
     jobs=tune.design()['jobs']
     a=deepcopy(next(j for j in jobs if j['code']=='unicycle74' and j['base_arm']==family and j['decoder']['v2c_damping']==0.))
+    a['decoder'].update(max_iterations=9,iterations_per_branch=9)
     b=deepcopy(a);b['decoder']['v2c_damping']=.5
     va,vb=rt.state(a),rt.state(b)
     ra,rb=rt.event(va,1),rt.event(vb,1)

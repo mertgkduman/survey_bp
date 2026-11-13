@@ -1,7 +1,7 @@
 ---
 status: passed
 scope: implementation, qualification, frozen designs and scheduler preflight
-campaign_status: running
+campaign_status: canceled
 ---
 
 # Verification
@@ -40,3 +40,12 @@ public counts unchanged at 70/369/8/0. Raw results/lock files remain local.
 Subsequent live check: 16 tuning tasks RUNNING and two COMPLETED; no failed
 task observed. Two terminal training summaries exist, not yet a complete grid
 audit. The dependent advance job remains pending.
+
+## Superseded budget design
+
+User correction in quick 261113-hk2 canceled array 61769653 and advance 61769654.
+Do not resume the 88,200 tuning design. Preserve these frozen records as history.
+The corrected source reference and damping pipeline uses an explicitly inferred
+100-iteration decode cap, with a separate source unicycle 100-per-hypothesis
+reference. The Roffe T=n study stays frozen and transfers to that corrected chain.
+See the hk2 records and data/reproductions/mackay-0304161-damping/STOPPED.json.

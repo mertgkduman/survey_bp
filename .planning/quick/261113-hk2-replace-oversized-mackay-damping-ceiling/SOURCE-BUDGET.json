@@ -1,0 +1,39 @@
+{
+  "schema": "iteration-budget-source-review-v1",
+  "status": "curve_inferred_author_cap_unverified",
+  "paper": "https://arxiv.org/abs/quant-ph/0304161v3",
+  "reviewed_sources": [
+    "https://arxiv.org/html/quant-ph/0304161v3",
+    "https://arxiv.org/pdf/quant-ph/0304161v3",
+    "https://arxiv.org/src/quant-ph/0304161v3"
+  ],
+  "source_archive_sha256": "fad6f31421f0ef198009f1f75de482ddaab0e3b1c1c8b25a44344a640359030e",
+  "numeric_cap": null,
+  "cap_scope": null,
+  "source_locator": null,
+  "finding": "The inspected primary text/source describes sum-product iterations and two independent unicycle hypotheses but supplies no numeric iteration limit.",
+  "blocked_assumptions": [
+    "88200 inherited from the unrelated BPGD comparison",
+    "an arbitrary 100 or n cap relabeled as paper-specified",
+    "a generic implementation default treated as the historical experiment setting"
+  ],
+  "required_input": null,
+  "preserve": "All completed large-budget curves and historical raw evidence remain unchanged.",
+  "roffe_budget": {
+    "status": "source_verified",
+    "caps": {
+      "toric9": 162,
+      "toric11": 242,
+      "toric13": 338,
+      "toric15": 450
+    },
+    "source": "https://arxiv.org/html/2005.07016v2",
+    "rule": "T=n"
+  },
+  "inferred_iterations_per_bp_decode": 100,
+  "inferred_unicycle_iterations_per_hypothesis": 100,
+  "inferred_unicycle_total_ceiling": 200,
+  "user_clarification": "Infer the missing cap from curve alignment.",
+  "inference_path": "data/reproductions/mackay-0304161-budget-calibration/inference.json",
+  "inference_sha256": "622297b081241f4fc6a0254c046cf8b0813d4e8098eda48172654d02db0da988"
+}

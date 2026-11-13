@@ -1,0 +1,17 @@
+{
+  "bp_iterations": 100,
+  "caveat": "Retrospective adaptively stopped bank; inferred cap is not a recovered author setting. New independent validation required. Ordinary BP and Q-BP each use T=100; unicycle has two independent hypotheses, each capped at 100.",
+  "inference_path": "data/reproductions/mackay-0304161-budget-calibration/inference.json",
+  "inference_sha256": "622297b081241f4fc6a0254c046cf8b0813d4e8098eda48172654d02db0da988",
+  "paper": "https://arxiv.org/abs/quant-ph/0304161v3",
+  "plausible_tested_range_per_hypothesis": [
+    50,
+    100
+  ],
+  "schema": "inferred-mackay-budget-v1",
+  "selection_basis": "Minimum equal-rate sum of squared log relative classical-error discrepancies over five source points among 11 tested cutoffs; 50 also plausible.",
+  "source_numeric_iteration_cap": null,
+  "status": "curve_inferred_not_source_specified",
+  "unicycle_iterations_per_hypothesis": 100,
+  "unicycle_total_ceiling": 200
+}

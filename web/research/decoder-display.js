@@ -4,6 +4,7 @@ const own=(o,k)=>o!=null&&Object.prototype.hasOwnProperty.call(o,k);
 const val=(...xs)=>xs.find(x=>x!==undefined);
 const number=x=>typeof x==='number'?Number(x.toPrecision(7)).toString():String(x);
 const symbols={"d":'old V2C message weight',"γ":'fresh V2C message weight (γ = 1 − d)',"c":'final check-message cap; none means no extra cap',"cᵥ":'variable-to-check cap',"T":'maximum iterations per decode',"Tᵣ":'iterations per decimation round',"R":'maximum rounds',"s":'fixed-point scale; step = 1/s',"α":'min-sum multiplicative scale',"β":'min-sum offset',"p₀":'decoder noise parameter; for binary BP under matched depolarizing noise, p₀ = 2p/3',"ε":'fixation strength',"w":'beam width',"I₀":'initial BP sweeps',"I₊":'additional sweeps per intervention',"K":'intervention test cap',"γₗ":'disordered-memory lower coefficient',"γₕ":'disordered-memory upper coefficient',"N":'retained shots per point; a range means the count varies',"code":'code or circuit input',"noise":'physical noise model',"n":'number of physical qubits',"order":'decimation selection order'};
+symbols['budget']='iteration cap inferred from curve alignment; not explicitly stated by the paper';
 symbols['αₜ']='min-sum scale at sweep t; the first sweep has t = 1';
 symbols['H']='number of conditioned extra-bit hypotheses';symbols['Tₕ']='maximum sweeps per conditioned hypothesis; all branch work contributes to the total';symbols['d_min']='certified minimum-distance lower bound; a uniquely lighter valid correction permits skipping the other hypothesis';
 function describe(decoder,series={}){
@@ -28,6 +29,7 @@ function describe(decoder,series={}){
  }else if(dataset==='yao-non-osd-results'){
   const joint=['a5','b2'].includes(series.code_id);algorithm=arm==='qbp'?'Q-BP':arm==='bp'?'Binary BP':joint?'Q-BPGD':'BPGD';rule='SP';precision='float64';add('d',0);if(arm==='qbp'||arm==='bp')add('T',100);else{const match=arm.match(/_t(\d+)/);add('Tᵣ',match?Number(match[1]):undefined);const rounds=arm.match(/_r(\d+)/);add('R',rounds?Number(rounds[1]):'n');if(arm.includes('random'))parameters.push({symbol:'order',value:'random',text:'order = random'});}if(!joint)add('cᵥ',25);else add('c',null);add('p₀','p');
  }
+ if(effective.budget_status==='curve_inferred_not_source_specified')add('budget','inferred');
  if(effective.alpha_schedule==='1-2**(-iteration)')add('αₜ','1 − 2⁻ᵗ');
  if(dataset==='pfister-presentation-local-pilots'&&arm.startsWith('bp4_'))retired='Retired experimental Q8 clipping of Q-BP state';
  if(dataset==='pfister-presentation-full-v2-curves'&&arm==='bp4_vanilla_ms_q8')retired='Retired experimental Q8 clipping of Q-BP state';

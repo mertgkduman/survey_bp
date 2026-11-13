@@ -217,10 +217,10 @@ def test_rebuilt_catalog_uses_same_active_view_as_browser_and_preserves_retained
     from bp_registry.research.catalog import build_catalog
     c = build_catalog(ROOT)
     view = active_view(c)
-    legacy = [s for s in view['curves'] if s['dataset_id'] not in {'yao-bpgd-completion', 'mackay-unicycle-bp', 'mackay-unicycle-paper-rates', 'mackay-damping-confirmation', 'roffe-2020-figure3-canonical-bp'}]
+    legacy = [s for s in view['curves'] if s['dataset_id'] not in {'yao-bpgd-completion', 'mackay-unicycle-bp', 'mackay-unicycle-paper-rates', 'mackay-damping-confirmation', 'roffe-2020-figure3-canonical-bp', 'mackay-inferred-t100-baseline', 'mackay-damping-t100-confirmation'}]
     assert len(legacy) == 53
     assert sum(len(s['points']) for s in legacy) == 262
-    added = {s['code_id'] for s in view['curves'] if s['dataset_id'] in {'mackay-unicycle-bp', 'mackay-unicycle-paper-rates', 'mackay-damping-confirmation', 'roffe-2020-figure3-canonical-bp'}}
+    added = {s['code_id'] for s in view['curves'] if s['dataset_id'] in {'mackay-unicycle-bp', 'mackay-unicycle-paper-rates', 'mackay-damping-confirmation', 'roffe-2020-figure3-canonical-bp', 'mackay-inferred-t100-baseline', 'mackay-damping-t100-confirmation'}}
     assert {code['code_id'] for code in view['codes']} == {'a5', 'b2', 'b1', 'c2', 'double-gross', 'bb72'} | added
     assert view['circuits'] == []
     from bp_registry.research.inputs import input_registry
@@ -288,3 +288,18 @@ def test_variable_min_sum_schedule_cannot_supply_points_to_a_constant_scale_curv
     ))
     assert len(curves) == 2
     assert all(len(curve['points']) == 1 for curve in curves)
+
+
+def test_smaller_budget_evidence_cannot_qualify_the_retained_large_budget_curve():
+    # The short cap is a synthetic fixture, not an asserted paper setting.
+    long = row('retained-long', seed=1, evidence='long.json')
+    short = row('new-short', seed=2, evidence='short.json')
+    short['points'][0]['x'] = .08
+    decoders = [
+        {'decoder_id': 'retained-long', 'configuration': {'effective_configuration': {'family': 'binary_css', 'check_rule': 'sum_product', 'max_iterations': 88200}}},
+        {'decoder_id': 'new-short', 'configuration': {'effective_configuration': {'family': 'binary_css', 'check_rule': 'sum_product', 'max_iterations': 17}}},
+    ]
+    curves = project(catalog([long, short], decoders))
+    assert len(curves) == 2
+    assert all(len({p['x'] for p in curve['points']}) == 1 for curve in curves)
+    assert {curve['points'][0]['x'] for curve in curves} == {.06, .08}

@@ -1,0 +1,321 @@
+{
+  "advance": "61769654",
+  "array": "61769653",
+  "plan_sha256": "f27b7f62ca0c49f630559f1197a273245eeaf96e396b71a24768383d472a4354",
+  "points": [
+    {
+      "failures": 15,
+      "id": "unicycle274-binary_sp_d000-p01000",
+      "retained_ledger_sha256": "e7ffebdc763c8a4b6f17ebffed10ab986f5ce75968fa3a83d4c5f967b76969e9",
+      "shots": 1024,
+      "terminal_summary": true
+    },
+    {
+      "failures": 9,
+      "id": "unicycle274-binary_sp_d000-p01300",
+      "retained_ledger_sha256": "cce8fa78a8ff33b167aba122948377392aea4405df4352a6d554040074ee5e32",
+      "shots": 1024,
+      "terminal_summary": true
+    },
+    {
+      "failures": 18,
+      "id": "unicycle274-binary_sp_d000-p02000",
+      "retained_ledger_sha256": "579e405f5977a95a9a15c74d68cf9f6a3bf069e7c8b22785534c116ac6c8f8db",
+      "shots": 1024,
+      "terminal_summary": true
+    },
+    {
+      "failures": 72,
+      "id": "unicycle274-binary_sp_d000-p03000",
+      "retained_ledger_sha256": "8b76f4c465cb6a307bca15d886fdd2817d77bf993852b84aad196bb149d686a1",
+      "shots": 1024,
+      "terminal_summary": true
+    },
+    {
+      "failures": 96,
+      "id": "unicycle274-binary_sp_d000-p04000",
+      "retained_ledger_sha256": "6c5a2411f773cf524ad1a1c17a4acbd8c840cd1e382457b6a20283cbd41e2c1f",
+      "shots": 448,
+      "terminal_summary": false
+    },
+    {
+      "failures": 15,
+      "id": "unicycle274-binary_sp_d010-p01000",
+      "retained_ledger_sha256": "c0435a3e350016cb6042188ed9a3ebd9cd1701c3be572cad971777bddae8458c",
+      "shots": 1024,
+      "terminal_summary": true
+    },
+    {
+      "failures": 8,
+      "id": "unicycle274-binary_sp_d010-p01300",
+      "retained_ledger_sha256": "67259a8a1cc73c4a52343d93054866f7a50b57b9691286dc35eb73940366b94c",
+      "shots": 1024,
+      "terminal_summary": true
+    },
+    {
+      "failures": 12,
+      "id": "unicycle274-binary_sp_d010-p02000",
+      "retained_ledger_sha256": "06e36feb68874f5544c662c87f3c25fe5b140f6a0da0468d621fc2b117f146be",
+      "shots": 1024,
+      "terminal_summary": true
+    },
+    {
+      "failures": 42,
+      "id": "unicycle274-binary_sp_d010-p03000",
+      "retained_ledger_sha256": "df234b5ec8ab8262b8a53e9de21a50e4e51e3916e504deb9b7b07874328bd9c7",
+      "shots": 1024,
+      "terminal_summary": true
+    },
+    {
+      "failures": 66,
+      "id": "unicycle274-binary_sp_d010-p04000",
+      "retained_ledger_sha256": "4750c5ce889e4d0c159b6cfb9418ed14c28d3e40255f41ee62975506a302f9cd",
+      "shots": 384,
+      "terminal_summary": false
+    },
+    {
+      "failures": 15,
+      "id": "unicycle274-binary_sp_d030-p01000",
+      "retained_ledger_sha256": "f95688e3e3cb6bf323212a65c2e6efbea4f9cd59aaef90e550214e1e9c6152da",
+      "shots": 1024,
+      "terminal_summary": true
+    },
+    {
+      "failures": 8,
+      "id": "unicycle274-binary_sp_d030-p01300",
+      "retained_ledger_sha256": "4f49f0e9fa731bea1d78d6c374402dc821534ada04070a69651e5c87f76975fc",
+      "shots": 1024,
+      "terminal_summary": true
+    },
+    {
+      "failures": 8,
+      "id": "unicycle274-binary_sp_d030-p02000",
+      "retained_ledger_sha256": "88af804239005625c5d76fe8c1a82f75dcb23ca690e315e9a09c7b96e51167db",
+      "shots": 1024,
+      "terminal_summary": true
+    },
+    {
+      "failures": 38,
+      "id": "unicycle274-binary_sp_d030-p03000",
+      "retained_ledger_sha256": "cf394755ef63affffc2f1edfb8eda7f9337036c8b6c9c06ce962076d0ef044cd",
+      "shots": 1024,
+      "terminal_summary": true
+    },
+    {
+      "failures": 62,
+      "id": "unicycle274-binary_sp_d030-p04000",
+      "retained_ledger_sha256": "6ef620110711a4c58ea542c20eac95699fb554b1550f779c6c18069c70f63458",
+      "shots": 384,
+      "terminal_summary": false
+    },
+    {
+      "failures": 11,
+      "id": "unicycle274-binary_sp_d050-p01000",
+      "retained_ledger_sha256": "454146e95a268579fda195f2b42dfa16f5942396fef984aff79090c41bb47d6c",
+      "shots": 1024,
+      "terminal_summary": true
+    },
+    {
+      "failures": 6,
+      "id": "unicycle274-binary_sp_d050-p01300",
+      "retained_ledger_sha256": "02a119f218dd5df82192520e5359c6f2b0538047f904370a10d569057daeb264",
+      "shots": 1024,
+      "terminal_summary": true
+    },
+    {
+      "failures": 2,
+      "id": "unicycle274-binary_sp_d050-p02000",
+      "retained_ledger_sha256": "6c3ae9fbede7bc099990f0c93181132b7ac50974840fb622a7534160d9048bb5",
+      "shots": 1024,
+      "terminal_summary": true
+    },
+    {
+      "failures": 37,
+      "id": "unicycle274-binary_sp_d050-p03000",
+      "retained_ledger_sha256": "c7fa15dc79c1202d589ba6cfeade1b8f6f325a34143cd46ce80fe1e3ff77a341",
+      "shots": 1024,
+      "terminal_summary": true
+    },
+    {
+      "failures": 61,
+      "id": "unicycle274-binary_sp_d050-p04000",
+      "retained_ledger_sha256": "b27ef9680b75699c2e2a1cfcfd76e267b555196effa0cabfb407e25bc837d315",
+      "shots": 384,
+      "terminal_summary": false
+    },
+    {
+      "failures": 0,
+      "id": "unicycle274-binary_sp_d070-p01000",
+      "retained_ledger_sha256": "eac7ae9d8a910ca7663c608e1f0d19358cd2d27913010eafb4b271f8e934f9cb",
+      "shots": 1024,
+      "terminal_summary": true
+    },
+    {
+      "failures": 0,
+      "id": "unicycle274-binary_sp_d070-p01300",
+      "retained_ledger_sha256": "ebc96da69942d2e867766b93614fcf2cca9c15017d7d6198ba47a20b1f9b34f0",
+      "shots": 1024,
+      "terminal_summary": true
+    },
+    {
+      "failures": 1,
+      "id": "unicycle274-binary_sp_d070-p02000",
+      "retained_ledger_sha256": "f82784d68cd79d91322230ec4e47c824f8d23eeb6932d792b18e192b851fcb7d",
+      "shots": 1024,
+      "terminal_summary": true
+    },
+    {
+      "failures": 37,
+      "id": "unicycle274-binary_sp_d070-p03000",
+      "retained_ledger_sha256": "bf6f32682f4304c10eb0d02829cb6c8f7b6780275242e0f6eb6d0b888b3ab6cd",
+      "shots": 1024,
+      "terminal_summary": true
+    },
+    {
+      "failures": 49,
+      "id": "unicycle274-binary_sp_d070-p04000",
+      "retained_ledger_sha256": "7256aa4ff95241da89779581b0a1fec7106993e532604ede8f5d44cc45920824",
+      "shots": 320,
+      "terminal_summary": false
+    },
+    {
+      "failures": 0,
+      "id": "unicycle274-binary_sp_d085-p01000",
+      "retained_ledger_sha256": "eddc535ce3d6acee3f481bb7896e3d5055f05c7c39aaeba479957ce777e425e1",
+      "shots": 1024,
+      "terminal_summary": true
+    },
+    {
+      "failures": 0,
+      "id": "unicycle274-binary_sp_d085-p01300",
+      "retained_ledger_sha256": "1002916753c3d4a079740108c89541dbad1861e76d49f9fe75d81a7fc6161a1e",
+      "shots": 1024,
+      "terminal_summary": true
+    },
+    {
+      "failures": 1,
+      "id": "unicycle274-binary_sp_d085-p02000",
+      "retained_ledger_sha256": "63c883c1c607ff8c6075dcb1bf0cbd9446596f794b716a66c609c447bc6d003b",
+      "shots": 1024,
+      "terminal_summary": true
+    },
+    {
+      "failures": 35,
+      "id": "unicycle274-binary_sp_d085-p03000",
+      "retained_ledger_sha256": "613e384c66f26e4f6cb1457a49cc940e20473b0206c3db0221cf86d8b0f51f9a",
+      "shots": 1024,
+      "terminal_summary": true
+    },
+    {
+      "failures": 50,
+      "id": "unicycle274-binary_sp_d085-p04000",
+      "retained_ledger_sha256": "807052d7497a193851e550c0b47eba58c9f7efa670df2ad7d52afe9abae72d1b",
+      "shots": 320,
+      "terminal_summary": false
+    },
+    {
+      "failures": 0,
+      "id": "unicycle274-binary_sp_d095-p01000",
+      "retained_ledger_sha256": "6d0b3aeaae831df5fddee0ed55cb555af79f02790401af01f737b01e5546104b",
+      "shots": 1024,
+      "terminal_summary": true
+    },
+    {
+      "failures": 0,
+      "id": "unicycle274-binary_sp_d095-p01300",
+      "retained_ledger_sha256": "a0d030f09c708bf258f9a97b952116939fbb670497d93a7648e18b21389272a5",
+      "shots": 1024,
+      "terminal_summary": true
+    },
+    {
+      "failures": 1,
+      "id": "unicycle274-binary_sp_d095-p02000",
+      "retained_ledger_sha256": "4033704f5e6935d42669240aa22f414a913c81628202e1fd69be3ffa3ab2a74b",
+      "shots": 1024,
+      "terminal_summary": true
+    },
+    {
+      "failures": 35,
+      "id": "unicycle274-binary_sp_d095-p03000",
+      "retained_ledger_sha256": "b0ef518f4a25054e616b432d527c922480da0cc267aa35341dcf554c8d45a074",
+      "shots": 1024,
+      "terminal_summary": true
+    },
+    {
+      "failures": 32,
+      "id": "unicycle274-binary_sp_d095-p04000",
+      "retained_ledger_sha256": "582a2b83d5b763b8adafa35cfef0609b809835e13758768a399ec29cf1c9f359",
+      "shots": 192,
+      "terminal_summary": false
+    },
+    {
+      "failures": 6,
+      "id": "unicycle274-qbp_d000-p01500",
+      "retained_ledger_sha256": "0cf186894be8296be4c9be31377592e7e0fd219404aa8d2caf8968fe57d0da64",
+      "shots": 640,
+      "terminal_summary": false
+    },
+    {
+      "failures": 4,
+      "id": "unicycle274-qbp_d000-p01950",
+      "retained_ledger_sha256": "349623762970110342664716fa152ac2faed6abab74b50c29354a76aeb224e43",
+      "shots": 320,
+      "terminal_summary": false
+    },
+    {
+      "failures": 6,
+      "id": "unicycle274-qbp_d000-p03000",
+      "retained_ledger_sha256": "176e41aab05a3935104ef69262fdafb00f63bd88811dab0b99d8b068ddb079dc",
+      "shots": 384,
+      "terminal_summary": false
+    },
+    {
+      "failures": 0,
+      "id": "unicycle274-qbp_d000-p04500",
+      "retained_ledger_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "shots": 0,
+      "terminal_summary": false
+    },
+    {
+      "failures": 4,
+      "id": "unicycle274-qbp_d000-p06000",
+      "retained_ledger_sha256": "87392d340813f47bfe5d604d145ddee58f3aa3333bd7a9e09b8eeb6ff04599dc",
+      "shots": 64,
+      "terminal_summary": false
+    },
+    {
+      "failures": 4,
+      "id": "unicycle274-qbp_d010-p01500",
+      "retained_ledger_sha256": "fd8b746bbd900f1eb738b3222a6a48898e0031b003577a004b668c30417fb49e",
+      "shots": 448,
+      "terminal_summary": false
+    },
+    {
+      "failures": 4,
+      "id": "unicycle274-qbp_d010-p01950",
+      "retained_ledger_sha256": "3dad2cfd037851569245ccbfd8018392f183ffb7571f1d76742cf6f6d9b19a7c",
+      "shots": 320,
+      "terminal_summary": false
+    },
+    {
+      "failures": 3,
+      "id": "unicycle274-qbp_d010-p03000",
+      "retained_ledger_sha256": "d68e0a9b45c19b4d5d25daecb519d2b153b6250ca723550bbfd9ddb79099ce37",
+      "shots": 384,
+      "terminal_summary": false
+    },
+    {
+      "failures": 3,
+      "id": "unicycle274-qbp_d010-p04500",
+      "retained_ledger_sha256": "4dda3b3bb024a24d22934b2fee1a01a56f7143b6afd76be0c7cb39a566cdb3c8",
+      "shots": 256,
+      "terminal_summary": false
+    }
+  ],
+  "preservation": "all frozen files and terminal/partial raw ledgers retained; no new decoding performed",
+  "public_training_points": 0,
+  "reason": "User requires paper-specific budget; 88200 must not be used for damping.",
+  "schema": "canceled-bp-damping-campaign-v1",
+  "status": "canceled_by_user_budget_correction",
+  "time_utc": "2026-11-13T17:41:26+00:00"
+}

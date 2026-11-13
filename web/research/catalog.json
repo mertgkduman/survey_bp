@@ -27758,6 +27758,14 @@
     {
       "path": "data/reproductions/roffe-2005-07016-bp/catalog.json",
       "sha256": "7bf8c353d6259d95496be1d823e426024358157ec8750ec74c446bf3b1684c79"
+    },
+    {
+      "path": "data/reproductions/mackay-0304161-inferred-budget/catalog.json",
+      "sha256": "7bf8c353d6259d95496be1d823e426024358157ec8750ec74c446bf3b1684c79"
+    },
+    {
+      "path": "data/reproductions/mackay-0304161-damping-t100/confirmation/catalog.json",
+      "sha256": "7bf8c353d6259d95496be1d823e426024358157ec8750ec74c446bf3b1684c79"
     }
   ],
   "limitations": [
