@@ -1,0 +1,57 @@
+{
+  "schema": "canonical-bp-study-comparison-v1",
+  "scope": "Pointwise descriptive assessment; no simultaneous source-reproduction or decoder-superiority claim.",
+  "source_points": [
+    {
+      "classical_rate": 5.037797333947273e-06,
+      "counts_coincide": true,
+      "id": "unicycle274-unicycle_sp-p01000",
+      "interval_scope": "quantum stopping interval; no classical interval borrowed when counts differ",
+      "p": 0.01,
+      "quantum_rate": 5.037797333947273e-06,
+      "source_approx": 6.6987415854056715e-06,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "classical_rate": 4.974122129620649e-05,
+      "counts_coincide": true,
+      "id": "unicycle274-unicycle_sp-p01300",
+      "interval_scope": "quantum stopping interval; no classical interval borrowed when counts differ",
+      "p": 0.013,
+      "quantum_rate": 4.974122129620649e-05,
+      "source_approx": 7.074690124032609e-05,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "classical_rate": 0.0020710365537951743,
+      "counts_coincide": true,
+      "id": "unicycle274-unicycle_sp-p02000",
+      "interval_scope": "quantum stopping interval; no classical interval borrowed when counts differ",
+      "p": 0.02,
+      "quantum_rate": 0.0020710365537951743,
+      "source_approx": 0.002230085570009857,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "classical_rate": 0.042826552462526764,
+      "counts_coincide": true,
+      "id": "unicycle274-unicycle_sp-p03000",
+      "interval_scope": "quantum stopping interval; no classical interval borrowed when counts differ",
+      "p": 0.03,
+      "quantum_rate": 0.042826552462526764,
+      "source_approx": 0.048341930691786106,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "classical_rate": 0.19230769230769232,
+      "counts_coincide": true,
+      "id": "unicycle274-unicycle_sp-p04000",
+      "interval_scope": "quantum stopping interval; no classical interval borrowed when counts differ",
+      "p": 0.04,
+      "quantum_rate": 0.19230769230769232,
+      "source_approx": 0.18078419336055465,
+      "source_inside_pointwise_interval": true
+    }
+  ],
+  "verified_sha256": "f19cb8cd5c9448fa41d8717652db569e689eccba61d0556de69259bf75e67c19"
+}

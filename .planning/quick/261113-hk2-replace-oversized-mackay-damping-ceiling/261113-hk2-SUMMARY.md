@@ -54,9 +54,26 @@ Implemented and froze independent replacement studies in `1b040da`:
 
 Slurm baseline arrays **61772607** (one CPU), **61772608** (four CPUs) and
 **61772609** (16 CPUs) were accepted, with final audit/advance **61772610**.
-Latest observed progress: 29 terminal summaries; the length-274 p=.010 source
-point continues. These terminal summaries are not yet a complete final audit.
-T100 tuning is frozen and awaits that successful baseline audit.
+All **30/30 baseline points** finished and passed the complete ledger audit:
+**4,482,325 shots / 600 quantum block failures**. All five length-274 source
+ordinates fall inside the fresh, pointwise exact 95% intervals; this is a
+descriptive check, not simultaneous reproduction or historical-cap proof.
+
+| X rate | Fresh T100 source rate | Pointwise 95% interval | Paper approximate |
+| --- | ---: | --- | ---: |
+| .010 | 5.038e-6 | [3.077e-6, 7.474e-6] | 6.699e-6 |
+| .013 | 4.974e-5 | [3.038e-5, 7.379e-5] | 7.075e-5 |
+| .020 | .002071 | [.001265, .003071] | .002230 |
+| .030 | .042827 | [.026353, .062941] | .048342 |
+| .040 | .192308 | [.121604, .272981] | .180784 |
+
+T100 tuning array **61773215** and audit **61773216** also completed: **140/140
+points, 143,360 fixed training shots / 5,272 failures**, with every actual cap
+100. Frozen provisional choices are binary BP d=.85 and Q-BP d=.95 for length
+274, and binary BP d=.7 and Q-BP d=.95 for length 74. No speed-based tie was
+certified. Independent confirmation has **40 points**, fresh seed 2026111323
+and T=100 throughout; array **61773602** and dependent audit/advance **61773603**
+are accepted and running/pending. Training cohorts are not public result curves.
 
 Baseline plan: 40 pins, SHA-256
 `a60f1906913f5ed2a58281463f7a90436a13ad60d31ce4e1582131428be73b3d`.
@@ -74,14 +91,17 @@ Chromium workflow groups passed with no page errors. Labels say budget=inferred;
 old and new curves coexist, exports agree and stale choices clear. Scheduler
 preflight accepted all new worker groups and the new T100 tuning array.
 
-Initial active view before/after setup: **70 curves / 369 points / 8 codes /
-0 circuits**. The completed baseline should add six separate five-rate curves
-(**76 / 399 / 8 / 0**), subject to normal evidence/multi-rate qualification.
+Initial active view: **70 curves / 369 points / 8 codes / 0 circuits**.
+The audited baseline adds six separate five-rate curves, for **76 / 399 / 8 / 0**.
+A fresh seven-group Chromium run on the measured catalog verifies every public
+selector/table/export, empty-result state, stale choices and custom matrix/Stim
+workflows, with no page errors. All 147 preexisting raw-catalog series, their
+points, and all existing codes/circuits/decoder records compare structurally
+identical; none were removed or modified.
 Existing catalogs/receipts were preserved. Future checked results use separate
 normalized extensions and the shared projection. Concurrent local catalog edits
 are preserved with a full refresh snapshot saved under results/catalog.json.
 
-Remaining work: automatic complete-ledger audits and independent baseline,
-tuning, confirmation and Roffe measurements. Neither retrospective alignment nor
+Remaining work: independent confirmation measurements and their automatic complete-ledger audit, then the unchanged Roffe T=n measurements and assessment. Neither retrospective alignment nor
 this implementation verification establishes the historical cap or completes
 source reproduction. See RESEARCH and the calibration README for the derivation.

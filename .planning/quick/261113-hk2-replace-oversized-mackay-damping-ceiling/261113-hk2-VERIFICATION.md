@@ -24,18 +24,35 @@ campaign_status: running
   no page errors or browser simulations. Original and new budgets coexist,
   labels state inferred, source branch/total limits are explicit, CSV/settings
   agree, and stale choices clear when short evidence loses a second rate.
-- Current active view stays 70 curves / 369 points / 8 codes / 0 circuits. Both
+- Initial active view was 70 curves / 369 points / 8 codes / 0 circuits. Both
   original completed catalog extensions and the old 30-point receipt are
   unchanged. New baseline, tuning and Roffe frozen plans load; old plans also
   retain their hashes. Canonical and archived v1 paths have no diffs.
 - Slurm --test-only accepts all three baseline worker groups and the T100 tuning
   array. Those scheduler checks are not dispatched measurements.
 
-Remaining: fresh baseline and T100 tuning/holdout results, then Roffe measurements
-and scientific assessment. Do not claim those results from setup checks.
+Fresh baseline audit: all 30 points, 4,482,325 shots / 600 failures; final
+collector 61772610 completed 0:0. The five source approximate ordinates all lie
+inside their fresh pointwise 95% intervals. Normalized catalog, verified receipt
+and descriptive comparison are published separately from the old long curves.
+No simultaneous statistical agreement or recovered author cap is claimed.
 
-Dispatch accepted: baseline arrays 61772607–61772609 and dependent audit/advance
-61772610. The latest checkpoint check saw 29 terminal summaries, with p=.010
-length-274 unicycle still active; final audit remains pending. New tuning is
-frozen at T=100 and starts only after that audit. No old large-budget damping
-has been restarted.
+Measured active catalog: **76 curves / 399 points / 8 codes / 0 circuits**.
+All 44 catalog/extension/projection regression tests pass against this fresh
+measured catalog (overlapping earlier suites).
+Seven additional Chromium workflow groups pass on the actual measured catalog,
+including per-code settings/CSV, empty state, custom matrix/Stim, stale input and
+saved-choice cleanup, imported eligibility and archived v1 loading. Browser
+receipt: `.git/short-budget-measured-browser/verification.json`. Structured
+comparison against the prior committed static catalog confirms all existing
+147 series/points and code/circuit/decoder/dataset records unchanged.
+
+Tuning 61773215 and audit 61773216 completed 0:0: 140 points, 143,360 paired fixed
+shots / 5,272 failures. Every cap is 100. Provisional choices and receipt are
+frozen; all four groups select their empirical LER minimum, without a certified
+speed tie. Forty independent confirmation jobs are frozen with cap 100 and seed
+2026111323; array 61773602 / audit 61773603 are accepted. Training is not pooled
+into the published baseline or confirmation.
+
+Remaining: independent confirmation complete-ledger audit and assessment, then
+Roffe T=n measurements. The old 88,200 damping chain remains canceled.

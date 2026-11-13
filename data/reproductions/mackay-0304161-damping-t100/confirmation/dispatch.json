@@ -1,0 +1,44 @@
+{
+  "advance": {
+    "argv": [
+      "sbatch",
+      "--parsable",
+      "--partition=common,scavenger",
+      "--account=pfisterlab",
+      "--nodes=1",
+      "--ntasks=1",
+      "--requeue",
+      "--time=4-00:00:00",
+      "--chdir=/hpc/group/pfisterlab/mg551/storage/survey_bp",
+      "--export=ALL,PYTHONPATH=/hpc/group/pfisterlab/mg551/storage/survey_bp/src,OMP_NUM_THREADS=1,OPENBLAS_NUM_THREADS=1,MKL_NUM_THREADS=1",
+      "--job-name=bp-damp-advance",
+      "--cpus-per-task=1",
+      "--mem=4G",
+      "--dependency=afterok:61773602",
+      "--output=/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/mackay-0304161-damping-t100/confirmation/results/advance-%j.log",
+      "--wrap=/hpc/group/pfisterlab/mg551/storage/survey_bp/.venv/bin/python /hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/mackay-0304161-damping-t100/run.py --stage confirmation --advance"
+    ],
+    "id": "61773603"
+  },
+  "array": {
+    "argv": [
+      "sbatch",
+      "--parsable",
+      "--partition=common,scavenger",
+      "--account=pfisterlab",
+      "--nodes=1",
+      "--ntasks=1",
+      "--requeue",
+      "--time=4-00:00:00",
+      "--chdir=/hpc/group/pfisterlab/mg551/storage/survey_bp",
+      "--export=ALL,PYTHONPATH=/hpc/group/pfisterlab/mg551/storage/survey_bp/src,OMP_NUM_THREADS=1,OPENBLAS_NUM_THREADS=1,MKL_NUM_THREADS=1",
+      "--job-name=bp-damp-confirmation",
+      "--cpus-per-task=4",
+      "--mem=4G",
+      "--array=0-39%8",
+      "--output=/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/mackay-0304161-damping-t100/confirmation/results/slurm-%A_%a.log",
+      "--wrap=exec /hpc/group/pfisterlab/mg551/storage/survey_bp/.venv/bin/python /hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/mackay-0304161-damping-t100/run.py --stage confirmation --index \"$SLURM_ARRAY_TASK_ID\""
+    ],
+    "id": "61773602"
+  }
+}

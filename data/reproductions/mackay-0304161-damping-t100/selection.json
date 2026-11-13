@@ -1,0 +1,256 @@
+{
+  "plan_sha256": "65ba3a1ab1c496efddf948c8cedaa339514242f3a911576808196b3b4845fb42",
+  "schema": "bp-damping-selection-v1",
+  "selected": [
+    {
+      "base_arm": "binary_sp",
+      "candidates": [
+        {
+          "damping": 0.0,
+          "eligible": false,
+          "mean_iterations": 7.084375,
+          "mean_ler": 0.0740234375,
+          "paired_regret_upper": 0.05471302804467841
+        },
+        {
+          "damping": 0.1,
+          "eligible": false,
+          "mean_iterations": 4.815625,
+          "mean_ler": 0.058203125,
+          "paired_regret_upper": 0.03344946109541682
+        },
+        {
+          "damping": 0.3,
+          "eligible": false,
+          "mean_iterations": 4.1580078125,
+          "mean_ler": 0.05546875,
+          "paired_regret_upper": 0.02808807352251768
+        },
+        {
+          "damping": 0.5,
+          "eligible": false,
+          "mean_iterations": 3.7140625,
+          "mean_ler": 0.0505859375,
+          "paired_regret_upper": 0.01918347810576938
+        },
+        {
+          "damping": 0.7,
+          "eligible": false,
+          "mean_iterations": 3.6326171875,
+          "mean_ler": 0.0470703125,
+          "paired_regret_upper": 0.011982096313292289
+        },
+        {
+          "damping": 0.85,
+          "eligible": true,
+          "mean_iterations": 4.1958984375,
+          "mean_ler": 0.0466796875,
+          "paired_regret_upper": 0.0
+        },
+        {
+          "damping": 0.95,
+          "eligible": false,
+          "mean_iterations": 6.2466796875,
+          "mean_ler": 0.0466796875,
+          "paired_regret_upper": 0.01146888616040723
+        }
+      ],
+      "code": "unicycle274",
+      "damping": 0.85,
+      "empirical_best_damping": 0.85,
+      "mean_iterations": 4.1958984375,
+      "mean_ler": 0.0466796875,
+      "paired_regret_upper": 0.0,
+      "similarity_margin": 0.00466796875,
+      "speed_tie_certified": false
+    },
+    {
+      "base_arm": "qbp",
+      "candidates": [
+        {
+          "damping": 0.0,
+          "eligible": false,
+          "mean_iterations": 6.8625,
+          "mean_ler": 0.055859375,
+          "paired_regret_upper": 0.06569812087865304
+        },
+        {
+          "damping": 0.1,
+          "eligible": false,
+          "mean_iterations": 4.0390625,
+          "mean_ler": 0.03515625,
+          "paired_regret_upper": 0.039631027140444204
+        },
+        {
+          "damping": 0.3,
+          "eligible": false,
+          "mean_iterations": 3.1703125,
+          "mean_ler": 0.034375,
+          "paired_regret_upper": 0.03666951112099441
+        },
+        {
+          "damping": 0.5,
+          "eligible": false,
+          "mean_iterations": 2.8322265625,
+          "mean_ler": 0.03046875,
+          "paired_regret_upper": 0.029698786090376704
+        },
+        {
+          "damping": 0.7,
+          "eligible": false,
+          "mean_iterations": 2.7435546875,
+          "mean_ler": 0.02421875,
+          "paired_regret_upper": 0.019172746878344728
+        },
+        {
+          "damping": 0.85,
+          "eligible": false,
+          "mean_iterations": 3.107421875,
+          "mean_ler": 0.02109375,
+          "paired_regret_upper": 0.012757051169633197
+        },
+        {
+          "damping": 0.95,
+          "eligible": true,
+          "mean_iterations": 5.1654296875,
+          "mean_ler": 0.020703125,
+          "paired_regret_upper": 0.0
+        }
+      ],
+      "code": "unicycle274",
+      "damping": 0.95,
+      "empirical_best_damping": 0.95,
+      "mean_iterations": 5.1654296875,
+      "mean_ler": 0.020703125,
+      "paired_regret_upper": 0.0,
+      "similarity_margin": 0.0020703125,
+      "speed_tie_certified": false
+    },
+    {
+      "base_arm": "binary_sp",
+      "candidates": [
+        {
+          "damping": 0.0,
+          "eligible": false,
+          "mean_iterations": 4.90859375,
+          "mean_ler": 0.0509765625,
+          "paired_regret_upper": 0.04698204426725391
+        },
+        {
+          "damping": 0.1,
+          "eligible": false,
+          "mean_iterations": 4.53671875,
+          "mean_ler": 0.0474609375,
+          "paired_regret_upper": 0.04309826230057879
+        },
+        {
+          "damping": 0.3,
+          "eligible": false,
+          "mean_iterations": 3.2001953125,
+          "mean_ler": 0.03984375,
+          "paired_regret_upper": 0.03098615835380994
+        },
+        {
+          "damping": 0.5,
+          "eligible": false,
+          "mean_iterations": 2.203515625,
+          "mean_ler": 0.0294921875,
+          "paired_regret_upper": 0.013187125260770458
+        },
+        {
+          "damping": 0.7,
+          "eligible": true,
+          "mean_iterations": 2.1068359375,
+          "mean_ler": 0.028125,
+          "paired_regret_upper": 0.0
+        },
+        {
+          "damping": 0.85,
+          "eligible": false,
+          "mean_iterations": 2.204296875,
+          "mean_ler": 0.028515625,
+          "paired_regret_upper": 0.01107340012231092
+        },
+        {
+          "damping": 0.95,
+          "eligible": false,
+          "mean_iterations": 2.409765625,
+          "mean_ler": 0.028515625,
+          "paired_regret_upper": 0.01107340012231092
+        }
+      ],
+      "code": "unicycle74",
+      "damping": 0.7,
+      "empirical_best_damping": 0.7,
+      "mean_iterations": 2.1068359375,
+      "mean_ler": 0.028125,
+      "paired_regret_upper": 0.0,
+      "similarity_margin": 0.0028125000000000003,
+      "speed_tie_certified": false
+    },
+    {
+      "base_arm": "qbp",
+      "candidates": [
+        {
+          "damping": 0.0,
+          "eligible": false,
+          "mean_iterations": 4.9509765625,
+          "mean_ler": 0.0484375,
+          "paired_regret_upper": 0.06675817304535209
+        },
+        {
+          "damping": 0.1,
+          "eligible": false,
+          "mean_iterations": 4.5208984375,
+          "mean_ler": 0.0451171875,
+          "paired_regret_upper": 0.062306805776742344
+        },
+        {
+          "damping": 0.3,
+          "eligible": false,
+          "mean_iterations": 2.9259765625,
+          "mean_ler": 0.0271484375,
+          "paired_regret_upper": 0.03823911761857798
+        },
+        {
+          "damping": 0.5,
+          "eligible": false,
+          "mean_iterations": 2.262890625,
+          "mean_ler": 0.01953125,
+          "paired_regret_upper": 0.026897948047791897
+        },
+        {
+          "damping": 0.7,
+          "eligible": false,
+          "mean_iterations": 1.6796875,
+          "mean_ler": 0.01328125,
+          "paired_regret_upper": 0.01598834488756004
+        },
+        {
+          "damping": 0.85,
+          "eligible": false,
+          "mean_iterations": 1.5978515625,
+          "mean_ler": 0.0115234375,
+          "paired_regret_upper": 0.01107340012231092
+        },
+        {
+          "damping": 0.95,
+          "eligible": true,
+          "mean_iterations": 1.948046875,
+          "mean_ler": 0.0111328125,
+          "paired_regret_upper": 0.0
+        }
+      ],
+      "code": "unicycle74",
+      "damping": 0.95,
+      "empirical_best_damping": 0.95,
+      "mean_iterations": 1.948046875,
+      "mean_ler": 0.0111328125,
+      "paired_regret_upper": 0.0,
+      "similarity_margin": 0.0011132812500000001,
+      "speed_tie_certified": false
+    }
+  ],
+  "status": "provisional selection; confirmation required; no equivalence inferred from overlapping intervals",
+  "tuning_receipt_sha256": "84046b62a6c37a7d7f8a4bbf7853fa6b009311b21a1f44ae962c2272cf0e20ea"
+}

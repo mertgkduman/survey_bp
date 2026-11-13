@@ -5,10 +5,10 @@ current_phase: 11
 current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
-stopped_at: Canceled oversized damping; inferred T100 baseline running, followed by T100 tuning/confirmation and Roffe T=n
-last_updated: "2026-11-13T18:31:52+00:00"
+stopped_at: Inferred T100 baseline published and tuning audited; independent confirmation running, then Roffe T=n
+last_updated: "2026-11-13T18:35:59+00:00"
 last_activity: 2026-11-13
-last_activity_desc: User correction cancels all 88200 damping. Retrospective alignment favors inferred 100 per hypothesis; new independent BP/Q-BP T100 baseline and tuning chain frozen, arrays 61772607–61772609 running with audit 61772610. Old curves preserved.
+last_activity_desc: Inferred T100 baseline audited/published (30 points, 4,482,325 shots); all five source points align pointwise. T100 tuning audited (140 points); independent confirmation array61773602 running, then unchanged Roffe T=n. Old curves and canceled chain preserved.
 state_head: fdbb98b
 progress:
   total_phases: 14
@@ -34,10 +34,10 @@ Total Phases: 14
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
-Last activity: 2026-11-13 — quick 261113-hk2 inferred short-budget correction dispatched; old damping canceled
-Last Activity Description: The user rejected 88200 for MacKay reproduction/tuning and authorized inferring a cap from alignment. Old damping array 61769653 and advance 61769654 are canceled, with partial/complete evidence and displayed curves preserved. Eleven-cutoff retrospective analysis favors 100 per hypothesis; author cap remains unverified. Implementation 1b040da freezes fresh ordinary BP/Q-BP T=100 and source unicycle 100 per hypothesis (200 total), 30 baseline points, then T100 damping/independent confirmation, then unchanged Roffe T=n. Arrays 61772607–61772609 and audit 61772610 are accepted; latest observed 29 terminal baseline summaries and p=.010 still running. Passed 156 regression checks, 43 final focused checks and 11 browser groups. Scientific gates and kernels are unchanged.
+Last activity: 2026-11-13 — quick 261113-hk2 T100 baseline published, tuning audited, independent confirmation dispatched
+Last Activity Description: The user authorized inferring the unspecified MacKay cap from curve alignment after rejecting 88,200. Old damping array 61769653 and advance 61769654 are canceled with evidence preserved. Eleven-cutoff calibration favors 100 per hypothesis; the author cap remains unverified. All 30 fresh baseline points passed audit (4,482,325 shots / 600 failures) and are published as six additional curves. All five source points contain the paper approximations in pointwise 95% intervals. The active view has 76 curves / 399 points / 8 codes / 0 circuits; all previous series and points are unchanged. All 140 T100 tuning points passed audit (143,360 training shots / 5,272 failures). The fresh 40-point T100 confirmation array 61773602 and audit 61773603 are running/pending, followed by unchanged Roffe T=n. Full 156, focused 43, and measured-catalog 44 regression checks passed (overlapping suites), plus 18 browser groups. Scientific gates and kernels are unchanged. Implementation 1b040da; dispatch record 84cfa4d.
 
-Completed campaign: See the [paper-rate task summary](./quick/261112-k9m-run-mackay-bp-campaign-at-the-five-publi/261112-k9m-SUMMARY.md). Source-plot coordinates and the exact five rates are pinned. Retain 20 block failures or 100 million shots per rate and the 88,200 total-sweep ceiling. Classical errors are recorded separately from quantum failures. No full-curve agreement is claimed.
+Completed campaign: See the [paper-rate task summary](./quick/261112-k9m-run-mackay-bp-campaign-at-the-five-publi/261112-k9m-SUMMARY.md). Source-plot coordinates and the exact five rates are pinned. The retained historical curves used 20 block failures or 100 million shots per rate and the 88,200 total-sweep ceiling; the new inferred-budget campaign is recorded above. Classical errors are recorded separately from quantum failures. No full-curve agreement is claimed.
 
 Completed historical MacKay campaign: Array 61698133 and collector 61698134 completed with exit 0:0. All 42 points, 2,366 shots and 840 block failures are audited. These controlled wide-grid results remain preserved; the subsequent paper-grid correction retires them from public v2 views.
 
