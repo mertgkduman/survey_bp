@@ -105,3 +105,19 @@ are preserved with a full refresh snapshot saved under results/catalog.json.
 Remaining work: independent confirmation measurements and their automatic complete-ledger audit, then the unchanged Roffe T=n measurements and assessment. Neither retrospective alignment nor
 this implementation verification establishes the historical cap or completes
 source reproduction. See RESEARCH and the calibration README for the derivation.
+
+
+## Subsequent results check
+
+All **38 completed confirmation points** passed the full-ledger audit, including
+pin/manifest hashes, outcome and work counts, terminal summaries and endpoint
+replay: **5,842,388 shots / 760 failures**. Two length-274 Q-BP points at
+depolarizing p=.015/.0195 remain running; see the timestamped progress receipt.
+The campaign stays incomplete and the Roffe continuation has not yet dispatched.
+The held-out comparisons show substantial low-rate LER gains from damping, but
+not uniform iteration savings: length-274 Q-BP at p=.060 has unchanged observed
+LER and mean iterations 7.109 → 16.2. Frozen choices remain unchanged. Detailed
+per-rate original/selected LER and work are in 261113-hk2-RESULTS-CHECK.md.
+Partial confirmation results are audited separately and await the planned
+complete audit before catalog publication. No new runs or kernel/UI changes
+were made during this check.

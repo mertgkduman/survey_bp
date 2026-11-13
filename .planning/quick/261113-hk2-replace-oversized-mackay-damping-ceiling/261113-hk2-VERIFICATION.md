@@ -56,3 +56,13 @@ into the published baseline or confirmation.
 
 Remaining: independent confirmation complete-ledger audit and assessment, then
 Roffe T=n measurements. The old 88,200 damping chain remains canceled.
+
+
+Subsequent check: partial confirmation collector passed for all 38 terminal
+points (5,842,388 shots / 760 failures), with full retained-ledger validation and
+endpoint replay. Two points remain live; no complete-success gate was bypassed.
+New baseline/tuning/confirmation and Roffe frozen plans still verify all
+40/36/38/40 pins respectively. Confirmation caps are uniformly 100; Roffe remains
+162/242/338/450. All 38 completed workers exited 0:0, two are running, and the
+advance waits on their array. No job error signatures or active old oversized
+damping were found. Public catalogs and raw evidence are unchanged by this check.
