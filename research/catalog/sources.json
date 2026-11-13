@@ -108,7 +108,8 @@
     "data/reproductions/mackay-0304161-damping/confirmation/catalog.json",
     "data/reproductions/roffe-2005-07016-bp/catalog.json",
     "data/reproductions/mackay-0304161-inferred-budget/catalog.json",
-    "data/reproductions/mackay-0304161-damping-t100/confirmation/catalog.json"
+    "data/reproductions/mackay-0304161-damping-t100/confirmation/catalog.json",
+    "data/reproductions/mackay-0304161-isolated-qbp/catalog.json"
   ],
   "public_retired_dataset_ids": [
     "mackay-unicycle-bp"

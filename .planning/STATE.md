@@ -5,10 +5,10 @@ current_phase: 11
 current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
-stopped_at: T100 confirmation 39 of 40 points audited; p=.015 Q-BP running, then Roffe T=n
-last_updated: "2026-11-13T20:58:59+00:00"
+stopped_at: Isolated d=0 Q-BP and matched-channel controls tested/frozen; old continuation held before Roffe
+last_updated: "2026-11-13T21:31:37+00:00"
 last_activity: 2026-11-13
-last_activity_desc: T100 confirmation 39/40 audited (12,619,245 shots / 780 failures). New p=.0195 Q-BP LER 2.95122e-6, mean iterations 1.07916; p=.015 remains running. Roffe T=n awaits complete confirmation.
+last_activity_desc: Quick261113-mmo implements undamped Q-BP and matched separate-X/Z depolarizing controls before Roffe. Twenty T100 points frozen;165 tests passed. Length74 source review finds no five-rate curve; genuine fixed-target summary extracted.
 state_head: fdbb98b
 progress:
   total_phases: 14
@@ -34,8 +34,8 @@ Total Phases: 14
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
-Last activity: 2026-11-13 — quick 261113-hk2 confirmation 39/40 audited; one rare Q-BP point continues
-Last Activity Description: T100 independent confirmation has 39/40 points audited, totaling 12,619,245 decoder shots / 780 failures. The newly terminal length-274 Q-BP d=.95 at depolarizing p=.0195 passed full-ledger/count/work and endpoint replay checks: 20 failures / 6,776,857 shots, LER 2.95122e-6, mean iterations 1.07916 (original damping .1: LER .0204082, mean iterations 3.05714). Prior 38 audits were reused after receipt/plan/manifest/summary hash checks. Only p=.015 remains live (0 failures / 9,274,432 shots at 2026-11-13T20:58:59+00:00); it continues to 20 failures or 100 million shots. Roffe waits for the full confirmation audit. Detailed per-rate results and current progress receipt are in quick hk2. Old curves, frozen damping choices, raw evidence and public catalogs are preserved; no new runs or kernel changes during this check.
+Last activity: 2026-11-13 — quick261113-mmo adds isolated Q-BP controls and verifies length74 source evidence
+Last Activity Description: User requests isolated Q-BP before moving on. Quick261113-mmo implements d=0 joint Q-BP and matched separate-X/Z binary BP on identical depolarizing samples,20 points at T100,20 failures or100M shots. Seed2026111323 is independent of tuning and matches confirmation prefixes. Actual component sweeps and full-graph rounds are distinct from directed edge work. Existing advance61773603 was canceled; rare confirmation61773602_10 continues. New continuation requires20 controls and40 prior confirmation points before unchanged Roffe T=n. Source versions1–3 provide no length74 five-rate curve; five requested ordinates are null/not_reported and the real fixed-target summary p≈.00681824 is extracted separately. Passed165 tests and final10 label checks (overlap). New plan has40 pins; all previous plans retain their hashes. Production dispatch/browser checks pending. No canonical-kernel or historical-evidence changes.
 
 Completed campaign: See the [paper-rate task summary](./quick/261112-k9m-run-mackay-bp-campaign-at-the-five-publi/261112-k9m-SUMMARY.md). Source-plot coordinates and the exact five rates are pinned. The retained historical curves used 20 block failures or 100 million shots per rate and the 88,200 total-sweep ceiling; the new inferred-budget campaign is recorded above. Classical errors are recorded separately from quantum failures. No full-curve agreement is claimed.
 
@@ -306,6 +306,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 | # | Description | Date | Commit | Status | Directory |
 |---|-------------|------|--------|--------|-----------|
+| 261113-mmo | Isolate undamped Q-BP under matched noise; verify length74 source ordinates | 2026-11-13 | pending | Tested/frozen; production and browser checks pending | [261113-mmo](./quick/261113-mmo-add-independent-undamped-q-bp-and-matche/) |
 | 261113-hk2 | Infer short MacKay cap, retain long curves, replace oversized damping | 2026-11-13 | 1b040da | T100 baseline published; confirmation 39/40 audited, then Roffe | [261113-hk2-replace-oversized-mackay-damping-ceiling](./quick/261113-hk2-replace-oversized-mackay-damping-ceiling/) |
 | 261113-ggu | Tune MacKay BP/Q-BP damping; then reproduce early BP-OSD paper regular BP | 2026-11-13 | ad689b0 | Setup verified; Superseded: oversized damping canceled; continuation moved to hk2 | [261113-ggu-tune-mackay-bp-and-q-bp-damping-and-repr](./quick/261113-ggu-tune-mackay-bp-and-q-bp-damping-and-repr/) |
 | 261112-k9m | Run MacKay at the five published error rates | 2026-11-12 | fdbb98b | Complete; 30/30 audited points; lower-rate source discrepancy retained | [261112-k9m-run-mackay-bp-campaign-at-the-five-publi](./quick/261112-k9m-run-mackay-bp-campaign-at-the-five-publi/) |

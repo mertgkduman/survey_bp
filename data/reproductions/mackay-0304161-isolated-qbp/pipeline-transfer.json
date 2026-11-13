@@ -1,0 +1,12 @@
+{
+  "observed_at": "2026-11-13T21:31:37+00:00",
+  "reason": "User requests isolated Q-BP before moving on",
+  "canceled_advance": "61773603",
+  "cancellation_state": "CANCELLED",
+  "preserved_confirmation_array": "61773602",
+  "required_new_points": 20,
+  "required_confirmation_points": 40,
+  "new_pipeline": "dispatch.json",
+  "next_study": "roffe-2005-07016-bp",
+  "gate": "both arrays and complete audits required before next study"
+}

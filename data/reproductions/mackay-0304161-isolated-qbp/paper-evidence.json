@@ -1,0 +1,242 @@
+{
+  "available_summary_point": {
+    "code_n": 74,
+    "marker_plot_xy": [
+      3651,
+      1574
+    ],
+    "meaning": "One marginal noise threshold at a fixed failure target. Not an ordinate at any of the five requested rates; cannot infer a curve or error bars.",
+    "member": "figs/QSUMMARYUBNM.ps",
+    "p_x_approx": 0.0068182390624880775,
+    "quantum_k": 18,
+    "sha256": "842a62e83b46f72a36af036ac02187539e8a4f11249b115ca4a8f02cfa9ba25f",
+    "source_target_classical_constituent_block_error": 5e-05,
+    "source_target_quantum_block_error_convention": 0.0001,
+    "x_axis": "logarithmic marginal flip probability",
+    "x_calibration": [
+      {
+        "p_x": 0.001,
+        "plot_x": 1601
+      },
+      {
+        "p_x": 0.01,
+        "plot_x": 4060
+      }
+    ]
+  },
+  "finding": "No length74 block-error-versus-noise curve is present. UCY.73 is a parity matrix; QSUMMARYUBNM is performance at a fixed error target. BSClDSC.273.82C is length274.",
+  "paper": "https://arxiv.org/abs/quant-ph/0304161v3",
+  "pdf_references": {
+    "construction": "Figure11, printed page27",
+    "fixed_error_summary": "Figure17, printed page35",
+    "length274_curve": "Figure16, printed page34"
+  },
+  "prohibited_substitutions": [
+    "Do not interpolate a single threshold into five error-rate values.",
+    "Do not substitute our simulations, the N274 curve, or the N73 classical cyclic code for N74 source measurements."
+  ],
+  "requested_ordinates": [
+    {
+      "p_x": 0.01,
+      "paper_block_error": null,
+      "status": "not_reported_in_inspected_sources"
+    },
+    {
+      "p_x": 0.013,
+      "paper_block_error": null,
+      "status": "not_reported_in_inspected_sources"
+    },
+    {
+      "p_x": 0.02,
+      "paper_block_error": null,
+      "status": "not_reported_in_inspected_sources"
+    },
+    {
+      "p_x": 0.03,
+      "paper_block_error": null,
+      "status": "not_reported_in_inspected_sources"
+    },
+    {
+      "p_x": 0.04,
+      "paper_block_error": null,
+      "status": "not_reported_in_inspected_sources"
+    }
+  ],
+  "schema": "mackay-length74-paper-evidence-v1",
+  "scope": "arXiv source versions1\u20133 and current42-page PDF; journal DOI retrieval was unavailable",
+  "source_inventory": [
+    {
+      "archive_sha256": "20da07820e524b04aa856bceb789c2e8d513fdf7b0c282b1e176811b627da249",
+      "figures": [
+        {
+          "member": "80.24.ps",
+          "sha256": "f750e032d9b1332fce77ef32f406346b7fb119c9d00bd937cfc4930394b873e0"
+        },
+        {
+          "member": "eps/code1.eps",
+          "sha256": "8de7de323d09f471ca28943995f598bc669ea87245e750bc10c0899f7e4a4e90"
+        },
+        {
+          "member": "eps/code2.eps",
+          "sha256": "26c71d3ecc6f11610bcea128861af96715414c175e70515dd686ae9b1ecf2189"
+        },
+        {
+          "member": "figs/BSClC9507.all.7131.ps",
+          "sha256": "bd769fe7db491d5a1d735b6a2c5ead411ba52d77d744b01404cd92d8e712bb55"
+        },
+        {
+          "member": "figs/errorVdist.ps",
+          "sha256": "2129c58bc0e580ebc3bb9828eb023e09b72ddb0edbe5a74bc59b2329fdb324a1"
+        },
+        {
+          "member": "figs/QSUMMARYUBNM.ps",
+          "sha256": "5bb7f7e7426d618870069534ea6985ce1830d3ca68b88bd3d2a43f72b53e7f27"
+        },
+        {
+          "member": "figs/QSUMMARYUBNM4D.ps",
+          "sha256": "ed8393dd11a033eb7a8d8eec27ce774611812f7e99ca8aef7b17e96ffa6d69f7"
+        },
+        {
+          "member": "figs/BSClC1893.all.1420.ps",
+          "sha256": "67ec1cc265b9144c1004fffd95e19f71c73ae03f935f0266db410b05b6bb5aa5"
+        },
+        {
+          "member": "figs/BSClC1893.40.473.ps",
+          "sha256": "a0ae8c2108609aea3e29bb9cea67e0c176a9e16fa7a9924dc49d6ada703659b7"
+        },
+        {
+          "member": "figs/UCY.73.ps",
+          "sha256": "045fcacca263c3eeb815d643a35978c2cc0a533d0f4da74f79cef07dccf95a92"
+        },
+        {
+          "member": "figs/pentagon.ps",
+          "sha256": "253a87f2566d0a771e7168d31e5bf899615a3def3eefa64f625bb51179e8e4a2"
+        },
+        {
+          "member": "figs/BCY.73.ps",
+          "sha256": "0882c10983ba358a7ec08c5850436ed7e53ecf9d84c6d5fd9abfe4bae87e6a30"
+        }
+      ],
+      "url": "https://arxiv.org/src/quant-ph/0304161v1",
+      "version": 1
+    },
+    {
+      "archive_sha256": "e8a337a277e2009b4e738b6b7978c6c00590b8cfbbfb5c0aa079002b9690dd4b",
+      "figures": [
+        {
+          "member": "80.24.ps",
+          "sha256": "f750e032d9b1332fce77ef32f406346b7fb119c9d00bd937cfc4930394b873e0"
+        },
+        {
+          "member": "figs/BSClC9507.all.7131.ps",
+          "sha256": "b608dff6f7d58abb188652f36e2cfa37afecc7f8f3df0d9ca4bd88536e15ad76"
+        },
+        {
+          "member": "figs/errorVdist.ps",
+          "sha256": "2129c58bc0e580ebc3bb9828eb023e09b72ddb0edbe5a74bc59b2329fdb324a1"
+        },
+        {
+          "member": "figs/QSUMMARYUBNM.ps",
+          "sha256": "144966c9f281ca098f563ae380d7cde6b938e9ef25cd84eb3fc2717a81a2b7da"
+        },
+        {
+          "member": "figs/QSUMMARYUBNM4D.ps",
+          "sha256": "2072fd9294ae124dc0e1ca62cbb030fd1f4c0031d766689faaac19bde10347fc"
+        },
+        {
+          "member": "figs/BSClC1893.all.1420.ps",
+          "sha256": "455f24e74da80bdd07380abbb8ddf9232756378f9322f07a5048759c5a664ba3"
+        },
+        {
+          "member": "figs/BSClDSC.273.82C.ps",
+          "sha256": "6f690b1aa3409b030e01997189de3299288cec386d2d7eb1bcc030b369af93b1"
+        },
+        {
+          "member": "figs/BSClC1893.40.473.ps",
+          "sha256": "f36c769d75cb08714632bb52be9c11e9b10da0734d88296eac85b96cdb5f0c63"
+        },
+        {
+          "member": "figs/UCY.73.ps",
+          "sha256": "045fcacca263c3eeb815d643a35978c2cc0a533d0f4da74f79cef07dccf95a92"
+        },
+        {
+          "member": "figs/pentagon.ps",
+          "sha256": "253a87f2566d0a771e7168d31e5bf899615a3def3eefa64f625bb51179e8e4a2"
+        },
+        {
+          "member": "figs/BCY.73.ps",
+          "sha256": "0882c10983ba358a7ec08c5850436ed7e53ecf9d84c6d5fd9abfe4bae87e6a30"
+        }
+      ],
+      "url": "https://arxiv.org/src/quant-ph/0304161v2",
+      "version": 2
+    },
+    {
+      "archive_sha256": "fad6f31421f0ef198009f1f75de482ddaab0e3b1c1c8b25a44344a640359030e",
+      "figures": [
+        {
+          "member": "80.24.ps",
+          "sha256": "f750e032d9b1332fce77ef32f406346b7fb119c9d00bd937cfc4930394b873e0"
+        },
+        {
+          "member": "MNCfigs/12.4.3.111/A.ps",
+          "sha256": "848863c3d559bfe62cc8456007672d567132bd6218e1e5d175a0db490b09edf0"
+        },
+        {
+          "member": "figs/BSClC9507.all.7131.ps",
+          "sha256": "b608dff6f7d58abb188652f36e2cfa37afecc7f8f3df0d9ca4bd88536e15ad76"
+        },
+        {
+          "member": "figs/errorVdist.ps",
+          "sha256": "2129c58bc0e580ebc3bb9828eb023e09b72ddb0edbe5a74bc59b2329fdb324a1"
+        },
+        {
+          "member": "figs/QSUMMARYUBNM.ps",
+          "sha256": "842a62e83b46f72a36af036ac02187539e8a4f11249b115ca4a8f02cfa9ba25f"
+        },
+        {
+          "member": "figs/QSUMMARYUBNM4D.ps",
+          "sha256": "42c105ca8ea04e9483a919182063c1cd93b2e30c05d43e4b0755b6b953610927"
+        },
+        {
+          "member": "figs/BSClC1893.all.1420.ps",
+          "sha256": "455f24e74da80bdd07380abbb8ddf9232756378f9322f07a5048759c5a664ba3"
+        },
+        {
+          "member": "figs/BSClDSC.273.82C.ps",
+          "sha256": "6f690b1aa3409b030e01997189de3299288cec386d2d7eb1bcc030b369af93b1"
+        },
+        {
+          "member": "figs/BSClC1893.40.473.ps",
+          "sha256": "f36c769d75cb08714632bb52be9c11e9b10da0734d88296eac85b96cdb5f0c63"
+        },
+        {
+          "member": "figs/UCY.73.ps",
+          "sha256": "045fcacca263c3eeb815d643a35978c2cc0a533d0f4da74f79cef07dccf95a92"
+        },
+        {
+          "member": "figs/pentagon.ps",
+          "sha256": "253a87f2566d0a771e7168d31e5bf899615a3def3eefa64f625bb51179e8e4a2"
+        },
+        {
+          "member": "figs/BCY.73.ps",
+          "sha256": "0882c10983ba358a7ec08c5850436ed7e53ecf9d84c6d5fd9abfe4bae87e6a30"
+        },
+        {
+          "member": "gallager/plus.eps",
+          "sha256": "0036796a86c9ffbe51adf4a1e5350856790d2b167a5a2aeda21f7d2bb450bf61"
+        },
+        {
+          "member": "gallager/16.12.ps",
+          "sha256": "a3896f694f3d05e3719c62082c60e2bf7940c9001084961100192a2ab27197a7"
+        },
+        {
+          "member": "gallager/equal.eps",
+          "sha256": "7267e3ad89eb318f6f12eef4470921665630755d34888245eaa2d5f91a70ef9a"
+        }
+      ],
+      "url": "https://arxiv.org/src/quant-ph/0304161v3",
+      "version": 3
+    }
+  ]
+}

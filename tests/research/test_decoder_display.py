@@ -115,3 +115,11 @@ def test_inferred_budget_is_distinguished_from_an_explicit_source_setting():
     script="""require('./web/research/decoder-display.js');console.log(JSON.stringify(DecoderDisplay.describe({configuration:{effective_configuration:{family:'binary_css',check_rule:'sum_product',message_resolution:'float64',max_iterations:100,budget_status:'curve_inferred_not_source_specified'}}})));"""
     value=json.loads(subprocess.check_output(['node','-e',script],cwd=ROOT,text=True))
     assert 'T = 100' in value['label'] and 'budget = inferred' in value['label']
+
+
+def test_isolated_separate_decoder_exposes_full_channel_and_marginal_prior():
+    script="""require('./web/research/decoder-display.js');const c={family:'binary_css',decoding_scope:'separate_xz',check_rule:'sum_product',v2c_damping:0,check_cap:null,max_iterations:100,prior:'2p/3',noise_model:'depolarizing',message_resolution:'float64',budget_status:'curve_inferred_not_source_specified'};console.log(JSON.stringify(DecoderDisplay.describe({configuration:{effective_configuration:c}})));"""
+    row=json.loads(subprocess.check_output(['node','-e',script],cwd=ROOT,text=True))
+    assert row['algorithm']=='Binary BP (separate X/Z)'
+    assert all(x in row['label'] for x in ('d = 0','T = 100','p₀ = 2p/3','noise = depolarizing','budget = inferred'))
+    assert row['retired'] is None

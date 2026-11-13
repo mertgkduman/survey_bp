@@ -21500,22 +21500,22 @@
           "url": "data/reproductions/mackay-0304161-inferred-budget/plan.json"
         },
         {
-          "availability": "local_only",
+          "availability": "tracked",
           "kind": "json",
           "label": "Audited terminal results",
-          "local_storage_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/mackay-0304161-inferred-budget/verified.json",
+          "local_storage_path": null,
           "path": "data/reproductions/mackay-0304161-inferred-budget/verified.json",
           "sha256": "f19cb8cd5c9448fa41d8717652db569e689eccba61d0556de69259bf75e67c19",
-          "url": null
+          "url": "data/reproductions/mackay-0304161-inferred-budget/verified.json"
         },
         {
-          "availability": "local_only",
+          "availability": "tracked",
           "kind": "json",
           "label": "Source or holdout assessment",
-          "local_storage_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/mackay-0304161-inferred-budget/comparison.json",
+          "local_storage_path": null,
           "path": "data/reproductions/mackay-0304161-inferred-budget/comparison.json",
           "sha256": "ce0ba2ddc7e5b86916b65764b041400e819a0e633daa479bf2e1b751c8f06825",
-          "url": null
+          "url": "data/reproductions/mackay-0304161-inferred-budget/comparison.json"
         }
       ],
       "caveat": "100 iterations per BP/Q-BP decode, inferred from retained curve alignment, not specified in the paper. Source unicycle uses 100 per hypothesis (maximum 200 total), explicitly distinct from 100-iteration plain decoders. Fresh seed; retain old 88200 curves separately. Classical source error and quantum block failure are separately recorded; no source-faithful cap claim.",
@@ -29095,6 +29095,10 @@
     {
       "path": "data/reproductions/mackay-0304161-damping-t100/confirmation/catalog.json",
       "sha256": "7bf8c353d6259d95496be1d823e426024358157ec8750ec74c446bf3b1684c79"
+    },
+    {
+      "path": "data/reproductions/mackay-0304161-isolated-qbp/catalog.json",
+      "sha256": "d0c71508226aa8ec0e7e0783916d53191c425ee8938d58efeaa0168b47f88314"
     }
   ],
   "limitations": [
