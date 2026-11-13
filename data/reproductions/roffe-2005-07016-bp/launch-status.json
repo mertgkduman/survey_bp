@@ -1,0 +1,25 @@
+{
+  "array": "61785159",
+  "collector": "61785160",
+  "cpus_per_point": 1,
+  "frozen_submitter_reused_receipt_without_change": true,
+  "macKay_cpus": 4,
+  "macKay_job": "61773602_10",
+  "maximum_concurrent_points": 218,
+  "observed_at": "2026-11-13T22:41:48+00:00",
+  "pending_reasons": {},
+  "planned_points": 218,
+  "queue_states": {},
+  "running_cpus": 0,
+  "scheduler_error_states": [],
+  "scientific_audit_status": "collector61785160 running; no completion claim",
+  "terminal_count_scope": "worker summaries; full collector audit still running at snapshot",
+  "terminal_failures": 4360,
+  "terminal_shots": 9816,
+  "terminal_summaries": 218,
+  "worker_accounting": {
+    "COMPLETED": 218,
+    "cpus_per_task": 1,
+    "exit_code": "0:0"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "array": "61785159",
+  "authorization": "User: Move to Roffe with a CPU for every point",
+  "collector": "61785160",
+  "continuation": "Original submit() reads the same dispatch receipt and reuses these jobs.",
+  "cpus_per_point": 1,
+  "frozen_scientific_files_changed": false,
+  "launcher_sha256": "078a9b8c54b75f97478c46490abdb6277d11cf18aff038e3998ef1d773304305",
+  "macKay_continues": true,
+  "maximum_concurrent_points": 218,
+  "plan_sha256": "eb16126dfa9eef45bb24eeddd70c5b287259e376b52a1531efcbf6126da9dcc3",
+  "points": 218,
+  "schema": "roffe-execution-override-v1"
+}

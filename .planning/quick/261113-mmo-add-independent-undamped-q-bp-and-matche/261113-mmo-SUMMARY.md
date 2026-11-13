@@ -67,3 +67,10 @@ The new controls and source-review deliverables are complete. The larger
 MacKay confirmation campaign still has one live point and is not declared
 complete; source-faithful numerical identity or full-curve reproduction is not
 asserted. The replacement continuation preserves that outstanding work.
+
+
+Subsequent user scheduling override: quick261113-oan launches Roffe immediately
+with one CPU for every point, preserving frozen science. Shared Roffe dispatch
+receipts ensure this task's eventual MacKay continuation reuses those existing
+jobs after its own audits. Its former serial-launch description is superseded
+by roffe-2005-07016-bp/LAUNCH-ALL.md; MacKay's live worker remains unchanged.

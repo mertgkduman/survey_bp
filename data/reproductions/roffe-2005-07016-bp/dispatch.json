@@ -1,0 +1,44 @@
+{
+  "array": {
+    "argv": [
+      "sbatch",
+      "--parsable",
+      "--partition=common,scavenger",
+      "--account=pfisterlab",
+      "--nodes=1",
+      "--ntasks=1",
+      "--cpus-per-task=1",
+      "--mem=4G",
+      "--requeue",
+      "--time=4-00:00:00",
+      "--chdir=/hpc/group/pfisterlab/mg551/storage/survey_bp",
+      "--export=ALL,PYTHONPATH=/hpc/group/pfisterlab/mg551/storage/survey_bp/src,OMP_NUM_THREADS=1,OPENBLAS_NUM_THREADS=1,MKL_NUM_THREADS=1",
+      "--job-name=roffe-bp",
+      "--array=0-217%218",
+      "--output=/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/roffe-2005-07016-bp/results/slurm-%A_%a.log",
+      "--wrap=exec /hpc/group/pfisterlab/mg551/storage/survey_bp/.venv/bin/python /hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/roffe-2005-07016-bp/run.py --index \"$SLURM_ARRAY_TASK_ID\""
+    ],
+    "id": "61785159"
+  },
+  "collect": {
+    "argv": [
+      "sbatch",
+      "--parsable",
+      "--partition=common,scavenger",
+      "--account=pfisterlab",
+      "--nodes=1",
+      "--ntasks=1",
+      "--cpus-per-task=1",
+      "--mem=4G",
+      "--requeue",
+      "--time=4-00:00:00",
+      "--chdir=/hpc/group/pfisterlab/mg551/storage/survey_bp",
+      "--export=ALL,PYTHONPATH=/hpc/group/pfisterlab/mg551/storage/survey_bp/src,OMP_NUM_THREADS=1,OPENBLAS_NUM_THREADS=1,MKL_NUM_THREADS=1",
+      "--job-name=roffe-bp-audit",
+      "--dependency=afterok:61785159",
+      "--output=/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/roffe-2005-07016-bp/results/collect-%j.log",
+      "--wrap=/hpc/group/pfisterlab/mg551/storage/survey_bp/.venv/bin/python /hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/roffe-2005-07016-bp/run.py --collect --complete"
+    ],
+    "id": "61785160"
+  }
+}
