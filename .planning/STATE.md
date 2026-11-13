@@ -5,10 +5,10 @@ current_phase: 11
 current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
-stopped_at: Isolated d=0 Q-BP and matched-channel controls tested/frozen; old continuation held before Roffe
-last_updated: "2026-11-13T21:31:37+00:00"
+stopped_at: Isolated controls 20/20 audited and published; prior rare confirmation remains before replacement Roffe gate
+last_updated: "2026-11-13T21:40:33+00:00"
 last_activity: 2026-11-13
-last_activity_desc: Quick261113-mmo implements undamped Q-BP and matched separate-X/Z depolarizing controls before Roffe. Twenty T100 points frozen;165 tests passed. Length74 source review finds no five-rate curve; genuine fixed-target summary extracted.
+last_activity_desc: Quick 261113-mmo completed undamped Q-BP and matched depolarizing separate-BP controls:20 points,13,641 shots,400 failures. Public 80 curves / 419 points. Length 74 five requested paper ordinates unavailable; actual fixed-target summary extracted. Roffe awaits prior confirmation.
 state_head: fdbb98b
 progress:
   total_phases: 14
@@ -34,8 +34,8 @@ Total Phases: 14
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
-Last activity: 2026-11-13 — quick261113-mmo adds isolated Q-BP controls and verifies length74 source evidence
-Last Activity Description: User requests isolated Q-BP before moving on. Quick261113-mmo implements d=0 joint Q-BP and matched separate-X/Z binary BP on identical depolarizing samples,20 points at T100,20 failures or100M shots. Seed2026111323 is independent of tuning and matches confirmation prefixes. Actual component sweeps and full-graph rounds are distinct from directed edge work. Existing advance61773603 was canceled; rare confirmation61773602_10 continues. New continuation requires20 controls and40 prior confirmation points before unchanged Roffe T=n. Source versions1–3 provide no length74 five-rate curve; five requested ordinates are null/not_reported and the real fixed-target summary p≈.00681824 is extracted separately. Passed165 tests and final10 label checks (overlap). New plan has40 pins; all previous plans retain their hashes. Production dispatch/browser checks pending. No canonical-kernel or historical-evidence changes.
+Last activity: 2026-11-13 — quick 261113-mmo controls audited/published; length74 source limitation documented
+Last Activity Description: Completed quick 261113-mmo (implementation bd08a80):20/20 independent d=0 controls on identical depolarizing samples,13,641 decoder shots/400 failures, full-ledger/work/endpoint audits passed. Undamped Q-BP and separate-X/Z BP now isolate method choice at T100, with typed full-graph/component work. All four curves are public:80 curves/419 points/8 codes/0 circuits; all prior series/points unchanged. Source versions1–3 contain no length74 five-rate curve; requested values stay not_reported, with the actual fixed-target reference p≈.00681824 extracted separately. Source evidence, full matched-method/damping tables and original-paper values are saved with the new study. Passed165 regressions,54 final catalog checks (overlap) and10 browser groups. Array61781770 and collector61781771 completed0:0. Old advance61773603 is canceled; replacement61781772 waits on all prior confirmation61773602 plus complete20/40 audits before unchanged Roffe. Prior rare point remains live, and Roffe has not dispatched. No canonical, old frozen evidence or archived interface changes.
 
 Completed campaign: See the [paper-rate task summary](./quick/261112-k9m-run-mackay-bp-campaign-at-the-five-publi/261112-k9m-SUMMARY.md). Source-plot coordinates and the exact five rates are pinned. The retained historical curves used 20 block failures or 100 million shots per rate and the 88,200 total-sweep ceiling; the new inferred-budget campaign is recorded above. Classical errors are recorded separately from quantum failures. No full-curve agreement is claimed.
 
@@ -306,8 +306,8 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 | # | Description | Date | Commit | Status | Directory |
 |---|-------------|------|--------|--------|-----------|
-| 261113-mmo | Isolate undamped Q-BP under matched noise; verify length74 source ordinates | 2026-11-13 | pending | Tested/frozen; production and browser checks pending | [261113-mmo](./quick/261113-mmo-add-independent-undamped-q-bp-and-matche/) |
-| 261113-hk2 | Infer short MacKay cap, retain long curves, replace oversized damping | 2026-11-13 | 1b040da | T100 baseline published; confirmation 39/40 audited, then Roffe | [261113-hk2-replace-oversized-mackay-damping-ceiling](./quick/261113-hk2-replace-oversized-mackay-damping-ceiling/) |
+| 261113-mmo | Isolate undamped Q-BP under matched noise; verify length74 source ordinates | 2026-11-13 | bd08a80 | Complete controls; five paper ordinates unavailable, summary extracted | [261113-mmo](./quick/261113-mmo-add-independent-undamped-q-bp-and-matche/) |
+| 261113-hk2 | Infer short MacKay cap, retain long curves, replace oversized damping | 2026-11-13 | 1b040da | T100 baseline published; confirmation 39/40, continuation via mmo controls | [261113-hk2-replace-oversized-mackay-damping-ceiling](./quick/261113-hk2-replace-oversized-mackay-damping-ceiling/) |
 | 261113-ggu | Tune MacKay BP/Q-BP damping; then reproduce early BP-OSD paper regular BP | 2026-11-13 | ad689b0 | Setup verified; Superseded: oversized damping canceled; continuation moved to hk2 | [261113-ggu-tune-mackay-bp-and-q-bp-damping-and-repr](./quick/261113-ggu-tune-mackay-bp-and-q-bp-damping-and-repr/) |
 | 261112-k9m | Run MacKay at the five published error rates | 2026-11-12 | fdbb98b | Complete; 30/30 audited points; lower-rate source discrepancy retained | [261112-k9m-run-mackay-bp-campaign-at-the-five-publi](./quick/261112-k9m-run-mackay-bp-campaign-at-the-five-publi/) |
 | 261112-i4d | Construct and run foundational MacKay unicycle BP campaign | 2026-11-12 | 8e234a4, fdbb98b | Complete: 42/42 audited points; old grid preserved as historical evidence | [261112-i4d-construct-mackay-2004-unicycle-codes-and](./quick/261112-i4d-construct-mackay-2004-unicycle-codes-and/) |

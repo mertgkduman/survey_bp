@@ -8,5 +8,12 @@
   "required_confirmation_points": 40,
   "new_pipeline": "dispatch.json",
   "next_study": "roffe-2005-07016-bp",
-  "gate": "both arrays and complete audits required before next study"
+  "gate": "both arrays and complete audits required before next study",
+  "new_dispatch": {
+    "advance": "61781772",
+    "array": "61781770",
+    "collect": "61781771"
+  },
+  "new_controls_status": "20/20 complete and audited; collector61781771 completed0:0",
+  "updated_at": "2026-11-13T21:40:33+00:00"
 }

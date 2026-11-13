@@ -134,3 +134,12 @@ previous 38 verified points after hash checks and fully validates the new
 point's retained ledger and endpoint replay. Roffe remains unsubmitted and
 awaits the unchanged complete-confirmation gate. No new simulation dispatch,
 canonical change or public-catalog refresh was performed during this check.
+
+
+Continuation transfer: the user's subsequent isolated-Q-BP request is tracked
+in quick261113-mmo. Old pending advance61773603 was canceled, preserving the
+rare worker. New20-point controls are fully audited/published; replacement
+advance61781772 waits on their audit and the original40-point confirmation,
+re-audits both completely and only then submits Roffe. Thus the old frozen
+README's direct-continuation description is superseded by pipeline-transfer.json
+in mackay-0304161-isolated-qbp; its frozen bytes are preserved.

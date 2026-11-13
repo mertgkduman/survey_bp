@@ -1,0 +1,65 @@
+{
+  "advance": {
+    "argv": [
+      "sbatch",
+      "--parsable",
+      "--partition=common,scavenger",
+      "--account=pfisterlab",
+      "--nodes=1",
+      "--ntasks=1",
+      "--requeue",
+      "--time=4-00:00:00",
+      "--chdir=/hpc/group/pfisterlab/mg551/storage/survey_bp",
+      "--export=ALL,PYTHONPATH=/hpc/group/pfisterlab/mg551/storage/survey_bp/src,OMP_NUM_THREADS=1,OPENBLAS_NUM_THREADS=1,MKL_NUM_THREADS=1",
+      "--job-name=mackay-isolate-next",
+      "--cpus-per-task=1",
+      "--mem=4G",
+      "--dependency=afterok:61781771:61773602",
+      "--output=/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/mackay-0304161-isolated-qbp/results/advance-%j.log",
+      "--wrap=/hpc/group/pfisterlab/mg551/storage/survey_bp/.venv/bin/python /hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/mackay-0304161-isolated-qbp/run.py --advance"
+    ],
+    "id": "61781772"
+  },
+  "array": {
+    "argv": [
+      "sbatch",
+      "--parsable",
+      "--partition=common,scavenger",
+      "--account=pfisterlab",
+      "--nodes=1",
+      "--ntasks=1",
+      "--requeue",
+      "--time=4-00:00:00",
+      "--chdir=/hpc/group/pfisterlab/mg551/storage/survey_bp",
+      "--export=ALL,PYTHONPATH=/hpc/group/pfisterlab/mg551/storage/survey_bp/src,OMP_NUM_THREADS=1,OPENBLAS_NUM_THREADS=1,MKL_NUM_THREADS=1",
+      "--job-name=mackay-qbp-isolate",
+      "--cpus-per-task=1",
+      "--mem=4G",
+      "--array=0-19%8",
+      "--output=/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/mackay-0304161-isolated-qbp/results/slurm-%A_%a.log",
+      "--wrap=exec /hpc/group/pfisterlab/mg551/storage/survey_bp/.venv/bin/python /hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/mackay-0304161-isolated-qbp/run.py --index \"$SLURM_ARRAY_TASK_ID\""
+    ],
+    "id": "61781770"
+  },
+  "collect": {
+    "argv": [
+      "sbatch",
+      "--parsable",
+      "--partition=common,scavenger",
+      "--account=pfisterlab",
+      "--nodes=1",
+      "--ntasks=1",
+      "--requeue",
+      "--time=4-00:00:00",
+      "--chdir=/hpc/group/pfisterlab/mg551/storage/survey_bp",
+      "--export=ALL,PYTHONPATH=/hpc/group/pfisterlab/mg551/storage/survey_bp/src,OMP_NUM_THREADS=1,OPENBLAS_NUM_THREADS=1,MKL_NUM_THREADS=1",
+      "--job-name=mackay-isolate-audit",
+      "--cpus-per-task=1",
+      "--mem=4G",
+      "--dependency=afterok:61781770",
+      "--output=/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/mackay-0304161-isolated-qbp/results/collect-%j.log",
+      "--wrap=/hpc/group/pfisterlab/mg551/storage/survey_bp/.venv/bin/python /hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/mackay-0304161-isolated-qbp/run.py --collect"
+    ],
+    "id": "61781771"
+  }
+}
