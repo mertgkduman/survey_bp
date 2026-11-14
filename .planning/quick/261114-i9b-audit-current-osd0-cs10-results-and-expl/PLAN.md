@@ -1,7 +1,7 @@
 ---
 id: 261114-i9b
 type: quick
-status: in_progress
+status: complete
 ---
 
 # Check OSD results and explain the performance change

@@ -5,11 +5,11 @@ current_phase: 11
 current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
-stopped_at: Roffe OSD0/CS10 array61804747 running;173 points audited/published; recovery collector61805014 pending
-last_updated: "2026-11-14T05:11:08.405200+00:00"
+stopped_at: OSD212/218 terminal points checked;6 rare points running; full refresh61820674 and final collector61820676 pending completion
+last_updated: "2026-11-14T18:21:50.732313+00:00"
 last_activity: 2026-11-14
-last_activity_desc: Spikes056-057 qualify OSD0/CS10 and canonical BP traversal; array61804747 running;173/218 points audited/published;100 tests and12 browser groups.
-state_head: a4497da
+last_activity_desc: Quick261114-i9b checks212 terminal OSD points/424 endpoints and host-target benchmark; full318M-row audit continues in Slurm, no simulation changes.
+state_head: 2c8b6fe
 progress:
   total_phases: 14
   completed_phases: 8
@@ -34,7 +34,10 @@ Total Phases: 14
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
-Last activity: 2026-11-14 — spikes056–057 qualify efficient canonical BP + OSD-0 / CS-10 and prepare production dispatch
+Last activity: 2026-11-14 — quick261114-i9b checks current OSD results and explains source-matched performance
+Last Activity Description:212/218 terminal points contain318,346,784 decoder shots/4,207 logical failures. Frozen manifests, summary arithmetic/stopping/exact95% CI/work and424 endpoint replays pass. Six rare points remain running: both methods on338/p=.01 and450/p=.01/.02; four zero-failure progress counts are50–77M shots and are not final estimates. At p=.02 the three completed codes have similar OSD0/CS10 LERs with overlapping intervals; damped BP is orders of magnitude worse. Same-CS10 native -O3 -march=native rebuild preserves64 selected outputs and yields2.32–3.53x warmed ratios; packed affine reuse/popcount explain the changed implementation, without a paperCS60 or generic speed claim. Full318M-row refresh runs as61820674; final complete collector61820676 is serialized behind it and the original array. Replaced61805014; prior retry61805013 already completed0:0. Fresh summary/endpoint snapshot and all109 comparison rows are saved separately; workbench retains fully audited173-point OSD snapshot112 curves/1246 points/12 codes/0 circuits pending full refresh, byte-identical to02f802a. No raw/frozen/canonical/native/v1/phase-gate changes. Evidence commit2c8b6fe.
+
+Prior OSD implementation activity: 2026-11-14 — spikes056–057 qualify efficient canonical BP + OSD-0 / CS-10 and prepare production dispatch
 Last Activity Description: Public OSD source pinned at d3429964cd4ffe1abfc041c6ec8b8425cb174f40;404 complete native/independent-oracle candidate sets pass. Packed source-derived CS10 achieves2.1–3.4x native final-only throughput; OSD0 costs33–55us with full provenance. The unchanged canonical sweep is called from a separate compiled traversal, with436 bitwise terminal-state and192 complete-event comparisons across109 source strata.128 qualification shots/72 OSD calls pass resume, full-ledger, endpoint and publication checks. Frozen campaign roffe-2005-07016-osd-fast has218 points, X-only/min-sum/alpha schedule/T=n,20 logical failures or1e8 shots, one CPU per point, separate BP/OSD work and timing. Superseded frozen scalar controller remains unlaunched.100 unique tests and12 Chromium workflow groups pass; prelaunch catalog104 curves/1073 points/12 codes/0 circuits, historical points unchanged. No canonical kernel, frozen prior campaign, v1, generic Phase7 admission or Phase11 gate/counter changes. Implementation a4497da is pushed; array61804747 is running. First173/218 points pass full-ledger/endpoint audit:153,881 shots/3,460 logical failures,88 OSD0/85 CS10. Public112 curves/1246 points/12 codes/0 circuits; all181 historical raw series unchanged. Seven real-data browser groups pass. One NFS cache failure before sampling recovered unchanged as61805013; replacement complete collector61805014 depends on initial-array termination and retry success and still enforces all218 terminal points. Report/CSV include paperCS60 and earlier BP/dampedBP/QBP alongside new methods; pending points stay unavailable.
 
 Prior source comparison activity: 2026-11-13 — quick261113-vj0 tabulates Roffe paper BP-OSD against confirmed BP-family results
@@ -313,6 +316,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 | # | Description | Date | Commit | Status | Directory |
 |---|-------------|------|--------|--------|-----------|
+| 261114-i9b | Explain optimized OSD search and check212 terminal points/424 endpoints | 2026-11-14 | 2c8b6fe | Check complete; full interior audit61820674 continues | [261114-i9b](./quick/261114-i9b-audit-current-osd0-cs10-results-and-expl/) |
 | 261113-vj0 | Tabulate all current Roffe BP-OSD source points beside confirmed BP/Q-BP | 2026-11-13 | 04002e0 | Complete;108 paper points/109 grid rows, no new simulations | [261113-vj0](./quick/261113-vj0-extract-all-roffe-figure3-bp-osd-points-/) |
 | 261113-v31 | Audit and publish completed Roffe damping comparison; fix shared paper registration | 2026-11-13 | c595969 | Complete;436 confirmation points audited/published | [261113-v31](./quick/261113-v31-audit-completed-roffe-damping-results-re/) |
 | 261113-q96 | Launch paper-budget Roffe damped BP/Q-BP tuning and fresh confirmation | 2026-11-13 | 4c8471f | Complete;1526 tuning/436 confirmation points, follow-up v31 | [261113-q96](./quick/261113-q96-tune-and-independently-confirm-damped-ro/) |
@@ -395,7 +399,7 @@ No requested decoding regime or named policy family is deferred beyond the first
 
 ## Session Continuity
 
-Latest comparison: quick261113-vj0, implementation04002e0. Complete Roffe Figure3 paper BP-OSD tables/plots contain108 source ordinates and109 grid rows, with all436 local results and explicit missing/unknown quantities. No BP-OSD execution was launched. See data/reproductions/roffe-2005-07016-osd-comparison/RESULTS.md. Active measured catalog and frozen studies unchanged.
+Latest comparison: quick261114-i9b, evidence2c8b6fe.212 terminal OSD0/CS10 points pass summary/manifest/CI/work and424 endpoint checks; full interior audit61820674 continues, with complete collector61820676 serialized afterward. See quick task COMPARISON.md for all109 source-rate rows and explicit pending values. Published workbench retains the173-point fully audited OSD snapshot pending refresh. PaperCS60 source reference and prior BP-family evidence remain distinct and preserved.
 
 Latest result: quick261113-v31, implementationc595969. Roffe damping is complete and published: all1526 tuning/436 independent confirmation points audited. Public104 curves/1073 points. See data/reproductions/roffe-2005-07016-damping/RESULTS.md and completion-status.json. Original failed publication history is retained; equal paper metadata now merges safely. Only the separate MacKay rare-event point remains running.
 
