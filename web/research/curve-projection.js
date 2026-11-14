@@ -23,7 +23,7 @@ const compact=value=>{
  if(value&&typeof value==='object'){const out={};for(const [key,item] of Object.entries(value)){const child=compact(item);if(child!==undefined)out[key]=child;}return Object.keys(out).length?out:undefined;}
  return value===undefined?undefined:value;
 };
-const kernelFields=['kernel','family','variant','rule','check_rule','numerical_profile','message_resolution','resolution','damping_old','v2c_damping','damping_gamma','check_cap','binary_paper_v2c_cap','qbp_check_cap','product_epsilon','prior','candidate','hard_decision','stop','zero_syndrome_shortcut','max_iterations','max_iterations_per_binary_decode','alpha','alpha_schedule','first_iteration','beta','min_sum','messages','v2c','policy','qbpgd','controller','common_controls','profile_controls','arm_policy','tie_break'];
+const kernelFields=['kernel','family','variant','rule','check_rule','numerical_profile','message_resolution','resolution','damping_old','v2c_damping','damping_gamma','check_cap','binary_paper_v2c_cap','qbp_check_cap','product_epsilon','prior','candidate','hard_decision','stop','zero_syndrome_shortcut','max_iterations','max_iterations_per_binary_decode','alpha','alpha_schedule','first_iteration','beta','min_sum','messages','v2c','policy','qbpgd','controller','common_controls','profile_controls','arm_policy','tie_break','postprocessing','execution_backend'];
 const pickKernel=value=>{
  if(!value||typeof value!=='object')return undefined;
  const profile={};for(const key of kernelFields)if(own(value,key))profile[key]=value[key];
@@ -62,6 +62,7 @@ function pooled(entries){
  const p={...primary.point,n,failures,y:failures/n,ci_low,ci_high,mean_work:weighted('mean_work'),mean_seconds:weighted('mean_seconds'),
   mean_iterations:weighted('mean_iterations',new Set(entries.map(({point})=>point.iteration_unit)).size===1),
   mean_directed_edge_updates:weighted('mean_directed_edge_updates',true),type_i:sumCounter('type_i'),type_ii:sumCounter('type_ii'),metadata:{...primary.point.metadata,projection_members:entries.length,uncertainty_method:'wilson_score_95_percent_pooled_fixed_iid'}};
+ for(const field of ['mean_bp_seconds','mean_osd_seconds','osd_invocation_fraction','mean_osd_candidate_evaluations','mean_osd_row_xor_words'])p[field]=weighted(field,true);
  return {point:p,method:'pooled_independent_fixed_iid'};
 }
 // The direct completion campaign supersedes these older bounded BPGD

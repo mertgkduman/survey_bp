@@ -217,10 +217,10 @@ def test_rebuilt_catalog_uses_same_active_view_as_browser_and_preserves_retained
     from bp_registry.research.catalog import build_catalog
     c = build_catalog(ROOT)
     view = active_view(c)
-    legacy = [s for s in view['curves'] if s['dataset_id'] not in {'yao-bpgd-completion', 'mackay-unicycle-bp', 'mackay-unicycle-paper-rates', 'mackay-damping-confirmation', 'roffe-2020-figure3-canonical-bp', 'mackay-inferred-t100-baseline', 'mackay-damping-t100-confirmation', 'mackay-qbp-isolation-t100', 'roffe-damping-confirmation'}]
+    legacy = [s for s in view['curves'] if s['dataset_id'] not in {'yao-bpgd-completion', 'mackay-unicycle-bp', 'mackay-unicycle-paper-rates', 'mackay-damping-confirmation', 'roffe-2020-figure3-canonical-bp', 'mackay-inferred-t100-baseline', 'mackay-damping-t100-confirmation', 'mackay-qbp-isolation-t100', 'roffe-damping-confirmation', 'roffe-canonical-bp-osd', 'roffe-canonical-bp-osd-fast'}]
     assert len(legacy) == 53
     assert sum(len(s['points']) for s in legacy) == 262
-    added = {s['code_id'] for s in view['curves'] if s['dataset_id'] in {'mackay-unicycle-bp', 'mackay-unicycle-paper-rates', 'mackay-damping-confirmation', 'roffe-2020-figure3-canonical-bp', 'mackay-inferred-t100-baseline', 'mackay-damping-t100-confirmation', 'mackay-qbp-isolation-t100', 'roffe-damping-confirmation'}}
+    added = {s['code_id'] for s in view['curves'] if s['dataset_id'] in {'mackay-unicycle-bp', 'mackay-unicycle-paper-rates', 'mackay-damping-confirmation', 'roffe-2020-figure3-canonical-bp', 'mackay-inferred-t100-baseline', 'mackay-damping-t100-confirmation', 'mackay-qbp-isolation-t100', 'roffe-damping-confirmation', 'roffe-canonical-bp-osd', 'roffe-canonical-bp-osd-fast'}}
     assert {code['code_id'] for code in view['codes']} == {'a5', 'b2', 'b1', 'c2', 'double-gross', 'bb72'} | added
     assert view['circuits'] == []
     from bp_registry.research.inputs import input_registry
@@ -264,17 +264,42 @@ def test_completion_retires_only_the_requested_historical_bounded_bpgd():
 def test_pooled_work_averages_use_shot_weights_and_preserve_missing_counters():
     first = row("a", seed=1, evidence="a.json", pool=True)
     second = row("b", seed=2, evidence="b.json", shots=30, pool=True)
-    first["points"][0].update(mean_iterations=2, mean_directed_edge_updates=20)
-    second["points"][0].update(mean_iterations=6, mean_directed_edge_updates=60)
+    first["points"][0].update(mean_iterations=2, mean_directed_edge_updates=20,
+                               osd_invocation_fraction=.2, mean_osd_candidate_evaluations=2, mean_osd_seconds=.01)
+    second["points"][0].update(mean_iterations=6, mean_directed_edge_updates=60,
+                                osd_invocation_fraction=.6, mean_osd_candidate_evaluations=6, mean_osd_seconds=.03)
     decoders = [{"decoder_id": id, "configuration": {"effective_policy": {"kernel": "same"}}}
                 for id in ("a", "b")]
     point = project(catalog([first, second], decoders))[0]["points"][0]
     assert point["mean_iterations"] == 5
     assert point["mean_directed_edge_updates"] == 50
+    assert point['osd_invocation_fraction'] == .5 and point['mean_osd_candidate_evaluations'] == 5
+    assert point['mean_osd_seconds'] == pytest.approx(.025)
     second["points"][0]["mean_directed_edge_updates"] = None
     point = project(catalog([first, second], decoders))[0]["points"][0]
     assert point["mean_directed_edge_updates"] is None
     assert point["mean_iterations"] == 5
+
+
+def test_postprocessor_controls_cannot_combine_points_to_qualify_a_curve():
+    first = row('osd0', seed=1, evidence='osd0.json')
+    second = row('cs10', seed=1, evidence='cs10.json'); second['points'][0]['x'] = .08
+    curves = project(catalog([first, second], [
+        {'decoder_id': 'osd0', 'configuration': {'effective_configuration': {'family': 'binary_css', 'postprocessing': {'method': 'OSD_0', 'order': 0}}}},
+        {'decoder_id': 'cs10', 'configuration': {'effective_configuration': {'family': 'binary_css', 'postprocessing': {'method': 'OSD_CS', 'order': 10}}}},
+    ]))
+    assert len(curves) == 2 and all(len(c['points']) == 1 for c in curves)
+
+
+def test_execution_backends_keep_timing_evidence_separate():
+    rows = [row(name, seed=1, evidence=name+'.json') for name in ('scalar', 'compiled')]
+    rows[1]['points'][0]['x'] = .08
+    curves = project(catalog(rows, [
+        {'decoder_id': name, 'configuration': {'effective_configuration': {
+            'family': 'binary_css', 'execution_backend': name,
+            'postprocessing': {'method': 'OSD_CS', 'order': 10}}}}
+        for name in ('scalar', 'compiled')]))
+    assert len(curves) == 2 and all(len(c['points']) == 1 for c in curves)
 
 
 def test_variable_min_sum_schedule_cannot_supply_points_to_a_constant_scale_curve():

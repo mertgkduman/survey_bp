@@ -1,0 +1,9 @@
+{
+  "test": "test_postprocessor_controls_cannot_combine_points_to_qualify_a_curve",
+  "observed_before_fix": "OSD0 and CS10 points at different rates formed one view under equal display labels",
+  "expected_curves": 2,
+  "observed_curves": 1,
+  "cause": "postprocessing absent from the effective implementation identity field list",
+  "risk": "incompatible singleton results could falsely qualify as a multi-rate curve",
+  "resolution": "retain the complete postprocessing configuration in implementation identity; regression added"
+}

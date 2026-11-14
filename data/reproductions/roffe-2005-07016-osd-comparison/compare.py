@@ -256,6 +256,7 @@ def main():
     for distance in (9, 11, 13, 15):
         points = [r for r in rows if r['distance'] == distance]
         lines += ['', f'## [[{2*distance**2},2,{distance}]], BP cap T={2*distance**2}', '', *markdown_table(points)]
+    lines += ['', 'New local lower-cost methods: [canonical BP + OSD-0 / CS-10 results and separate work accounting](../roffe-2005-07016-osd-fast/RESULTS.md). Pending points remain explicitly unavailable until their audited runs finish.']
     (ROOT / 'RESULTS.md').write_text('\n'.join(lines)+'\n')
     print(json.dumps(assessment, indent=2))
 

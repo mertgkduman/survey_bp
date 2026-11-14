@@ -123,3 +123,11 @@ def test_isolated_separate_decoder_exposes_full_channel_and_marginal_prior():
     assert row['algorithm']=='Binary BP (separate X/Z)'
     assert all(x in row['label'] for x in ('d = 0','T = 100','p₀ = 2p/3','noise = depolarizing','budget = inferred'))
     assert row['retired'] is None
+
+
+def test_osd_methods_are_distinct_and_show_bp_budget_and_search_depth():
+    script="""require('./web/research/decoder-display.js');const base={family:'binary_css',check_rule:'min_sum',v2c_damping:0,check_cap:null,max_iterations:162,prior:'p',noise_model:'x_only',message_resolution:'float64',alpha_schedule:'1-2**(-iteration)'};console.log(JSON.stringify(['OSD_0','OSD_CS'].map(method=>DecoderDisplay.describe({configuration:{effective_configuration:{...base,postprocessing:{method,order:method==='OSD_0'?0:10}}}}))));"""
+    a,b=json.loads(subprocess.check_output(['node','-e',script],cwd=ROOT,text=True))
+    assert a['algorithm']=='BP+OSD-0' and b['algorithm']=='BP+OSD-CS'
+    assert 'λ = 10' in b['label'] and 'T = 162' in a['label']
+    assert 'αₜ = 1 − 2⁻ᵗ' in b['label'] and 'noise = X-only' in b['label']

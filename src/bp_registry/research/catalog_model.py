@@ -60,7 +60,8 @@ def validate_catalog(catalog: dict[str, Any]) -> dict[str, Any]:
             if value not in indexes[kind]:
                 raise ValueError(f"result series has an unresolved {kind} relationship: {value}")
         for point in series["points"]:
-            for field in ("x", "y", "n", "failures", "ci_low", "ci_high", "mean_work", "mean_seconds", "mean_iterations", "mean_directed_edge_updates"):
+            for field in ("x", "y", "n", "failures", "ci_low", "ci_high", "mean_work", "mean_seconds", "mean_iterations", "mean_directed_edge_updates",
+                          "mean_bp_seconds", "mean_osd_seconds", "osd_invocation_fraction", "mean_osd_candidate_evaluations", "mean_osd_row_xor_words"):
                 value = point.get(field)
                 if value is not None and (isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value)):
                     raise ValueError(f"nonfinite/nonnumeric result value {field} in {key}")
@@ -71,6 +72,11 @@ def validate_catalog(catalog: dict[str, Any]) -> dict[str, Any]:
                 raise ValueError(f"invalid failure count in {key}")
             if point.get("y") is not None and not 0 <= point["y"] <= 1:
                 raise ValueError(f"failure probability outside [0,1] in {key}")
+            if point.get("osd_invocation_fraction") is not None and not 0 <= point["osd_invocation_fraction"] <= 1:
+                raise ValueError(f"OSD invocation fraction outside [0,1] in {key}")
+            for field in ("mean_bp_seconds", "mean_osd_seconds", "mean_osd_candidate_evaluations", "mean_osd_row_xor_words"):
+                if point.get(field) is not None and point[field] < 0:
+                    raise ValueError(f"negative OSD work/time {field} in {key}")
         series.setdefault("series_id", ":".join(key))
         if not isinstance(series["series_id"], str) or not series["series_id"] or series["series_id"] in explicit_series_ids:
             raise ValueError("missing or duplicate series_id")

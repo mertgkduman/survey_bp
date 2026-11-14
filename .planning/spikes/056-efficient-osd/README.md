@@ -4,7 +4,7 @@ idea: efficient-canonical-bp-osd
 name: efficient-osd
 type: comparison
 validates: Given pinned public OSD source and independent exact GF2 oracles, when OSD-0 and CS-10 run, then every candidate is valid, scored reproducibly and traceable at practical cost.
-verdict: PENDING
+verdict: VALIDATED
 related: ['055', '057']
 tags: [osd, correctness, performance, provenance]
 ---
@@ -27,7 +27,7 @@ Pinned public reference: quantumgizmos/ldpc commit d3429964cd4ffe1abfc041c6ec8b8
 
 ## How to Run
 
-Qualification scripts and commands will be recorded after implementation. No package replacement in the primary environment is permitted.
+Run `PYTHONPATH=src .venv/bin/python .planning/spikes/056-efficient-osd/probe.py` with the clean pinned native checkout at `.git/osd-upstream`. It builds the thin reference adapter with g++ and writes the qualification receipt. Run `PYTHONPATH=src .venv/bin/python -m pytest -q tests/test_uniform_osd.py tests/canonical/test_postprocessing_osd.py` for independent algebra and historical-admission checks. No package replacement in the primary environment was needed. Do not overwrite a receipt pinned by a dispatched plan; use a separate qualification directory for later changes.
 
 ## Investigation Trail
 
@@ -37,4 +37,10 @@ Qualification scripts and commands will be recorded after implementation. No pac
 
 ## Results
 
-First qualification passes404 complete native/oracle candidate-set comparisons, including128 actual toric BP terminal-state/method cases. Thirty regression cases pass including the unchanged failed Phase7 receipt contract. Warm alternating single-core timings show CS10 about2.2–2.4x faster than native, but OSD0 is slower (0.53–0.62x native throughput on longer codes). This is not yet a production-efficiency pass. Preserve qualification-before.json and the baseline source revision before optimizing original-syndrome checks and OSD0 reduction work.
+Passed404 complete native/oracle candidate-set comparisons, including128 actual toric BP terminal-state/method cases. Thirty regression cases pass including the unchanged failed Phase7 receipt contract. Exact search coverage, scoring/ties, signed reliabilities, redundant/inconsistent syndromes, zero inputs, packed-word boundaries, immutability and original-syndrome validation pass.
+
+The first implementation was correct but OSD0 was slower. Preserved baseline source commit9865447 and qualification-before.json; removed a dense per-call int64 validation allocation and unnecessary OSD0 above-diagonal reduction. The final warmed, alternating, single-core benchmark puts CS10 at2.1–3.4x native throughput, with the optimized call also producing full candidates, digest and counters. OSD0 is33–55 microseconds/call: slower than native's final-only interface on the two smaller matrices and comparable/faster on the larger ones. No universal OSD0 speedup is claimed. Its additional provenance/validation overhead is retained, and end-to-end pilot timings must assess its contribution alongside canonical BP.
+
+The native timing wrapper was corrected to exclude redundant Python tie-control sorting for already order-equivalent unique inputs. Only qualification.json's final timings support the final comparison; the earlier snapshot remains historical. Constructor/JIT costs are excluded, CPU affinity is recorded, and measurements do not imply end-to-end speedups.
+
+Qualified scope is uniform-channel OSD0/CS with no hidden truth. Source sorting is signed log(P0/P1), stable original-ID ties are explicit, and strict first-minimum scoring is uniform-channel minimum Hamming weight. OSD0 uses a partial pivot prefix sufficient to span the syndrome; its reported pivots/unprocessed columns are not a claim of full matrix rank. Complete candidate vectors and weights are available through the API, with per-shot candidate-set digests and deterministic replay planned for production. The historical failed Phase7 admission remains unchanged. Nonuniform channels and generic Phase7 worker admission are outside this new version's qualification.

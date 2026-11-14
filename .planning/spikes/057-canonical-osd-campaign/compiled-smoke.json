@@ -1,0 +1,9 @@
+{
+  "status": "passed",
+  "points": 8,
+  "shots": 128,
+  "osd_calls": 72,
+  "scope": "qualification only; fast complete ledger, resume, endpoint replay, publisher/report; not registered or pooled",
+  "plan_sha256": "aca50057b51d3812fce021e0a9f98db0bb709191f681687881fb16bff926e220",
+  "verified_sha256": "527337dd10480fced6394c2c2f6e3a3c254f8a9775bedb672f885fee87137087"
+}

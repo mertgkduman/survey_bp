@@ -44945,6 +44945,35 @@
         }
       ],
       "source_path": "data/reproductions/roffe-2005-07016-damping/confirmation/verified.json"
+    },
+    {
+      "assets": [
+        {
+          "availability": "local_only",
+          "kind": "json",
+          "label": "Frozen BP/OSD design",
+          "local_storage_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/roffe-2005-07016-osd-fast/plan.json",
+          "path": "data/reproductions/roffe-2005-07016-osd-fast/plan.json",
+          "sha256": "b034513155d31da31ba6854f48f5416aac3dacc7b3abf022140e86b3f912c76b",
+          "url": null
+        },
+        {
+          "availability": "local_only",
+          "kind": "json",
+          "label": "Audited BP/OSD measurements",
+          "local_storage_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/roffe-2005-07016-osd-fast/verified.json",
+          "path": "data/reproductions/roffe-2005-07016-osd-fast/verified.json",
+          "sha256": "7815fa00420a61c9887ec3852a383e6d192d1a6501d95476f4984a1c48a7e770",
+          "url": null
+        }
+      ],
+      "caveat": "Canonical adaptation: original toric codes/grids, X-only, undamped canonical min-sum alpha_t=1-2^-t and T=n; separately qualified source-derived OSD0/CS10 after nonconvergence. Signed LLR reliability; original-column tie order explicit. Source paper CS60 is context, not a claimed reproduced CS10 curve. BP iterations/edge work exclude elimination/search; separate OSD work and stage times are retained. Historical failed Phase7 admission is not relabeled.20 logical failures or1e8 shots; no superiority claim without uncertainty.",
+      "dataset_id": "roffe-canonical-bp-osd-fast",
+      "evidence_status": "canonical_adaptation",
+      "label": "Roffe paper-budget canonical BP + OSD-0 / CS-10",
+      "paper_id": "roffe-2005-07016-v2",
+      "points": [],
+      "source_path": "data/reproductions/roffe-2005-07016-osd-fast/verified.json"
     }
   ],
   "decoders": [
@@ -52620,6 +52649,30 @@
         "original_instruction_path": "data/reproductions/roffe-2005-07016-damping/README.md",
         "study_path": "data/reproductions/roffe-2005-07016-damping/confirmation/plan.json"
       }
+    },
+    {
+      "code_ids": [],
+      "dataset_id": "roffe-canonical-bp-osd-fast",
+      "dataset_ids": [
+        "roffe-canonical-bp-osd-fast"
+      ],
+      "decoder_ids": [],
+      "description": "Canonical adaptation: original toric codes/grids, X-only, undamped canonical min-sum alpha_t=1-2^-t and T=n; separately qualified source-derived OSD0/CS10 after nonconvergence. Signed LLR reliability; original-column tie order explicit. Source paper CS60 is context, not a claimed reproduced CS10 curve. BP iterations/edge work exclude elimination/search; separate OSD work and stage times are retained. Historical failed Phase7 admission is not relabeled.20 logical failures or1e8 shots; no superiority claim without uncertainty.",
+      "evidence_status": "canonical_adaptation",
+      "experiment_id": "roffe-canonical-bp-osd-fast",
+      "paper_ids": [
+        "roffe-2005-07016-v2"
+      ],
+      "reproduction_recipe": {
+        "budget_note": "Collection audits retained evidence. Frozen simulations require explicit point indices.",
+        "commands": [
+          "PYTHONPATH=src .venv/bin/python data/reproductions/roffe-2005-07016-osd-fast/run.py --collect"
+        ],
+        "decoder_path": "data/reproductions/roffe-2005-07016-osd-fast/plan.json",
+        "kind": "source_command",
+        "original_instruction_path": "data/reproductions/roffe-2005-07016-osd-fast/README.md",
+        "study_path": "data/reproductions/roffe-2005-07016-osd-fast/plan.json"
+      }
     }
   ],
   "extension_sources": [
@@ -52654,6 +52707,10 @@
     {
       "path": "data/reproductions/roffe-2005-07016-damping/confirmation/catalog.json",
       "sha256": "3c8e16e437ff58e68a10a758cfa545d2128afd60d88436147928c69c1a30d30c"
+    },
+    {
+      "path": "data/reproductions/roffe-2005-07016-osd-fast/catalog.json",
+      "sha256": "1a04d2989fee3ed52ffb8f750a8d3d046c4d3be6727878f23dfc816802c6dcb4"
     }
   ],
   "limitations": [

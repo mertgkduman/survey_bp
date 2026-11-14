@@ -161,3 +161,5 @@ All Figure3 rates and available source points follow. Each table is sorted by it
 | 0.108 | 0.9999 | 0.3216 | 1 | 1 | 1 | 0.9524 |
 | 0.109 | 0.9999 | 0.3332 | 1 | 1 | 1 | 1 |
 | 0.11 | 0.9999 | 0.345 | 1 | 1 | 1 | 1 |
+
+New local lower-cost methods: [canonical BP + OSD-0 / CS-10 results and separate work accounting](../roffe-2005-07016-osd-fast/RESULTS.md). Pending points remain explicitly unavailable until their audited runs finish.

@@ -1,0 +1,229 @@
+{
+  "affinity_before": [
+    56,
+    120
+  ],
+  "affinity_during_benchmark": [
+    56
+  ],
+  "benchmarks": [
+    {
+      "code": "toric9",
+      "method": "OSD0",
+      "native_ns_per_call": 28594.59375,
+      "native_trials": [
+        25694.0625,
+        27065.6875,
+        24326.5,
+        32358.4375,
+        30123.5,
+        33058.125
+      ],
+      "optimized_ns_per_call": 41932.53125,
+      "optimized_trials": [
+        38364.4375,
+        43778.75,
+        42045.3125,
+        41819.75,
+        94839.625,
+        31982.25
+      ],
+      "speed_ratio": 0.6819190947362616
+    },
+    {
+      "code": "toric9",
+      "method": "CS10",
+      "native_ns_per_call": 184116.5,
+      "native_trials": [
+        182244.8125,
+        210167.6875,
+        204297.3125,
+        185988.1875,
+        172630.625,
+        176867.5625
+      ],
+      "optimized_ns_per_call": 86555.28125,
+      "optimized_trials": [
+        89462.1875,
+        89434.0,
+        88371.6875,
+        84738.875,
+        82201.4375,
+        57607.125
+      ],
+      "speed_ratio": 2.1271550082335384
+    },
+    {
+      "code": "toric11",
+      "method": "OSD0",
+      "native_ns_per_call": 34508.15625,
+      "native_trials": [
+        39205.4375,
+        35661.6875,
+        34042.125,
+        34974.1875,
+        32772.0,
+        32230.0625
+      ],
+      "optimized_ns_per_call": 32978.78125,
+      "optimized_trials": [
+        35687.125,
+        31129.75,
+        43427.625,
+        30566.3125,
+        34130.0625,
+        31827.5
+      ],
+      "speed_ratio": 1.0463745154317976
+    },
+    {
+      "code": "toric11",
+      "method": "CS10",
+      "native_ns_per_call": 283368.0,
+      "native_trials": [
+        284873.0625,
+        281862.9375,
+        306638.8125,
+        280790.25,
+        278935.625,
+        293020.625
+      ],
+      "optimized_ns_per_call": 104842.46875,
+      "optimized_trials": [
+        107411.5,
+        101974.375,
+        140740.0,
+        102273.4375,
+        116211.75,
+        93972.8125
+      ],
+      "speed_ratio": 2.7027978583344834
+    },
+    {
+      "code": "toric13",
+      "method": "OSD0",
+      "native_ns_per_call": 52674.84375,
+      "native_trials": [
+        51222.0,
+        61551.4375,
+        49837.5625,
+        54127.6875,
+        49974.5625,
+        59795.6875
+      ],
+      "optimized_ns_per_call": 47078.09375,
+      "optimized_trials": [
+        47225.1875,
+        42365.4375,
+        50748.875,
+        43339.625,
+        48230.1875,
+        46931.0
+      ],
+      "speed_ratio": 1.1188822561448764
+    },
+    {
+      "code": "toric13",
+      "method": "CS10",
+      "native_ns_per_call": 472407.375,
+      "native_trials": [
+        472245.0625,
+        472569.6875,
+        518970.3125,
+        471905.0625,
+        471747.625,
+        515363.25
+      ],
+      "optimized_ns_per_call": 153765.1875,
+      "optimized_trials": [
+        171921.4375,
+        150472.625,
+        172283.5625,
+        149341.875,
+        157057.75,
+        147518.125
+      ],
+      "speed_ratio": 3.072264812866046
+    },
+    {
+      "code": "toric15",
+      "method": "OSD0",
+      "native_ns_per_call": 73558.46875,
+      "native_trials": [
+        77154.4375,
+        72592.875,
+        74524.0625,
+        76405.0625,
+        65261.625,
+        70894.9375
+      ],
+      "optimized_ns_per_call": 55465.15625,
+      "optimized_trials": [
+        54786.25,
+        48806.0625,
+        56144.0625,
+        50005.875,
+        58231.3125,
+        63489.375
+      ],
+      "speed_ratio": 1.326210430534936
+    },
+    {
+      "code": "toric15",
+      "method": "CS10",
+      "native_ns_per_call": 814633.625,
+      "native_trials": [
+        787752.9375,
+        821469.4375,
+        759312.75,
+        861474.6875,
+        807797.8125,
+        863219.375
+      ],
+      "optimized_ns_per_call": 239006.96875,
+      "optimized_trials": [
+        245068.5625,
+        242393.9375,
+        240325.6875,
+        214731.0,
+        237688.25,
+        230365.5625
+      ],
+      "speed_ratio": 3.4084095089800597
+    }
+  ],
+  "checked_complete_candidate_sets": 404,
+  "failures": [],
+  "implementation_sha256": "b2e4b1685afb20f5c10acaad31837184fb654004d05e027e2438431659b59586",
+  "native_build": {
+    "command": [
+      "g++",
+      "-std=c++17",
+      "-O3",
+      "-shared",
+      "-fPIC",
+      "-I/hpc/group/pfisterlab/mg551/storage/survey_bp/.git/osd-upstream/src_cpp",
+      "/hpc/group/pfisterlab/mg551/storage/survey_bp/.planning/spikes/056-efficient-osd/reference.cpp",
+      "-o",
+      "/hpc/group/pfisterlab/mg551/storage/survey_bp/.git/osd-reference.so"
+    ],
+    "commit": "d3429964cd4ffe1abfc041c6ec8b8425cb174f40",
+    "compiler": "g++ (GCC) 11.5.0 20240719 (Red Hat 11.5.0-14)",
+    "library_sha256": "d550b910405d4b2dfc70eaa8b03dc40dbb263439d2dbc06c153daf45237b9103",
+    "source_sha256": {
+      "LICENSE": "8e3a6c34477756c5abb278c153e25b447edc334145716e83f4ed121beadd03bb",
+      "src_cpp/gf2sparse_linalg.hpp": "5ad67b841e3c977734aefb2a2cc8a1facd249a17558b19a720ffa98b0c233737",
+      "src_cpp/osd.hpp": "604ec8273edcb253e8db7abeeb1ab26ddf203ea2e272f9616549c9670a7e7415",
+      "src_cpp/sort.hpp": "811abe797c882e2aa17158d758354d15c4b514d33acc0eb24024a7fdcf7d9f9b"
+    }
+  },
+  "primary_ldpc_version": "2.4.1",
+  "status": "passed",
+  "tie_convention": "signed ascending; original-column ties controlled before native call",
+  "timing_scope": "warm standalone decoder calls, matched ordered inputs; native final-only vs optimized full candidates/digest/check; constructor/JIT excluded",
+  "topology_snapshot_after_benchmark": {
+    "host": "dcc-core-ferc-u-ab39-5-6",
+    "lscpu": "CPU CORE SOCKET\n  0    0      0\n  1    1      0\n  2    2      0\n  3    3      0\n  4    4      0\n  5    5      0\n  6    6      0\n  7    7      0\n  8    8      0\n  9    9      0\n 10   10      0\n 11   11      0\n 12   12      0\n 13   13      0\n 14   14      0\n 15   15      0\n 16   16      0\n 17   17      0\n 18   18      0\n 19   19      0\n 20   20      0\n 21   21      0\n 22   22      0\n 23   23      0\n 24   24      0\n 25   25      0\n 26   26      0\n 27   27      0\n 28   28      0\n 29   29      0\n 30   30      0\n 31   31      0\n 32   32      1\n 33   33      1\n 34   34      1\n 35   35      1\n 36   36      1\n 37   37      1\n 38   38      1\n 39   39      1\n 40   40      1\n 41   41      1\n 42   42      1\n 43   43      1\n 44   44      1\n 45   45      1\n 46   46      1\n 47   47      1\n 48   48      1\n 49   49      1\n 50   50      1\n 51   51      1\n 52   52      1\n 53   53      1\n 54   54      1\n 55   55      1\n 56   56      1\n 57   57      1\n 58   58      1\n 59   59      1\n 60   60      1\n 61   61      1\n 62   62      1\n 63   63      1\n 64    0      0\n 65    1      0\n 66    2      0\n 67    3      0\n 68    4      0\n 69    5      0\n 70    6      0\n 71    7      0\n 72    8      0\n 73    9      0\n 74   10      0\n 75   11      0\n 76   12      0\n 77   13      0\n 78   14      0\n 79   15      0\n 80   16      0\n 81   17      0\n 82   18      0\n 83   19      0\n 84   20      0\n 85   21      0\n 86   22      0\n 87   23      0\n 88   24      0\n 89   25      0\n 90   26      0\n 91   27      0\n 92   28      0\n 93   29      0\n 94   30      0\n 95   31      0\n 96   32      1\n 97   33      1\n 98   34      1\n 99   35      1\n100   36      1\n101   37      1\n102   38      1\n103   39      1\n104   40      1\n105   41      1\n106   42      1\n107   43      1\n108   44      1\n109   45      1\n110   46      1\n111   47      1\n112   48      1\n113   49      1\n114   50      1\n115   51      1\n116   52      1\n117   53      1\n118   54      1\n119   55      1\n120   56      1\n121   57      1\n122   58      1\n123   59      1\n124   60      1\n125   61      1\n126   62      1\n127   63      1\n",
+    "scope": "post-benchmark snapshot; exclusive physical-core occupancy not asserted"
+  }
+}

@@ -4,7 +4,7 @@ idea: efficient-canonical-bp-osd
 name: canonical-osd-campaign
 type: standard
 validates: Given qualified OSD-0/CS-10, when the canonical BP controller emits its terminal state, then optional fallback runs without hidden truth or second BP and produces paper-budget auditable results.
-verdict: PENDING
+verdict: VALIDATED
 related: ['056']
 tags: [osd, canonical, campaign, roffe]
 ---
@@ -19,6 +19,14 @@ Use the existing canonical min-sum sweep unchanged, preserve its terminal signed
 
 Initial design uses the original undamped BP so postprocessing is the only changed setting. Existing damped BP/Q-BP and paper CS60 results remain comparison context. Production dispatch depends on Spike056 qualification; no old plan/runtime or historical result is edited.
 
+The first controller retained the public Python sweep wrapper. The128-shot smoke passed all ledgers/replays but exposed substantial per-iteration wrapper overhead. Its frozen `roffe-2005-07016-osd` plan remains an unlaunched baseline. A separate `roffe-2005-07016-osd-fast` campaign compiles only traversal/allocation/stopping around the unchanged canonical sweep and original-syndrome check. It preserves the original initialization prior separately from the canonical v2 update prior; recomputing them as one expression would change float64 beliefs.
+
 ## Results
 
-Pending qualification and implementation.
+All436 full-budget terminal states over109 original code/rate strata match candidates, bitwise float64 terminal beliefs, stopping and work.192 complete events match every non-timing field, including complete OSD candidate-set hashes. Both converged and nonconverged paths are represented. The separate fast smoke audited128 shots,72 OSD calls, exact resume, full-ledger and endpoint replay, normalized publication and comparison reporting. Qualification shots are unregistered and never pooled with production.
+
+Alternating warmed complete-event timings improve approximately5–48x over the scalar controller in the sampled cases. At p=.01 they are94–335 microseconds/shot including sampling, decoding, independent evaluation and hashes, excluding JIT and ledger I/O. These are small-sample forecasts without exclusive-core guarantees; stage times in reported results exclude sampling/evaluation. Native OSD-only comparisons remain in Spike056.
+
+The frozen production design has218 points (109 strata times OSD-0/CS-10), T=n, original alpha schedule/min-sum/X-only grid, one CPU/2GiB per point,20 logical failures or1e8 shots, and an after-success full audit. It preserves earlier evidence, native implementations, canonical kernels and phase gates. A free-space checkpoint guard avoids filesystem exhaustion without changing scientific stopping. Candidate methods and execution backend participate in curve identity; singleton filtering and empty/stale-choice handling remain central. Tables/CSV show BP work beside separate OSD costs.
+
+Validation of implementation and launch is distinct from completion of the prospective statistical campaign. Production measurements and source comparisons are updated in `data/reproductions/roffe-2005-07016-osd-fast/RESULTS.md` only after full retained-ledger audit. No CS60 reproduction or decoder superiority is inferred from qualification.

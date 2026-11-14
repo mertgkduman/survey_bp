@@ -5,11 +5,11 @@ current_phase: 11
 current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
-stopped_at: Roffe Figure3 BP-OSD source comparison complete; Roffe measured campaigns complete; MacKay rare point continues
-last_updated: "2026-11-14T03:53:00.354483+00:00"
-last_activity: 2026-11-13
-last_activity_desc: Quick261113-vj0 adds all108 Figure3 BP-OSD-CS paper values to109-rate tables alongside436 local measurements;22 tests pass, no simulation or catalog change.
-state_head: 04002e0
+stopped_at: OSD0/CS10 and compiled canonical BP traversal qualified; frozen218-point Roffe campaign ready for dispatch
+last_updated: "2026-11-14T05:05:49.927291+00:00"
+last_activity: 2026-11-14
+last_activity_desc: Spikes056-057 qualify source-derived OSD0/CS10 and unchanged canonical BP traversal; frozen218-point Roffe campaign,100 tests and12 browser groups.
+state_head: 9865447
 progress:
   total_phases: 14
   completed_phases: 8
@@ -34,7 +34,10 @@ Total Phases: 14
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
-Last activity: 2026-11-13 — quick261113-vj0 tabulates Roffe paper BP-OSD against confirmed BP-family results
+Last activity: 2026-11-14 — spikes056–057 qualify efficient canonical BP + OSD-0 / CS-10 and prepare production dispatch
+Last Activity Description: Public OSD source pinned at d3429964cd4ffe1abfc041c6ec8b8425cb174f40;404 complete native/independent-oracle candidate sets pass. Packed source-derived CS10 achieves2.1–3.4x native final-only throughput; OSD0 costs33–55us with full provenance. The unchanged canonical sweep is called from a separate compiled traversal, with436 bitwise terminal-state and192 complete-event comparisons across109 source strata.128 qualification shots/72 OSD calls pass resume, full-ledger, endpoint and publication checks. Frozen campaign roffe-2005-07016-osd-fast has218 points, X-only/min-sum/alpha schedule/T=n,20 logical failures or1e8 shots, one CPU per point, separate BP/OSD work and timing. Superseded frozen scalar controller remains unlaunched.100 unique tests and12 Chromium workflow groups pass; prelaunch catalog104 curves/1073 points/12 codes/0 circuits, historical points unchanged. No canonical kernel, frozen prior campaign, v1, generic Phase7 admission or Phase11 gate/counter changes. Production dispatch and partial results will be recorded in the next activity update.
+
+Prior source comparison activity: 2026-11-13 — quick261113-vj0 tabulates Roffe paper BP-OSD against confirmed BP-family results
 Last Activity Description: Added all108 main-panel Figure3 BP+OSD-CS lambda60 source ordinates and109 ordinary-BP source-rate rows alongside436 local confirmed measurements. Tables preserve the missing length450/p=.01 value, undefined author samples/work, source error-bar semantics and separate noise channels. At X-only p=.02, source BP-OSD LER is about2,200–1.2M times below damped binary BP estimates, with additional elimination/search work. Complete Markdown/CSV, source hashes and PNG/PDF are in roffe-2005-07016-osd-comparison; linked from damping RESULTS.md. Passed22 source/join/damping/unchanged-plan tests; public catalog remains byte-identical104 curves/1073 points/12 codes/0 circuits. No simulations, canonical/frozen/source or measured-data changes. Phase11 gates/counters unchanged; MacKay rare point continues separately.
 
 Prior Roffe damping activity: All1526 tuning points and436 fresh confirmation points pass the original full audit; independent re-reading reconciles all436 raw ledgers and the completed receipt. Confirmation retained47,473 shots/8,720 failures. Selected BP d=.5 and Q-BP d=.3 on all four codes, preserving paper grids/min-sum/T=n. At matched X rate.02, Q-BP depolarizing p=.03 LER estimates improve15–21x versus its own undamped controls; ordinary BP improvements are smaller. Equal-rate mean LER decreases3.4–16.3% for BP and20.8–35.1% for Q-BP; mean iterations decrease2.9–10.8% and19.4–31.9%. These are descriptive20-failure results with different channels across families. Final collector61794901 failed only after audit/normalization at duplicate Roffe paper metadata; exact-equality paper merging now repairs future rebuilds and rejects conflicts. Public104 curves/1073 points/12 codes/0 circuits; all165 prior raw series/points unchanged. Saved full CSV/report/assessment/four-panel figure. Passed62 tests and16 Chromium groups. No frozen/kernel/runtime/publisher/v1 changes or new simulations. Separate MacKay rare point remains running, last observed33.79M shots/3 failures. Phase11 gates and counters unchanged.

@@ -94,3 +94,14 @@ def test_retired_public_datasets_resolve_to_preserved_evidence():
     for invalid in (['missing'], ['d', 'd'], [{}], 'd'):
         with pytest.raises(ValueError, match='public retired datasets'):
             validate_catalog({**base, 'public_retired_dataset_ids': invalid})
+
+
+@pytest.mark.parametrize('field,value', [('osd_invocation_fraction', 1.1), ('mean_osd_seconds', -1),
+                                        ('mean_osd_candidate_evaluations', -2), ('mean_osd_row_xor_words', float('nan'))])
+def test_invalid_osd_costs_cannot_enter_the_catalog(field, value):
+    c = {'papers': [{'paper_id': 'p'}], 'datasets': [{'dataset_id': 'd', 'paper_id': 'p'}],
+         'codes': [{'code_id': 'c'}], 'decoders': [{'decoder_id': 'm'}], 'experiments': [],
+         'result_series': [{'dataset_id': 'd', 'code_id': 'c', 'decoder_id': 'm',
+                            'points': [{'x': .01, 'y': .1, field: value}]}]}
+    with pytest.raises(ValueError):
+        validate_catalog(c)

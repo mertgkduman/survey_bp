@@ -2,6 +2,7 @@
 from hashlib import sha256
 import importlib.util
 import json
+import math
 import os
 from pathlib import Path
 import statistics
@@ -21,7 +22,7 @@ import bp_study_runtime as rt
 
 def terminal(job, syndrome):
     _, _, _, graphs = rt.state(job)
-    old = np.full(graphs[0].table.edge_count, np.log((1-job['physical_p'])/job['physical_p']))
+    old = np.full(graphs[0].table.edge_count, math.log((1-job['physical_p'])/job['physical_p']))
     code = rt.load_artifact(REPO, job['code_artifact']).code
     for iteration in range(1, job['decoder']['max_iterations']+1):
         sweep = graphs[min(iteration, len(graphs))-1].sweep(old, syndrome, error_rate=job['physical_p'])

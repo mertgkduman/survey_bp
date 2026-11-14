@@ -51,14 +51,14 @@ class Native:
         s = np.ascontiguousarray(syndrome, dtype=np.uint8)
         # Upstream qsort has unspecified equal-value ordering. Feed equivalent
         # signed-order ranks to control ties by original column ID explicitly.
-        order = np.argsort(posterior, kind='stable')
         if control_ties:
+            order = np.argsort(posterior, kind='stable')
             ranks = np.empty(len(posterior), dtype=np.float64); ranks[order] = np.arange(len(order))
         else:
             ranks = np.ascontiguousarray(posterior, dtype=np.float64)
-        selected = np.empty(len(order), dtype=np.uint8)
-        capacity = 1+len(order)+self.order*(self.order-1)//2
-        candidates = np.empty((capacity, len(order)), dtype=np.uint8) if trace else None
+        selected = np.empty(len(posterior), dtype=np.uint8)
+        capacity = 1+len(posterior)+self.order*(self.order-1)//2
+        candidates = np.empty((capacity, len(posterior)), dtype=np.uint8) if trace else None
         count = self.library.osd_decode(self.handle, s.ctypes.data, ranks.ctypes.data,
                                        selected.ctypes.data, candidates.ctypes.data if trace else None)
         if count < 0:

@@ -36,6 +36,17 @@ def _weight(words):
 
 
 @njit(cache=True)
+def _original_check(matrix, candidate, syndrome):
+    for row in range(matrix.shape[0]):
+        parity = 0
+        for word in range(matrix.shape[1]):
+            parity ^= _popcount(matrix[row, word] & candidate[word]) & 1
+        if parity != syndrome[row]:
+            return False
+    return True
+
+
+@njit(cache=True)
 def _solve(matrix, syndrome, ordering, n, depth, cs):
     m, width = matrix.shape
     a, b = matrix.copy(), syndrome.copy()
@@ -77,16 +88,17 @@ def _solve(matrix, syndrome, ordering, n, depth, cs):
                 pivots[:rank], np.zeros(0, dtype=np.int64), probes, xor_words, row_swaps, -1)
     # Reduce only pivot rows above the diagonal, reusing one elimination for
     # the OSD0 solution and every affine nullspace direction.
-    for i in range(rank-1, -1, -1):
-        column = pivots[i]
-        word, bit = column//64, np.uint64(1) << np.uint64(column % 64)
-        for row in range(i):
-            probes += 1
-            if a[row, word] & bit:
-                for w in range(width):
-                    a[row, w] ^= a[i, w]
-                b[row] ^= b[i]
-                xor_words += width
+    if cs:
+        for i in range(rank-1, -1, -1):
+            column = pivots[i]
+            word, bit = column//64, np.uint64(1) << np.uint64(column % 64)
+            for row in range(i):
+                probes += 1
+                if a[row, word] & bit:
+                    for w in range(width):
+                        a[row, w] ^= a[i, w]
+                    b[row] ^= b[i]
+                    xor_words += width
     free = np.empty(n-rank, dtype=np.int64)
     q = 0
     for column in ordering:
@@ -98,8 +110,13 @@ def _solve(matrix, syndrome, ordering, n, depth, cs):
                 pivots[:rank], free, probes, xor_words, row_swaps, -2)
     count = 1 + (q + depth*(depth-1)//2 if cs else 0)
     candidates = np.zeros((count, width), dtype=np.uint64)
-    for row in range(rank):
-        if b[row]:
+    for row in range(rank-1, -1, -1):
+        value = int(b[row])
+        if not cs:
+            # OSD0 needs only one triangular solve, not a complete RREF.
+            for w in range(width):
+                value ^= _popcount(a[row, w] & candidates[0, w]) & 1
+        if value:
             column = pivots[row]
             candidates[0, column//64] |= np.uint64(1) << np.uint64(column % 64)
     if cs:
@@ -195,11 +212,16 @@ class UniformOsd:
         if best < 0:
             raise ValueError('inconsistent syndrome' if best == -1 else 'OSD search depth exceeds non-pivot count')
         selected = np.unpackbits(np.ascontiguousarray(values[best], dtype='<u8').view(np.uint8), bitorder='little')[:self.n]
-        if not np.array_equal((self.check_matrix.astype(np.int64) @ selected) % 2, s):
+        if not _original_check(self.packed_matrix, values[best], s):
             raise RuntimeError('OSD output fails independent original-syndrome validation')
         work = {'sort_items': self.n, 'pivot_probes': probes, 'row_xor_words': xor_words,
                 'row_swaps': swaps, 'pivots': len(pivots), 'candidate_evaluations': len(weights),
-                'candidate_score_words': len(weights)*self.packed_matrix.shape[1], 'original_syndrome_checks': 1}
+                'candidate_score_words': len(weights)*self.packed_matrix.shape[1], 'original_syndrome_checks': 1,
+                'matrix_words_copied': self.packed_matrix.size,
+                'back_substitution_words': len(pivots)*self.packed_matrix.shape[1] if self.method == 'OSD_0' else 0,
+                'affine_single_pivot_probes': len(pivots)*len(free) if self.method == 'OSD_CS' else 0,
+                'affine_pair_xor_words': (self.order*(self.order-1)//2)*self.packed_matrix.shape[1] if self.method == 'OSD_CS' else 0,
+                'original_check_words': self.packed_matrix.size}
         encoded = np.ascontiguousarray(values, dtype='<u8').tobytes() + np.ascontiguousarray(weights, dtype='<i8').tobytes()
         return OsdResult(immutable_snapshot(selected, dtype=np.uint8), immutable_snapshot(values),
                          immutable_snapshot(weights), immutable_snapshot(ordering), immutable_snapshot(pivots),

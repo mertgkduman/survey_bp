@@ -1,0 +1,65 @@
+{
+  "datasets": [
+    {
+      "assets": [
+        {
+          "kind": "json",
+          "label": "Frozen BP/OSD design",
+          "path": "data/reproductions/roffe-2005-07016-osd-fast/plan.json"
+        },
+        {
+          "kind": "json",
+          "label": "Audited BP/OSD measurements",
+          "path": "data/reproductions/roffe-2005-07016-osd-fast/verified.json"
+        }
+      ],
+      "caveat": "Canonical adaptation: original toric codes/grids, X-only, undamped canonical min-sum alpha_t=1-2^-t and T=n; separately qualified source-derived OSD0/CS10 after nonconvergence. Signed LLR reliability; original-column tie order explicit. Source paper CS60 is context, not a claimed reproduced CS10 curve. BP iterations/edge work exclude elimination/search; separate OSD work and stage times are retained. Historical failed Phase7 admission is not relabeled.20 logical failures or1e8 shots; no superiority claim without uncertainty.",
+      "dataset_id": "roffe-canonical-bp-osd-fast",
+      "evidence_status": "canonical_adaptation",
+      "label": "Roffe paper-budget canonical BP + OSD-0 / CS-10",
+      "paper_id": "roffe-2005-07016-v2",
+      "points": [],
+      "source_path": "data/reproductions/roffe-2005-07016-osd-fast/verified.json"
+    }
+  ],
+  "decoders": [],
+  "experiments": [
+    {
+      "code_ids": [],
+      "dataset_id": "roffe-canonical-bp-osd-fast",
+      "dataset_ids": [
+        "roffe-canonical-bp-osd-fast"
+      ],
+      "decoder_ids": [],
+      "description": "Canonical adaptation: original toric codes/grids, X-only, undamped canonical min-sum alpha_t=1-2^-t and T=n; separately qualified source-derived OSD0/CS10 after nonconvergence. Signed LLR reliability; original-column tie order explicit. Source paper CS60 is context, not a claimed reproduced CS10 curve. BP iterations/edge work exclude elimination/search; separate OSD work and stage times are retained. Historical failed Phase7 admission is not relabeled.20 logical failures or1e8 shots; no superiority claim without uncertainty.",
+      "evidence_status": "canonical_adaptation",
+      "experiment_id": "roffe-canonical-bp-osd-fast",
+      "paper_ids": [
+        "roffe-2005-07016-v2"
+      ],
+      "reproduction_recipe": {
+        "budget_note": "Collection audits retained evidence. Frozen simulations require explicit point indices.",
+        "commands": [
+          "PYTHONPATH=src .venv/bin/python data/reproductions/roffe-2005-07016-osd-fast/run.py --collect"
+        ],
+        "decoder_path": "data/reproductions/roffe-2005-07016-osd-fast/plan.json",
+        "kind": "source_command",
+        "original_instruction_path": "data/reproductions/roffe-2005-07016-osd-fast/README.md",
+        "study_path": "data/reproductions/roffe-2005-07016-osd-fast/plan.json"
+      }
+    }
+  ],
+  "papers": [
+    {
+      "evidence_path": "data/reproductions/roffe-2005-07016-bp/source.json",
+      "identity": "arXiv:2005.07016v2; Phys. Rev. Research 2, 043423 (2020)",
+      "kind": "paper",
+      "paper_id": "roffe-2005-07016-v2",
+      "registered_scope": "Figure 3 toric regular min-sum BP; Q-BP is a controlled comparison",
+      "source_url": "https://arxiv.org/abs/2005.07016v2",
+      "title": "Decoding Across the Quantum LDPC Code Landscape"
+    }
+  ],
+  "result_series": [],
+  "schema": "research-catalog-extension-v1"
+}

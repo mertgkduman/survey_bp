@@ -53,3 +53,12 @@ The project `.venv` supplies the pinned versions in `pyproject.toml`; no new dep
 - Keep a dated, single-provider citation snapshot and stable publication IDs; inspect journal/preprint duplicates without adding their counts as though disjoint.
 - Verify decoder-baseline eligibility in primary methods/results independently from bibliographic prominence. Distinguish standalone BP comparisons, BP-based code benchmarks and BP-plus-postprocessing hybrids.
 - Literature inclusion identifies a source to extract, not a qualified reproduction manifest or permission to launch experiments.
+
+## BP and OSD composition
+
+- Compare complete candidate sets and selected outputs against source execution and an independent GF2 oracle; a syndrome-valid final vector alone does not qualify a search implementation.
+- Signed log(P0/P1) ordering is distinct from absolute reliability. Declare column-ID ties and first-minimum score ties explicitly when native sorting does not specify them.
+- Preserve a canonical BP terminal state and invoke OSD only for original-syndrome nonconvergence, before hidden-truth evaluation. Never rerun native BP inside postprocessing or repair converged logical errors with truth.
+- Separate BP sweeps/edge work from OSD elimination/search operands and stage timing. Complete candidate API/digests and deterministic replay keep compact ledgers inspectable without serializing every vector.
+- Qualify compiled outer-loop changes with bitwise terminal beliefs, candidates, stopping and complete-event work/provenance. Preserve historical initialization and update-prior expressions; algebraic equivalence does not guarantee float64 identity.
+- Keep superseded frozen controllers as unlaunched baselines. New execution backends and postprocessing settings participate in evidence identity; benchmark scope and stage-time scope must remain explicit.

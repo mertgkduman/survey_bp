@@ -1,0 +1,40 @@
+{
+  "osd_browser": {
+    "checks": [
+      "OSD0 and CS10 stay distinct for all four codes with exact BP budget and scale schedule",
+      "Table and CSV preserve BP work separately from OSD invocation, candidate and time costs",
+      "Saved settings preserve processor method/depth and original canonical BP configuration",
+      "Builder cannot silently turn a saved compound BP/OSD curve into ordinary BP",
+      "Single-rate filtering hides empty inputs/processor choices and clears stale builder state"
+    ],
+    "errors": [],
+    "simulations": 0
+  },
+  "public_browser": {
+    "checks": [
+      "104 curves / 1073 rows; all public input and saved-decoder lists use the active view; GB46 and all three singleton circuits absent",
+      "Every remaining code: picker, legend, plotted collection, table, settings receipt and CSV agree",
+      "Empty active view clears plot/decoder/input state and stale matrices; reset, custom matrix and custom Stim still validate",
+      "Missing default A5/B2 inputs fall back to a displayed input in both DOM and experiment/plot state",
+      "Import refresh hides singleton, admits multi-rate circuit and updates availability; hiding the selected circuit clears its Stim bytes and download validation",
+      "Saved imports reapply eligibility after reload; internal three-qubit fixture remains hidden even with two rates",
+      "Empty mobile layout fits; archived v1 still loads its retained catalog"
+    ],
+    "errors": [],
+    "simulations": 0
+  },
+  "tests": {
+    "preflight": 86,
+    "additional": 13,
+    "new_backend_identity": 1,
+    "scope": "100 unique cases; projection suite repeated after final backend regression"
+  },
+  "prelaunch_counts": {
+    "curves": 104,
+    "points": 1073,
+    "codes": 12,
+    "circuits": 0
+  },
+  "production_points": 0,
+  "scope": "qualification and empty prospective catalog; no production results claimed"
+}

@@ -197,9 +197,10 @@ function drawPlot(card,box){
 }
 const tableStart=['Series','Noise','Metric','Observed value','Samples','Failures','Type I / II','CI',metricNames.iterations,metricNames.edge_updates];
 const showOtherWork=card=>points(card).some(({p})=>otherWork(p));
-function headers(card){return [...tableStart,...(showOtherWork(card)?['Other recorded work / shot']:[]),'Time','Evidence','Availability'];}
+const showOsdWork=card=>points(card).some(({p})=>known(p.osd_invocation_fraction));
+function headers(card){return [...tableStart,...(showOtherWork(card)?['Other recorded work / shot']:[]),...(showOsdWork(card)?['OSD calls / shot','Mean OSD candidates / shot','Mean OSD time / shot']:[]),'Time','Evidence','Availability'];}
 function tableRows(card){
- const includeOther=showOtherWork(card);
+ const includeOther=showOtherWork(card),includeOsd=showOsdWork(card);
  return points(card).map(({s,p})=>{
   const weighted=/importance|weighted/i.test(p.estimator||p.sampling_method||'');
   const ci=known(p.ci_low)&&known(p.ci_high)?`[${fmt(p.ci_low)}, ${fmt(p.ci_high)}]`:'Unavailable';
@@ -215,12 +216,14 @@ function tableRows(card){
    known(p.mean_iterations)?`${fmt(p.mean_iterations)} ${p.iteration_unit||'sweeps'}`:'Unavailable',
    fmt(p.mean_directed_edge_updates),
    ...(includeOther?[otherWork(p)?`${fmt(p.mean_work)} ${p.work_unit}`:'Unavailable']:[]),
+   ...(includeOsd?[fmt(p.osd_invocation_fraction),fmt(p.mean_osd_candidate_evaluations),known(p.mean_osd_seconds)?`${fmt(p.mean_osd_seconds)} s`:'Unavailable']:[]),
    known(p.mean_seconds)?`${fmt(p.mean_seconds)} s · ${p.runtime_scope||'see run details'}`:'Unavailable',
    `${s.evidence} · ${p.status||''}`,weighted?'Weighted estimate; proposal counts':p.raw_asset?.availability||'Retained summary',
   ];
  });
 }
 function drawTable(card,box){
+ if(showOsdWork(card))box.append(el('p',{class:'small muted'},'Iteration and edge-update counts cover the BP stage. OSD calls, candidate evaluations and time are reported separately.'));
  const wrap=el('div',{class:'table-wrap',tabindex:'0','aria-label':`Results table for plot ${card.id}`}),table=el('table'),head=el('thead'),tr=el('tr');
  const definitions={
   [metricNames.iterations]:'Executed sweeps summed across decoder components and rounds, averaged over all sampled shots.',

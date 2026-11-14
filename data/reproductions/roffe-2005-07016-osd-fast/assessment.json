@@ -1,0 +1,10 @@
+{
+  "complete": false,
+  "failures": 0,
+  "paper_source_sha256": "808710d8412833e123687b38cacafab9842c621212c9132b4e85a5c0db5b1fb7",
+  "planned_points": 218,
+  "points": 0,
+  "schema": "canonical-bp-osd-report-v1",
+  "shots": 0,
+  "verified_sha256": "7815fa00420a61c9887ec3852a383e6d192d1a6501d95476f4984a1c48a7e770"
+}

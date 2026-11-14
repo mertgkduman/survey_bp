@@ -174,6 +174,7 @@ def main():
               'The complete 436-row results-table.csv retains pointwise exact stopping-aware 95% intervals, both work means, actual physical channels, source ordinary-BP ordinates for context, and ledger/summary hashes. assessment.json links both frozen plans, selected settings and audit receipts. Training is not pooled into confirmation. No OSD was run; this remains a canonical controlled adaptation.', '',
               'The automated final collector audited/normalized all results, then encountered duplicate paper metadata in the shared catalog. The catalog merger now permits identical paper records across studies and still rejects conflicting metadata. Revalidating the ledgers and refreshing the catalog from the completed audit repaired the display without rerunning simulations.']
     lines += ['', 'Paper BP-OSD reference: [all 108 Figure 3 BP+OSD-CS ordinates beside our confirmed results](../roffe-2005-07016-osd-comparison/RESULTS.md). The source table also preserves the unavailable length-450/p=.01 point, all four local arms, and separate OSD-0/CS threshold context.']
+    lines += ['', 'Local lower-cost OSD comparison: [canonical BP + OSD-0 / CS-10, including separate BP/OSD work](../roffe-2005-07016-osd-fast/RESULTS.md).']
     (ROOT / 'RESULTS.md').write_text('\n'.join(lines) + '\n')
     print(json.dumps({'confirmation_points': result['confirmation_points'],
                       'confirmation_shots': result['confirmation_shots'],

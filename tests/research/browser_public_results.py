@@ -36,9 +36,9 @@ load();''')
         page.wait_for_function("document.querySelector('#catalog-status').textContent.includes('measured')")
         active = page.evaluate('''async()=>{const c=await(await fetch('catalog.json')).json();const v=ResearchCurves.active(c,DecoderDisplay.labels(c));return {...v,decoderIds:[...v.decoderIds]};}''')
         ids = {x['code_id'] for x in active['codes']}
-        legacy = [s for s in active['curves'] if s['dataset_id'] not in {'yao-bpgd-completion', 'mackay-unicycle-bp', 'mackay-unicycle-paper-rates', 'mackay-damping-confirmation', 'roffe-2020-figure3-canonical-bp', 'mackay-inferred-t100-baseline', 'mackay-damping-t100-confirmation', 'mackay-qbp-isolation-t100', 'roffe-damping-confirmation'}]
+        legacy = [s for s in active['curves'] if s['dataset_id'] not in {'yao-bpgd-completion', 'mackay-unicycle-bp', 'mackay-unicycle-paper-rates', 'mackay-damping-confirmation', 'roffe-2020-figure3-canonical-bp', 'mackay-inferred-t100-baseline', 'mackay-damping-t100-confirmation', 'mackay-qbp-isolation-t100', 'roffe-damping-confirmation', 'roffe-canonical-bp-osd', 'roffe-canonical-bp-osd-fast'}]
         assert len(legacy) == 53 and sum(len(s['points']) for s in legacy) == 262
-        added = {s['code_id'] for s in active['curves'] if s['dataset_id'] in {'mackay-unicycle-bp', 'mackay-unicycle-paper-rates', 'mackay-damping-confirmation', 'roffe-2020-figure3-canonical-bp', 'mackay-inferred-t100-baseline', 'mackay-damping-t100-confirmation', 'mackay-qbp-isolation-t100', 'roffe-damping-confirmation'}}
+        added = {s['code_id'] for s in active['curves'] if s['dataset_id'] in {'mackay-unicycle-bp', 'mackay-unicycle-paper-rates', 'mackay-damping-confirmation', 'roffe-2020-figure3-canonical-bp', 'mackay-inferred-t100-baseline', 'mackay-damping-t100-confirmation', 'mackay-qbp-isolation-t100', 'roffe-damping-confirmation', 'roffe-canonical-bp-osd', 'roffe-canonical-bp-osd-fast'}}
         assert ids == {'a5', 'b2', 'b1', 'c2', 'double-gross', 'bb72'} | added
         assert not active['circuits']
         card = page.locator('[data-plot]').first
