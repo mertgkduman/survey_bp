@@ -35,6 +35,29 @@
     "codes": 12,
     "circuits": 0
   },
-  "production_points": 0,
-  "scope": "qualification and empty prospective catalog; no production results claimed"
+  "production_points": 173,
+  "scope": "qualified implementation and173 audited production points; remaining points unavailable until audited",
+  "postlaunch_public_browser": {
+    "checks": [
+      "112 curves / 1246 rows; all public input and saved-decoder lists use the active view; GB46 and all three singleton circuits absent",
+      "Every remaining code: picker, legend, plotted collection, table, settings receipt and CSV agree",
+      "Empty active view clears plot/decoder/input state and stale matrices; reset, custom matrix and custom Stim still validate",
+      "Missing default A5/B2 inputs fall back to a displayed input in both DOM and experiment/plot state",
+      "Import refresh hides singleton, admits multi-rate circuit and updates availability; hiding the selected circuit clears its Stim bytes and download validation",
+      "Saved imports reapply eligibility after reload; internal three-qubit fixture remains hidden even with two rates",
+      "Empty mobile layout fits; archived v1 still loads its retained catalog"
+    ],
+    "errors": [],
+    "simulations": 0
+  },
+  "postlaunch_counts": {
+    "curves": 112,
+    "points": 1246,
+    "codes": 12,
+    "circuits": 0
+  },
+  "production_shots": 153881,
+  "production_failures": 3460,
+  "historical_raw_series_unchanged": 181,
+  "postlaunch_regression_cases": 45
 }

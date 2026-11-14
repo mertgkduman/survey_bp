@@ -1,0 +1,48 @@
+{
+  "timestamp_utc": "2026-11-14T05:08:37.579593+00:00",
+  "reason": "array task83 failed during zero-syndrome warmup loading shared Numba cache: OSError116 stale file handle; no shots retained",
+  "replaced_collector": "61804748",
+  "retry": {
+    "id": "61805013",
+    "index": 83,
+    "argv": [
+      "sbatch",
+      "--parsable",
+      "--partition=common,scavenger",
+      "--account=pfisterlab",
+      "--nodes=1",
+      "--ntasks=1",
+      "--cpus-per-task=1",
+      "--mem=2G",
+      "--requeue",
+      "--time=4-00:00:00",
+      "--chdir=/hpc/group/pfisterlab/mg551/storage/survey_bp",
+      "--export=ALL,PYTHONPATH=/hpc/group/pfisterlab/mg551/storage/survey_bp/src,OMP_NUM_THREADS=1,OPENBLAS_NUM_THREADS=1,MKL_NUM_THREADS=1",
+      "--job-name=roffe-osd-retry83",
+      "--output=/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/roffe-2005-07016-osd-fast/results/retry83-%j.log",
+      "--wrap=export NUMBA_CACHE_DIR=\"/tmp/roffe-osd-${SLURM_JOB_ID}\"; mkdir -p \"$NUMBA_CACHE_DIR\"; exec /hpc/group/pfisterlab/mg551/storage/survey_bp/.venv/bin/python /hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/roffe-2005-07016-osd-fast/run.py --index 83"
+    ]
+  },
+  "collector": {
+    "id": "61805014",
+    "argv": [
+      "sbatch",
+      "--parsable",
+      "--partition=common,scavenger",
+      "--account=pfisterlab",
+      "--nodes=1",
+      "--ntasks=1",
+      "--cpus-per-task=1",
+      "--mem=2G",
+      "--requeue",
+      "--time=4-00:00:00",
+      "--chdir=/hpc/group/pfisterlab/mg551/storage/survey_bp",
+      "--export=ALL,PYTHONPATH=/hpc/group/pfisterlab/mg551/storage/survey_bp/src,OMP_NUM_THREADS=1,OPENBLAS_NUM_THREADS=1,MKL_NUM_THREADS=1",
+      "--job-name=roffe-osd-audit",
+      "--dependency=afterany:61804747,afterok:61805013",
+      "--output=/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/roffe-2005-07016-osd-fast/results/recovery-collect-%j.log",
+      "--wrap=/hpc/group/pfisterlab/mg551/storage/survey_bp/.venv/bin/python /hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/roffe-2005-07016-osd-fast/run.py --collect --complete"
+    ]
+  },
+  "scientific_plan_changed": false
+}
