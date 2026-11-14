@@ -1,0 +1,58 @@
+{
+  "at_x_rate_002": [
+    {
+      "bp_damped_ler": 0.07272727272727272,
+      "bp_damped_ler_over_paper_osd_cs": 2223.286996186351,
+      "bp_undamped_ler": 0.145985401459854,
+      "code": "toric9",
+      "paper_bp_osd_cs_ler_approx": 3.271159902073969e-05,
+      "qbp_damped_ler": 0.005636978579481398
+    },
+    {
+      "bp_damped_ler": 0.21505376344086022,
+      "bp_damped_ler_over_paper_osd_cs": 37200.74665605486,
+      "bp_undamped_ler": 0.24691358024691357,
+      "code": "toric11",
+      "paper_bp_osd_cs_ler_approx": 5.780899115525084e-06,
+      "qbp_damped_ler": 0.005929439667951379
+    },
+    {
+      "bp_damped_ler": 0.22988505747126436,
+      "bp_damped_ler_over_paper_osd_cs": 228925.85610219542,
+      "bp_undamped_ler": 0.273972602739726,
+      "code": "toric13",
+      "paper_bp_osd_cs_ler_approx": 1.0041900088762395e-06,
+      "qbp_damped_ler": 0.011435105774728416
+    },
+    {
+      "bp_damped_ler": 0.23255813953488372,
+      "bp_damped_ler_over_paper_osd_cs": 1195071.1047236596,
+      "bp_undamped_ler": 0.3076923076923077,
+      "code": "toric15",
+      "paper_bp_osd_cs_ler_approx": 1.9459774285870543e-07,
+      "qbp_damped_ler": 0.013262599469496022
+    }
+  ],
+  "comparison_scope": "direct X-only BP versus source X-only BP+OSD-CS; Q-BP depolarizing shown as different-channel context",
+  "confirmation_receipt_sha256": "ce93347ae032d24b8f05444c22dca4c51e660c4e9cecd46d90cf1939a6d6e6a5",
+  "figure_sha256": "547fb722746f75e26bd1913c9a67b45ca7d29df9b48f7ed4d2554eaefbe63733",
+  "matched_confirmation_measurements": 436,
+  "missing_source_values": [
+    {
+      "distance": 15,
+      "physical_p": 0.01,
+      "status": "not_plotted; no interpolation, zero, or upper bound inferred"
+    }
+  ],
+  "paper_osd_per_distance": {
+    "11": 28,
+    "13": 28,
+    "15": 27,
+    "9": 25
+  },
+  "paper_osd_points": 108,
+  "rows": 109,
+  "schema": "roffe-bp-osd-context-comparison-v1",
+  "source_archive_sha256": "e68595d13a330c067e280a473354d7254816bea8be2746ae4a5ab46557a23ef4",
+  "work_scope": "BP cap T=n in all arms; source OSD adds elimination/candidate search, author work means/counts unavailable"
+}

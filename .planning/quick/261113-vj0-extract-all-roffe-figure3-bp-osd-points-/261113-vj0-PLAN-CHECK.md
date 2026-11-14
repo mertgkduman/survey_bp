@@ -1,0 +1,3 @@
+# Inline plan check
+
+PASS. The table extends the current four-code study using independently labeled source evidence, not a new decoder implementation or campaign. Primary source distinguishes CS lambda60, OSD-0 thresholds and AppendixB settings. All108 solid vertices can be matched to measured vertical error bars;109 grid rows preserve the one unavailable source point and existing frozen BP coordinates. Direct BP/OSD comparisons share X-only noise; Q-BP remains contextual. Unknown author sample/work/uncertainty semantics are retained. No canonical/runtime/worker/old source edits or public catalog changes are required.
