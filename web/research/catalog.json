@@ -30522,31 +30522,31 @@
     {
       "assets": [
         {
-          "availability": "local_only",
+          "availability": "tracked",
           "kind": "json",
           "label": "Frozen configuration",
-          "local_storage_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/roffe-2005-07016-damping/confirmation/plan.json",
+          "local_storage_path": null,
           "path": "data/reproductions/roffe-2005-07016-damping/confirmation/plan.json",
           "sha256": "1bb2f08aa0c4706f6bfbfe95d710386ac7108ad9252193d8119c7dab4d56868f",
-          "url": null
+          "url": "data/reproductions/roffe-2005-07016-damping/confirmation/plan.json"
         },
         {
-          "availability": "local_only",
+          "availability": "tracked",
           "kind": "json",
           "label": "Audited terminal results",
-          "local_storage_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/roffe-2005-07016-damping/confirmation/verified.json",
+          "local_storage_path": null,
           "path": "data/reproductions/roffe-2005-07016-damping/confirmation/verified.json",
           "sha256": "ce93347ae032d24b8f05444c22dca4c51e660c4e9cecd46d90cf1939a6d6e6a5",
-          "url": null
+          "url": "data/reproductions/roffe-2005-07016-damping/confirmation/verified.json"
         },
         {
-          "availability": "local_only",
+          "availability": "tracked",
           "kind": "json",
           "label": "Source or holdout assessment",
-          "local_storage_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/roffe-2005-07016-damping/confirmation/comparison.json",
+          "local_storage_path": null,
           "path": "data/reproductions/roffe-2005-07016-damping/confirmation/comparison.json",
           "sha256": "7a885ca4499ae9458d92e8016eb2080f82e5281fdd44a056ad381422eccdfc0a",
-          "url": null
+          "url": "data/reproductions/roffe-2005-07016-damping/confirmation/comparison.json"
         }
       ],
       "caveat": "Controlled damping adaptation of Roffe Figure 3; source code artifacts, rate grids, flooding min-sum alpha_t=1-2^-t and T=n preserved. Damping is a new policy. Training is never pooled with fresh confirmation. Ordinary BP is X-only; Q-BP is joint-Pauli depolarizing at p_dep=1.5*p_X, a different channel and not an isolated Q-BP effect. No OSD, source-faithful numerical or superiority claim.",
@@ -51171,13 +51171,13 @@
     },
     {
       "asset": {
-        "availability": "local_only",
+        "availability": "tracked",
         "kind": "decoder_source",
         "label": "Frozen study configuration",
-        "local_storage_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/roffe-2005-07016-damping/confirmation/plan.json",
+        "local_storage_path": null,
         "path": "data/reproductions/roffe-2005-07016-damping/confirmation/plan.json",
         "sha256": "1bb2f08aa0c4706f6bfbfe95d710386ac7108ad9252193d8119c7dab4d56868f",
-        "url": null
+        "url": "data/reproductions/roffe-2005-07016-damping/confirmation/plan.json"
       },
       "configuration": {
         "effective_configuration": {
@@ -51208,13 +51208,13 @@
     },
     {
       "asset": {
-        "availability": "local_only",
+        "availability": "tracked",
         "kind": "decoder_source",
         "label": "Frozen study configuration",
-        "local_storage_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/roffe-2005-07016-damping/confirmation/plan.json",
+        "local_storage_path": null,
         "path": "data/reproductions/roffe-2005-07016-damping/confirmation/plan.json",
         "sha256": "1bb2f08aa0c4706f6bfbfe95d710386ac7108ad9252193d8119c7dab4d56868f",
-        "url": null
+        "url": "data/reproductions/roffe-2005-07016-damping/confirmation/plan.json"
       },
       "configuration": {
         "effective_configuration": {
@@ -51245,13 +51245,13 @@
     },
     {
       "asset": {
-        "availability": "local_only",
+        "availability": "tracked",
         "kind": "decoder_source",
         "label": "Frozen study configuration",
-        "local_storage_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/roffe-2005-07016-damping/confirmation/plan.json",
+        "local_storage_path": null,
         "path": "data/reproductions/roffe-2005-07016-damping/confirmation/plan.json",
         "sha256": "1bb2f08aa0c4706f6bfbfe95d710386ac7108ad9252193d8119c7dab4d56868f",
-        "url": null
+        "url": "data/reproductions/roffe-2005-07016-damping/confirmation/plan.json"
       },
       "configuration": {
         "effective_configuration": {
@@ -51282,13 +51282,13 @@
     },
     {
       "asset": {
-        "availability": "local_only",
+        "availability": "tracked",
         "kind": "decoder_source",
         "label": "Frozen study configuration",
-        "local_storage_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/roffe-2005-07016-damping/confirmation/plan.json",
+        "local_storage_path": null,
         "path": "data/reproductions/roffe-2005-07016-damping/confirmation/plan.json",
         "sha256": "1bb2f08aa0c4706f6bfbfe95d710386ac7108ad9252193d8119c7dab4d56868f",
-        "url": null
+        "url": "data/reproductions/roffe-2005-07016-damping/confirmation/plan.json"
       },
       "configuration": {
         "effective_configuration": {
@@ -51319,13 +51319,13 @@
     },
     {
       "asset": {
-        "availability": "local_only",
+        "availability": "tracked",
         "kind": "decoder_source",
         "label": "Frozen study configuration",
-        "local_storage_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/roffe-2005-07016-damping/confirmation/plan.json",
+        "local_storage_path": null,
         "path": "data/reproductions/roffe-2005-07016-damping/confirmation/plan.json",
         "sha256": "1bb2f08aa0c4706f6bfbfe95d710386ac7108ad9252193d8119c7dab4d56868f",
-        "url": null
+        "url": "data/reproductions/roffe-2005-07016-damping/confirmation/plan.json"
       },
       "configuration": {
         "effective_configuration": {
@@ -51356,13 +51356,13 @@
     },
     {
       "asset": {
-        "availability": "local_only",
+        "availability": "tracked",
         "kind": "decoder_source",
         "label": "Frozen study configuration",
-        "local_storage_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/roffe-2005-07016-damping/confirmation/plan.json",
+        "local_storage_path": null,
         "path": "data/reproductions/roffe-2005-07016-damping/confirmation/plan.json",
         "sha256": "1bb2f08aa0c4706f6bfbfe95d710386ac7108ad9252193d8119c7dab4d56868f",
-        "url": null
+        "url": "data/reproductions/roffe-2005-07016-damping/confirmation/plan.json"
       },
       "configuration": {
         "effective_configuration": {
@@ -51393,13 +51393,13 @@
     },
     {
       "asset": {
-        "availability": "local_only",
+        "availability": "tracked",
         "kind": "decoder_source",
         "label": "Frozen study configuration",
-        "local_storage_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/roffe-2005-07016-damping/confirmation/plan.json",
+        "local_storage_path": null,
         "path": "data/reproductions/roffe-2005-07016-damping/confirmation/plan.json",
         "sha256": "1bb2f08aa0c4706f6bfbfe95d710386ac7108ad9252193d8119c7dab4d56868f",
-        "url": null
+        "url": "data/reproductions/roffe-2005-07016-damping/confirmation/plan.json"
       },
       "configuration": {
         "effective_configuration": {
@@ -51430,13 +51430,13 @@
     },
     {
       "asset": {
-        "availability": "local_only",
+        "availability": "tracked",
         "kind": "decoder_source",
         "label": "Frozen study configuration",
-        "local_storage_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/roffe-2005-07016-damping/confirmation/plan.json",
+        "local_storage_path": null,
         "path": "data/reproductions/roffe-2005-07016-damping/confirmation/plan.json",
         "sha256": "1bb2f08aa0c4706f6bfbfe95d710386ac7108ad9252193d8119c7dab4d56868f",
-        "url": null
+        "url": "data/reproductions/roffe-2005-07016-damping/confirmation/plan.json"
       },
       "configuration": {
         "effective_configuration": {
@@ -51467,13 +51467,13 @@
     },
     {
       "asset": {
-        "availability": "local_only",
+        "availability": "tracked",
         "kind": "decoder_source",
         "label": "Frozen study configuration",
-        "local_storage_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/roffe-2005-07016-damping/confirmation/plan.json",
+        "local_storage_path": null,
         "path": "data/reproductions/roffe-2005-07016-damping/confirmation/plan.json",
         "sha256": "1bb2f08aa0c4706f6bfbfe95d710386ac7108ad9252193d8119c7dab4d56868f",
-        "url": null
+        "url": "data/reproductions/roffe-2005-07016-damping/confirmation/plan.json"
       },
       "configuration": {
         "effective_configuration": {
@@ -51504,13 +51504,13 @@
     },
     {
       "asset": {
-        "availability": "local_only",
+        "availability": "tracked",
         "kind": "decoder_source",
         "label": "Frozen study configuration",
-        "local_storage_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/roffe-2005-07016-damping/confirmation/plan.json",
+        "local_storage_path": null,
         "path": "data/reproductions/roffe-2005-07016-damping/confirmation/plan.json",
         "sha256": "1bb2f08aa0c4706f6bfbfe95d710386ac7108ad9252193d8119c7dab4d56868f",
-        "url": null
+        "url": "data/reproductions/roffe-2005-07016-damping/confirmation/plan.json"
       },
       "configuration": {
         "effective_configuration": {
@@ -51541,13 +51541,13 @@
     },
     {
       "asset": {
-        "availability": "local_only",
+        "availability": "tracked",
         "kind": "decoder_source",
         "label": "Frozen study configuration",
-        "local_storage_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/roffe-2005-07016-damping/confirmation/plan.json",
+        "local_storage_path": null,
         "path": "data/reproductions/roffe-2005-07016-damping/confirmation/plan.json",
         "sha256": "1bb2f08aa0c4706f6bfbfe95d710386ac7108ad9252193d8119c7dab4d56868f",
-        "url": null
+        "url": "data/reproductions/roffe-2005-07016-damping/confirmation/plan.json"
       },
       "configuration": {
         "effective_configuration": {
@@ -51578,13 +51578,13 @@
     },
     {
       "asset": {
-        "availability": "local_only",
+        "availability": "tracked",
         "kind": "decoder_source",
         "label": "Frozen study configuration",
-        "local_storage_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/roffe-2005-07016-damping/confirmation/plan.json",
+        "local_storage_path": null,
         "path": "data/reproductions/roffe-2005-07016-damping/confirmation/plan.json",
         "sha256": "1bb2f08aa0c4706f6bfbfe95d710386ac7108ad9252193d8119c7dab4d56868f",
-        "url": null
+        "url": "data/reproductions/roffe-2005-07016-damping/confirmation/plan.json"
       },
       "configuration": {
         "effective_configuration": {
@@ -51615,13 +51615,13 @@
     },
     {
       "asset": {
-        "availability": "local_only",
+        "availability": "tracked",
         "kind": "decoder_source",
         "label": "Frozen study configuration",
-        "local_storage_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/roffe-2005-07016-damping/confirmation/plan.json",
+        "local_storage_path": null,
         "path": "data/reproductions/roffe-2005-07016-damping/confirmation/plan.json",
         "sha256": "1bb2f08aa0c4706f6bfbfe95d710386ac7108ad9252193d8119c7dab4d56868f",
-        "url": null
+        "url": "data/reproductions/roffe-2005-07016-damping/confirmation/plan.json"
       },
       "configuration": {
         "effective_configuration": {
@@ -51652,13 +51652,13 @@
     },
     {
       "asset": {
-        "availability": "local_only",
+        "availability": "tracked",
         "kind": "decoder_source",
         "label": "Frozen study configuration",
-        "local_storage_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/roffe-2005-07016-damping/confirmation/plan.json",
+        "local_storage_path": null,
         "path": "data/reproductions/roffe-2005-07016-damping/confirmation/plan.json",
         "sha256": "1bb2f08aa0c4706f6bfbfe95d710386ac7108ad9252193d8119c7dab4d56868f",
-        "url": null
+        "url": "data/reproductions/roffe-2005-07016-damping/confirmation/plan.json"
       },
       "configuration": {
         "effective_configuration": {
@@ -51689,13 +51689,13 @@
     },
     {
       "asset": {
-        "availability": "local_only",
+        "availability": "tracked",
         "kind": "decoder_source",
         "label": "Frozen study configuration",
-        "local_storage_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/roffe-2005-07016-damping/confirmation/plan.json",
+        "local_storage_path": null,
         "path": "data/reproductions/roffe-2005-07016-damping/confirmation/plan.json",
         "sha256": "1bb2f08aa0c4706f6bfbfe95d710386ac7108ad9252193d8119c7dab4d56868f",
-        "url": null
+        "url": "data/reproductions/roffe-2005-07016-damping/confirmation/plan.json"
       },
       "configuration": {
         "effective_configuration": {
@@ -51726,13 +51726,13 @@
     },
     {
       "asset": {
-        "availability": "local_only",
+        "availability": "tracked",
         "kind": "decoder_source",
         "label": "Frozen study configuration",
-        "local_storage_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/roffe-2005-07016-damping/confirmation/plan.json",
+        "local_storage_path": null,
         "path": "data/reproductions/roffe-2005-07016-damping/confirmation/plan.json",
         "sha256": "1bb2f08aa0c4706f6bfbfe95d710386ac7108ad9252193d8119c7dab4d56868f",
-        "url": null
+        "url": "data/reproductions/roffe-2005-07016-damping/confirmation/plan.json"
       },
       "configuration": {
         "effective_configuration": {
