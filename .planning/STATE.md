@@ -5,11 +5,11 @@ current_phase: 11
 current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
-stopped_at: Roffe damping1526 tuning/436 confirmation points audited and published; MacKay rare point continues
-last_updated: "2026-11-14T03:34:31.903966+00:00"
+stopped_at: Roffe Figure3 BP-OSD source comparison complete; Roffe measured campaigns complete; MacKay rare point continues
+last_updated: "2026-11-14T03:53:00.354483+00:00"
 last_activity: 2026-11-13
-last_activity_desc: Quick261113-v31 completes Roffe damping assessment and repairs shared-paper publication. BP d=.5 and Q-BP d=.3; public104 curves/1073 points/12 codes.62 tests and16 browser groups pass.
-state_head: c595969
+last_activity_desc: Quick261113-vj0 adds all108 Figure3 BP-OSD-CS paper values to109-rate tables alongside436 local measurements;22 tests pass, no simulation or catalog change.
+state_head: 04002e0
 progress:
   total_phases: 14
   completed_phases: 8
@@ -34,8 +34,10 @@ Total Phases: 14
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
-Last activity: 2026-11-13 — quick261113-v31 verifies and publishes completed Roffe damping results
-Last Activity Description: All1526 tuning points and436 fresh confirmation points pass the original full audit; independent re-reading reconciles all436 raw ledgers and the completed receipt. Confirmation retained47,473 shots/8,720 failures. Selected BP d=.5 and Q-BP d=.3 on all four codes, preserving paper grids/min-sum/T=n. At matched X rate.02, Q-BP depolarizing p=.03 LER estimates improve15–21x versus its own undamped controls; ordinary BP improvements are smaller. Equal-rate mean LER decreases3.4–16.3% for BP and20.8–35.1% for Q-BP; mean iterations decrease2.9–10.8% and19.4–31.9%. These are descriptive20-failure results with different channels across families. Final collector61794901 failed only after audit/normalization at duplicate Roffe paper metadata; exact-equality paper merging now repairs future rebuilds and rejects conflicts. Public104 curves/1073 points/12 codes/0 circuits; all165 prior raw series/points unchanged. Saved full CSV/report/assessment/four-panel figure. Passed62 tests and16 Chromium groups. No frozen/kernel/runtime/publisher/v1 changes or new simulations. Separate MacKay rare point remains running, last observed33.79M shots/3 failures. Phase11 gates and counters unchanged.
+Last activity: 2026-11-13 — quick261113-vj0 tabulates Roffe paper BP-OSD against confirmed BP-family results
+Last Activity Description: Added all108 main-panel Figure3 BP+OSD-CS lambda60 source ordinates and109 ordinary-BP source-rate rows alongside436 local confirmed measurements. Tables preserve the missing length450/p=.01 value, undefined author samples/work, source error-bar semantics and separate noise channels. At X-only p=.02, source BP-OSD LER is about2,200–1.2M times below damped binary BP estimates, with additional elimination/search work. Complete Markdown/CSV, source hashes and PNG/PDF are in roffe-2005-07016-osd-comparison; linked from damping RESULTS.md. Passed22 source/join/damping/unchanged-plan tests; public catalog remains byte-identical104 curves/1073 points/12 codes/0 circuits. No simulations, canonical/frozen/source or measured-data changes. Phase11 gates/counters unchanged; MacKay rare point continues separately.
+
+Prior Roffe damping activity: All1526 tuning points and436 fresh confirmation points pass the original full audit; independent re-reading reconciles all436 raw ledgers and the completed receipt. Confirmation retained47,473 shots/8,720 failures. Selected BP d=.5 and Q-BP d=.3 on all four codes, preserving paper grids/min-sum/T=n. At matched X rate.02, Q-BP depolarizing p=.03 LER estimates improve15–21x versus its own undamped controls; ordinary BP improvements are smaller. Equal-rate mean LER decreases3.4–16.3% for BP and20.8–35.1% for Q-BP; mean iterations decrease2.9–10.8% and19.4–31.9%. These are descriptive20-failure results with different channels across families. Final collector61794901 failed only after audit/normalization at duplicate Roffe paper metadata; exact-equality paper merging now repairs future rebuilds and rejects conflicts. Public104 curves/1073 points/12 codes/0 circuits; all165 prior raw series/points unchanged. Saved full CSV/report/assessment/four-panel figure. Passed62 tests and16 Chromium groups. No frozen/kernel/runtime/publisher/v1 changes or new simulations. Separate MacKay rare point remains running, last observed33.79M shots/3 failures. Phase11 gates and counters unchanged.
 
 Prior Roffe assessment: Roffe collector61785160 completed0:0 and fully audited/published218 points (9,816 decoder shots/4,360 failures). Quick261113-p1r independently checks source coordinates, counts, work, stopping intervals and receipt hashes: all109 ordinary-BP paper values lie inside pointwise95% intervals; maximum point-estimate deviation22.3%. Four-panel overlay and complete tables are in the Roffe study. Agreement is scoped to current20-failure precision and X-only ordinary BP, with no simultaneous curve/native numerical identity or BP-OSD claim.109 Q-BP/depolarizing points remain separate. Source archive re-extraction and frozen40-pin plan pass. Passed54 catalog checks and12 browser groups; public88 curves/637 points/12 codes/0 circuits. All157 prior raw series/points unchanged, no canonical/frozen/v1 edits. Roffe is complete; MacKay's separate rare point remains running. Phase11 gates unchanged.
 
@@ -308,6 +310,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 | # | Description | Date | Commit | Status | Directory |
 |---|-------------|------|--------|--------|-----------|
+| 261113-vj0 | Tabulate all current Roffe BP-OSD source points beside confirmed BP/Q-BP | 2026-11-13 | 04002e0 | Complete;108 paper points/109 grid rows, no new simulations | [261113-vj0](./quick/261113-vj0-extract-all-roffe-figure3-bp-osd-points-/) |
 | 261113-v31 | Audit and publish completed Roffe damping comparison; fix shared paper registration | 2026-11-13 | c595969 | Complete;436 confirmation points audited/published | [261113-v31](./quick/261113-v31-audit-completed-roffe-damping-results-re/) |
 | 261113-q96 | Launch paper-budget Roffe damped BP/Q-BP tuning and fresh confirmation | 2026-11-13 | 4c8471f | Complete;1526 tuning/436 confirmation points, follow-up v31 | [261113-q96](./quick/261113-q96-tune-and-independently-confirm-damped-ro/) |
 | 261113-p1r | Assess completed Roffe curves and verify publication | 2026-11-13 | efc3e6a | Complete;109/109 source points consistent pointwise | [261113-p1r](./quick/261113-p1r-assess-completed-roffe-figure-3-results-/) |
@@ -388,6 +391,8 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 No requested decoding regime or named policy family is deferred beyond the first journal milestone. The user deferred Phase 5's pending human notebook/HTML review while moving to Phase 11; Phase 5 is not marked complete. Phase 7 remains paused. The cancelled comprehensive Phase 4 CSS evaluation/factorial is deferred from Phase 4; Phase 8 supplied bounded campaign infrastructure and Phase 9 completed exploratory CSS controls. Source-faithful CSS publication assessments remain pending exact author evidence. Relay circuit-curve assessment remains in Phase 13.
 
 ## Session Continuity
+
+Latest comparison: quick261113-vj0, implementation04002e0. Complete Roffe Figure3 paper BP-OSD tables/plots contain108 source ordinates and109 grid rows, with all436 local results and explicit missing/unknown quantities. No BP-OSD execution was launched. See data/reproductions/roffe-2005-07016-osd-comparison/RESULTS.md. Active measured catalog and frozen studies unchanged.
 
 Latest result: quick261113-v31, implementationc595969. Roffe damping is complete and published: all1526 tuning/436 independent confirmation points audited. Public104 curves/1073 points. See data/reproductions/roffe-2005-07016-damping/RESULTS.md and completion-status.json. Original failed publication history is retained; equal paper metadata now merges safely. Only the separate MacKay rare-event point remains running.
 

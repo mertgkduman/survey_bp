@@ -1,0 +1,53 @@
+{
+  "active_catalog_counts_unchanged": {
+    "circuits": 0,
+    "codes": 12,
+    "curves": 104,
+    "points": 1073
+  },
+  "artifacts": {
+    "README.md": "1ca163f4c8c5d765e6176aed7d2e4cb47d6f14486af9c67bc03fb226e92c5bd0",
+    "RESULTS.md": "05361e8a12a4589f6a686a19342b2a59d95844348c5f8850b29a78355938d13f",
+    "assessment.json": "5eb3e9204718dcd8fb1231bb46aca377bedec49c841350e7a90ad67d5f5ae09d",
+    "compare.py": "cca961b752939ecdb538cee4ecefea4be7d6bb3ba22230d9d74b23facfaad15a",
+    "comparison-table.csv": "f5792c7919a6122800c9441c60693069e6aa7bb589bdc97de90cb0428de6afdb",
+    "comparison.pdf": "4e006e5b22c5e79fac514e995a72437da839233a6f95b8f499afb036f1bf27c0",
+    "comparison.png": "9afaaf9c759cea2577e1d37526f06ae44a88e5ce60f1e5b4d0ca4bca3363a42b",
+    "source_points.json": "808710d8412833e123687b38cacafab9842c621212c9132b4e85a5c0db5b1fb7"
+  },
+  "comparison_grid_rows": 109,
+  "figure_sha256": "547fb722746f75e26bd1913c9a67b45ca7d29df9b48f7ed4d2554eaefbe63733",
+  "figure_visually_inspected": true,
+  "frozen_scientific_and_measurement_files_unchanged": true,
+  "local_confirmation_receipt_sha256": "ce93347ae032d24b8f05444c22dca4c51e660c4e9cecd46d90cf1939a6d6e6a5",
+  "local_confirmation_values": 436,
+  "missing_source_values": [
+    {
+      "distance": 15,
+      "physical_p": 0.01,
+      "status": "not_plotted; no interpolation, zero, or upper bound inferred"
+    }
+  ],
+  "paper_osd_points": 108,
+  "per_code_osd_points": {
+    "11": 28,
+    "13": 28,
+    "15": 27,
+    "9": 25
+  },
+  "primary_sources": [
+    "https://arxiv.org/html/2005.07016v2",
+    "https://arxiv.org/pdf/2005.07016v2#page=8",
+    "https://arxiv.org/src/2005.07016v2"
+  ],
+  "scope": "Roffe Figure3 current four toric codes; approximate paper BP+OSD-CS lambda60 source, not locally run BP-OSD",
+  "simulations_launched": 0,
+  "source_archive_sha256": "e68595d13a330c067e280a473354d7254816bea8be2746ae4a5ab46557a23ef4",
+  "status": "passed",
+  "tests": {
+    "existing_damping_and_original_launch": 16,
+    "new_source_and_join": 6,
+    "unique_total": 22
+  },
+  "workbench_byte_identical": true
+}
