@@ -60,6 +60,20 @@ Identify highly cited QLDPC papers that actually evaluate a sum-product or min-s
 - Use a dated single-provider citation snapshot without summing duplicate editions; do not claim exhaustive global ranking from a bounded screen.
 - Provide paper links, update family and evidence locations; do not run simulations or alter kernel/evidence qualification.
 
+### efficient-canonical-bp-osd
+
+Qualify an observable, efficient OSD-0/combination-sweep processor grounded in public source, attach it to the existing canonical BP terminal state, then run CS-10 and OSD-0 on the current four-code Roffe comparison.
+
+**Requirements:**
+
+- Use the canonical BP kernel and exact Roffe min-sum alpha schedule, source rate grids, X-only channel and T=n budgets; do not substitute a native BP composite.
+- Inspect and pin public OSD source; optimize the repository implementation only after independent algebra, candidate enumeration, source correspondence and warm performance checks.
+- Preserve the old failed Phase7 qualification as historical evidence. This new user-authorized source-derived implementation is a distinct version; do not assert the old admission gate passed.
+- Expose original-coordinate candidate provenance, ranking/tie/scoring semantics, per-method work and independently checked syndromes. Decoder inputs cannot include hidden truth.
+- Run OSD only on BP nonconvergence; retain converged BP outputs even when the evaluator later finds a logical failure. Keep BP sweeps/edge updates separate from elimination/search work and timing.
+- Freeze and run both OSD-0 and CS-10 with original undamped BP so the processor is the changed setting, using20 logical failures or1e8 shots and one CPU per point. Preserve custom inputs, old measured/source data and frozen canonical files.
+- The requested sequence (quality/efficiency, then simulation) supplies alignment for both spikes; execute inline without an additional approval gate. Use CLI/machine-readable experiments because this is algorithm qualification and benchmarking, then the existing workbench for results.
+
 ## Spikes
 
 | # | Idea | Name | Type | Validates | Verdict | Tags |
@@ -119,6 +133,8 @@ Identify highly cited QLDPC papers that actually evaluate a sum-product or min-s
 | 053 | canonical-kernel-audit | Shared execution and evidence closure | standard | Given the same decoding problem, when public transports and replay execute, then outputs and evidence preserve their declared identities. | PARTIAL | shared-policies, completeness |
 | 054 | cited-bp-baselines | Citation screen | standard | Given candidate papers, resolve one-provider publication identities and dated citation counts without adding duplicate editions. | PARTIAL | literature, citations |
 | 055 | cited-bp-baselines | Primary BP baseline evidence | standard | Given citation-prioritized papers, verify explicit standalone BP comparisons and separate code benchmarks and hybrids. | VALIDATED | literature, baseline, min-sum, sum-product |
+| 056 | efficient-canonical-bp-osd | Observable efficient OSD-0/CS-10 | comparison | Given pinned public OSD and exact small-code oracles, validate full candidate/scoring/work correspondence and efficient source-derived execution. | IN_PROGRESS | osd, correctness, performance, provenance |
+| 057 | efficient-canonical-bp-osd | Canonical BP/OSD handoff and Roffe campaign | standard | Given qualified OSD, preserve canonical terminal BP messages and run paper-budget OSD-0/CS-10 with auditable ledgers and comparison publication. | PENDING | osd, canonical, campaign, roffe |
 
 Ordered closure of D03 → D04 → D01 → D02 → D05: [correction report](CANONICAL-KERNEL-COMPLETENESS-FIXES.md), [combined verification](042-batch-evidence-fix/verification.json), and [execution contracts](../../docs/canonical-kernel-contracts.md). Historical 034–037 verdicts remain as originally observed.
 

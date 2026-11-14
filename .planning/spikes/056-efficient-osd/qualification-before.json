@@ -1,0 +1,224 @@
+{
+  "affinity_before": [
+    56,
+    120
+  ],
+  "affinity_during_benchmark": [
+    56
+  ],
+  "benchmarks": [
+    {
+      "code": "toric9",
+      "method": "OSD0",
+      "native_ns_per_call": 39995.34375,
+      "native_trials": [
+        45357.9375,
+        43808.5,
+        41050.25,
+        35050.5625,
+        38940.4375,
+        37839.6875
+      ],
+      "optimized_ns_per_call": 61664.625,
+      "optimized_trials": [
+        63364.6875,
+        64842.0,
+        82754.75,
+        58857.75,
+        55152.375,
+        59964.5625
+      ],
+      "speed_ratio": 0.6485946156325446
+    },
+    {
+      "code": "toric9",
+      "method": "CS10",
+      "native_ns_per_call": 196233.25,
+      "native_trials": [
+        203667.625,
+        193404.25,
+        178658.875,
+        199062.25,
+        172908.4375,
+        201121.75
+      ],
+      "optimized_ns_per_call": 110175.34375,
+      "optimized_trials": [
+        133029.625,
+        112880.1875,
+        112775.8125,
+        88322.125,
+        107574.875,
+        99455.0625
+      ],
+      "speed_ratio": 1.781099503036495
+    },
+    {
+      "code": "toric11",
+      "method": "OSD0",
+      "native_ns_per_call": 48025.5625,
+      "native_trials": [
+        47754.5,
+        52591.75,
+        42161.5,
+        45075.625,
+        49352.3125,
+        48296.625
+      ],
+      "optimized_ns_per_call": 77355.375,
+      "optimized_trials": [
+        81527.5,
+        64247.0625,
+        83391.375,
+        73183.25,
+        82245.5,
+        67187.1875
+      ],
+      "speed_ratio": 0.6208432510345919
+    },
+    {
+      "code": "toric11",
+      "method": "CS10",
+      "native_ns_per_call": 345566.1875,
+      "native_trials": [
+        346393.9375,
+        406026.4375,
+        344738.4375,
+        315334.5625,
+        314802.75,
+        394748.0625
+      ],
+      "optimized_ns_per_call": 158148.8125,
+      "optimized_trials": [
+        207815.0,
+        165543.0625,
+        156319.3125,
+        147837.375,
+        159978.3125,
+        147367.25
+      ],
+      "speed_ratio": 2.1850697582696044
+    },
+    {
+      "code": "toric13",
+      "method": "OSD0",
+      "native_ns_per_call": 75269.96875,
+      "native_trials": [
+        63978.0625,
+        84831.6875,
+        61106.8125,
+        83275.375,
+        72667.875,
+        77872.0625
+      ],
+      "optimized_ns_per_call": 132950.03125,
+      "optimized_trials": [
+        123564.1875,
+        128917.8125,
+        159923.8125,
+        150436.0,
+        136982.25,
+        121375.75
+      ],
+      "speed_ratio": 0.5661523208555094
+    },
+    {
+      "code": "toric13",
+      "method": "CS10",
+      "native_ns_per_call": 546432.78125,
+      "native_trials": [
+        513453.5,
+        554436.9375,
+        617798.0,
+        538001.125,
+        538428.625,
+        601970.9375
+      ],
+      "optimized_ns_per_call": 248207.375,
+      "optimized_trials": [
+        248764.125,
+        232963.625,
+        261878.5625,
+        241506.6875,
+        247650.625,
+        269507.75
+      ],
+      "speed_ratio": 2.201517103389857
+    },
+    {
+      "code": "toric15",
+      "method": "OSD0",
+      "native_ns_per_call": 89181.875,
+      "native_trials": [
+        114140.875,
+        109373.5625,
+        86018.5625,
+        89436.625,
+        88927.125,
+        88868.8125
+      ],
+      "optimized_ns_per_call": 167670.875,
+      "optimized_trials": [
+        175270.5625,
+        148150.5625,
+        176414.1875,
+        160071.1875,
+        194686.0625,
+        144750.125
+      ],
+      "speed_ratio": 0.5318865008606891
+    },
+    {
+      "code": "toric15",
+      "method": "CS10",
+      "native_ns_per_call": 828176.5,
+      "native_trials": [
+        924541.0,
+        798444.0625,
+        874620.1875,
+        791484.75,
+        830792.5,
+        825560.5
+      ],
+      "optimized_ns_per_call": 339203.71875,
+      "optimized_trials": [
+        358473.375,
+        294531.75,
+        362918.5625,
+        305987.0,
+        446221.625,
+        319934.0625
+      ],
+      "speed_ratio": 2.4415313105997605
+    }
+  ],
+  "checked_complete_candidate_sets": 404,
+  "failures": [],
+  "implementation_sha256": "b4470ef05809f41f986538ec22eb8368bae9bd2f86e487a8a06831dedbf032ae",
+  "native_build": {
+    "command": [
+      "g++",
+      "-std=c++17",
+      "-O3",
+      "-shared",
+      "-fPIC",
+      "-I/hpc/group/pfisterlab/mg551/storage/survey_bp/.git/osd-upstream/src_cpp",
+      "/hpc/group/pfisterlab/mg551/storage/survey_bp/.planning/spikes/056-efficient-osd/reference.cpp",
+      "-o",
+      "/hpc/group/pfisterlab/mg551/storage/survey_bp/.git/osd-reference.so"
+    ],
+    "commit": "d3429964cd4ffe1abfc041c6ec8b8425cb174f40",
+    "compiler": "g++ (GCC) 11.5.0 20240719 (Red Hat 11.5.0-14)",
+    "library_sha256": "d550b910405d4b2dfc70eaa8b03dc40dbb263439d2dbc06c153daf45237b9103",
+    "source_sha256": {
+      "LICENSE": "8e3a6c34477756c5abb278c153e25b447edc334145716e83f4ed121beadd03bb",
+      "src_cpp/gf2sparse_linalg.hpp": "5ad67b841e3c977734aefb2a2cc8a1facd249a17558b19a720ffa98b0c233737",
+      "src_cpp/osd.hpp": "604ec8273edcb253e8db7abeeb1ab26ddf203ea2e272f9616549c9670a7e7415",
+      "src_cpp/sort.hpp": "811abe797c882e2aa17158d758354d15c4b514d33acc0eb24024a7fdcf7d9f9b"
+    }
+  },
+  "primary_ldpc_version": "2.4.1",
+  "status": "passed",
+  "tie_convention": "signed ascending; original-column ties controlled before native call",
+  "timing_scope": "warm standalone decoder calls, matched ordered inputs; native final-only vs optimized full candidates/digest/check; constructor/JIT excluded"
+}
