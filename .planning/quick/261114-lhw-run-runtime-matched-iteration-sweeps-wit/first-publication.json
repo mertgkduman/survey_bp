@@ -1,0 +1,20 @@
+{
+  "assessment": {
+    "confirmation_measurements": 45,
+    "confirmed_failures": 900,
+    "confirmed_shots": 36041,
+    "finished_strata": 6,
+    "planned_strata": 218,
+    "schema": "runtime-budget-assessment-v1",
+    "tuning_measurements": 5496
+  },
+  "public_counts": {
+    "curves": 117,
+    "points": 1258,
+    "codes": 12,
+    "circuits": 0
+  },
+  "historical_raw_series_unchanged": 189,
+  "source_commit": "8e903bc",
+  "scope": "full-ledger/manifest/endpoint-audited fresh confirmations; tuning remains separate"
+}
