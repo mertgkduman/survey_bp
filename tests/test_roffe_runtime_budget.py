@@ -168,4 +168,5 @@ def test_dispatch_is_one_cpu_per_point_idempotent_and_dependency_complete(tmp_pa
     campaign.submit(); campaign.submit()
     assert len(calls) == 2 and '--cpus-per-task=1' in calls[0] and '--array=0-217%218' in calls[0]
     assert '--dependency=afterok:9901' in calls[1] and calls[1][-1].endswith('--collect --complete')
+    assert '--mem=2G' in calls[0] and '--mem=16G' in calls[1] and '--mem=2G' not in calls[1]
     assert 'NUMBA_CACHE_DIR' in calls[0][-1]

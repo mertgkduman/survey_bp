@@ -21,4 +21,4 @@ PYTHONPATH=src .venv/bin/python data/reproductions/roffe-2005-07016-runtime-budg
 PYTHONPATH=src .venv/bin/python data/reproductions/roffe-2005-07016-runtime-budget/run.py --collect
 ```
 
-Slurm array218 one-CPU/2GiB workers, native threads1, private job-local Numba caches, four-day checkpointable tasks. Each point tunes then confirms its frozen settings on the same allocation. A successful array triggers complete independent audit and report/catalog generation. No old plan, canonical kernel, archivedv1, source measurement or Phase11 scientific gate is changed.
+Slurm array218 one-CPU/2GiB workers, native threads1, private job-local Numba caches, four-day checkpointable tasks. The separate one-CPU collector requests16GiB to combine the full tuning history. Each point tunes then confirms its frozen settings on the same allocation. A successful array triggers complete independent audit and report/catalog generation. The initial unlaunched2GiB-collector plan is preserved in the quick-task records and its exact source revision in Git; no production samples used it. No old plan, canonical kernel, archivedv1, source measurement or Phase11 scientific gate is changed.

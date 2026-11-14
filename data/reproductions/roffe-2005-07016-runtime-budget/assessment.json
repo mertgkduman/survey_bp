@@ -1,0 +1,9 @@
+{
+  "confirmation_measurements": 0,
+  "confirmed_failures": 0,
+  "confirmed_shots": 0,
+  "finished_strata": 0,
+  "planned_strata": 218,
+  "schema": "runtime-budget-assessment-v1",
+  "tuning_measurements": 0
+}

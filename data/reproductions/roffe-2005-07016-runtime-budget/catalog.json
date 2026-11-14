@@ -1,8 +1,28 @@
 {
-  "schema": "research-catalog-extension-v1",
-  "papers": [],
-  "datasets": [],
+  "datasets": [
+    {
+      "caveat": "Prospective controlled adaptation. Same-host warmed decoder mean time versus undamped canonical BP+OSD0, not campaign elapsed time. Joint damping/constant-or-paper scaling/offset search; alpha*max(0,min_abs-beta), old-V2C damping. Every tested control/cap retained. Training never pooled with fresh confirmation. Preserve full cap progression for previous damping and selected joint settings. Runtime tolerance10%, explicit saturation/search ceilings and over-budget starting points. Binary BP X-only; Q-BP joint depolarizing at1.5p_X, distinct channels. Timings are host/cohort dependent; report actual ratios, not assumed equality. No source-reproduction or global-optimality claim.",
+      "dataset_id": "roffe-joint-controls-runtime-budget",
+      "evidence_status": "canonical_adaptation",
+      "label": "Roffe: joint BP controls versus iteration cap and BP+OSD0 runtime",
+      "paper_id": "roffe-2005-07016-v2",
+      "points": [],
+      "source_path": "data/reproductions/roffe-2005-07016-runtime-budget/verified.json"
+    }
+  ],
   "decoders": [],
+  "experiments": [],
+  "papers": [
+    {
+      "evidence_path": "data/reproductions/roffe-2005-07016-bp/source.json",
+      "identity": "arXiv:2005.07016v2; Phys. Rev. Research 2, 043423 (2020)",
+      "kind": "paper",
+      "paper_id": "roffe-2005-07016-v2",
+      "registered_scope": "Figure 3 toric regular min-sum BP; Q-BP is a controlled comparison",
+      "source_url": "https://arxiv.org/abs/2005.07016v2",
+      "title": "Decoding Across the Quantum LDPC Code Landscape"
+    }
+  ],
   "result_series": [],
-  "experiments": []
+  "schema": "research-catalog-extension-v1"
 }

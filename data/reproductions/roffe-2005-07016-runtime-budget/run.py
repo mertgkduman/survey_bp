@@ -113,6 +113,8 @@ def submit(test_only=False):
         def queue(name, options):
             if name in receipt and not test_only: return receipt[name]['id']
             argv = [*base, *(['--test-only'] if test_only else []), *options]
+            if name == 'collect':
+                argv = ['--mem=16G' if value == '--mem=2G' else value for value in argv]
             result = subprocess.run(argv, check=True, capture_output=True, text=True)
             if test_only: print(result.stdout+result.stderr); return None
             jid = result.stdout.strip().split(';')[0]

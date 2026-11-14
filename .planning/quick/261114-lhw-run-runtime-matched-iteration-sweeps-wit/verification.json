@@ -1,0 +1,39 @@
+{
+  "status": "passed",
+  "exact_canonical_cases": 144,
+  "unique_regression_cases": 65,
+  "collector_resource_dispatch_recheck": 1,
+  "browser": {
+    "controls": {
+      "checks": [
+        "Both families display exact constant/ramped scaling, damping, offset, cap and distinct channels",
+        "Results table and CSV expose the measured time/reference ratio and tolerance",
+        "Run settings preserve numerical controls and compiled execution identity",
+        "Builder cannot replace the tuned scheduled decoder with a plain decoder",
+        "Singleton filtering hides ineligible tuned curves and clears stale input/preset selections"
+      ],
+      "errors": [],
+      "simulations": 0
+    },
+    "public": {
+      "checks": [
+        "112 curves / 1246 rows; all public input and saved-decoder lists use the active view; GB46 and all three singleton circuits absent",
+        "Every remaining code: picker, legend, plotted collection, table, settings receipt and CSV agree",
+        "Empty active view clears plot/decoder/input state and stale matrices; reset, custom matrix and custom Stim still validate",
+        "Missing default A5/B2 inputs fall back to a displayed input in both DOM and experiment/plot state",
+        "Import refresh hides singleton, admits multi-rate circuit and updates availability; hiding the selected circuit clears its Stim bytes and download validation",
+        "Saved imports reapply eligibility after reload; internal three-qubit fixture remains hidden even with two rates",
+        "Empty mobile layout fits; archived v1 still loads its retained catalog"
+      ],
+      "errors": [],
+      "simulations": 0
+    }
+  },
+  "public_counts_before_launch": {
+    "curves": 112,
+    "points": 1246,
+    "codes": 12,
+    "circuits": 0
+  },
+  "scope": "implementation, real102-control smoke, public/empty/stale paths, unregistered calibration evidence excluded; prospective production pending"
+}

@@ -5,11 +5,11 @@ current_phase: 11
 current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
-stopped_at: OSD212/218 terminal points checked;6 rare points running; full refresh61820674 and final collector61820676 pending completion
-last_updated: "2026-11-14T18:21:50.732313+00:00"
+stopped_at: Joint damping/scale/offset runtime-budget campaign qualified and frozen;218 point workers ready for dispatch
+last_updated: "2026-11-14T21:00:57.447075+00:00"
 last_activity: 2026-11-14
-last_activity_desc: Quick261114-i9b checks212 terminal OSD points/424 endpoints and host-target benchmark; full318M-row audit continues in Slurm, no simulation changes.
-state_head: 2c8b6fe
+last_activity_desc: Quick261114-lhw qualifies joint controls and per-point cap progression;144 exact canonical cases,65 tests,12 browser groups; frozen218-worker runtime campaign.
+state_head: ab91af9
 progress:
   total_phases: 14
   completed_phases: 8
@@ -34,7 +34,10 @@ Total Phases: 14
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
-Last activity: 2026-11-14 — quick261114-i9b checks current OSD results and explains source-matched performance
+Last activity: 2026-11-14 — quick261114-lhw prepares joint-control tuning and runtime-matched iteration studies
+Last Activity Description: Separately versioned traversal calls unchanged canonical binary/Pauli sweep helpers;144 exact candidate/belief/stopping checks pass across damping/scaling/offset. Joint search has80 coarse controls plus local refinement, then4096-shot finalist training and fresh20-failure/1e8-shot confirmation. Preserve each candidate/cap and earlier damping progression; match mean warmed same-CPU BP+OSD0 time within10%, with explicit saturation/over-budget status. Original109 code/rate grids retained for both families; BP X-only and Q-BP depolarizing1.5p remain distinct. Pilot finds Q-BP at T=n can already exceed reference1.2–6.6x, so lower caps are retained alongside n-cap controls. Real full search tested102 controls/963 control-caps,10 shortened confirmation caps/699 shots, exact resume/full audit; these qualification samples are not pooled.65 regression cases and12 Chromium groups pass, including exact scale/offset labels and time/reference CSV column. Frozen218-worker campaign ready; one CPU/2GiB per worker, one CPU/16GiB collector. Initial unlaunched2GiB-collector plan/source preserved; scientific design unchanged. Public112 curves/1246 points/12 codes/0 circuits before launch, with singleton/incompatible-policy filtering unchanged. No canonical, prior frozen simulation, v1 or phase-gate/counter changes.
+
+Prior OSD check activity: 2026-11-14 — quick261114-i9b checks current OSD results and explains source-matched performance
 Last Activity Description:212/218 terminal points contain318,346,784 decoder shots/4,207 logical failures. Frozen manifests, summary arithmetic/stopping/exact95% CI/work and424 endpoint replays pass. Six rare points remain running: both methods on338/p=.01 and450/p=.01/.02; four zero-failure progress counts are50–77M shots and are not final estimates. At p=.02 the three completed codes have similar OSD0/CS10 LERs with overlapping intervals; damped BP is orders of magnitude worse. Same-CS10 native -O3 -march=native rebuild preserves64 selected outputs and yields2.32–3.53x warmed ratios; packed affine reuse/popcount explain the changed implementation, without a paperCS60 or generic speed claim. Full318M-row refresh runs as61820674; final complete collector61820676 is serialized behind it and the original array. Replaced61805014; prior retry61805013 already completed0:0. Fresh summary/endpoint snapshot and all109 comparison rows are saved separately; workbench retains fully audited173-point OSD snapshot112 curves/1246 points/12 codes/0 circuits pending full refresh, byte-identical to02f802a. No raw/frozen/canonical/native/v1/phase-gate changes. Evidence commit2c8b6fe.
 
 Prior OSD implementation activity: 2026-11-14 — spikes056–057 qualify efficient canonical BP + OSD-0 / CS-10 and prepare production dispatch

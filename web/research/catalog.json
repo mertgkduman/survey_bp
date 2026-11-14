@@ -54317,6 +54317,15 @@
         }
       ],
       "source_path": "data/reproductions/roffe-2005-07016-osd-fast/verified.json"
+    },
+    {
+      "caveat": "Prospective controlled adaptation. Same-host warmed decoder mean time versus undamped canonical BP+OSD0, not campaign elapsed time. Joint damping/constant-or-paper scaling/offset search; alpha*max(0,min_abs-beta), old-V2C damping. Every tested control/cap retained. Training never pooled with fresh confirmation. Preserve full cap progression for previous damping and selected joint settings. Runtime tolerance10%, explicit saturation/search ceilings and over-budget starting points. Binary BP X-only; Q-BP joint depolarizing at1.5p_X, distinct channels. Timings are host/cohort dependent; report actual ratios, not assumed equality. No source-reproduction or global-optimality claim.",
+      "dataset_id": "roffe-joint-controls-runtime-budget",
+      "evidence_status": "canonical_adaptation",
+      "label": "Roffe: joint BP controls versus iteration cap and BP+OSD0 runtime",
+      "paper_id": "roffe-2005-07016-v2",
+      "points": [],
+      "source_path": "data/reproductions/roffe-2005-07016-runtime-budget/verified.json"
     }
   ],
   "decoders": [
@@ -62460,6 +62469,10 @@
     {
       "path": "data/reproductions/roffe-2005-07016-osd-fast/catalog.json",
       "sha256": "168616e05ad330353d736a198f118fdd0b3a3bf56c0b90f70b5e0a355f6ca423"
+    },
+    {
+      "path": "data/reproductions/roffe-2005-07016-runtime-budget/catalog.json",
+      "sha256": "f46b450d7b538f6b5b664e175bbd87414cfcc68d0da3cef069b7d714c6f73d13"
     }
   ],
   "limitations": [

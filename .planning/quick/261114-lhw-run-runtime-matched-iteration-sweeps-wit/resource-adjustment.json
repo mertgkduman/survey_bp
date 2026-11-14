@@ -1,0 +1,11 @@
+{
+  "initial_source_commit": "ab91af9",
+  "initial_unlaunched_plan_sha256": "2fc07948d4c6e97d7b103794a7b5d914019c300687667e211f2ad10adf77e0cb",
+  "final_plan_sha256": "6551628b646126758e2c549fdbe0d909a3f04d0388d20c9d95c73b8b4a69e94c",
+  "scientific_design_unchanged": true,
+  "changed_pins": [
+    "data/reproductions/roffe-2005-07016-runtime-budget/README.md",
+    "data/reproductions/roffe-2005-07016-runtime-budget/run.py"
+  ],
+  "reason": "Increase only collector memory from2GiB to16GiB for full tuning-history aggregation; workers remain one CPU/2GiB. No production samples used initial plan; math/source qualification and full search smoke unchanged."
+}
