@@ -217,10 +217,10 @@ def test_rebuilt_catalog_uses_same_active_view_as_browser_and_preserves_retained
     from bp_registry.research.catalog import build_catalog
     c = build_catalog(ROOT)
     view = active_view(c)
-    legacy = [s for s in view['curves'] if s['dataset_id'] not in {'yao-bpgd-completion', 'mackay-unicycle-bp', 'mackay-unicycle-paper-rates', 'mackay-damping-confirmation', 'roffe-2020-figure3-canonical-bp', 'mackay-inferred-t100-baseline', 'mackay-damping-t100-confirmation', 'mackay-qbp-isolation-t100'}]
+    legacy = [s for s in view['curves'] if s['dataset_id'] not in {'yao-bpgd-completion', 'mackay-unicycle-bp', 'mackay-unicycle-paper-rates', 'mackay-damping-confirmation', 'roffe-2020-figure3-canonical-bp', 'mackay-inferred-t100-baseline', 'mackay-damping-t100-confirmation', 'mackay-qbp-isolation-t100', 'roffe-damping-confirmation'}]
     assert len(legacy) == 53
     assert sum(len(s['points']) for s in legacy) == 262
-    added = {s['code_id'] for s in view['curves'] if s['dataset_id'] in {'mackay-unicycle-bp', 'mackay-unicycle-paper-rates', 'mackay-damping-confirmation', 'roffe-2020-figure3-canonical-bp', 'mackay-inferred-t100-baseline', 'mackay-damping-t100-confirmation', 'mackay-qbp-isolation-t100'}}
+    added = {s['code_id'] for s in view['curves'] if s['dataset_id'] in {'mackay-unicycle-bp', 'mackay-unicycle-paper-rates', 'mackay-damping-confirmation', 'roffe-2020-figure3-canonical-bp', 'mackay-inferred-t100-baseline', 'mackay-damping-t100-confirmation', 'mackay-qbp-isolation-t100', 'roffe-damping-confirmation'}}
     assert {code['code_id'] for code in view['codes']} == {'a5', 'b2', 'b1', 'c2', 'double-gross', 'bb72'} | added
     assert view['circuits'] == []
     from bp_registry.research.inputs import input_registry

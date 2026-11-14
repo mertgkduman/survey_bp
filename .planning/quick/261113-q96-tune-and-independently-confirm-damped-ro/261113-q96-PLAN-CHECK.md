@@ -1,0 +1,3 @@
+# Inline plan check
+
+PASS. This is a controlled damping extension of the completed Roffe study, with no kernel, source-artifact or old-plan changes. Dynamic source rate counts (25/28) enter both the objective and simultaneous multiplicity correction. Physical sample identities are checked before selection. Fresh confirmation avoids training bias, keeps d=0 controls and deduplicates identical settings. T=n is preserved at every stage. Empty registration cannot add unmeasured public curves. Dispatch is locked and receipted; automatic dependent stages require complete audits. One 1526-element array fits the measured Slurm limit and concurrency392 leaves current CPU/memory headroom. No new paper or fallback executes.

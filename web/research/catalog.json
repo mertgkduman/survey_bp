@@ -21500,22 +21500,22 @@
           "url": "data/reproductions/roffe-2005-07016-bp/plan.json"
         },
         {
-          "availability": "local_only",
+          "availability": "tracked",
           "kind": "json",
           "label": "Audited terminal results",
-          "local_storage_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/roffe-2005-07016-bp/verified.json",
+          "local_storage_path": null,
           "path": "data/reproductions/roffe-2005-07016-bp/verified.json",
           "sha256": "20e0feff53ee5ebe63a9b281ab052c20bec182403db223e47abddc2e173b02fe",
-          "url": null
+          "url": "data/reproductions/roffe-2005-07016-bp/verified.json"
         },
         {
-          "availability": "local_only",
+          "availability": "tracked",
           "kind": "json",
           "label": "Source or holdout assessment",
-          "local_storage_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/roffe-2005-07016-bp/comparison.json",
+          "local_storage_path": null,
           "path": "data/reproductions/roffe-2005-07016-bp/comparison.json",
           "sha256": "fc3e82a273a249eca6050929d2070cb60192301d341968c1d886bc1379c4fe1d",
-          "url": null
+          "url": "data/reproductions/roffe-2005-07016-bp/comparison.json"
         }
       ],
       "caveat": "Source-matched regular binary BP: Figure 3 toric codes, measured p grid, flooding min-sum, alpha_t=1-2^-t, T=n. Exact author floating-point/row ordering is not available; canonical adaptation pending statistical comparison. Q-BP uses joint min-sum at T=n on matched-marginal depolarizing noise (p_dep=1.5*p_X), not the paper channel. No OSD executes in either arm.",
@@ -37585,6 +37585,10 @@
     {
       "path": "data/reproductions/mackay-0304161-isolated-qbp/catalog.json",
       "sha256": "ccffabf0529a970fff7968fadd2d3f3d0c75442385db0161fbed7f06388d6bcd"
+    },
+    {
+      "path": "data/reproductions/roffe-2005-07016-damping/confirmation/catalog.json",
+      "sha256": "db4d07115a7dde3707c153098fec1a95963ebcbba4b0105fee7f8f5e225578bc"
     }
   ],
   "limitations": [
