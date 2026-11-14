@@ -1,0 +1,31 @@
+{
+  "timestamp_utc": "2026-11-14T18:13:47.220474+00:00",
+  "reason": "212 terminal points contain318M events; sequential full-ledger refresh moved from interactive process to one-CPU Slurm job; final publication serialized after refresh and original array. Retry61805013 already completed0:0 and is verified in retained summary; scheduler has purged its job dependency record. Full complete audit still enforces all218 points.",
+  "replaced_collector": "61805014",
+  "partial_audit": {
+    "id": "61820674",
+    "details": "scontrol show job retained in scheduler.txt; one CPU/2G/4days; unchanged frozen run.py --collect; private Numba cache"
+  },
+  "complete_audit": {
+    "id": "61820676",
+    "argv": [
+      "sbatch",
+      "--parsable",
+      "--partition=common,scavenger",
+      "--account=pfisterlab",
+      "--nodes=1",
+      "--ntasks=1",
+      "--cpus-per-task=1",
+      "--mem=2G",
+      "--requeue",
+      "--time=4-00:00:00",
+      "--chdir=/hpc/group/pfisterlab/mg551/storage/survey_bp",
+      "--export=ALL,PYTHONPATH=/hpc/group/pfisterlab/mg551/storage/survey_bp/src,OMP_NUM_THREADS=1,OPENBLAS_NUM_THREADS=1,MKL_NUM_THREADS=1",
+      "--job-name=roffe-osd-audit",
+      "--dependency=afterany:61804747,afterok:61820674",
+      "--output=/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/roffe-2005-07016-osd-fast/results/complete-collect-%j.log",
+      "--wrap=/hpc/group/pfisterlab/mg551/storage/survey_bp/.venv/bin/python /hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/roffe-2005-07016-osd-fast/run.py --collect --complete"
+    ]
+  },
+  "scientific_plan_changed": false
+}

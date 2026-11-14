@@ -1,0 +1,185 @@
+{
+  "affinity": [
+    56
+  ],
+  "benchmarks": [
+    {
+      "code": "toric9",
+      "fixtures": 16,
+      "median_ns": {
+        "native": 116189.90625,
+        "optimized": 50028.21875
+      },
+      "n": 162,
+      "speed_ratio": 2.322487371189885,
+      "trials": {
+        "native": [
+          119177.3125,
+          122060.25,
+          117978.0,
+          120334.375,
+          120813.375,
+          116156.375,
+          114410.6875,
+          116223.4375,
+          114902.875,
+          115943.0,
+          115537.0625,
+          115903.375
+        ],
+        "optimized": [
+          65690.8125,
+          49482.0,
+          61881.875,
+          49056.0625,
+          52800.5,
+          47979.75,
+          51038.125,
+          47214.1875,
+          50574.4375,
+          47177.6875,
+          50836.5625,
+          46250.625
+        ]
+      }
+    },
+    {
+      "code": "toric11",
+      "fixtures": 16,
+      "median_ns": {
+        "native": 210885.3125,
+        "optimized": 75563.625
+      },
+      "n": 242,
+      "speed_ratio": 2.790831071166848,
+      "trials": {
+        "native": [
+          213843.375,
+          215305.125,
+          210208.6875,
+          210158.5625,
+          210686.4375,
+          205617.0,
+          206938.875,
+          211084.1875,
+          222397.125,
+          211594.75,
+          212280.375,
+          202777.9375
+        ],
+        "optimized": [
+          77285.875,
+          76033.875,
+          79007.1875,
+          74289.1875,
+          76545.8125,
+          73492.0625,
+          88138.375,
+          74871.0625,
+          79802.625,
+          73665.125,
+          75093.375,
+          72507.0
+        ]
+      }
+    },
+    {
+      "code": "toric13",
+      "fixtures": 16,
+      "median_ns": {
+        "native": 361155.5625,
+        "optimized": 114628.59375
+      },
+      "n": 338,
+      "speed_ratio": 3.150658580769687,
+      "trials": {
+        "native": [
+          365668.0,
+          372227.125,
+          372441.875,
+          358324.0625,
+          347308.375,
+          358452.5,
+          374482.875,
+          359779.625,
+          358931.0,
+          352907.375,
+          362531.5,
+          366006.4375
+        ],
+        "optimized": [
+          125061.6875,
+          111247.125,
+          120791.125,
+          113575.875,
+          115681.3125,
+          112167.3125,
+          137570.3125,
+          115883.1875,
+          113060.5625,
+          110112.75,
+          116001.0,
+          110275.9375
+        ]
+      }
+    },
+    {
+      "code": "toric15",
+      "fixtures": 16,
+      "median_ns": {
+        "native": 600127.28125,
+        "optimized": 170047.0625
+      },
+      "n": 450,
+      "speed_ratio": 3.5291834650186917,
+      "trials": {
+        "native": [
+          571962.6875,
+          601636.1875,
+          587632.3125,
+          602125.5625,
+          602073.125,
+          580939.6875,
+          603067.4375,
+          598618.375,
+          591177.5625,
+          604584.3125,
+          592364.8125,
+          609979.375
+        ],
+        "optimized": [
+          179215.6875,
+          167165.6875,
+          171204.1875,
+          162055.375,
+          174927.0,
+          163329.1875,
+          182080.5625,
+          166949.125,
+          173688.75,
+          181624.375,
+          168889.9375,
+          164026.1875
+        ]
+      }
+    }
+  ],
+  "command": [
+    "g++",
+    "-std=c++17",
+    "-O3",
+    "-march=native",
+    "-shared",
+    "-fPIC",
+    "-I/hpc/group/pfisterlab/mg551/storage/survey_bp/.git/osd-upstream/src_cpp",
+    "/hpc/group/pfisterlab/mg551/storage/survey_bp/.planning/spikes/056-efficient-osd/reference.cpp",
+    "-o",
+    "/hpc/group/pfisterlab/mg551/storage/survey_bp/.git/osd-reference-host-target.so"
+  ],
+  "host": "dcc-core-ferc-u-ab39-5-6",
+  "implementation_sha256": "b2e4b1685afb20f5c10acaad31837184fb654004d05e027e2438431659b59586",
+  "library_sha256": "2a69951540876e1b65b7cfcf151d2456daf51f58e906e02db6b510303fb54209",
+  "scope": "CS10 vs CS10 on64 warm source-derived fixtures; twelve alternating rounds; native final-only with original syndrome check vs optimized full candidates/digest/work/check; BP/constructor/JIT excluded; host-target C++ -O3 -march=native; original qualification preserved; no exclusive physical core claim",
+  "source_commit": "d3429964cd4ffe1abfc041c6ec8b8425cb174f40",
+  "status": "passed"
+}

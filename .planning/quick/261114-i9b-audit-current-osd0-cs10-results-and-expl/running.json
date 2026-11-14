@@ -1,0 +1,65 @@
+{
+  "timestamp_utc": "2026-11-14T18:18:42.348623+00:00",
+  "points": [
+    {
+      "arm": "bp_osd0",
+      "code": "toric13",
+      "id": "toric13-binary_ms-p01000-bp_osd0",
+      "physical_p": 0.01,
+      "retained_shots": 77119488,
+      "logical_failures": 0,
+      "osd_calls": 6966968,
+      "status": "in_progress; descriptive counters only, not final estimates"
+    },
+    {
+      "arm": "bp_osd_cs10",
+      "code": "toric13",
+      "id": "toric13-binary_ms-p01000-bp_osd_cs10",
+      "physical_p": 0.01,
+      "retained_shots": 74104832,
+      "logical_failures": 0,
+      "osd_calls": 6694447,
+      "status": "in_progress; descriptive counters only, not final estimates"
+    },
+    {
+      "arm": "bp_osd0",
+      "code": "toric15",
+      "id": "toric15-binary_ms-p01000-bp_osd0",
+      "physical_p": 0.01,
+      "retained_shots": 50794496,
+      "logical_failures": 0,
+      "osd_calls": 6014386,
+      "status": "in_progress; descriptive counters only, not final estimates"
+    },
+    {
+      "arm": "bp_osd_cs10",
+      "code": "toric15",
+      "id": "toric15-binary_ms-p01000-bp_osd_cs10",
+      "physical_p": 0.01,
+      "retained_shots": 50151424,
+      "logical_failures": 0,
+      "osd_calls": 5937925,
+      "status": "in_progress; descriptive counters only, not final estimates"
+    },
+    {
+      "arm": "bp_osd0",
+      "code": "toric15",
+      "id": "toric15-binary_ms-p02000-bp_osd0",
+      "physical_p": 0.02,
+      "retained_shots": 21700608,
+      "logical_failures": 6,
+      "osd_calls": 8165396,
+      "status": "in_progress; descriptive counters only, not final estimates"
+    },
+    {
+      "arm": "bp_osd_cs10",
+      "code": "toric15",
+      "id": "toric15-binary_ms-p02000-bp_osd_cs10",
+      "physical_p": 0.02,
+      "retained_shots": 20566016,
+      "logical_failures": 9,
+      "osd_calls": 7737513,
+      "status": "in_progress; descriptive counters only, not final estimates"
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+JobId=61820674 JobName=roffe-osd-refresh
+   UserId=mg551(1498154) GroupId=dukeusers(1000000) MCS_label=N/A
+   Priority=11983 Nice=0 Account=pfisterlab QOS=normal
+   JobState=RUNNING Reason=None Dependency=(null)
+   Requeue=1 Restarts=0 BatchFlag=1 Reboot=0 ExitCode=0:0
+   RunTime=00:04:52 TimeLimit=4-00:00:00 TimeMin=N/A
+   SubmitTime=2026-11-14T13:13:28 EligibleTime=2026-11-14T13:13:28
+   AccrueTime=2026-11-14T13:13:28
+   StartTime=2026-11-14T13:13:50 EndTime=2026-11-18T13:13:50 Deadline=N/A
+   SuspendTime=None SecsPreSuspend=0 LastSchedEval=2026-11-14T13:13:50 Scheduler=Backfill
+   Partition=common AllocNode:Sid=dcc-core-ferc-u-ab39-5-6:636768
+   ReqNodeList=(null) ExcNodeList=(null)
+   NodeList=dcc-dhvimdcore-gpu-ferc-s-p15-22
+   BatchHost=dcc-dhvimdcore-gpu-ferc-s-p15-22
+   NumNodes=1 NumCPUs=1 NumTasks=1 CPUs/Task=1 ReqB:S:C:T=0:0:*:*
+   ReqTRES=cpu=1,mem=2G,node=1,billing=1
+   AllocTRES=cpu=1,mem=2G,node=1,billing=1
+   Socks/Node=* NtasksPerN:B:S:C=0:0:*:* CoreSpec=*
+   MinCPUsNode=1 MinMemoryNode=2G MinTmpDiskNode=0
+   Features=(null) DelayBoot=00:00:00
+   OverSubscribe=OK Contiguous=0 Licenses=(null) LicensesAlloc=(null) Network=(null)
+   Command=(null)
+   SubmitLine=sbatch --parsable --partition=common,scavenger --account=pfisterlab --nodes=1 --ntasks=1 --cpus-per-task=1 --mem=2G --requeue --time=4-00:00:00 --chdir=/hpc/group/pfisterlab/mg551/storage/survey_bp --export=ALL,PYTHONPATH=/hpc/group/pfisterlab/mg551/storage/survey_bp/src,OMP_NUM_THREADS=1,OPENBLAS_NUM_THREADS=1,MKL_NUM_THREADS=1 --job-name=roffe-osd-refresh --output=/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/roffe-2005-07016-osd-fast/results/refresh-collect-%j.log --wrap=export NUMBA_CACHE_DIR="/tmp/roffe-osd-audit-${SLURM_JOB_ID}"; mkdir -p "$NUMBA_CACHE_DIR"; exec /hpc/group/pfisterlab/mg551/storage/survey_bp/.venv/bin/python /hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/roffe-2005-07016-osd-fast/run.py --collect
+   WorkDir=/hpc/group/pfisterlab/mg551/storage/survey_bp
+   StdErr=
+   StdIn=/dev/null
+   StdOut=/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/roffe-2005-07016-osd-fast/results/refresh-collect-61820674.log
+   TresPerTask=cpu=1
+
+
+JobId=61820676 JobName=roffe-osd-audit
+   UserId=mg551(1498154) GroupId=dukeusers(1000000) MCS_label=N/A
+   Priority=11983 Nice=0 Account=pfisterlab QOS=normal
+   JobState=PENDING Reason=Dependency Dependency=afterany:61804747_*(unfulfilled),afterok:61820674(unfulfilled)
+   Requeue=1 Restarts=0 BatchFlag=1 Reboot=0 ExitCode=0:0
+   RunTime=00:00:00 TimeLimit=4-00:00:00 TimeMin=N/A
+   SubmitTime=2026-11-14T13:13:47 EligibleTime=Unknown
+   AccrueTime=Unknown
+   StartTime=Unknown EndTime=Unknown Deadline=N/A
+   SuspendTime=None SecsPreSuspend=0 LastSchedEval=2026-11-14T13:13:47 Scheduler=Main
+   Partition=common,scavenger AllocNode:Sid=dcc-core-ferc-u-ab39-5-6:636801
+   ReqNodeList=(null) ExcNodeList=(null)
+   NodeList=
+   NumNodes=1-1 NumCPUs=1 NumTasks=1 CPUs/Task=1 ReqB:S:C:T=0:0:*:*
+   ReqTRES=cpu=1,mem=2G,node=1,billing=1
+   AllocTRES=(null)
+   Socks/Node=* NtasksPerN:B:S:C=0:0:*:* CoreSpec=*
+   MinCPUsNode=1 MinMemoryNode=2G MinTmpDiskNode=0
+   Features=(null) DelayBoot=00:00:00
+   OverSubscribe=OK Contiguous=0 Licenses=(null) LicensesAlloc=(null) Network=(null)
+   Command=(null)
+   SubmitLine=sbatch --parsable --partition=common,scavenger --account=pfisterlab --nodes=1 --ntasks=1 --cpus-per-task=1 --mem=2G --requeue --time=4-00:00:00 --chdir=/hpc/group/pfisterlab/mg551/storage/survey_bp --export=ALL,PYTHONPATH=/hpc/group/pfisterlab/mg551/storage/survey_bp/src,OMP_NUM_THREADS=1,OPENBLAS_NUM_THREADS=1,MKL_NUM_THREADS=1 --job-name=roffe-osd-audit --dependency=afterany:61804747,afterok:61820674 --output=/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/roffe-2005-07016-osd-fast/results/complete-collect-%j.log --wrap=/hpc/group/pfisterlab/mg551/storage/survey_bp/.venv/bin/python /hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/roffe-2005-07016-osd-fast/run.py --collect --complete
+   WorkDir=/hpc/group/pfisterlab/mg551/storage/survey_bp
+   StdErr=
+   StdIn=/dev/null
+   StdOut=/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/roffe-2005-07016-osd-fast/results/complete-collect-61820676.log
+   TresPerTask=cpu=1
