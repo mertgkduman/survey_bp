@@ -5,11 +5,11 @@ current_phase: 11
 current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
-stopped_at: Roffe218/218 audited and published;109 BP paper points consistent pointwise, MacKay rare point continues
-last_updated: "2026-11-13T23:15:59+00:00"
+stopped_at: Roffe damping tuning array61789908 running; audited selection and fresh confirmation auto-continue via61789909
+last_updated: "2026-11-14T00:10:54.131066+00:00"
 last_activity: 2026-11-13
-last_activity_desc: Quick261113-p1r verifies complete Roffe audit and comparison. All109 ordinary-BP paper values lie in pointwise95% intervals;20-failure precision and canonical-adaptation limits retained. Public88 curves/637 points/12 codes; MacKay continues separately.
-state_head: fdbb98b
+last_activity_desc: Quick261113-q96 launches1526 Roffe min-sum damping tuning points at paper T=n; independent confirmation auto-continues after full audit.90 tests/16 browser groups pass; existing results unchanged.
+state_head: 4c8471f
 progress:
   total_phases: 14
   completed_phases: 8
@@ -34,8 +34,10 @@ Total Phases: 14
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
-Last activity: 2026-11-13 — quick261113-p1r assesses and verifies completed Roffe source curves
-Last Activity Description: Roffe collector61785160 completed0:0 and fully audited/published218 points (9,816 decoder shots/4,360 failures). Quick261113-p1r independently checks source coordinates, counts, work, stopping intervals and receipt hashes: all109 ordinary-BP paper values lie inside pointwise95% intervals; maximum point-estimate deviation22.3%. Four-panel overlay and complete tables are in the Roffe study. Agreement is scoped to current20-failure precision and X-only ordinary BP, with no simultaneous curve/native numerical identity or BP-OSD claim.109 Q-BP/depolarizing points remain separate. Source archive re-extraction and frozen40-pin plan pass. Passed54 catalog checks and12 browser groups; public88 curves/637 points/12 codes/0 circuits. All157 prior raw series/points unchanged, no canonical/frozen/v1 edits. Roffe is complete; MacKay's separate rare point remains running. Phase11 gates unchanged.
+Last activity: 2026-11-13 — quick261113-q96 launches Roffe damped BP/Q-BP tuning and automatic independent confirmation
+Last Activity Description: Committed4c8471f; array61789908 tests seven damping values on1024 paired fixed shots/rate (1526 points), retaining all original rate grids and paper T=n. One CPU/2GiB per point, concurrency392 under measured400-CPU/1500000M limits. Controller61789909 requires a complete audit, selects by LER before guarded iteration speed, then freezes/submits fresh selected/zero-damping controls at20 failures or1e8 shots. Final automatic audit publishes confirmation only. Initial workers and terminal ledgers pass; selection/results remain pending.90 tests,16 Chromium groups and16 real qualification shots pass. Public88 curves/637 points/12 codes/0 circuits; all165 retained raw series unchanged. No canonical, shared-runtime, old frozen plan or v1 changes. MacKay rare point continues separately; phase gates/counters unchanged.
+
+Prior Roffe assessment: Roffe collector61785160 completed0:0 and fully audited/published218 points (9,816 decoder shots/4,360 failures). Quick261113-p1r independently checks source coordinates, counts, work, stopping intervals and receipt hashes: all109 ordinary-BP paper values lie inside pointwise95% intervals; maximum point-estimate deviation22.3%. Four-panel overlay and complete tables are in the Roffe study. Agreement is scoped to current20-failure precision and X-only ordinary BP, with no simultaneous curve/native numerical identity or BP-OSD claim.109 Q-BP/depolarizing points remain separate. Source archive re-extraction and frozen40-pin plan pass. Passed54 catalog checks and12 browser groups; public88 curves/637 points/12 codes/0 circuits. All157 prior raw series/points unchanged, no canonical/frozen/v1 edits. Roffe is complete; MacKay's separate rare point remains running. Phase11 gates unchanged.
 
 Completed campaign: See the [paper-rate task summary](./quick/261112-k9m-run-mackay-bp-campaign-at-the-five-publi/261112-k9m-SUMMARY.md). Source-plot coordinates and the exact five rates are pinned. The retained historical curves used 20 block failures or 100 million shots per rate and the 88,200 total-sweep ceiling; the new inferred-budget campaign is recorded above. Classical errors are recorded separately from quantum failures. No full-curve agreement is claimed.
 
@@ -306,6 +308,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 | # | Description | Date | Commit | Status | Directory |
 |---|-------------|------|--------|--------|-----------|
+| 261113-q96 | Launch paper-budget Roffe damped BP/Q-BP tuning and fresh confirmation | 2026-11-13 | 4c8471f | Verified setup/launch; tuning running, confirmation pending | [261113-q96](./quick/261113-q96-tune-and-independently-confirm-damped-ro/) |
 | 261113-p1r | Assess completed Roffe curves and verify publication | 2026-11-13 | efc3e6a | Complete;109/109 source points consistent pointwise | [261113-p1r](./quick/261113-p1r-assess-completed-roffe-figure-3-results-/) |
 | 261113-oan | Launch Roffe with one CPU for each of218 points | 2026-11-13 | b121812 | Complete218-point audit/publication; see p1r assessment | [261113-oan](./quick/261113-oan-launch-all-218-roffe-points-concurrently/) |
 | 261113-mmo | Isolate undamped Q-BP under matched noise; verify length74 source ordinates | 2026-11-13 | bd08a80 | Complete controls; five paper ordinates unavailable, summary extracted | [261113-mmo](./quick/261113-mmo-add-independent-undamped-q-bp-and-matche/) |
@@ -384,6 +387,8 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 No requested decoding regime or named policy family is deferred beyond the first journal milestone. The user deferred Phase 5's pending human notebook/HTML review while moving to Phase 11; Phase 5 is not marked complete. Phase 7 remains paused. The cancelled comprehensive Phase 4 CSS evaluation/factorial is deferred from Phase 4; Phase 8 supplied bounded campaign infrastructure and Phase 9 completed exploratory CSS controls. Source-faithful CSS publication assessments remain pending exact author evidence. Relay circuit-curve assessment remains in Phase 13.
 
 ## Session Continuity
+
+Latest campaign: quick261113-q96, implementation4c8471f. Roffe damping array61789908 and dependent controller61789909 run the automatic audit -> LER-first selection -> independent paper-budget confirmation -> audit/publication sequence. Inspect data/reproductions/roffe-2005-07016-damping/launch-status.json and dispatch.json; do not resubmit or change frozen files. Selection and confirmation results are still pending.
 
 Latest campaign: quick 261113-hk2, implementation `1b040da`. Old 88200 damping is canceled. Curve alignment favors inferred T=100, with 50 also plausible; no historical cap is asserted. Fresh baseline and training are audited; confirmation has 39/40 terminal points audited, with one rare Q-BP point running before the unchanged Roffe T=n study. The old 30-point long-budget MacKay results and displayed curves stay intact. See the hk2 summary for frozen plans, retrospective caveats, tests and accepted commands.
 

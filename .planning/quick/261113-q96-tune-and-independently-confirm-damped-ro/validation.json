@@ -1,0 +1,98 @@
+{
+  "browser_checks": [
+    {
+      "checks": [
+        "All four codes keep binary/Q-BP and zero/selected damping distinct, with source scale schedule",
+        "CSV and settings export every visible curve and preserve both work metrics and min-sum schedule",
+        "Selected damping saved choice cannot replace the source changing-scale execution with a builder default",
+        "Loss of multi-rate confirmation hides empty inputs and clears stale selected damping choices"
+      ],
+      "errors": [],
+      "simulations": 0
+    },
+    {
+      "checks": [
+        "88 curves / 637 rows; all public input and saved-decoder lists use the active view; GB46 and all three singleton circuits absent",
+        "Every remaining code: picker, legend, plotted collection, table, settings receipt and CSV agree",
+        "Empty active view clears plot/decoder/input state and stale matrices; reset, custom matrix and custom Stim still validate",
+        "Missing default A5/B2 inputs fall back to a displayed input in both DOM and experiment/plot state",
+        "Import refresh hides singleton, admits multi-rate circuit and updates availability; hiding the selected circuit clears its Stim bytes and download validation",
+        "Saved imports reapply eligibility after reload; internal three-qubit fixture remains hidden even with two rates",
+        "Empty mobile layout fits; archived v1 still loads its retained catalog"
+      ],
+      "errors": [],
+      "simulations": 0
+    },
+    {
+      "checks": [
+        "All four registered toric inputs remain hidden before measured multi-rate evidence",
+        "Every toric input: both measured curves, tables, builder choices and changing min-sum scale agree",
+        "CSV and settings exports retain both work metrics and the original variable-scale configuration",
+        "Source-specific sweep schedule is preserved; saved study cannot silently become a constant-scale decoder",
+        "Losing the second measured rate hides toric codes and saved choices and clears stale selections"
+      ],
+      "errors": [],
+      "simulations": 0
+    }
+  ],
+  "browser_errors": [],
+  "browser_workflow_groups": 16,
+  "live_launch": {
+    "automatic_audit_selection_continuation": "61789909",
+    "confirmation_status": "not yet selected or submitted; launches only after full tuning audit",
+    "cpus_per_point": 1,
+    "implementation_commit": "4c8471f",
+    "launch_errors": [],
+    "live_terminal_audits": [
+      {
+        "base_arm": "binary_ms",
+        "full_ledger_and_endpoint_replay": "passed",
+        "id": "toric11-binary_ms-p01000-d000",
+        "shots": 1024
+      },
+      {
+        "base_arm": "qbp_ms",
+        "full_ledger_and_endpoint_replay": "passed",
+        "id": "toric11-qbp_ms-p01500-d000",
+        "shots": 1024
+      }
+    ],
+    "max_concurrent_points": 392,
+    "observed_utc": "2026-11-14T00:11:24.068578+00:00",
+    "planned_tuning_points": 1526,
+    "public_counts": {
+      "circuits": 0,
+      "codes": 12,
+      "curves": 88,
+      "points": 637
+    },
+    "scheduler_counts": {
+      "PD": 1117,
+      "R": 175
+    },
+    "schema": "roffe-damping-launch-status-v1",
+    "scope": "setup and dispatch verified; scientific selection and confirmation are pending",
+    "terminal_points": 234,
+    "tuning_array": "61789908",
+    "tuning_plan_sha256": "35ae5a9eb0bbe6c0cb8d78276708c61718d5435809efe108b589551a2c574104"
+  },
+  "new_tuning_plan_sha256": "35ae5a9eb0bbe6c0cb8d78276708c61718d5435809efe108b589551a2c574104",
+  "old_frozen_plan_loads": "passed",
+  "original_roffe_plan_sha256": "eb16126dfa9eef45bb24eeddd70c5b287259e376b52a1531efcbf6126da9dcc3",
+  "publication": "only held-out confirmation registered; no new public results",
+  "qualification": {
+    "families": [
+      "binary_css",
+      "bp4"
+    ],
+    "full_ledger_endpoint_replay_and_exact_resume": "passed",
+    "real_min_sum_damped_shots": 16
+  },
+  "retained_catalog_series_unchanged": 165,
+  "tests": {
+    "catalog_projection": 40,
+    "existing_damping_roffe_launch_and_mackay": 39,
+    "new_damping": 11,
+    "total": 90
+  }
+}

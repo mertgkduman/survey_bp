@@ -1,0 +1,39 @@
+{
+  "automatic_audit_selection_continuation": "61789909",
+  "confirmation_status": "not yet selected or submitted; launches only after full tuning audit",
+  "cpus_per_point": 1,
+  "implementation_commit": "4c8471f",
+  "launch_errors": [],
+  "live_terminal_audits": [
+    {
+      "base_arm": "binary_ms",
+      "full_ledger_and_endpoint_replay": "passed",
+      "id": "toric11-binary_ms-p01000-d000",
+      "shots": 1024
+    },
+    {
+      "base_arm": "qbp_ms",
+      "full_ledger_and_endpoint_replay": "passed",
+      "id": "toric11-qbp_ms-p01500-d000",
+      "shots": 1024
+    }
+  ],
+  "max_concurrent_points": 392,
+  "observed_utc": "2026-11-14T00:11:24.068578+00:00",
+  "planned_tuning_points": 1526,
+  "public_counts": {
+    "circuits": 0,
+    "codes": 12,
+    "curves": 88,
+    "points": 637
+  },
+  "scheduler_counts": {
+    "PD": 1117,
+    "R": 175
+  },
+  "schema": "roffe-damping-launch-status-v1",
+  "scope": "setup and dispatch verified; scientific selection and confirmation are pending",
+  "terminal_points": 234,
+  "tuning_array": "61789908",
+  "tuning_plan_sha256": "35ae5a9eb0bbe6c0cb8d78276708c61718d5435809efe108b589551a2c574104"
+}
