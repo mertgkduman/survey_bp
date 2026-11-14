@@ -1,0 +1,44 @@
+{
+  "array": {
+    "argv": [
+      "sbatch",
+      "--parsable",
+      "--partition=common,scavenger",
+      "--account=pfisterlab",
+      "--nodes=1",
+      "--ntasks=1",
+      "--cpus-per-task=1",
+      "--mem=2G",
+      "--requeue",
+      "--time=4-00:00:00",
+      "--chdir=/hpc/group/pfisterlab/mg551/storage/survey_bp",
+      "--export=ALL,PYTHONPATH=/hpc/group/pfisterlab/mg551/storage/survey_bp/src,OMP_NUM_THREADS=1,OPENBLAS_NUM_THREADS=1,MKL_NUM_THREADS=1",
+      "--job-name=roffe-runtime-controls",
+      "--array=0-217%218",
+      "--output=/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/roffe-2005-07016-runtime-budget/results/slurm-%A_%a.log",
+      "--wrap=export NUMBA_CACHE_DIR=\"/tmp/roffe-budget-${SLURM_JOB_ID}\"; mkdir -p \"$NUMBA_CACHE_DIR\"; exec /hpc/group/pfisterlab/mg551/storage/survey_bp/.venv/bin/python /hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/roffe-2005-07016-runtime-budget/run.py --index \"$SLURM_ARRAY_TASK_ID\""
+    ],
+    "id": "61824235"
+  },
+  "collect": {
+    "argv": [
+      "sbatch",
+      "--parsable",
+      "--partition=common,scavenger",
+      "--account=pfisterlab",
+      "--nodes=1",
+      "--ntasks=1",
+      "--cpus-per-task=1",
+      "--mem=16G",
+      "--requeue",
+      "--time=4-00:00:00",
+      "--chdir=/hpc/group/pfisterlab/mg551/storage/survey_bp",
+      "--export=ALL,PYTHONPATH=/hpc/group/pfisterlab/mg551/storage/survey_bp/src,OMP_NUM_THREADS=1,OPENBLAS_NUM_THREADS=1,MKL_NUM_THREADS=1",
+      "--job-name=roffe-runtime-audit",
+      "--dependency=afterok:61824235",
+      "--output=/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/roffe-2005-07016-runtime-budget/results/collect-%j.log",
+      "--wrap=export NUMBA_CACHE_DIR=\"/tmp/roffe-budget-${SLURM_JOB_ID}\"; mkdir -p \"$NUMBA_CACHE_DIR\"; /hpc/group/pfisterlab/mg551/storage/survey_bp/.venv/bin/python /hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/roffe-2005-07016-runtime-budget/run.py --collect --complete"
+    ],
+    "id": "61824236"
+  }
+}

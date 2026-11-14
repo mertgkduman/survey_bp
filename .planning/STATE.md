@@ -5,11 +5,11 @@ current_phase: 11
 current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
-stopped_at: Joint damping/scale/offset runtime-budget campaign qualified and frozen;218 point workers ready for dispatch
-last_updated: "2026-11-14T21:00:57.447075+00:00"
+stopped_at: Runtime-budget joint-control array61824235 launched; tuning underway; complete collector61824236 pending
+last_updated: "2026-11-14T21:05:04.544756+00:00"
 last_activity: 2026-11-14
-last_activity_desc: Quick261114-lhw qualifies joint controls and per-point cap progression;144 exact canonical cases,65 tests,12 browser groups; frozen218-worker runtime campaign.
-state_head: ab91af9
+last_activity_desc: Quick261114-lhw launches218 joint damping/scale/offset workers and fresh cap histories; array61824235, collector61824236;144 exact cases/65 tests/12 browser groups.
+state_head: 8e903bc
 progress:
   total_phases: 14
   completed_phases: 8
@@ -35,7 +35,7 @@ Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
 Last activity: 2026-11-14 — quick261114-lhw prepares joint-control tuning and runtime-matched iteration studies
-Last Activity Description: Separately versioned traversal calls unchanged canonical binary/Pauli sweep helpers;144 exact candidate/belief/stopping checks pass across damping/scaling/offset. Joint search has80 coarse controls plus local refinement, then4096-shot finalist training and fresh20-failure/1e8-shot confirmation. Preserve each candidate/cap and earlier damping progression; match mean warmed same-CPU BP+OSD0 time within10%, with explicit saturation/over-budget status. Original109 code/rate grids retained for both families; BP X-only and Q-BP depolarizing1.5p remain distinct. Pilot finds Q-BP at T=n can already exceed reference1.2–6.6x, so lower caps are retained alongside n-cap controls. Real full search tested102 controls/963 control-caps,10 shortened confirmation caps/699 shots, exact resume/full audit; these qualification samples are not pooled.65 regression cases and12 Chromium groups pass, including exact scale/offset labels and time/reference CSV column. Frozen218-worker campaign ready; one CPU/2GiB per worker, one CPU/16GiB collector. Initial unlaunched2GiB-collector plan/source preserved; scientific design unchanged. Public112 curves/1246 points/12 codes/0 circuits before launch, with singleton/incompatible-policy filtering unchanged. No canonical, prior frozen simulation, v1 or phase-gate/counter changes.
+Last Activity Description: Separately versioned traversal calls unchanged canonical binary/Pauli sweep helpers;144 exact candidate/belief/stopping checks pass across damping/scaling/offset. Joint search has80 coarse controls plus local refinement, then4096-shot finalist training and fresh20-failure/1e8-shot confirmation. Preserve each candidate/cap and earlier damping progression; match mean warmed same-CPU BP+OSD0 time within10%, with explicit saturation/over-budget status. Original109 code/rate grids retained for both families; BP X-only and Q-BP depolarizing1.5p remain distinct. Pilot finds Q-BP at T=n can already exceed reference1.2–6.6x, so lower caps are retained alongside n-cap controls. Real full search tested102 controls/963 control-caps,10 shortened confirmation caps/699 shots, exact resume/full audit; these qualification samples are not pooled.65 regression cases and12 Chromium groups pass, including exact scale/offset labels and time/reference CSV column. Frozen218-worker campaign launched as61824235 with complete collector61824236; workers have begun calibration/tuning, with no new final LER claim yet. One CPU/2GiB per worker, one CPU/16GiB collector. Initial unlaunched2GiB-collector plan/source preserved; scientific design unchanged. Public112 curves/1246 points/12 codes/0 circuits before launch, with singleton/incompatible-policy filtering unchanged. No canonical, prior frozen simulation, v1 or phase-gate/counter changes.
 
 Prior OSD check activity: 2026-11-14 — quick261114-i9b checks current OSD results and explains source-matched performance
 Last Activity Description:212/218 terminal points contain318,346,784 decoder shots/4,207 logical failures. Frozen manifests, summary arithmetic/stopping/exact95% CI/work and424 endpoint replays pass. Six rare points remain running: both methods on338/p=.01 and450/p=.01/.02; four zero-failure progress counts are50–77M shots and are not final estimates. At p=.02 the three completed codes have similar OSD0/CS10 LERs with overlapping intervals; damped BP is orders of magnitude worse. Same-CS10 native -O3 -march=native rebuild preserves64 selected outputs and yields2.32–3.53x warmed ratios; packed affine reuse/popcount explain the changed implementation, without a paperCS60 or generic speed claim. Full318M-row refresh runs as61820674; final complete collector61820676 is serialized behind it and the original array. Replaced61805014; prior retry61805013 already completed0:0. Fresh summary/endpoint snapshot and all109 comparison rows are saved separately; workbench retains fully audited173-point OSD snapshot112 curves/1246 points/12 codes/0 circuits pending full refresh, byte-identical to02f802a. No raw/frozen/canonical/native/v1/phase-gate changes. Evidence commit2c8b6fe.
@@ -319,6 +319,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 | # | Description | Date | Commit | Status | Directory |
 |---|-------------|------|--------|--------|-----------|
+| 261114-lhw | Joint damping/scaling/offset and runtime-matched iteration histories | 2026-11-14 | 8e903bc | Implementation/launch complete;218-worker array61824235 running | [261114-lhw](./quick/261114-lhw-run-runtime-matched-iteration-sweeps-wit/) |
 | 261114-i9b | Explain optimized OSD search and check212 terminal points/424 endpoints | 2026-11-14 | 2c8b6fe | Check complete; full interior audit61820674 continues | [261114-i9b](./quick/261114-i9b-audit-current-osd0-cs10-results-and-expl/) |
 | 261113-vj0 | Tabulate all current Roffe BP-OSD source points beside confirmed BP/Q-BP | 2026-11-13 | 04002e0 | Complete;108 paper points/109 grid rows, no new simulations | [261113-vj0](./quick/261113-vj0-extract-all-roffe-figure3-bp-osd-points-/) |
 | 261113-v31 | Audit and publish completed Roffe damping comparison; fix shared paper registration | 2026-11-13 | c595969 | Complete;436 confirmation points audited/published | [261113-v31](./quick/261113-v31-audit-completed-roffe-damping-results-re/) |

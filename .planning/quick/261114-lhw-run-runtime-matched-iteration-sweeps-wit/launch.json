@@ -1,0 +1,2508 @@
+{
+  "timestamp_utc": "2026-11-14T21:04:19.366146+00:00",
+  "implementation_commit": "8e903bc",
+  "dispatch": {
+    "array": {
+      "argv": [
+        "sbatch",
+        "--parsable",
+        "--partition=common,scavenger",
+        "--account=pfisterlab",
+        "--nodes=1",
+        "--ntasks=1",
+        "--cpus-per-task=1",
+        "--mem=2G",
+        "--requeue",
+        "--time=4-00:00:00",
+        "--chdir=/hpc/group/pfisterlab/mg551/storage/survey_bp",
+        "--export=ALL,PYTHONPATH=/hpc/group/pfisterlab/mg551/storage/survey_bp/src,OMP_NUM_THREADS=1,OPENBLAS_NUM_THREADS=1,MKL_NUM_THREADS=1",
+        "--job-name=roffe-runtime-controls",
+        "--array=0-217%218",
+        "--output=/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/roffe-2005-07016-runtime-budget/results/slurm-%A_%a.log",
+        "--wrap=export NUMBA_CACHE_DIR=\"/tmp/roffe-budget-${SLURM_JOB_ID}\"; mkdir -p \"$NUMBA_CACHE_DIR\"; exec /hpc/group/pfisterlab/mg551/storage/survey_bp/.venv/bin/python /hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/roffe-2005-07016-runtime-budget/run.py --index \"$SLURM_ARRAY_TASK_ID\""
+      ],
+      "id": "61824235"
+    },
+    "collect": {
+      "argv": [
+        "sbatch",
+        "--parsable",
+        "--partition=common,scavenger",
+        "--account=pfisterlab",
+        "--nodes=1",
+        "--ntasks=1",
+        "--cpus-per-task=1",
+        "--mem=16G",
+        "--requeue",
+        "--time=4-00:00:00",
+        "--chdir=/hpc/group/pfisterlab/mg551/storage/survey_bp",
+        "--export=ALL,PYTHONPATH=/hpc/group/pfisterlab/mg551/storage/survey_bp/src,OMP_NUM_THREADS=1,OPENBLAS_NUM_THREADS=1,MKL_NUM_THREADS=1",
+        "--job-name=roffe-runtime-audit",
+        "--dependency=afterok:61824235",
+        "--output=/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/roffe-2005-07016-runtime-budget/results/collect-%j.log",
+        "--wrap=export NUMBA_CACHE_DIR=\"/tmp/roffe-budget-${SLURM_JOB_ID}\"; mkdir -p \"$NUMBA_CACHE_DIR\"; /hpc/group/pfisterlab/mg551/storage/survey_bp/.venv/bin/python /hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/roffe-2005-07016-runtime-budget/run.py --collect --complete"
+      ],
+      "id": "61824236"
+    }
+  },
+  "scheduler": [
+    "61824235_165 RUNNING 1 None",
+    "61824235_164 RUNNING 1 None",
+    "61824235_163 RUNNING 1 None",
+    "61824235_162 RUNNING 1 None",
+    "61824235_161 RUNNING 1 None",
+    "61824235_160 RUNNING 1 None",
+    "61824235_159 RUNNING 1 None",
+    "61824235_158 RUNNING 1 None",
+    "61824235_157 RUNNING 1 None",
+    "61824235_156 RUNNING 1 None",
+    "61824235_155 RUNNING 1 None",
+    "61824235_154 RUNNING 1 None",
+    "61824235_153 RUNNING 1 None",
+    "61824235_152 RUNNING 1 None",
+    "61824235_151 RUNNING 1 None",
+    "61824235_150 RUNNING 1 None",
+    "61824235_149 RUNNING 1 None",
+    "61824235_148 RUNNING 1 None",
+    "61824235_147 RUNNING 1 None",
+    "61824235_146 RUNNING 1 None",
+    "61824235_145 RUNNING 1 None",
+    "61824235_144 RUNNING 1 None",
+    "61824235_143 RUNNING 1 None",
+    "61824235_142 RUNNING 1 None",
+    "61824235_141 RUNNING 1 None",
+    "61824235_140 RUNNING 1 None",
+    "61824235_139 RUNNING 1 None",
+    "61824235_138 RUNNING 1 None",
+    "61824235_137 RUNNING 1 None",
+    "61824235_136 RUNNING 1 None",
+    "61824235_135 RUNNING 1 None",
+    "61824235_134 RUNNING 1 None",
+    "61824235_133 RUNNING 1 None",
+    "61824235_132 RUNNING 1 None",
+    "61824235_131 RUNNING 1 None",
+    "61824235_130 RUNNING 1 None",
+    "61824235_129 RUNNING 1 None",
+    "61824235_128 RUNNING 1 None",
+    "61824235_127 RUNNING 1 None",
+    "61824235_126 RUNNING 1 None",
+    "61824235_125 RUNNING 1 None",
+    "61824235_124 RUNNING 1 None",
+    "61824235_123 RUNNING 1 None",
+    "61824235_122 RUNNING 1 None",
+    "61824235_121 RUNNING 1 None",
+    "61824235_120 RUNNING 1 None",
+    "61824235_119 RUNNING 1 None",
+    "61824235_118 RUNNING 1 None",
+    "61824235_117 RUNNING 1 None",
+    "61824235_116 RUNNING 1 None",
+    "61824235_115 RUNNING 1 None",
+    "61824235_114 RUNNING 1 None",
+    "61824235_113 RUNNING 1 None",
+    "61824235_112 RUNNING 1 None",
+    "61824235_111 RUNNING 1 None",
+    "61824235_110 RUNNING 1 None",
+    "61824235_109 RUNNING 1 None",
+    "61824235_108 RUNNING 1 None",
+    "61824235_107 RUNNING 1 None",
+    "61824235_106 RUNNING 1 None",
+    "61824235_105 RUNNING 1 None",
+    "61824235_104 RUNNING 1 None",
+    "61824235_103 RUNNING 1 None",
+    "61824235_102 RUNNING 1 None",
+    "61824235_101 RUNNING 1 None",
+    "61824235_100 RUNNING 1 None",
+    "61824235_99 RUNNING 1 None",
+    "61824235_98 RUNNING 1 None",
+    "61824235_97 RUNNING 1 None",
+    "61824235_96 RUNNING 1 None",
+    "61824235_95 RUNNING 1 None",
+    "61824235_94 RUNNING 1 None",
+    "61824235_93 RUNNING 1 None",
+    "61824235_92 RUNNING 1 None",
+    "61824235_91 RUNNING 1 None",
+    "61824235_90 RUNNING 1 None",
+    "61824235_89 RUNNING 1 None",
+    "61824235_88 RUNNING 1 None",
+    "61824235_87 RUNNING 1 None",
+    "61824235_86 RUNNING 1 None",
+    "61824235_85 RUNNING 1 Priority",
+    "61824235_84 RUNNING 1 None",
+    "61824235_83 RUNNING 1 None",
+    "61824235_82 RUNNING 1 None",
+    "61824235_81 RUNNING 1 None",
+    "61824235_80 RUNNING 1 None",
+    "61824235_79 RUNNING 1 None",
+    "61824235_78 RUNNING 1 None",
+    "61824235_77 RUNNING 1 None",
+    "61824235_76 RUNNING 1 None",
+    "61824235_75 RUNNING 1 None",
+    "61824235_74 RUNNING 1 None",
+    "61824235_73 RUNNING 1 None",
+    "61824235_72 RUNNING 1 None",
+    "61824235_71 RUNNING 1 None",
+    "61824235_70 RUNNING 1 None",
+    "61824235_69 RUNNING 1 None",
+    "61824235_68 RUNNING 1 None",
+    "61824235_67 RUNNING 1 None",
+    "61824235_66 RUNNING 1 None",
+    "61824235_65 RUNNING 1 None",
+    "61824235_64 RUNNING 1 None",
+    "61824235_63 RUNNING 1 None",
+    "61824235_62 RUNNING 1 None",
+    "61824235_61 RUNNING 1 None",
+    "61824235_60 RUNNING 1 None",
+    "61824235_59 RUNNING 1 None",
+    "61824235_58 RUNNING 1 None",
+    "61824235_57 RUNNING 1 None",
+    "61824235_56 RUNNING 1 None",
+    "61824235_55 RUNNING 1 None",
+    "61824235_54 RUNNING 1 None",
+    "61824235_53 RUNNING 1 None",
+    "61824235_52 RUNNING 1 None",
+    "61824235_51 RUNNING 1 None",
+    "61824235_50 RUNNING 1 None",
+    "61824235_49 RUNNING 1 None",
+    "61824235_48 RUNNING 1 None",
+    "61824235_47 RUNNING 1 None",
+    "61824235_46 RUNNING 1 None",
+    "61824235_45 RUNNING 1 None",
+    "61824235_44 RUNNING 1 None",
+    "61824235_43 RUNNING 1 None",
+    "61824235_42 RUNNING 1 None",
+    "61824235_41 RUNNING 1 None",
+    "61824235_40 RUNNING 1 None",
+    "61824235_39 RUNNING 1 None",
+    "61824235_38 RUNNING 1 None",
+    "61824235_37 RUNNING 1 None",
+    "61824235_36 RUNNING 1 None",
+    "61824235_35 RUNNING 1 None",
+    "61824235_34 RUNNING 1 None",
+    "61824235_33 RUNNING 1 None",
+    "61824235_32 RUNNING 1 None",
+    "61824235_31 RUNNING 1 None",
+    "61824235_30 RUNNING 1 None",
+    "61824235_29 RUNNING 1 None",
+    "61824235_28 RUNNING 1 None",
+    "61824235_27 RUNNING 1 None",
+    "61824235_26 RUNNING 1 None",
+    "61824235_25 RUNNING 1 None",
+    "61824235_24 RUNNING 1 None",
+    "61824235_23 RUNNING 1 None",
+    "61824235_22 RUNNING 1 None",
+    "61824235_21 RUNNING 1 None",
+    "61824235_20 RUNNING 1 None",
+    "61824235_19 RUNNING 1 None",
+    "61824235_18 RUNNING 1 None",
+    "61824235_17 RUNNING 1 None",
+    "61824235_16 RUNNING 1 None",
+    "61824235_15 RUNNING 1 None",
+    "61824235_14 RUNNING 1 None",
+    "61824235_13 RUNNING 1 None",
+    "61824235_12 RUNNING 1 None",
+    "61824235_11 RUNNING 1 None",
+    "61824235_10 RUNNING 1 None",
+    "61824235_9 RUNNING 1 None",
+    "61824235_8 RUNNING 1 None",
+    "61824235_7 RUNNING 1 None",
+    "61824235_6 RUNNING 1 None",
+    "61824235_5 RUNNING 1 None",
+    "61824235_4 RUNNING 1 None",
+    "61824235_3 RUNNING 1 None",
+    "61824235_2 RUNNING 1 None",
+    "61824235_1 RUNNING 1 None",
+    "61824235_0 RUNNING 1 Priority",
+    "61824235_[166-217%218] PENDING 1 Priority"
+  ],
+  "point_progress": [
+    {
+      "point": "toric11-qbp_ms-p14100-runtime-budget",
+      "last_cap": 26,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "constant",
+        "beta": 0.25,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 1.0020148340506185,
+      "last_training_ler": 0.9375,
+      "reference_sha256": "6884ffd7672f808602d5b1c982bd8f7fd5141c0a58ba43fdf4fb0212b9730b47",
+      "stage": "tuning",
+      "tested_control_caps": 135,
+      "tested_controls": 15
+    },
+    {
+      "point": "toric13-qbp_ms-p01500-runtime-budget",
+      "last_cap": 11,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.5,
+        "damping": 0.5
+      },
+      "last_runtime_ratio": 1.0404499274736967,
+      "last_training_ler": 0.06640625,
+      "reference_sha256": "fe74cad19fccc5e87695f9a0a495dfa9553a02ac91cc6aacc5a50b9d79c47b31",
+      "stage": "tuning",
+      "tested_control_caps": 315,
+      "tested_controls": 35
+    },
+    {
+      "point": "toric13-qbp_ms-p15000-runtime-budget",
+      "last_cap": 33,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.0,
+        "damping": 0.3
+      },
+      "last_runtime_ratio": 1.0030677116963802,
+      "last_training_ler": 0.90234375,
+      "reference_sha256": "3ed0f9e0c79155b5c5cada94f555d2caa07212d434241828496e0f3fedd9f098",
+      "stage": "tuning",
+      "tested_control_caps": 9,
+      "tested_controls": 1
+    },
+    {
+      "point": "toric15-qbp_ms-p15300-runtime-budget",
+      "last_cap": 42,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.0,
+        "damping": 0.3
+      },
+      "last_runtime_ratio": 1.030713112933873,
+      "last_training_ler": 0.9375,
+      "reference_sha256": "dc6adf183124359a2e5c83f6ad0c751cd711f6d6000819b7d09ff7a0adcb9dcf",
+      "stage": "tuning",
+      "tested_control_caps": 9,
+      "tested_controls": 1
+    },
+    {
+      "point": "toric15-qbp_ms-p12000-runtime-budget",
+      "last_cap": 49,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.0,
+        "damping": 0.3
+      },
+      "last_runtime_ratio": 1.0049853085472733,
+      "last_training_ler": 0.71484375,
+      "reference_sha256": "cb2149c33c29502b1e932e2a5b3a3b931a3c1fe9e1680f0a45929a08b9bd7914",
+      "stage": "tuning",
+      "tested_control_caps": 9,
+      "tested_controls": 1
+    },
+    {
+      "point": "toric11-binary_ms-p08000-runtime-budget",
+      "last_cap": 287,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "constant",
+        "beta": 0.25,
+        "damping": 0.3
+      },
+      "last_runtime_ratio": 1.0039427402998355,
+      "last_training_ler": 0.9609375,
+      "reference_sha256": "f6ddb79dc31906b73580c83b49f6a645bdf5f5801134681a064eee84775d58e9",
+      "stage": "tuning",
+      "tested_control_caps": 151,
+      "tested_controls": 31
+    },
+    {
+      "point": "toric11-binary_ms-p09300-runtime-budget",
+      "last_cap": 317,
+      "last_controls": {
+        "alpha": 0.75,
+        "alpha_mode": "constant",
+        "beta": 0.25,
+        "damping": 0.3
+      },
+      "last_runtime_ratio": 0.9990496191805456,
+      "last_training_ler": 0.99609375,
+      "reference_sha256": "37f594f7557f6f04b86914fd17c6452a811f9872b9586b70f6f4c8b1080e1817",
+      "stage": "tuning",
+      "tested_control_caps": 162,
+      "tested_controls": 27
+    },
+    {
+      "point": "toric15-qbp_ms-p15750-runtime-budget",
+      "last_cap": 45,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.0,
+        "damping": 0.3
+      },
+      "last_runtime_ratio": 1.025256157529653,
+      "last_training_ler": 0.96484375,
+      "reference_sha256": "bee103604dad89f64a789562ec00ab2cb56451f796eaaabf57b59769af09ae4b",
+      "stage": "tuning",
+      "tested_control_caps": 9,
+      "tested_controls": 1
+    },
+    {
+      "point": "toric15-qbp_ms-p13650-runtime-budget",
+      "last_cap": 45,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 1.0,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 1.0360046038131236,
+      "last_training_ler": 1.0,
+      "reference_sha256": "a4620f21de462587238cdfd796de68db94f9071581f70dc9ca9c9b4c58987b16",
+      "stage": "tuning",
+      "tested_control_caps": 45,
+      "tested_controls": 5
+    },
+    {
+      "point": "toric13-binary_ms-p10500-runtime-budget",
+      "last_cap": 401,
+      "last_controls": {
+        "alpha": 0.75,
+        "alpha_mode": "constant",
+        "beta": 0.0,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 1.006552594766878,
+      "last_training_ler": 1.0,
+      "reference_sha256": "4f9cc33f0343a3ee5a64df7561225a8f168c3aca2e7f7e6245d6eb18b836f4ac",
+      "stage": "tuning",
+      "tested_control_caps": 50,
+      "tested_controls": 10
+    },
+    {
+      "point": "toric13-qbp_ms-p13500-runtime-budget",
+      "last_cap": 33,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.5,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 0.9891141180871234,
+      "last_training_ler": 0.96875,
+      "reference_sha256": "a0fdeacf00b83e6116f189c9066d1ecb054570079c2e8fd853c508bece97fbff",
+      "stage": "tuning",
+      "tested_control_caps": 36,
+      "tested_controls": 4
+    },
+    {
+      "point": "toric13-binary_ms-p11000-runtime-budget",
+      "last_cap": 422,
+      "last_controls": {
+        "alpha": 0.5,
+        "alpha_mode": "constant",
+        "beta": 1.0,
+        "damping": 0.3
+      },
+      "last_runtime_ratio": 1.0333295561196951,
+      "last_training_ler": 1.0,
+      "reference_sha256": "17496beb50865b3a0bb0f9189580a2d8d4238ffee145b3f426a9a8451cca8114",
+      "stage": "tuning",
+      "tested_control_caps": 85,
+      "tested_controls": 25
+    },
+    {
+      "point": "toric11-qbp_ms-p15900-runtime-budget",
+      "last_cap": 24,
+      "last_controls": {
+        "alpha": 0.75,
+        "alpha_mode": "constant",
+        "beta": 0.0,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 1.0018438242409717,
+      "last_training_ler": 1.0,
+      "reference_sha256": "5eb9f973796434686970ee065d170dc4b238e15b6e077b6bd059c08b829815df",
+      "stage": "tuning",
+      "tested_control_caps": 90,
+      "tested_controls": 10
+    },
+    {
+      "point": "toric13-qbp_ms-p07500-runtime-budget",
+      "last_cap": 44,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.5,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 1.0132671276833056,
+      "last_training_ler": 0.6796875,
+      "reference_sha256": "bd75afad62715a156ae3236dc66c872b60a740cbf71a1b07b8b6bb08e277057b",
+      "stage": "tuning",
+      "tested_control_caps": 36,
+      "tested_controls": 4
+    },
+    {
+      "point": "toric15-qbp_ms-p15000-runtime-budget",
+      "last_cap": 45,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.0,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 0.9439972120399677,
+      "last_training_ler": 0.99609375,
+      "reference_sha256": "c2e51faedce8cdf1d5e69dc832128584df231b4fb3f8082354abe34d1b4b1244",
+      "stage": "tuning",
+      "tested_control_caps": 18,
+      "tested_controls": 2
+    },
+    {
+      "point": "toric11-binary_ms-p09200-runtime-budget",
+      "last_cap": 302,
+      "last_controls": {
+        "alpha": 0.75,
+        "alpha_mode": "constant",
+        "beta": 1.0,
+        "damping": 0.3
+      },
+      "last_runtime_ratio": 0.9926055367759389,
+      "last_training_ler": 0.99609375,
+      "reference_sha256": "ee86932fb3a2fa9cdb22fa70c1c716e5baa3f74b0c5687fcb546fc9a84ed1c39",
+      "stage": "tuning",
+      "tested_control_caps": 164,
+      "tested_controls": 29
+    },
+    {
+      "point": "toric13-binary_ms-p09500-runtime-budget",
+      "last_cap": 401,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "constant",
+        "beta": 1.0,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 1.0087962754701523,
+      "last_training_ler": 1.0,
+      "reference_sha256": "3a1c90124260e35f3b25f1472c3897ebd289cfdacbf00439d909b3ed51974bb9",
+      "stage": "tuning",
+      "tested_control_caps": 77,
+      "tested_controls": 17
+    },
+    {
+      "point": "toric13-binary_ms-p09300-runtime-budget",
+      "last_cap": 380,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "constant",
+        "beta": 0.5,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 0.9750872064717749,
+      "last_training_ler": 1.0,
+      "reference_sha256": "9a9a501f02b1f165f2b0f070eb5157471ff3e02877af7c061b67925803f24bb4",
+      "stage": "tuning",
+      "tested_control_caps": 76,
+      "tested_controls": 16
+    },
+    {
+      "point": "toric11-binary_ms-p10200-runtime-budget",
+      "last_cap": 302,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "constant",
+        "beta": 0.25,
+        "damping": 0.3
+      },
+      "last_runtime_ratio": 1.0431819605506665,
+      "last_training_ler": 0.984375,
+      "reference_sha256": "35398dea755b8f94036fa14c644424ba6cc67ed1ab74b3e97cce1be9cd36ea9a",
+      "stage": "tuning",
+      "tested_control_caps": 176,
+      "tested_controls": 31
+    },
+    {
+      "point": "toric15-qbp_ms-p07500-runtime-budget",
+      "last_cap": 52,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.0,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 0.979274737890383,
+      "last_training_ler": 0.70703125,
+      "reference_sha256": "a7dc9f146bdf684b88cf5aaabb74c60933105497a23528417540c96cd07c19d2",
+      "stage": "tuning",
+      "tested_control_caps": 18,
+      "tested_controls": 2
+    },
+    {
+      "point": "toric13-binary_ms-p10600-runtime-budget",
+      "last_cap": 401,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.5,
+        "damping": 0.3
+      },
+      "last_runtime_ratio": 0.989094670726697,
+      "last_training_ler": 1.0,
+      "reference_sha256": "c82097601772a0da12aaaa0cd47da01274834907d88543eac910fd709d325e50",
+      "stage": "tuning",
+      "tested_control_caps": 90,
+      "tested_controls": 20
+    },
+    {
+      "point": "toric11-qbp_ms-p13950-runtime-budget",
+      "last_cap": 24,
+      "last_controls": {
+        "alpha": 0.75,
+        "alpha_mode": "constant",
+        "beta": 0.0,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 0.9636263646562644,
+      "last_training_ler": 0.9765625,
+      "reference_sha256": "c623e8375000b22c6c6e06de2ba8c1f7701dfe0e4688594b15e208040c51789b",
+      "stage": "tuning",
+      "tested_control_caps": 90,
+      "tested_controls": 10
+    },
+    {
+      "point": "toric11-binary_ms-p03000-runtime-budget",
+      "last_cap": 158,
+      "last_controls": {
+        "alpha": 0.5,
+        "alpha_mode": "constant",
+        "beta": 0.5,
+        "damping": 0.85
+      },
+      "last_runtime_ratio": 0.9850166080022632,
+      "last_training_ler": 0.71484375,
+      "reference_sha256": "b2e087030ea10a1bb71c3e2655a0d71fd3be7e18d3ae95189a83d5050c518a40",
+      "stage": "tuning",
+      "tested_control_caps": 328,
+      "tested_controls": 71
+    },
+    {
+      "point": "toric11-binary_ms-p10100-runtime-budget",
+      "last_cap": 302,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "constant",
+        "beta": 0.5,
+        "damping": 0.3
+      },
+      "last_runtime_ratio": 1.0154824819919184,
+      "last_training_ler": 1.0,
+      "reference_sha256": "d26a25425a5ccf1ecbcc04744106fd60a9d693573390978451b8eabbfc502845",
+      "stage": "tuning",
+      "tested_control_caps": 187,
+      "tested_controls": 32
+    },
+    {
+      "point": "toric13-binary_ms-p03000-runtime-budget",
+      "last_cap": 507,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "constant",
+        "beta": 0.0,
+        "damping": 0.5
+      },
+      "last_runtime_ratio": 1.0274051489932212,
+      "last_training_ler": 0.36328125,
+      "reference_sha256": "d29b36ba92bfae36c5c67f3356589e4c0a530c6dfc84a920fe53157597531e82",
+      "stage": "tuning",
+      "tested_control_caps": 187,
+      "tested_controls": 45
+    },
+    {
+      "point": "toric11-qbp_ms-p16500-runtime-budget",
+      "last_cap": 24,
+      "last_controls": {
+        "alpha": 0.5,
+        "alpha_mode": "constant",
+        "beta": 0.5,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 1.0250052706665045,
+      "last_training_ler": 1.0,
+      "reference_sha256": "1fc5189f40bff89a02b18ef22ed0f6d64d55aad1a1e9e8b707e49e6f1abf3f86",
+      "stage": "tuning",
+      "tested_control_caps": 72,
+      "tested_controls": 8
+    },
+    {
+      "point": "toric13-binary_ms-p10100-runtime-budget",
+      "last_cap": 401,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "constant",
+        "beta": 0.5,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 1.0334736979848784,
+      "last_training_ler": 0.99609375,
+      "reference_sha256": "a5cdb2083ef2b236aabdde750523af87b354f595421bf9c4790d85d20f39a775",
+      "stage": "tuning",
+      "tested_control_caps": 76,
+      "tested_controls": 16
+    },
+    {
+      "point": "toric13-qbp_ms-p13800-runtime-budget",
+      "last_cap": 36,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.25,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 1.031022238630244,
+      "last_training_ler": 0.98046875,
+      "reference_sha256": "b5e96ee40e8d63e940da29ab69d460e2a44ae802039f8a3f4a7c920901b83320",
+      "stage": "tuning",
+      "tested_control_caps": 27,
+      "tested_controls": 3
+    },
+    {
+      "point": "toric15-binary_ms-p10900-runtime-budget",
+      "last_cap": 506,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.25,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 0.9964893436885515,
+      "last_training_ler": 1.0,
+      "reference_sha256": "b7dd236e7ecbd59a60785491c9d3661ec942d61a78c3105d1cb01e6f0276890a",
+      "stage": "tuning",
+      "tested_control_caps": 13,
+      "tested_controls": 3
+    },
+    {
+      "point": "toric11-qbp_ms-p15000-runtime-budget",
+      "last_cap": 22,
+      "last_controls": {
+        "alpha": 0.5,
+        "alpha_mode": "constant",
+        "beta": 1.0,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 0.9497429901422342,
+      "last_training_ler": 1.0,
+      "reference_sha256": "ffdf9cc99aeda0516ee89b952d63a33891d1988e4c2ce8cf7ac6045266413fc6",
+      "stage": "tuning",
+      "tested_control_caps": 81,
+      "tested_controls": 9
+    },
+    {
+      "point": "toric13-qbp_ms-p04500-runtime-budget",
+      "last_cap": 23,
+      "last_controls": {
+        "alpha": 0.5,
+        "alpha_mode": "constant",
+        "beta": 0.25,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 0.9445533690783148,
+      "last_training_ler": 0.76953125,
+      "reference_sha256": "a1e8eeeb93af687e443da338395532a182e8363ef4c28232f991bb47bd61710e",
+      "stage": "tuning",
+      "tested_control_caps": 58,
+      "tested_controls": 7
+    },
+    {
+      "point": "toric13-binary_ms-p07000-runtime-budget",
+      "last_cap": 338,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "constant",
+        "beta": 0.25,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 0.9029643854248558,
+      "last_training_ler": 0.953125,
+      "reference_sha256": "63d936bb81109415321065ba89a966f33e82e885870a0d34a8a601ffe5ae7aeb",
+      "stage": "tuning",
+      "tested_control_caps": 70,
+      "tested_controls": 15
+    },
+    {
+      "point": "toric15-qbp_ms-p14700-runtime-budget",
+      "last_cap": 42,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.0,
+        "damping": 0.3
+      },
+      "last_runtime_ratio": 0.9808169444780812,
+      "last_training_ler": 0.91015625,
+      "reference_sha256": "f45399bd5c67794569407daef2e75b88b8c48b180bf8718acc406e1e15ec3e3a",
+      "stage": "tuning",
+      "tested_control_caps": 9,
+      "tested_controls": 1
+    },
+    {
+      "point": "toric11-binary_ms-p10500-runtime-budget",
+      "last_cap": 302,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "constant",
+        "beta": 1.0,
+        "damping": 0.3
+      },
+      "last_runtime_ratio": 0.986593921265995,
+      "last_training_ler": 1.0,
+      "reference_sha256": "e0f2015141e39392cea5266a35af51bb27ea4f75741e10ad36d214d2ba34b1bb",
+      "stage": "tuning",
+      "tested_control_caps": 178,
+      "tested_controls": 33
+    },
+    {
+      "point": "toric13-qbp_ms-p13950-runtime-budget",
+      "last_cap": 33,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.25,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 1.0076073973417106,
+      "last_training_ler": 0.9765625,
+      "reference_sha256": "81c3e85a55686fdb57071c33188af0e6bb9706663e293710b5b1011fa311eed7",
+      "stage": "tuning",
+      "tested_control_caps": 27,
+      "tested_controls": 3
+    },
+    {
+      "point": "toric15-qbp_ms-p13500-runtime-budget",
+      "last_cap": 45,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.0,
+        "damping": 0.3
+      },
+      "last_runtime_ratio": 1.023246032288587,
+      "last_training_ler": 0.8359375,
+      "reference_sha256": "bc72741de540624332f06f7e25740325bcd3f560664354aa2b1c423693366079",
+      "stage": "tuning",
+      "tested_control_caps": 9,
+      "tested_controls": 1
+    },
+    {
+      "point": "toric15-qbp_ms-p14850-runtime-budget",
+      "last_cap": 42,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.0,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 0.9970920531314572,
+      "last_training_ler": 0.99609375,
+      "reference_sha256": "58f83fe6bd01aa463f1128763e8ec16e51f4e9086616a0a1a6aa3c093d6d8c4c",
+      "stage": "tuning",
+      "tested_control_caps": 18,
+      "tested_controls": 2
+    },
+    {
+      "point": "toric11-qbp_ms-p16050-runtime-budget",
+      "last_cap": 24,
+      "last_controls": {
+        "alpha": 0.5,
+        "alpha_mode": "constant",
+        "beta": 0.5,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 1.0033873064225645,
+      "last_training_ler": 1.0,
+      "reference_sha256": "a0bc782360e7bab1f9470be5ef35c91a37cb286950c26544db2eda4003a892c5",
+      "stage": "tuning",
+      "tested_control_caps": 72,
+      "tested_controls": 8
+    },
+    {
+      "point": "toric13-binary_ms-p06000-runtime-budget",
+      "last_cap": 338,
+      "last_controls": {
+        "alpha": 0.5,
+        "alpha_mode": "constant",
+        "beta": 0.25,
+        "damping": 0.3
+      },
+      "last_runtime_ratio": 0.924333131134908,
+      "last_training_ler": 0.98828125,
+      "reference_sha256": "75aca044ef4a0400a0eee5b3f5a8d4fae0134bd0604d57b0de9ac00254253237",
+      "stage": "tuning",
+      "tested_control_caps": 73,
+      "tested_controls": 23
+    },
+    {
+      "point": "toric11-qbp_ms-p13650-runtime-budget",
+      "last_cap": 24,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "constant",
+        "beta": 0.0,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 0.9943974667343972,
+      "last_training_ler": 0.9375,
+      "reference_sha256": "b9b656a0a39ffd77e98d6e9faf52620d64a113d393d94d9811a98f3c2c48d575",
+      "stage": "tuning",
+      "tested_control_caps": 126,
+      "tested_controls": 14
+    },
+    {
+      "point": "toric11-qbp_ms-p10500-runtime-budget",
+      "last_cap": 26,
+      "last_controls": {
+        "alpha": 0.75,
+        "alpha_mode": "constant",
+        "beta": 0.5,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 1.03291709670841,
+      "last_training_ler": 0.92578125,
+      "reference_sha256": "206e02d7e480939138a5f673f25b498d8eea427e69230c961631dc587c472bfe",
+      "stage": "tuning",
+      "tested_control_caps": 108,
+      "tested_controls": 12
+    },
+    {
+      "point": "toric15-qbp_ms-p09000-runtime-budget",
+      "last_cap": 45,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.0,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 1.0073425850717463,
+      "last_training_ler": 0.8515625,
+      "reference_sha256": "cc502212bf4ba995bcd9967ffb0bbd2bfc60d1d7731a67792cbd2ec32bbc9983",
+      "stage": "tuning",
+      "tested_control_caps": 18,
+      "tested_controls": 2
+    },
+    {
+      "point": "toric11-binary_ms-p10700-runtime-budget",
+      "last_cap": 302,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "constant",
+        "beta": 0.5,
+        "damping": 0.3
+      },
+      "last_runtime_ratio": 1.0079760924586276,
+      "last_training_ler": 0.99609375,
+      "reference_sha256": "9efd1309f490d72bc0dff828740cbeebbd27068a05583b518efad8de76766420",
+      "stage": "tuning",
+      "tested_control_caps": 182,
+      "tested_controls": 32
+    },
+    {
+      "point": "toric15-binary_ms-p09600-runtime-budget",
+      "last_cap": 450,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.0,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 0.9355036711059445,
+      "last_training_ler": 1.0,
+      "reference_sha256": "059dfe243371a5005c8799a4ef0a4925e9dc8151058f138f598108c832f551d4",
+      "stage": "tuning",
+      "tested_control_caps": 2,
+      "tested_controls": 2
+    },
+    {
+      "point": "toric11-qbp_ms-p16200-runtime-budget",
+      "last_cap": 22,
+      "last_controls": {
+        "alpha": 0.5,
+        "alpha_mode": "constant",
+        "beta": 1.0,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 0.956483488951117,
+      "last_training_ler": 1.0,
+      "reference_sha256": "22dc0d0eb1349f51104e32cc52f36d14af95e42ab24fd7082f93befbe3bc1484",
+      "stage": "tuning",
+      "tested_control_caps": 81,
+      "tested_controls": 9
+    },
+    {
+      "point": "toric13-binary_ms-p10200-runtime-budget",
+      "last_cap": 401,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "constant",
+        "beta": 0.25,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 1.006979268718161,
+      "last_training_ler": 1.0,
+      "reference_sha256": "bec0363d7988db5b36b82c76d3dffd6d43e29452bab62b9bbe6a17293834144a",
+      "stage": "tuning",
+      "tested_control_caps": 75,
+      "tested_controls": 15
+    },
+    {
+      "point": "toric13-qbp_ms-p09000-runtime-budget",
+      "last_cap": 36,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.5,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 1.001241870619747,
+      "last_training_ler": 0.8359375,
+      "reference_sha256": "0cbc8cea0cb945e6ced988d530056999dbaae861bd31912d6e5fe6559ed3d218",
+      "stage": "tuning",
+      "tested_control_caps": 36,
+      "tested_controls": 4
+    },
+    {
+      "point": "toric11-qbp_ms-p01500-runtime-budget",
+      "last_cap": 1,
+      "last_controls": {
+        "alpha": 0.5,
+        "alpha_mode": "constant",
+        "beta": 0.5,
+        "damping": 0.7
+      },
+      "last_runtime_ratio": 0.6731369650388959,
+      "last_training_ler": 0.91015625,
+      "reference_sha256": "a43841c8ce71825b90a409d4691158391346ac5262780a95155d3af437bb416f",
+      "stage": "tuning",
+      "tested_control_caps": 495,
+      "tested_controls": 55
+    },
+    {
+      "point": "toric11-binary_ms-p02000-runtime-budget",
+      "last_cap": 242,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "constant",
+        "beta": 0.125,
+        "damping": 0.4
+      },
+      "last_runtime_ratio": 1.0318303871435701,
+      "last_training_ler": 0.23046875,
+      "reference_sha256": "7ad59e513e6ae33b50d64ec56ed22f397db7d04c1a27320bf88ef083901de373",
+      "stage": "tuning",
+      "tested_control_caps": 364,
+      "tested_controls": 102
+    },
+    {
+      "point": "toric15-qbp_ms-p01500-runtime-budget",
+      "last_cap": 38,
+      "last_controls": {
+        "alpha": 0.75,
+        "alpha_mode": "constant",
+        "beta": 0.5,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 0.9879788972587901,
+      "last_training_ler": 0.0859375,
+      "reference_sha256": "12d1d7792b3cf911e06e0b450a18e95f28069a18bd908a0ec279d41f1dd73e33",
+      "stage": "tuning",
+      "tested_control_caps": 108,
+      "tested_controls": 12
+    },
+    {
+      "point": "toric11-binary_ms-p10600-runtime-budget",
+      "last_cap": 302,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "constant",
+        "beta": 0.25,
+        "damping": 0.3
+      },
+      "last_runtime_ratio": 1.001985222725894,
+      "last_training_ler": 0.984375,
+      "reference_sha256": "94c03b54e7b31cbe699c04d1945b305807d2ca9e08c0b5616944510a11d9a7d0",
+      "stage": "tuning",
+      "tested_control_caps": 181,
+      "tested_controls": 31
+    },
+    {
+      "point": "toric11-qbp_ms-p06000-runtime-budget",
+      "last_cap": 31,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "constant",
+        "beta": 0.0,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 0.9930598576969923,
+      "last_training_ler": 0.41796875,
+      "reference_sha256": "817f0902a605bac66c9c0b29041c9f1251d682ee38d875b3c6e56699065919e9",
+      "stage": "tuning",
+      "tested_control_caps": 126,
+      "tested_controls": 14
+    },
+    {
+      "point": "toric13-binary_ms-p09000-runtime-budget",
+      "last_cap": 338,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "constant",
+        "beta": 0.0,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 0.9543512630158743,
+      "last_training_ler": 0.98046875,
+      "reference_sha256": "586e6373d466d934725fe7c565c091ec5324117d3315672979b1a294b55c1310",
+      "stage": "tuning",
+      "tested_control_caps": 74,
+      "tested_controls": 14
+    },
+    {
+      "point": "toric15-binary_ms-p03000-runtime-budget",
+      "last_cap": 379,
+      "last_controls": {
+        "alpha": 0.5,
+        "alpha_mode": "constant",
+        "beta": 0.0,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 0.9784915334158407,
+      "last_training_ler": 0.7890625,
+      "reference_sha256": "6f25c8d18e92bb65227cdd80e75f740c529595a7bb0130967900b822f46a23e3",
+      "stage": "tuning",
+      "tested_control_caps": 19,
+      "tested_controls": 6
+    },
+    {
+      "point": "toric15-binary_ms-p10500-runtime-budget",
+      "last_cap": 450,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.0,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 0.9603582725419694,
+      "last_training_ler": 1.0,
+      "reference_sha256": "b464ca279b24046e1303981610c57c568a32bf6323c49ae190691673b426cf8a",
+      "stage": "tuning",
+      "tested_control_caps": 2,
+      "tested_controls": 2
+    },
+    {
+      "point": "toric11-binary_ms-p05000-runtime-budget",
+      "last_cap": 317,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.0,
+        "damping": 0.4
+      },
+      "last_runtime_ratio": 1.0183463069286538,
+      "last_training_ler": 0.58984375,
+      "reference_sha256": "bd3cc1e01d9b4d379915d51e5f07953b72ab922bb5c40240109edea396eebb59",
+      "stage": "tuning",
+      "tested_control_caps": 226,
+      "tested_controls": 101
+    },
+    {
+      "point": "toric11-qbp_ms-p04500-runtime-budget",
+      "last_cap": 13,
+      "last_controls": {
+        "alpha": 0.5,
+        "alpha_mode": "constant",
+        "beta": 0.5,
+        "damping": 0.3
+      },
+      "last_runtime_ratio": 1.0709790875481178,
+      "last_training_ler": 0.796875,
+      "reference_sha256": "470fb3315e8c4d46aed4cb013b682f8923c0585c9c137241005cb220328e950c",
+      "stage": "tuning",
+      "tested_control_caps": 200,
+      "tested_controls": 23
+    },
+    {
+      "point": "toric11-qbp_ms-p14700-runtime-budget",
+      "last_cap": 24,
+      "last_controls": {
+        "alpha": 0.5,
+        "alpha_mode": "constant",
+        "beta": 1.0,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 1.023378367194061,
+      "last_training_ler": 1.0,
+      "reference_sha256": "e4718512a847d2383fadcc8291e53b241289ef07a07791cf625dede3c01500be",
+      "stage": "tuning",
+      "tested_control_caps": 81,
+      "tested_controls": 9
+    },
+    {
+      "point": "toric11-binary_ms-p10900-runtime-budget",
+      "last_cap": 302,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "constant",
+        "beta": 0.5,
+        "damping": 0.3
+      },
+      "last_runtime_ratio": 0.9996597350862239,
+      "last_training_ler": 0.9921875,
+      "reference_sha256": "d0a743a936fac9f0903049223c73887c8bc694ea26ac6414747cf865837e04de",
+      "stage": "tuning",
+      "tested_control_caps": 182,
+      "tested_controls": 32
+    },
+    {
+      "point": "toric13-binary_ms-p10800-runtime-budget",
+      "last_cap": 338,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 1.0,
+        "damping": 0.3
+      },
+      "last_runtime_ratio": 0.9015576329690905,
+      "last_training_ler": 1.0,
+      "reference_sha256": "29962639d1d63e961177a651a6dd362c7d981e0961e934c0fa107cf5c1e24887",
+      "stage": "tuning",
+      "tested_control_caps": 91,
+      "tested_controls": 21
+    },
+    {
+      "point": "toric11-qbp_ms-p12000-runtime-budget",
+      "last_cap": 26,
+      "last_controls": {
+        "alpha": 0.75,
+        "alpha_mode": "constant",
+        "beta": 0.25,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 1.0302735376911691,
+      "last_training_ler": 0.96484375,
+      "reference_sha256": "4286b6331fc3056d3b8aca9938501161e8dd6e98961c8d8902cde1df938bd78a",
+      "stage": "tuning",
+      "tested_control_caps": 99,
+      "tested_controls": 11
+    },
+    {
+      "point": "toric11-binary_ms-p09100-runtime-budget",
+      "last_cap": 302,
+      "last_controls": {
+        "alpha": 0.75,
+        "alpha_mode": "constant",
+        "beta": 0.5,
+        "damping": 0.3
+      },
+      "last_runtime_ratio": 0.9753823069238999,
+      "last_training_ler": 0.9921875,
+      "reference_sha256": "1391b9ea72f4ead41840df082c3eee15c6e6d3db4e6ef481d637ce3615cc2a12",
+      "stage": "tuning",
+      "tested_control_caps": 163,
+      "tested_controls": 28
+    },
+    {
+      "point": "toric11-binary_ms-p10300-runtime-budget",
+      "last_cap": 302,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "constant",
+        "beta": 0.5,
+        "damping": 0.3
+      },
+      "last_runtime_ratio": 0.9944767070346128,
+      "last_training_ler": 0.99609375,
+      "reference_sha256": "908387f154cb1192d4017fe5c2cc827640ce36142899b72a003e11f7bc4069c6",
+      "stage": "tuning",
+      "tested_control_caps": 187,
+      "tested_controls": 32
+    },
+    {
+      "point": "toric11-qbp_ms-p14850-runtime-budget",
+      "last_cap": 24,
+      "last_controls": {
+        "alpha": 0.5,
+        "alpha_mode": "constant",
+        "beta": 1.0,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 1.0221062075812906,
+      "last_training_ler": 1.0,
+      "reference_sha256": "521807fa6a32dd7e44fceb33f8bba61093eff6f8545df426161a7f4b6760d4f5",
+      "stage": "tuning",
+      "tested_control_caps": 81,
+      "tested_controls": 9
+    },
+    {
+      "point": "toric11-qbp_ms-p16350-runtime-budget",
+      "last_cap": 24,
+      "last_controls": {
+        "alpha": 0.5,
+        "alpha_mode": "constant",
+        "beta": 0.25,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 1.0221013869240165,
+      "last_training_ler": 1.0,
+      "reference_sha256": "1ddcaee4f599e93ca06b9cd1c4a76a2f492babcbc0e678941425f3233f6f39dc",
+      "stage": "tuning",
+      "tested_control_caps": 63,
+      "tested_controls": 7
+    },
+    {
+      "point": "toric15-qbp_ms-p14100-runtime-budget",
+      "last_cap": 42,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.0,
+        "damping": 0.3
+      },
+      "last_runtime_ratio": 0.9640379347569817,
+      "last_training_ler": 0.85546875,
+      "reference_sha256": "8e0155dece0da1b23e95b50c3eb1dd36e4a1cf01fb7f9e47bd4a6060da23fff9",
+      "stage": "tuning",
+      "tested_control_caps": 9,
+      "tested_controls": 1
+    },
+    {
+      "point": "toric15-binary_ms-p02000-runtime-budget",
+      "last_cap": 450,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 1.0,
+        "damping": 0.3
+      },
+      "last_runtime_ratio": 0.935403654888305,
+      "last_training_ler": 0.37109375,
+      "reference_sha256": "3d82421d926d7eb8868660e68a7795f50d70b546a9c150f8ccd553c2f558b212",
+      "stage": "tuning",
+      "tested_control_caps": 63,
+      "tested_controls": 21
+    },
+    {
+      "point": "toric15-qbp_ms-p14550-runtime-budget",
+      "last_cap": 42,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.0,
+        "damping": 0.3
+      },
+      "last_runtime_ratio": 0.9933246410906011,
+      "last_training_ler": 0.828125,
+      "reference_sha256": "2ad67b72659fb33fcd87e16ef8e802b1e840460e9ef74621fd458a8f363623d5",
+      "stage": "tuning",
+      "tested_control_caps": 9,
+      "tested_controls": 1
+    },
+    {
+      "point": "toric11-qbp_ms-p15150-runtime-budget",
+      "last_cap": 24,
+      "last_controls": {
+        "alpha": 0.5,
+        "alpha_mode": "constant",
+        "beta": 1.0,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 1.0220380983642827,
+      "last_training_ler": 1.0,
+      "reference_sha256": "3500c8b6f1c1b93898072e0f2ef9dbcd12a4599f16dfc49d288ad6265828f502",
+      "stage": "tuning",
+      "tested_control_caps": 81,
+      "tested_controls": 9
+    },
+    {
+      "point": "toric15-binary_ms-p10300-runtime-budget",
+      "last_cap": 506,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 1.0,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 1.016790975391851,
+      "last_training_ler": 1.0,
+      "reference_sha256": "d846d53e3c2366805c2af0ae3484f01a54e465f102eb6991d2612264ba2c9767",
+      "stage": "tuning",
+      "tested_control_caps": 15,
+      "tested_controls": 5
+    },
+    {
+      "point": "toric11-binary_ms-p09900-runtime-budget",
+      "last_cap": 302,
+      "last_controls": {
+        "alpha": 0.75,
+        "alpha_mode": "constant",
+        "beta": 1.0,
+        "damping": 0.5
+      },
+      "last_runtime_ratio": 0.9848680536921205,
+      "last_training_ler": 1.0,
+      "reference_sha256": "3fc4494d3f40b7ad984eb3049c214bbf2f219dea048a341b013f71af4dfb2fc0",
+      "stage": "tuning",
+      "tested_control_caps": 259,
+      "tested_controls": 44
+    },
+    {
+      "point": "toric15-qbp_ms-p15450-runtime-budget",
+      "last_cap": 45,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.0,
+        "damping": 0.3
+      },
+      "last_runtime_ratio": 0.9956198937744045,
+      "last_training_ler": 0.9453125,
+      "reference_sha256": "88bf6239a8858c19207c5791f8e3f8ae136a1e7d9af0e48ca250fccad5af9c44",
+      "stage": "tuning",
+      "tested_control_caps": 9,
+      "tested_controls": 1
+    },
+    {
+      "point": "toric15-qbp_ms-p03000-runtime-budget",
+      "last_cap": 31,
+      "last_controls": {
+        "alpha": 0.5,
+        "alpha_mode": "constant",
+        "beta": 0.0,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 0.9919970202779672,
+      "last_training_ler": 0.4453125,
+      "reference_sha256": "d6ba542f12b3f30d55b29c3c7e132d1ca58268cc360d97092803106362699dbc",
+      "stage": "tuning",
+      "tested_control_caps": 46,
+      "tested_controls": 6
+    },
+    {
+      "point": "toric11-binary_ms-p09600-runtime-budget",
+      "last_cap": 287,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "constant",
+        "beta": 0.25,
+        "damping": 0.3
+      },
+      "last_runtime_ratio": 0.9620725739923246,
+      "last_training_ler": 0.984375,
+      "reference_sha256": "bf5829c62c92d55bb0631165c177d60185ecdbab19832f7441df304950fa2bf9",
+      "stage": "tuning",
+      "tested_control_caps": 166,
+      "tested_controls": 31
+    },
+    {
+      "point": "toric11-qbp_ms-p13800-runtime-budget",
+      "last_cap": 24,
+      "last_controls": {
+        "alpha": 0.75,
+        "alpha_mode": "constant",
+        "beta": 0.25,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 0.9998683951093316,
+      "last_training_ler": 0.99609375,
+      "reference_sha256": "aff1732ec1612a3ec7cda26c538b19f07e760b5053db3188ec6fed23fd783a01",
+      "stage": "tuning",
+      "tested_control_caps": 99,
+      "tested_controls": 11
+    },
+    {
+      "point": "toric11-binary_ms-p01000-runtime-budget",
+      "last_cap": 173,
+      "last_controls": {
+        "alpha": 0.9,
+        "alpha_mode": "paper",
+        "beta": 0.125,
+        "damping": 0.4
+      },
+      "last_runtime_ratio": 0.9340262870757116,
+      "last_training_ler": 0.08203125,
+      "reference_sha256": "1424a8a0b335658e9c9c8916dd05b02c56cd1dc37bd3d4ae67ad66663f71c883",
+      "stage": "tuning",
+      "tested_control_caps": 876,
+      "tested_controls": 100
+    },
+    {
+      "point": "toric13-binary_ms-p10000-runtime-budget",
+      "last_cap": 401,
+      "last_controls": {
+        "alpha": 0.75,
+        "alpha_mode": "constant",
+        "beta": 0.0,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 0.9946128960822342,
+      "last_training_ler": 1.0,
+      "reference_sha256": "d932b5b73a5012023766ef0998b6608cc21cd481cada1fb55408031d2a50c4e8",
+      "stage": "tuning",
+      "tested_control_caps": 55,
+      "tested_controls": 10
+    },
+    {
+      "point": "toric11-binary_ms-p06000-runtime-budget",
+      "last_cap": 317,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.0,
+        "damping": 0.7
+      },
+      "last_runtime_ratio": 0.993817171467594,
+      "last_training_ler": 0.65625,
+      "reference_sha256": "c47c905cebd3161b3f961ec88afceb4aa666b954a4fc40648aacf55972d81ed9",
+      "stage": "tuning",
+      "tested_control_caps": 199,
+      "tested_controls": 49
+    },
+    {
+      "point": "toric13-binary_ms-p10400-runtime-budget",
+      "last_cap": 401,
+      "last_controls": {
+        "alpha": 0.75,
+        "alpha_mode": "constant",
+        "beta": 0.25,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 0.990685467651851,
+      "last_training_ler": 1.0,
+      "reference_sha256": "b557d18dd3119dc5da9e9ce4bcc86ab5b84829b19bf345db08c4504ed7b7911d",
+      "stage": "tuning",
+      "tested_control_caps": 61,
+      "tested_controls": 11
+    },
+    {
+      "point": "toric13-binary_ms-p09400-runtime-budget",
+      "last_cap": 380,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.5,
+        "damping": 0.3
+      },
+      "last_runtime_ratio": 0.9972746434965368,
+      "last_training_ler": 0.99609375,
+      "reference_sha256": "bd7f0b981e7d7cc77429b7eea7fd3dd0fe31cae081916aa72ee006f385ff73a2",
+      "stage": "tuning",
+      "tested_control_caps": 70,
+      "tested_controls": 20
+    },
+    {
+      "point": "toric15-qbp_ms-p13800-runtime-budget",
+      "last_cap": 42,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.25,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 0.9907320754520649,
+      "last_training_ler": 0.99609375,
+      "reference_sha256": "45d9ad69ba860439f569fb433b0bd9acae60651f4181e5de83da7d7232a92bc0",
+      "stage": "tuning",
+      "tested_control_caps": 27,
+      "tested_controls": 3
+    },
+    {
+      "point": "toric15-binary_ms-p08000-runtime-budget",
+      "last_cap": 506,
+      "last_controls": {
+        "alpha": 0.5,
+        "alpha_mode": "constant",
+        "beta": 0.5,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 0.9854585838134098,
+      "last_training_ler": 1.0,
+      "reference_sha256": "84be7810d6d566cdf67353e8408efa5e14e52ba4e9f741f4f6c670b687208266",
+      "stage": "tuning",
+      "tested_control_caps": 18,
+      "tested_controls": 8
+    },
+    {
+      "point": "toric13-qbp_ms-p12000-runtime-budget",
+      "last_cap": 33,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.5,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 0.9676882825235424,
+      "last_training_ler": 0.9609375,
+      "reference_sha256": "6c2bcb21bc9415dc45697a831f36cb1aa33fc4f413fb133b853a4c83b40f3aaf",
+      "stage": "tuning",
+      "tested_control_caps": 36,
+      "tested_controls": 4
+    },
+    {
+      "point": "toric13-binary_ms-p09100-runtime-budget",
+      "last_cap": 401,
+      "last_controls": {
+        "alpha": 0.75,
+        "alpha_mode": "constant",
+        "beta": 0.5,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 0.9782023185344407,
+      "last_training_ler": 1.0,
+      "reference_sha256": "4ea766f1c667b8a63ceb95d60b522d1bf06c12281904b0babe7188fcbf47c221",
+      "stage": "tuning",
+      "tested_control_caps": 62,
+      "tested_controls": 12
+    },
+    {
+      "point": "toric13-qbp_ms-p15600-runtime-budget",
+      "last_cap": 28,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.0,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 0.9729810296466088,
+      "last_training_ler": 0.984375,
+      "reference_sha256": "1e387a2672d2e983b0d26a989a2ec3b1c4e5288b56846b5d8517595c26ed83ff",
+      "stage": "tuning",
+      "tested_control_caps": 18,
+      "tested_controls": 2
+    },
+    {
+      "point": "toric15-qbp_ms-p15150-runtime-budget",
+      "last_cap": 42,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.0,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 1.0102861047547478,
+      "last_training_ler": 0.99609375,
+      "reference_sha256": "1bf9da96f5936df39de3fa576c3ac52b264bfbb90d9c82871abe1752c2350591",
+      "stage": "tuning",
+      "tested_control_caps": 18,
+      "tested_controls": 2
+    },
+    {
+      "point": "toric13-binary_ms-p10700-runtime-budget",
+      "last_cap": 359,
+      "last_controls": {
+        "alpha": 0.5,
+        "alpha_mode": "constant",
+        "beta": 0.0,
+        "damping": 0.3
+      },
+      "last_runtime_ratio": 0.9804629606537526,
+      "last_training_ler": 1.0,
+      "reference_sha256": "24300c111f5e7d7e56e021bf553960e18dcd913c016a67c9c70c099c056b4767",
+      "stage": "tuning",
+      "tested_control_caps": 87,
+      "tested_controls": 22
+    },
+    {
+      "point": "toric15-qbp_ms-p15600-runtime-budget",
+      "last_cap": 42,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.0,
+        "damping": 0.3
+      },
+      "last_runtime_ratio": 1.0165367636791114,
+      "last_training_ler": 0.9609375,
+      "reference_sha256": "c4f20d70e51f593a9f60011617cb35d1cf3389daefa0bc52f9670ec9b711eb0a",
+      "stage": "tuning",
+      "tested_control_caps": 9,
+      "tested_controls": 1
+    },
+    {
+      "point": "toric11-binary_ms-p09400-runtime-budget",
+      "last_cap": 302,
+      "last_controls": {
+        "alpha": 0.75,
+        "alpha_mode": "constant",
+        "beta": 0.0,
+        "damping": 0.5
+      },
+      "last_runtime_ratio": 1.0310167419225655,
+      "last_training_ler": 0.984375,
+      "reference_sha256": "eedf01faf9e07cebf558a4f561c774c304b4e944e5d88822ae0d8580693e41b8",
+      "stage": "tuning",
+      "tested_control_caps": 171,
+      "tested_controls": 41
+    },
+    {
+      "point": "toric13-binary_ms-p02000-runtime-budget",
+      "last_cap": 253,
+      "last_controls": {
+        "alpha": 0.5,
+        "alpha_mode": "constant",
+        "beta": 0.25,
+        "damping": 0.7
+      },
+      "last_runtime_ratio": 1.094176689325112,
+      "last_training_ler": 0.390625,
+      "reference_sha256": "cbf64fda5452beb4bc5104c989ff04f4fa0ad5541ffe241176877c959baffb5d",
+      "stage": "tuning",
+      "tested_control_caps": 271,
+      "tested_controls": 54
+    },
+    {
+      "point": "toric11-qbp_ms-p15750-runtime-budget",
+      "last_cap": 24,
+      "last_controls": {
+        "alpha": 0.5,
+        "alpha_mode": "constant",
+        "beta": 1.0,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 1.0283452282326404,
+      "last_training_ler": 1.0,
+      "reference_sha256": "7a43b7c5d0e5894c727ef9539330ab8e422e5f3d3bfa836f542c34f5ca2e7fce",
+      "stage": "tuning",
+      "tested_control_caps": 81,
+      "tested_controls": 9
+    },
+    {
+      "point": "toric13-qbp_ms-p06000-runtime-budget",
+      "last_cap": 28,
+      "last_controls": {
+        "alpha": 0.5,
+        "alpha_mode": "constant",
+        "beta": 0.0,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 1.027536917523118,
+      "last_training_ler": 0.93359375,
+      "reference_sha256": "c2d58d1ce14ec1c9647de48f61e64953d26fca3a3b48e8832e9c26400c53a945",
+      "stage": "tuning",
+      "tested_control_caps": 47,
+      "tested_controls": 6
+    },
+    {
+      "point": "toric15-qbp_ms-p14400-runtime-budget",
+      "last_cap": 42,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.0,
+        "damping": 0.3
+      },
+      "last_runtime_ratio": 0.9891654300850702,
+      "last_training_ler": 0.9140625,
+      "reference_sha256": "ae42b56d38f5a8b230f893c8ea2bf2b38a63cf1f88a3056fbbb32982de459b19",
+      "stage": "tuning",
+      "tested_control_caps": 9,
+      "tested_controls": 1
+    },
+    {
+      "point": "toric11-qbp_ms-p07500-runtime-budget",
+      "last_cap": 28,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "constant",
+        "beta": 0.0,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 0.992659517253855,
+      "last_training_ler": 0.57421875,
+      "reference_sha256": "b142cb5e4a4157a54212e444ae7d57afa930a958033dae04df0d8af597c4e975",
+      "stage": "tuning",
+      "tested_control_caps": 126,
+      "tested_controls": 14
+    },
+    {
+      "point": "toric11-binary_ms-p11000-runtime-budget",
+      "last_cap": 302,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.25,
+        "damping": 0.5
+      },
+      "last_runtime_ratio": 1.0002633455900907,
+      "last_training_ler": 0.98828125,
+      "reference_sha256": "cfd1b541bb69429af31e1dc10b3d38538ea974624c7d294248fe30735ea8030a",
+      "stage": "tuning",
+      "tested_control_caps": 199,
+      "tested_controls": 34
+    },
+    {
+      "point": "toric13-qbp_ms-p14400-runtime-budget",
+      "last_cap": 33,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.25,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 1.0220326052007638,
+      "last_training_ler": 0.984375,
+      "reference_sha256": "4e2dc0d183e5b51073801ae27cf523e000f657256ca161b90bf0124ac5699cbd",
+      "stage": "tuning",
+      "tested_control_caps": 27,
+      "tested_controls": 3
+    },
+    {
+      "point": "toric11-qbp_ms-p14550-runtime-budget",
+      "last_cap": 24,
+      "last_controls": {
+        "alpha": 0.5,
+        "alpha_mode": "constant",
+        "beta": 0.5,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 1.0206722172329679,
+      "last_training_ler": 1.0,
+      "reference_sha256": "e79236c84eb7ce378b3cdbf05499ee4b59023657bfceab247b73f944db940c54",
+      "stage": "tuning",
+      "tested_control_caps": 72,
+      "tested_controls": 8
+    },
+    {
+      "point": "toric11-qbp_ms-p15450-runtime-budget",
+      "last_cap": 22,
+      "last_controls": {
+        "alpha": 0.75,
+        "alpha_mode": "constant",
+        "beta": 0.25,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 0.9901526050368172,
+      "last_training_ler": 1.0,
+      "reference_sha256": "038960d418cde8aac6c6bcef20b89bec692279ab9e452928b25dafd007050625",
+      "stage": "tuning",
+      "tested_control_caps": 99,
+      "tested_controls": 11
+    },
+    {
+      "point": "toric13-qbp_ms-p14100-runtime-budget",
+      "last_cap": 33,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.25,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 0.9629568808913497,
+      "last_training_ler": 0.9765625,
+      "reference_sha256": "b410b66e52b459a9f5149c39e778965546d76d228f1d71fb4eacc44811fad7da",
+      "stage": "tuning",
+      "tested_control_caps": 27,
+      "tested_controls": 3
+    },
+    {
+      "point": "toric13-binary_ms-p09800-runtime-budget",
+      "last_cap": 338,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.0,
+        "damping": 0.3
+      },
+      "last_runtime_ratio": 0.9640438397233954,
+      "last_training_ler": 0.96484375,
+      "reference_sha256": "fb33d91530be722d0b73e78cd7679e06c2e88d6ad651a514cde9d345ce398a2e",
+      "stage": "tuning",
+      "tested_control_caps": 78,
+      "tested_controls": 18
+    },
+    {
+      "point": "toric13-binary_ms-p09200-runtime-budget",
+      "last_cap": 422,
+      "last_controls": {
+        "alpha": 0.75,
+        "alpha_mode": "constant",
+        "beta": 1.0,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 0.9897484723566303,
+      "last_training_ler": 1.0,
+      "reference_sha256": "382a589985cefc0506be0c9c78cadbd22a857b6bca4da99e86561cc3d369c13a",
+      "stage": "tuning",
+      "tested_control_caps": 73,
+      "tested_controls": 13
+    },
+    {
+      "point": "toric15-qbp_ms-p13950-runtime-budget",
+      "last_cap": 42,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.25,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 0.9710247081020319,
+      "last_training_ler": 1.0,
+      "reference_sha256": "62de7f453f7e0da469c992fba686e7b7be2a28be7d7ce74ab32385b41d3cfd82",
+      "stage": "tuning",
+      "tested_control_caps": 27,
+      "tested_controls": 3
+    },
+    {
+      "point": "toric11-binary_ms-p09800-runtime-budget",
+      "last_cap": 302,
+      "last_controls": {
+        "alpha": 0.75,
+        "alpha_mode": "constant",
+        "beta": 1.0,
+        "damping": 0.5
+      },
+      "last_runtime_ratio": 0.9860382833040834,
+      "last_training_ler": 0.99609375,
+      "reference_sha256": "92e64767fb915fea83f78be2209f52c5ffd503003fceed10048c8a32de229160",
+      "stage": "tuning",
+      "tested_control_caps": 259,
+      "tested_controls": 44
+    },
+    {
+      "point": "toric13-binary_ms-p09900-runtime-budget",
+      "last_cap": 401,
+      "last_controls": {
+        "alpha": 0.75,
+        "alpha_mode": "constant",
+        "beta": 0.25,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 1.0282319182761668,
+      "last_training_ler": 1.0,
+      "reference_sha256": "c879e0d959ea5dbac0a8a60baaf4ed4f0f31c3f2e33967767f8faa298df176a8",
+      "stage": "tuning",
+      "tested_control_caps": 61,
+      "tested_controls": 11
+    },
+    {
+      "point": "toric11-qbp_ms-p09000-runtime-budget",
+      "last_cap": 22,
+      "last_controls": {
+        "alpha": 0.75,
+        "alpha_mode": "constant",
+        "beta": 1.0,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 0.9675759959950537,
+      "last_training_ler": 0.96484375,
+      "reference_sha256": "aa9f33f1dda3cf7c52140a28dda0a372a042943a5982ebcd8554bf10a8cea628",
+      "stage": "tuning",
+      "tested_control_caps": 117,
+      "tested_controls": 13
+    },
+    {
+      "point": "toric13-binary_ms-p10300-runtime-budget",
+      "last_cap": 401,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "constant",
+        "beta": 0.25,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 1.015706635713458,
+      "last_training_ler": 1.0,
+      "reference_sha256": "2faaa1c3dbf7ca524c6ea1fdc8a5b24337e7f7078c39f4e086eec9249b6a4265",
+      "stage": "tuning",
+      "tested_control_caps": 75,
+      "tested_controls": 15
+    },
+    {
+      "point": "toric13-qbp_ms-p15150-runtime-budget",
+      "last_cap": 33,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.0,
+        "damping": 0.3
+      },
+      "last_runtime_ratio": 0.9625083452934005,
+      "last_training_ler": 0.8828125,
+      "reference_sha256": "1e8e203d8d740fd84e28bc368902bf472a7dca82ad2ba5b442b04d1f263e8932",
+      "stage": "tuning",
+      "tested_control_caps": 9,
+      "tested_controls": 1
+    },
+    {
+      "point": "toric13-qbp_ms-p15300-runtime-budget",
+      "last_cap": 36,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.0,
+        "damping": 0.3
+      },
+      "last_runtime_ratio": 1.0308626562576046,
+      "last_training_ler": 0.85546875,
+      "reference_sha256": "70dd3fab1265508b8b358041c5dc18bbfdcbb01d623134a3b5a6048039c7389f",
+      "stage": "tuning",
+      "tested_control_caps": 9,
+      "tested_controls": 1
+    },
+    {
+      "point": "toric15-binary_ms-p09900-runtime-budget",
+      "last_cap": 450,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.0,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 0.9654121014612662,
+      "last_training_ler": 0.99609375,
+      "reference_sha256": "2acad1ebfb6948465c9a48cd1b8909dab88c76cb24fa8568925149ce98e34634",
+      "stage": "tuning",
+      "tested_control_caps": 2,
+      "tested_controls": 2
+    },
+    {
+      "point": "toric11-binary_ms-p10000-runtime-budget",
+      "last_cap": 287,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "constant",
+        "beta": 1.0,
+        "damping": 0.3
+      },
+      "last_runtime_ratio": 1.0098172924494964,
+      "last_training_ler": 0.99609375,
+      "reference_sha256": "136a2299b2f6e7de393709c47bf6d69250bceacbadb79f423fd1c6d49ed45889",
+      "stage": "tuning",
+      "tested_control_caps": 173,
+      "tested_controls": 33
+    },
+    {
+      "point": "toric15-qbp_ms-p04500-runtime-budget",
+      "last_cap": 66,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.5,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 0.9931862435155214,
+      "last_training_ler": 0.3984375,
+      "reference_sha256": "bd556db28859f30d7dbaf6b001f6bf619dbd3930aaf4cb4faf9eca69a3e29482",
+      "stage": "tuning",
+      "tested_control_caps": 29,
+      "tested_controls": 4
+    },
+    {
+      "point": "toric11-binary_ms-p10800-runtime-budget",
+      "last_cap": 302,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.5,
+        "damping": 0.5
+      },
+      "last_runtime_ratio": 1.003975605779058,
+      "last_training_ler": 1.0,
+      "reference_sha256": "bee18213ccf669e2ad6b30176d73103f9da044d8fcd76d4ae4924b8dad5890cc",
+      "stage": "tuning",
+      "tested_control_caps": 200,
+      "tested_controls": 35
+    },
+    {
+      "point": "toric11-binary_ms-p09700-runtime-budget",
+      "last_cap": 242,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.125,
+        "damping": 0.7
+      },
+      "last_runtime_ratio": 1.0479902210871572,
+      "last_training_ler": 0.98828125,
+      "reference_sha256": "3c1630d655727b3eef58a91298275d7459f4abec0b78bf5f126b4ce8c1f0225e",
+      "stage": "tuning",
+      "tested_control_caps": 176,
+      "tested_controls": 98
+    },
+    {
+      "point": "toric11-qbp_ms-p14400-runtime-budget",
+      "last_cap": 18,
+      "last_controls": {
+        "alpha": 0.5,
+        "alpha_mode": "constant",
+        "beta": 0.5,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 1.0054916331153665,
+      "last_training_ler": 1.0,
+      "reference_sha256": "6b2260bab6c1231b9edf814e0081842e476d63fe322b2b8585f93a0abfa21bea",
+      "stage": "tuning",
+      "tested_control_caps": 72,
+      "tested_controls": 8
+    },
+    {
+      "point": "toric13-qbp_ms-p15900-runtime-budget",
+      "last_cap": 31,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.0,
+        "damping": 0.3
+      },
+      "last_runtime_ratio": 0.9945156824490041,
+      "last_training_ler": 0.91015625,
+      "reference_sha256": "e8c7e315a5722eed24b51ded18eaf48fab479c2720c0760d1b1f51a81f2204b9",
+      "stage": "tuning",
+      "tested_control_caps": 9,
+      "tested_controls": 1
+    },
+    {
+      "point": "toric11-binary_ms-p04000-runtime-budget",
+      "last_cap": 242,
+      "last_controls": {
+        "alpha": 0.75,
+        "alpha_mode": "constant",
+        "beta": 0.25,
+        "damping": 0.7
+      },
+      "last_runtime_ratio": 0.9022470341165497,
+      "last_training_ler": 0.625,
+      "reference_sha256": "4bea90ca72fa41dd91450395b95957001d9d0940f52bf745801d83ffafcbe0c9",
+      "stage": "tuning",
+      "tested_control_caps": 267,
+      "tested_controls": 58
+    },
+    {
+      "point": "toric11-qbp_ms-p03000-runtime-budget",
+      "last_cap": 24,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 1.0,
+        "damping": 0.5
+      },
+      "last_runtime_ratio": 1.004140248016932,
+      "last_training_ler": 0.125,
+      "reference_sha256": "f2275cc825666989379dfbcad3ef44aa4829321a3644c7def6248aa7b2ff5b4b",
+      "stage": "tuning",
+      "tested_control_caps": 316,
+      "tested_controls": 36
+    },
+    {
+      "point": "toric13-qbp_ms-p16050-runtime-budget",
+      "last_cap": 33,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.0,
+        "damping": 0.3
+      },
+      "last_runtime_ratio": 0.972283331030525,
+      "last_training_ler": 0.921875,
+      "reference_sha256": "186a08f46051a0cba64a5aa7b73e7021d5e0f64640b3334da7fa2f6eccceeff2",
+      "stage": "tuning",
+      "tested_control_caps": 9,
+      "tested_controls": 1
+    },
+    {
+      "point": "toric15-binary_ms-p01000-runtime-budget",
+      "last_cap": 295,
+      "last_controls": {
+        "alpha": 0.5,
+        "alpha_mode": "constant",
+        "beta": 0.25,
+        "damping": 0.3
+      },
+      "last_runtime_ratio": 0.9950501033389606,
+      "last_training_ler": 0.1640625,
+      "reference_sha256": "d349dbc803aa1876f4fb187ceed3289e9125ce6543bf56c883b9ae64eafdd0fb",
+      "stage": "tuning",
+      "tested_control_caps": 196,
+      "tested_controls": 23
+    },
+    {
+      "point": "toric15-qbp_ms-p15900-runtime-budget",
+      "last_cap": 42,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.0,
+        "damping": 0.3
+      },
+      "last_runtime_ratio": 1.0174579285499736,
+      "last_training_ler": 0.97265625,
+      "reference_sha256": "ec0a1004fdd436d0baca91bce209aba8ed9ea9ad0a4b232810197edaa3e583be",
+      "stage": "tuning",
+      "tested_control_caps": 9,
+      "tested_controls": 1
+    },
+    {
+      "point": "toric13-qbp_ms-p10500-runtime-budget",
+      "last_cap": 36,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.5,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 0.9671704538630862,
+      "last_training_ler": 0.8984375,
+      "reference_sha256": "02c5044a2902e246a36e03bcdc9c65363b938dc3f7f15da2995a17f6d0d90472",
+      "stage": "tuning",
+      "tested_control_caps": 36,
+      "tested_controls": 4
+    },
+    {
+      "point": "toric13-qbp_ms-p03000-runtime-budget",
+      "last_cap": 44,
+      "last_controls": {
+        "alpha": 0.75,
+        "alpha_mode": "constant",
+        "beta": 0.0,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 0.9815972770227,
+      "last_training_ler": 0.203125,
+      "reference_sha256": "a0350411022892344464c65d37f90bcbbdf4e5a66eba14d1ffb0608fab9d5584",
+      "stage": "tuning",
+      "tested_control_caps": 82,
+      "tested_controls": 10
+    },
+    {
+      "point": "toric13-binary_ms-p08000-runtime-budget",
+      "last_cap": 401,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "constant",
+        "beta": 0.5,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 1.0232773361986345,
+      "last_training_ler": 0.9921875,
+      "reference_sha256": "9f6d4151d9e7d248b2f89bdbae62b645c3c0618aab66a5a33fa2ce2e3e7920fe",
+      "stage": "tuning",
+      "tested_control_caps": 76,
+      "tested_controls": 16
+    },
+    {
+      "point": "toric13-binary_ms-p09600-runtime-budget",
+      "last_cap": 380,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.25,
+        "damping": 0.3
+      },
+      "last_runtime_ratio": 0.9935326734631722,
+      "last_training_ler": 1.0,
+      "reference_sha256": "95188a514e301f62a2e7c21fc177e8d2ecabb534dcb7f625adc4d9bd9ddd2593",
+      "stage": "tuning",
+      "tested_control_caps": 74,
+      "tested_controls": 19
+    },
+    {
+      "point": "toric15-qbp_ms-p10500-runtime-budget",
+      "last_cap": 42,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.0,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 0.976945795394918,
+      "last_training_ler": 0.91796875,
+      "reference_sha256": "d2f74324832dad7c9e77e33a32f6d0f1aa92898204c9e2620ddc3f1c10626c6d",
+      "stage": "tuning",
+      "tested_control_caps": 18,
+      "tested_controls": 2
+    },
+    {
+      "point": "toric11-qbp_ms-p15300-runtime-budget",
+      "last_cap": 22,
+      "last_controls": {
+        "alpha": 0.75,
+        "alpha_mode": "constant",
+        "beta": 0.25,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 0.9654215411909929,
+      "last_training_ler": 1.0,
+      "reference_sha256": "d3585a2fbadfbddba320ae58513f47c6ed0e2586b38f259979138858f4e23d28",
+      "stage": "tuning",
+      "tested_control_caps": 99,
+      "tested_controls": 11
+    },
+    {
+      "point": "toric11-binary_ms-p09000-runtime-budget",
+      "last_cap": 302,
+      "last_controls": {
+        "alpha": 0.75,
+        "alpha_mode": "constant",
+        "beta": 0.25,
+        "damping": 0.3
+      },
+      "last_runtime_ratio": 0.9828846623189752,
+      "last_training_ler": 0.9921875,
+      "reference_sha256": "d1b47e1cf464966dd84831d04adab0aa1a48400d61a82c833c3047bb08d01185",
+      "stage": "tuning",
+      "tested_control_caps": 152,
+      "tested_controls": 27
+    },
+    {
+      "point": "toric13-binary_ms-p04000-runtime-budget",
+      "last_cap": 316,
+      "last_controls": {
+        "alpha": 0.5,
+        "alpha_mode": "constant",
+        "beta": 0.25,
+        "damping": 0.5
+      },
+      "last_runtime_ratio": 0.9875751991862801,
+      "last_training_ler": 0.921875,
+      "reference_sha256": "6044b2f78d2e51ac13d3b64af1aec4200a200ea9da38f16cbfe1ad116089a7b7",
+      "stage": "tuning",
+      "tested_control_caps": 123,
+      "tested_controls": 38
+    },
+    {
+      "point": "toric15-binary_ms-p09800-runtime-budget",
+      "last_cap": 450,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.0,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 0.9724363573513126,
+      "last_training_ler": 1.0,
+      "reference_sha256": "32b93a171a5f382861dac76b141facd6a5916e47271bcad715e33d870fac1d4f",
+      "stage": "tuning",
+      "tested_control_caps": 2,
+      "tested_controls": 2
+    },
+    {
+      "point": "toric13-qbp_ms-p14850-runtime-budget",
+      "last_cap": 36,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.0,
+        "damping": 0.3
+      },
+      "last_runtime_ratio": 1.036797689780354,
+      "last_training_ler": 0.859375,
+      "reference_sha256": "a777d0a302d9ce3e3b21374a5b933b24e68f174395590a62f2e6f13b3056bacd",
+      "stage": "tuning",
+      "tested_control_caps": 9,
+      "tested_controls": 1
+    },
+    {
+      "point": "toric13-binary_ms-p05000-runtime-budget",
+      "last_cap": 401,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.5,
+        "damping": 0.3
+      },
+      "last_runtime_ratio": 0.9909935757070993,
+      "last_training_ler": 0.87890625,
+      "reference_sha256": "8603398ed6e973b4eccc826cf8dd16bcc07be24e1fd4a83c91a7f5440e1a072a",
+      "stage": "tuning",
+      "tested_control_caps": 90,
+      "tested_controls": 20
+    },
+    {
+      "point": "toric11-qbp_ms-p13500-runtime-budget",
+      "last_cap": 26,
+      "last_controls": {
+        "alpha": 0.75,
+        "alpha_mode": "constant",
+        "beta": 0.0,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 1.0212812194892966,
+      "last_training_ler": 0.94921875,
+      "reference_sha256": "fcbbcde6e360b6d68e90bc9750235055f5622f88c73d27e4a5eec90fb69085a0",
+      "stage": "tuning",
+      "tested_control_caps": 90,
+      "tested_controls": 10
+    },
+    {
+      "point": "toric13-binary_ms-p01000-runtime-budget",
+      "last_cap": 253,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.125,
+        "damping": 0.6
+      },
+      "last_runtime_ratio": 0.9420951748237558,
+      "last_training_ler": 0.0859375,
+      "reference_sha256": "19bb9516f1d11d80ba6866b94c73a36b556ece6cf866d29de760aa44fb2d68e1",
+      "stage": "tuning",
+      "tested_control_caps": 597,
+      "tested_controls": 102
+    },
+    {
+      "point": "toric11-qbp_ms-p14250-runtime-budget",
+      "last_cap": 22,
+      "last_controls": {
+        "alpha": 0.5,
+        "alpha_mode": "constant",
+        "beta": 1.0,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 1.0165940589127236,
+      "last_training_ler": 1.0,
+      "reference_sha256": "d8c72777934d814c56fdb573d6023d79a47d880ae02167ea8561daf0ee021f31",
+      "stage": "tuning",
+      "tested_control_caps": 81,
+      "tested_controls": 9
+    },
+    {
+      "point": "toric11-binary_ms-p07000-runtime-budget",
+      "last_cap": 242,
+      "last_controls": {
+        "alpha": 0.75,
+        "alpha_mode": "constant",
+        "beta": 1.0,
+        "damping": 0.5
+      },
+      "last_runtime_ratio": 0.9386471800904389,
+      "last_training_ler": 0.97265625,
+      "reference_sha256": "68b70061c848db05c730318069059381193a25e9de8c08fdbd92db982259ae2f",
+      "stage": "tuning",
+      "tested_control_caps": 174,
+      "tested_controls": 44
+    },
+    {
+      "point": "toric13-qbp_ms-p13650-runtime-budget",
+      "last_cap": 31,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.5,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 1.013518955050814,
+      "last_training_ler": 0.98828125,
+      "reference_sha256": "34248c2b4ae0779781114495f4bdb460f99d0ebec166ace154e0950bef3578ab",
+      "stage": "tuning",
+      "tested_control_caps": 36,
+      "tested_controls": 4
+    },
+    {
+      "point": "toric15-binary_ms-p11000-runtime-budget",
+      "last_cap": 562,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.5,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 0.995664515098457,
+      "last_training_ler": 1.0,
+      "reference_sha256": "786ca5cf1689df7c2fb28471f85b9e910611b45c0db039dfcba1ce7f544c44de",
+      "stage": "tuning",
+      "tested_control_caps": 19,
+      "tested_controls": 4
+    },
+    {
+      "point": "toric11-binary_ms-p09500-runtime-budget",
+      "last_cap": 302,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "constant",
+        "beta": 0.5,
+        "damping": 0.3
+      },
+      "last_runtime_ratio": 1.0229822784662366,
+      "last_training_ler": 0.98046875,
+      "reference_sha256": "435dbf12badd619eb4c81e228958153ef7f3bd0088a1bd7a41744d31b6355718",
+      "stage": "tuning",
+      "tested_control_caps": 177,
+      "tested_controls": 32
+    },
+    {
+      "point": "toric13-binary_ms-p10900-runtime-budget",
+      "last_cap": 338,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "constant",
+        "beta": 0.5,
+        "damping": 0.3
+      },
+      "last_runtime_ratio": 0.9237604417232359,
+      "last_training_ler": 1.0,
+      "reference_sha256": "1c544c0896838ac08211d21746f0d10aa45375dcc310295a88106377468ea2b2",
+      "stage": "tuning",
+      "tested_control_caps": 97,
+      "tested_controls": 32
+    },
+    {
+      "point": "toric13-qbp_ms-p14250-runtime-budget",
+      "last_cap": 33,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.25,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 1.0177285286440865,
+      "last_training_ler": 0.98828125,
+      "reference_sha256": "97103b0f14c1a77a2668032172b14b856c8909b8c87c82955ee47f93e6f92a72",
+      "stage": "tuning",
+      "tested_control_caps": 27,
+      "tested_controls": 3
+    },
+    {
+      "point": "toric13-qbp_ms-p16500-runtime-budget",
+      "last_cap": 33,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.0,
+        "damping": 0.3
+      },
+      "last_runtime_ratio": 1.0129376758388149,
+      "last_training_ler": 0.91015625,
+      "reference_sha256": "ca2535e3b65409d363265a4168e0fcb1691bba1295be0aa49b3f9e4d8e2663cb",
+      "stage": "tuning",
+      "tested_control_caps": 9,
+      "tested_controls": 1
+    },
+    {
+      "point": "toric15-binary_ms-p05000-runtime-budget",
+      "last_cap": 562,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.0,
+        "damping": 0.5
+      },
+      "last_runtime_ratio": 1.0061352608726062,
+      "last_training_ler": 0.765625,
+      "reference_sha256": "7ab16ebabd9b2ca960be95223c36487ed55534229eed6de54bb9fa3f8fa42125",
+      "stage": "tuning",
+      "tested_control_caps": 6,
+      "tested_controls": 1
+    },
+    {
+      "point": "toric15-qbp_ms-p06000-runtime-budget",
+      "last_cap": 56,
+      "last_controls": {
+        "alpha": 1.0,
+        "alpha_mode": "paper",
+        "beta": 0.25,
+        "damping": 0.0
+      },
+      "last_runtime_ratio": 0.9756951817189993,
+      "last_training_ler": 0.58984375,
+      "reference_sha256": "4e3ecd1ba02ec6c707f5bf422099aec2fcecb1e40a9b7671968cea3f39dfe884",
+      "stage": "tuning",
+      "tested_control_caps": 27,
+      "tested_controls": 3
+    }
+  ],
+  "scope": "production tuning started; no new confirmed LERs claimed; calibration/confirmation/source identities remain frozen"
+}
