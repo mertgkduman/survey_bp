@@ -134,6 +134,14 @@ def extend_catalog(catalog: dict[str, Any], registry: dict[str, Any], repository
                     item["asset"] = asset(item["asset"])
                 if "assets" in item:
                     item["assets"] = [asset(a) for a in item["assets"]]
+                if kind == "papers":
+                    # Independent studies may cite the same exact source.
+                    existing = next((p for p in result.get("papers", [])
+                                     if p.get("paper_id") == item.get("paper_id")), None)
+                    if existing is not None:
+                        if existing != item:
+                            raise ValueError(f"conflicting paper metadata: {item.get('paper_id')}")
+                        continue
                 result.setdefault(kind, []).append(item)
         result["extension_sources"].append({"path": relative, "sha256": sha256(path.read_bytes()).hexdigest()})
     return validate_catalog(result)

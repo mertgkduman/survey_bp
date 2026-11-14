@@ -38,7 +38,8 @@ def verify(url,output):
     output.mkdir(parents=True,exist_ok=False);checks=[];errors=[]
     catalog=json.loads((ROOT/'web/research/catalog.json').read_text())
     # Isolate this synthetic eligibility fixture even after real publication.
-    catalog['result_series']=[s for s in catalog['result_series'] if s['dataset_id']!='roffe-2020-figure3-canonical-bp']
+    catalog['result_series']=[s for s in catalog['result_series'] if s['dataset_id'] not in
+                              {'roffe-2020-figure3-canonical-bp', 'roffe-damping-confirmation'}]
     future=overlay(catalog)
     with sync_playwright() as p:
         browser=p.chromium.launch();page=browser.new_page(accept_downloads=True,viewport={'width':1512,'height':1100})

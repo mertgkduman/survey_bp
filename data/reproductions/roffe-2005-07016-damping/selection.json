@@ -1,0 +1,739 @@
+{
+  "discordance_tail_probability": 2.7304499781564004e-06,
+  "plan_sha256": "35ae5a9eb0bbe6c0cb8d78276708c61718d5435809efe108b589551a2c574104",
+  "schema": "bp-damping-selection-v1",
+  "selected": [
+    {
+      "base_arm": "binary_ms",
+      "candidates": [
+        {
+          "damping": 0.0,
+          "eligible": false,
+          "mean_iterations": 211.16388811383928,
+          "mean_ler": 0.8717912946428571,
+          "paired_regret_upper": 0.1354932373886833
+        },
+        {
+          "damping": 0.1,
+          "eligible": false,
+          "mean_iterations": 204.30821010044642,
+          "mean_ler": 0.8377162388392857,
+          "paired_regret_upper": 0.09832665782635934
+        },
+        {
+          "damping": 0.3,
+          "eligible": true,
+          "mean_iterations": 196.25864955357142,
+          "mean_ler": 0.7823311941964286,
+          "paired_regret_upper": 0.03523157430325859
+        },
+        {
+          "damping": 0.5,
+          "eligible": true,
+          "mean_iterations": 195.12733677455358,
+          "mean_ler": 0.7817034040178571,
+          "paired_regret_upper": 0.0
+        },
+        {
+          "damping": 0.7,
+          "eligible": true,
+          "mean_iterations": 198.23154994419642,
+          "mean_ler": 0.7877022879464286,
+          "paired_regret_upper": 0.041091939490127787
+        },
+        {
+          "damping": 0.85,
+          "eligible": true,
+          "mean_iterations": 204.71240234375,
+          "mean_ler": 0.8127790178571429,
+          "paired_regret_upper": 0.0688875500540028
+        },
+        {
+          "damping": 0.95,
+          "eligible": false,
+          "mean_iterations": 209.95033482142858,
+          "mean_ler": 0.8451102120535714,
+          "paired_regret_upper": 0.10426172455438064
+        }
+      ],
+      "code": "toric11",
+      "damping": 0.5,
+      "empirical_best_damping": 0.5,
+      "mean_iterations": 195.12733677455358,
+      "mean_ler": 0.7817034040178571,
+      "paired_regret_upper": 0.0,
+      "rates": [
+        0.01,
+        0.02,
+        0.03,
+        0.04,
+        0.05,
+        0.06,
+        0.07,
+        0.08,
+        0.09,
+        0.091,
+        0.092,
+        0.093,
+        0.094,
+        0.095,
+        0.096,
+        0.097,
+        0.098,
+        0.099,
+        0.1,
+        0.101,
+        0.102,
+        0.103,
+        0.105,
+        0.106,
+        0.107,
+        0.108,
+        0.109,
+        0.11
+      ],
+      "similarity_margin": 0.07817034040178572,
+      "speed_tie_certified": false
+    },
+    {
+      "base_arm": "qbp_ms",
+      "candidates": [
+        {
+          "damping": 0.0,
+          "eligible": false,
+          "mean_iterations": 191.30259486607142,
+          "mean_ler": 0.7802385602678571,
+          "paired_regret_upper": 0.3188488561780748
+        },
+        {
+          "damping": 0.1,
+          "eligible": true,
+          "mean_iterations": 139.81581333705358,
+          "mean_ler": 0.5347726004464286,
+          "paired_regret_upper": 0.047617074695822194
+        },
+        {
+          "damping": 0.3,
+          "eligible": true,
+          "mean_iterations": 135.59270368303572,
+          "mean_ler": 0.529052734375,
+          "paired_regret_upper": 0.030378403823522773
+        },
+        {
+          "damping": 0.5,
+          "eligible": true,
+          "mean_iterations": 136.48353794642858,
+          "mean_ler": 0.5284946986607143,
+          "paired_regret_upper": 0.0
+        },
+        {
+          "damping": 0.7,
+          "eligible": true,
+          "mean_iterations": 140.99257114955358,
+          "mean_ler": 0.5321219308035714,
+          "paired_regret_upper": 0.03126284174681602
+        },
+        {
+          "damping": 0.85,
+          "eligible": true,
+          "mean_iterations": 151.46784319196428,
+          "mean_ler": 0.546142578125,
+          "paired_regret_upper": 0.05172374834854874
+        },
+        {
+          "damping": 0.95,
+          "eligible": false,
+          "mean_iterations": 178.49466378348214,
+          "mean_ler": 0.612548828125,
+          "paired_regret_upper": 0.13245056323192503
+        }
+      ],
+      "code": "toric11",
+      "damping": 0.3,
+      "empirical_best_damping": 0.5,
+      "mean_iterations": 135.59270368303572,
+      "mean_ler": 0.529052734375,
+      "paired_regret_upper": 0.030378403823522773,
+      "rates": [
+        0.01,
+        0.02,
+        0.03,
+        0.04,
+        0.05,
+        0.06,
+        0.07,
+        0.08,
+        0.09,
+        0.091,
+        0.092,
+        0.093,
+        0.094,
+        0.095,
+        0.096,
+        0.097,
+        0.098,
+        0.099,
+        0.1,
+        0.101,
+        0.102,
+        0.103,
+        0.105,
+        0.106,
+        0.107,
+        0.108,
+        0.109,
+        0.11
+      ],
+      "similarity_margin": 0.05284946986607143,
+      "speed_tie_certified": true
+    },
+    {
+      "base_arm": "binary_ms",
+      "candidates": [
+        {
+          "damping": 0.0,
+          "eligible": false,
+          "mean_iterations": 305.23971121651783,
+          "mean_ler": 0.9023088727678571,
+          "paired_regret_upper": 0.09461179854345873
+        },
+        {
+          "damping": 0.1,
+          "eligible": true,
+          "mean_iterations": 299.2374790736607,
+          "mean_ler": 0.8556431361607143,
+          "paired_regret_upper": 0.04089491575520313
+        },
+        {
+          "damping": 0.3,
+          "eligible": true,
+          "mean_iterations": 291.04990931919644,
+          "mean_ler": 0.8463309151785714,
+          "paired_regret_upper": 0.030405537903604857
+        },
+        {
+          "damping": 0.5,
+          "eligible": true,
+          "mean_iterations": 290.0167759486607,
+          "mean_ler": 0.844482421875,
+          "paired_regret_upper": 0.0
+        },
+        {
+          "damping": 0.7,
+          "eligible": true,
+          "mean_iterations": 292.50313895089283,
+          "mean_ler": 0.8490862165178571,
+          "paired_regret_upper": 0.03380625798552706
+        },
+        {
+          "damping": 0.85,
+          "eligible": true,
+          "mean_iterations": 297.08890206473217,
+          "mean_ler": 0.8527483258928571,
+          "paired_regret_upper": 0.03747332415645632
+        },
+        {
+          "damping": 0.95,
+          "eligible": true,
+          "mean_iterations": 302.947998046875,
+          "mean_ler": 0.8839983258928571,
+          "paired_regret_upper": 0.07330095181478342
+        }
+      ],
+      "code": "toric13",
+      "damping": 0.5,
+      "empirical_best_damping": 0.5,
+      "mean_iterations": 290.0167759486607,
+      "mean_ler": 0.844482421875,
+      "paired_regret_upper": 0.0,
+      "rates": [
+        0.01,
+        0.02,
+        0.03,
+        0.04,
+        0.05,
+        0.06,
+        0.07,
+        0.08,
+        0.09,
+        0.091,
+        0.092,
+        0.093,
+        0.094,
+        0.095,
+        0.096,
+        0.098,
+        0.099,
+        0.1,
+        0.101,
+        0.102,
+        0.103,
+        0.104,
+        0.105,
+        0.106,
+        0.107,
+        0.108,
+        0.109,
+        0.11
+      ],
+      "similarity_margin": 0.08444824218750001,
+      "speed_tie_certified": false
+    },
+    {
+      "base_arm": "qbp_ms",
+      "candidates": [
+        {
+          "damping": 0.0,
+          "eligible": false,
+          "mean_iterations": 286.9889439174107,
+          "mean_ler": 0.8432268415178571,
+          "paired_regret_upper": 0.28560030913999335
+        },
+        {
+          "damping": 0.1,
+          "eligible": true,
+          "mean_iterations": 221.75809151785714,
+          "mean_ler": 0.6231166294642857,
+          "paired_regret_upper": 0.042595472543025946
+        },
+        {
+          "damping": 0.3,
+          "eligible": true,
+          "mean_iterations": 217.19154575892858,
+          "mean_ler": 0.6194196428571429,
+          "paired_regret_upper": 0.0
+        },
+        {
+          "damping": 0.5,
+          "eligible": true,
+          "mean_iterations": 218.06473214285714,
+          "mean_ler": 0.6199428013392857,
+          "paired_regret_upper": 0.029458231024455734
+        },
+        {
+          "damping": 0.7,
+          "eligible": true,
+          "mean_iterations": 222.25230189732142,
+          "mean_ler": 0.6227329799107143,
+          "paired_regret_upper": 0.03684787682881572
+        },
+        {
+          "damping": 0.85,
+          "eligible": true,
+          "mean_iterations": 231.55618722098214,
+          "mean_ler": 0.6304408482142857,
+          "paired_regret_upper": 0.0473287993432009
+        },
+        {
+          "damping": 0.95,
+          "eligible": false,
+          "mean_iterations": 257.84720284598217,
+          "mean_ler": 0.6683523995535714,
+          "paired_regret_upper": 0.09268969509387621
+        }
+      ],
+      "code": "toric13",
+      "damping": 0.3,
+      "empirical_best_damping": 0.3,
+      "mean_iterations": 217.19154575892858,
+      "mean_ler": 0.6194196428571429,
+      "paired_regret_upper": 0.0,
+      "rates": [
+        0.01,
+        0.02,
+        0.03,
+        0.04,
+        0.05,
+        0.06,
+        0.07,
+        0.08,
+        0.09,
+        0.091,
+        0.092,
+        0.093,
+        0.094,
+        0.095,
+        0.096,
+        0.098,
+        0.099,
+        0.1,
+        0.101,
+        0.102,
+        0.103,
+        0.104,
+        0.105,
+        0.106,
+        0.107,
+        0.108,
+        0.109,
+        0.11
+      ],
+      "similarity_margin": 0.061941964285714295,
+      "speed_tie_certified": false
+    },
+    {
+      "base_arm": "binary_ms",
+      "candidates": [
+        {
+          "damping": 0.0,
+          "eligible": true,
+          "mean_iterations": 414.50962611607144,
+          "mean_ler": 0.920654296875,
+          "paired_regret_upper": 0.06809133432453553
+        },
+        {
+          "damping": 0.1,
+          "eligible": true,
+          "mean_iterations": 407.06881277901783,
+          "mean_ler": 0.8849400111607143,
+          "paired_regret_upper": 0.026209048450610627
+        },
+        {
+          "damping": 0.3,
+          "eligible": true,
+          "mean_iterations": 401.26175362723217,
+          "mean_ler": 0.8833356584821429,
+          "paired_regret_upper": 0.023379334514867168
+        },
+        {
+          "damping": 0.5,
+          "eligible": true,
+          "mean_iterations": 400.3011997767857,
+          "mean_ler": 0.8815220424107143,
+          "paired_regret_upper": 0.0
+        },
+        {
+          "damping": 0.7,
+          "eligible": true,
+          "mean_iterations": 402.90384347098217,
+          "mean_ler": 0.886474609375,
+          "paired_regret_upper": 0.027839703990404207
+        },
+        {
+          "damping": 0.85,
+          "eligible": true,
+          "mean_iterations": 406.0906459263393,
+          "mean_ler": 0.8878348214285714,
+          "paired_regret_upper": 0.028648648985663404
+        },
+        {
+          "damping": 0.95,
+          "eligible": true,
+          "mean_iterations": 412.22495814732144,
+          "mean_ler": 0.9098772321428571,
+          "paired_regret_upper": 0.05529964478949695
+        }
+      ],
+      "code": "toric15",
+      "damping": 0.5,
+      "empirical_best_damping": 0.5,
+      "mean_iterations": 400.3011997767857,
+      "mean_ler": 0.8815220424107143,
+      "paired_regret_upper": 0.0,
+      "rates": [
+        0.01,
+        0.02,
+        0.03,
+        0.04,
+        0.05,
+        0.06,
+        0.07,
+        0.08,
+        0.09,
+        0.091,
+        0.092,
+        0.093,
+        0.094,
+        0.096,
+        0.097,
+        0.098,
+        0.099,
+        0.1,
+        0.101,
+        0.102,
+        0.103,
+        0.104,
+        0.105,
+        0.106,
+        0.107,
+        0.108,
+        0.109,
+        0.11
+      ],
+      "similarity_margin": 0.08815220424107144,
+      "speed_tie_certified": false
+    },
+    {
+      "base_arm": "qbp_ms",
+      "candidates": [
+        {
+          "damping": 0.0,
+          "eligible": false,
+          "mean_iterations": 396.13950892857144,
+          "mean_ler": 0.8774065290178571,
+          "paired_regret_upper": 0.2445942264596054
+        },
+        {
+          "damping": 0.1,
+          "eligible": true,
+          "mean_iterations": 322.19241768973217,
+          "mean_ler": 0.6914411272321429,
+          "paired_regret_upper": 0.03957669883303138
+        },
+        {
+          "damping": 0.3,
+          "eligible": true,
+          "mean_iterations": 316.7568359375,
+          "mean_ler": 0.6872209821428571,
+          "paired_regret_upper": 0.0
+        },
+        {
+          "damping": 0.5,
+          "eligible": true,
+          "mean_iterations": 317.52047293526783,
+          "mean_ler": 0.6881975446428571,
+          "paired_regret_upper": 0.02705652249224692
+        },
+        {
+          "damping": 0.7,
+          "eligible": true,
+          "mean_iterations": 321.00938197544644,
+          "mean_ler": 0.6906040736607143,
+          "paired_regret_upper": 0.033443852709511016
+        },
+        {
+          "damping": 0.85,
+          "eligible": true,
+          "mean_iterations": 329.19900948660717,
+          "mean_ler": 0.6954868861607143,
+          "paired_regret_upper": 0.04064134670224876
+        },
+        {
+          "damping": 0.95,
+          "eligible": true,
+          "mean_iterations": 353.1663295200893,
+          "mean_ler": 0.7169363839285714,
+          "paired_regret_upper": 0.06803279020409037
+        }
+      ],
+      "code": "toric15",
+      "damping": 0.3,
+      "empirical_best_damping": 0.3,
+      "mean_iterations": 316.7568359375,
+      "mean_ler": 0.6872209821428571,
+      "paired_regret_upper": 0.0,
+      "rates": [
+        0.01,
+        0.02,
+        0.03,
+        0.04,
+        0.05,
+        0.06,
+        0.07,
+        0.08,
+        0.09,
+        0.091,
+        0.092,
+        0.093,
+        0.094,
+        0.096,
+        0.097,
+        0.098,
+        0.099,
+        0.1,
+        0.101,
+        0.102,
+        0.103,
+        0.104,
+        0.105,
+        0.106,
+        0.107,
+        0.108,
+        0.109,
+        0.11
+      ],
+      "similarity_margin": 0.06872209821428571,
+      "speed_tie_certified": false
+    },
+    {
+      "base_arm": "binary_ms",
+      "candidates": [
+        {
+          "damping": 0.0,
+          "eligible": false,
+          "mean_iterations": 128.4762109375,
+          "mean_ler": 0.7937109375,
+          "paired_regret_upper": 0.17986921392986693
+        },
+        {
+          "damping": 0.1,
+          "eligible": false,
+          "mean_iterations": 120.913203125,
+          "mean_ler": 0.7373046875,
+          "paired_regret_upper": 0.11796109232123729
+        },
+        {
+          "damping": 0.3,
+          "eligible": true,
+          "mean_iterations": 115.8439453125,
+          "mean_ler": 0.666171875,
+          "paired_regret_upper": 0.0
+        },
+        {
+          "damping": 0.5,
+          "eligible": true,
+          "mean_iterations": 114.78796875,
+          "mean_ler": 0.6681640625,
+          "paired_regret_upper": 0.04180327196919581
+        },
+        {
+          "damping": 0.7,
+          "eligible": true,
+          "mean_iterations": 118.3281640625,
+          "mean_ler": 0.6805078125,
+          "paired_regret_upper": 0.056719619773136234
+        },
+        {
+          "damping": 0.85,
+          "eligible": false,
+          "mean_iterations": 123.1430078125,
+          "mean_ler": 0.7341015625,
+          "paired_regret_upper": 0.11756097494908305
+        },
+        {
+          "damping": 0.95,
+          "eligible": false,
+          "mean_iterations": 130.110078125,
+          "mean_ler": 0.765625,
+          "paired_regret_upper": 0.14875331855854232
+        }
+      ],
+      "code": "toric9",
+      "damping": 0.5,
+      "empirical_best_damping": 0.3,
+      "mean_iterations": 114.78796875,
+      "mean_ler": 0.6681640625,
+      "paired_regret_upper": 0.04180327196919581,
+      "rates": [
+        0.01,
+        0.02,
+        0.03,
+        0.04,
+        0.05,
+        0.06,
+        0.07,
+        0.08,
+        0.09,
+        0.091,
+        0.093,
+        0.094,
+        0.095,
+        0.099,
+        0.1,
+        0.101,
+        0.102,
+        0.103,
+        0.104,
+        0.105,
+        0.106,
+        0.107,
+        0.108,
+        0.109,
+        0.11
+      ],
+      "similarity_margin": 0.0666171875,
+      "speed_tie_certified": true
+    },
+    {
+      "base_arm": "qbp_ms",
+      "candidates": [
+        {
+          "damping": 0.0,
+          "eligible": false,
+          "mean_iterations": 110.9338671875,
+          "mean_ler": 0.669453125,
+          "paired_regret_upper": 0.32256424698150965
+        },
+        {
+          "damping": 0.1,
+          "eligible": false,
+          "mean_iterations": 76.603203125,
+          "mean_ler": 0.423984375,
+          "paired_regret_upper": 0.04546895696340757
+        },
+        {
+          "damping": 0.3,
+          "eligible": true,
+          "mean_iterations": 73.1351953125,
+          "mean_ler": 0.4157421875,
+          "paired_regret_upper": 0.0
+        },
+        {
+          "damping": 0.5,
+          "eligible": true,
+          "mean_iterations": 74.48234375,
+          "mean_ler": 0.4159765625,
+          "paired_regret_upper": 0.028991832359313973
+        },
+        {
+          "damping": 0.7,
+          "eligible": true,
+          "mean_iterations": 79.10703125,
+          "mean_ler": 0.422734375,
+          "paired_regret_upper": 0.04041506436596897
+        },
+        {
+          "damping": 0.85,
+          "eligible": false,
+          "mean_iterations": 89.0438671875,
+          "mean_ler": 0.4416796875,
+          "paired_regret_upper": 0.06486720886834961
+        },
+        {
+          "damping": 0.95,
+          "eligible": false,
+          "mean_iterations": 113.1124609375,
+          "mean_ler": 0.543828125,
+          "paired_regret_upper": 0.18345766301393254
+        }
+      ],
+      "code": "toric9",
+      "damping": 0.3,
+      "empirical_best_damping": 0.3,
+      "mean_iterations": 73.1351953125,
+      "mean_ler": 0.4157421875,
+      "paired_regret_upper": 0.0,
+      "rates": [
+        0.01,
+        0.02,
+        0.03,
+        0.04,
+        0.05,
+        0.06,
+        0.07,
+        0.08,
+        0.09,
+        0.091,
+        0.093,
+        0.094,
+        0.095,
+        0.099,
+        0.1,
+        0.101,
+        0.102,
+        0.103,
+        0.104,
+        0.105,
+        0.106,
+        0.107,
+        0.108,
+        0.109,
+        0.11
+      ],
+      "similarity_margin": 0.04157421875,
+      "speed_tie_certified": false
+    }
+  ],
+  "status": "provisional selection; confirmation required; no equivalence inferred from overlapping intervals",
+  "tuning_receipt_sha256": "b02e1c562f8272fa4c45a6054f57923b41860f1b9c15f10c2c17733a08c4415d"
+}

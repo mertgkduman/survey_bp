@@ -1,0 +1,171 @@
+{
+  "claim_limit": "Descriptive independent confirmation at 20 failures per point; no simultaneous superiority test. Compare damping within a channel. Binary BP uses X-only; Q-BP uses depolarizing p=1.5*p_X. Dense high-noise source grids dominate equal-rate averages; they are not pooled-shot estimates or thresholds. Paper ordinates describe ordinary undamped binary BP only.",
+  "comparisons": [
+    {
+      "code": "toric9",
+      "damping": 0.5,
+      "equal_rate_means": {
+        "baseline": {
+          "iterations": 130.67390512650275,
+          "ler": 0.8048951492903288
+        },
+        "selected": {
+          "iterations": 116.53917254441498,
+          "ler": 0.6735805874574904
+        }
+      },
+      "family": "binary_ms",
+      "iteration_reduction_fraction": 0.10816798172828934,
+      "ler_reduction_fraction": 0.16314492881292386,
+      "lower_point_estimates": 23,
+      "rates": 25
+    },
+    {
+      "code": "toric9",
+      "damping": 0.3,
+      "equal_rate_means": {
+        "baseline": {
+          "iterations": 111.98984777242606,
+          "ler": 0.6696857006499974
+        },
+        "selected": {
+          "iterations": 76.24248329877007,
+          "ler": 0.43432861809427187
+        }
+      },
+      "family": "qbp_ms",
+      "iteration_reduction_fraction": 0.3192018311007798,
+      "ler_reduction_fraction": 0.35144409135104393,
+      "lower_point_estimates": 25,
+      "rates": 25
+    },
+    {
+      "code": "toric11",
+      "damping": 0.5,
+      "equal_rate_means": {
+        "baseline": {
+          "iterations": 209.42905921978263,
+          "ler": 0.8634183898277176
+        },
+        "selected": {
+          "iterations": 198.3438974498246,
+          "ler": 0.8012116846113172
+        }
+      },
+      "family": "binary_ms",
+      "iteration_reduction_fraction": 0.05293038994328314,
+      "ler_reduction_fraction": 0.07204700056112168,
+      "lower_point_estimates": 21,
+      "rates": 28
+    },
+    {
+      "code": "toric11",
+      "damping": 0.3,
+      "equal_rate_means": {
+        "baseline": {
+          "iterations": 193.90880818789088,
+          "ler": 0.7935386262704197
+        },
+        "selected": {
+          "iterations": 142.15090219452853,
+          "ler": 0.5614432300576488
+        }
+      },
+      "family": "qbp_ms",
+      "iteration_reduction_fraction": 0.26691879794965656,
+      "ler_reduction_fraction": 0.2924815359065812,
+      "lower_point_estimates": 28,
+      "rates": 28
+    },
+    {
+      "code": "toric13",
+      "damping": 0.5,
+      "equal_rate_means": {
+        "baseline": {
+          "iterations": 306.00760688219145,
+          "ler": 0.9043683294419187
+        },
+        "selected": {
+          "iterations": 289.7044001565951,
+          "ler": 0.8490276239454495
+        }
+      },
+      "family": "binary_ms",
+      "iteration_reduction_fraction": 0.053277128930565576,
+      "ler_reduction_fraction": 0.06119266198830697,
+      "lower_point_estimates": 19,
+      "rates": 28
+    },
+    {
+      "code": "toric13",
+      "damping": 0.3,
+      "equal_rate_means": {
+        "baseline": {
+          "iterations": 286.7117772461036,
+          "ler": 0.8419248459246711
+        },
+        "selected": {
+          "iterations": 222.61942058583423,
+          "ler": 0.6362672194350338
+        }
+      },
+      "family": "qbp_ms",
+      "iteration_reduction_fraction": 0.22354281109720409,
+      "ler_reduction_fraction": 0.24427076536002112,
+      "lower_point_estimates": 26,
+      "rates": 28
+    },
+    {
+      "code": "toric15",
+      "damping": 0.5,
+      "equal_rate_means": {
+        "baseline": {
+          "iterations": 416.88501222239563,
+          "ler": 0.9260023726555167
+        },
+        "selected": {
+          "iterations": 404.8058172025157,
+          "ler": 0.8941106497169621
+        }
+      },
+      "family": "binary_ms",
+      "iteration_reduction_fraction": 0.028974884358366038,
+      "ler_reduction_fraction": 0.034440217304301246,
+      "lower_point_estimates": 12,
+      "rates": 28
+    },
+    {
+      "code": "toric15",
+      "damping": 0.3,
+      "equal_rate_means": {
+        "baseline": {
+          "iterations": 400.82902275189326,
+          "ler": 0.8883077549638202
+        },
+        "selected": {
+          "iterations": 322.9482743617381,
+          "ler": 0.7036203155674399
+        }
+      },
+      "family": "qbp_ms",
+      "iteration_reduction_fraction": 0.19429917488375614,
+      "ler_reduction_fraction": 0.2079092953589068,
+      "lower_point_estimates": 23,
+      "rates": 28
+    }
+  ],
+  "confirmation_failures": 8720,
+  "confirmation_points": 436,
+  "confirmation_shots": 47473,
+  "hashes": {
+    "data/reproductions/roffe-2005-07016-bp/source_points.json": "5966c842a485cd76368879c024750442221de80323cc21de4e5f4460ffa97b4f",
+    "data/reproductions/roffe-2005-07016-damping/confirmation/plan.json": "1bb2f08aa0c4706f6bfbfe95d710386ac7108ad9252193d8119c7dab4d56868f",
+    "data/reproductions/roffe-2005-07016-damping/confirmation/verified.json": "ce93347ae032d24b8f05444c22dca4c51e660c4e9cecd46d90cf1939a6d6e6a5",
+    "data/reproductions/roffe-2005-07016-damping/plan.json": "35ae5a9eb0bbe6c0cb8d78276708c61718d5435809efe108b589551a2c574104",
+    "data/reproductions/roffe-2005-07016-damping/selection.json": "50b279f9c7f91190db942dfa6e10879cc30f38ec6073e1c392b94d2663cc81c9",
+    "data/reproductions/roffe-2005-07016-damping/verified.json": "b02e1c562f8272fa4c45a6054f57923b41860f1b9c15f10c2c17733a08c4415d"
+  },
+  "schema": "roffe-heldout-damping-assessment-v1",
+  "training_points": 1526,
+  "training_shots": 1562624
+}

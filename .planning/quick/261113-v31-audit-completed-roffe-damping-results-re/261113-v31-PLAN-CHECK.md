@@ -1,0 +1,3 @@
+# Inline plan check
+
+PASS. Failure occurs only after full confirmation audit and normalization: the final catalog merge appends identical Roffe paper records twice. An idempotent exact-equality rule for papers fixes future multi-study rebuilds without changing scientific evidence or weakening conflicting-identity checks. catalog_model.py is not pinned by these studies; canonical/runtime/publisher files remain frozen. Descriptive same-channel holdout comparisons, independent interval/count/work checks, full CSV and browser verification are appropriate; no new simulation or hyperparameter selection is needed.

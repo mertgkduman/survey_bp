@@ -1,0 +1,58 @@
+{
+  "browser_workflow_groups_passed": 16,
+  "claim_limit": "Descriptive independent confirmation at 20 failures per point; no simultaneous superiority test. Compare damping within a channel. Binary BP uses X-only; Q-BP uses depolarizing p=1.5*p_X. Dense high-noise source grids dominate equal-rate averages; they are not pooled-shot estimates or thresholds. Paper ordinates describe ordinary undamped binary BP only.",
+  "confirmation_logical_failures": 8720,
+  "confirmation_points": 436,
+  "confirmation_shots": 47473,
+  "full_endpoint_audit": "original complete436-point automatic receipt; SHA256 in assessment.json",
+  "independent_assessment_hashes": {
+    "data/reproductions/roffe-2005-07016-bp/source_points.json": "5966c842a485cd76368879c024750442221de80323cc21de4e5f4460ffa97b4f",
+    "data/reproductions/roffe-2005-07016-damping/confirmation/plan.json": "1bb2f08aa0c4706f6bfbfe95d710386ac7108ad9252193d8119c7dab4d56868f",
+    "data/reproductions/roffe-2005-07016-damping/confirmation/verified.json": "ce93347ae032d24b8f05444c22dca4c51e660c4e9cecd46d90cf1939a6d6e6a5",
+    "data/reproductions/roffe-2005-07016-damping/plan.json": "35ae5a9eb0bbe6c0cb8d78276708c61718d5435809efe108b589551a2c574104",
+    "data/reproductions/roffe-2005-07016-damping/selection.json": "50b279f9c7f91190db942dfa6e10879cc30f38ec6073e1c392b94d2663cc81c9",
+    "data/reproductions/roffe-2005-07016-damping/verified.json": "b02e1c562f8272fa4c45a6054f57923b41860f1b9c15f10c2c17733a08c4415d"
+  },
+  "observed_utc": "2026-11-14T03:32:52.253587+00:00",
+  "old_raw_series_unchanged": 165,
+  "original_final_collector": {
+    "id": "61794901",
+    "state": "failed after full audit/normalization at duplicate paper catalog refresh"
+  },
+  "public_counts_after": {
+    "circuits": 0,
+    "codes": 12,
+    "curves": 104,
+    "points": 1073
+  },
+  "public_counts_before": {
+    "circuits": 0,
+    "codes": 12,
+    "curves": 88,
+    "points": 637
+  },
+  "publication_repair": "idempotent equal paper records in catalog_model; refreshed successfully from completed evidence",
+  "redundant_controller_retry": {
+    "exit_code": 143,
+    "reason": "terminated by execution environment; original receipt unchanged"
+  },
+  "repeat_full_ledger_validation": {
+    "points": 436,
+    "status": "passed"
+  },
+  "schema": "roffe-damping-completion-status-v1",
+  "selected_damping": {
+    "toric11:binary_ms": 0.5,
+    "toric11:qbp_ms": 0.3,
+    "toric13:binary_ms": 0.5,
+    "toric13:qbp_ms": 0.3,
+    "toric15:binary_ms": 0.5,
+    "toric15:qbp_ms": 0.3,
+    "toric9:binary_ms": 0.5,
+    "toric9:qbp_ms": 0.3
+  },
+  "status": "audited_published",
+  "tests_passed": 62,
+  "training_shots": 1562624,
+  "tuning_points": 1526
+}

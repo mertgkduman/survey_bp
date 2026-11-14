@@ -41,6 +41,38 @@ def test_catalog_extension_cannot_escape_repository(tmp_path):
         extend_catalog({}, {"normalized_catalogs": ["../outside.json"]}, tmp_path)
 
 
+def test_independent_studies_share_identical_paper_without_merging_datasets(tmp_path):
+    base = {kind: [] for kind in ("papers", "decoders", "codes", "circuits", "experiments", "datasets", "result_series")}
+    paper = {"paper_id": "same-paper", "title": "The same source", "kind": "paper"}
+    for name in ("original", "confirmation"):
+        extension = {"schema": "research-catalog-extension-v1", "papers": [paper],
+                     "datasets": [{"dataset_id": name, "paper_id": paper["paper_id"]}]}
+        (tmp_path / f"{name}.json").write_text(json.dumps(extension))
+    registry = {"normalized_catalogs": ["original.json", "confirmation.json"]}
+    value = extend_catalog(base, registry, tmp_path)
+    assert value["papers"] == [paper]
+    assert [r["dataset_id"] for r in value["datasets"]] == ["original", "confirmation"]
+    assert len(value["extension_sources"]) == 2
+    assert not base["papers"]
+    base["papers"] = [deepcopy(paper)]
+    assert extend_catalog(base, registry, tmp_path)["papers"] == [paper]
+
+
+def test_conflicting_paper_and_duplicate_dataset_remain_invalid(tmp_path):
+    base = {"papers": [{"paper_id": "same-paper", "title": "Original"}], "datasets": []}
+    extension = {"schema": "research-catalog-extension-v1",
+                 "papers": [{"paper_id": "same-paper", "title": "Conflicting"}]}
+    path = tmp_path / "extension.json"
+    path.write_text(json.dumps(extension))
+    with pytest.raises(ValueError, match="conflicting paper metadata: same-paper"):
+        extend_catalog(base, {"normalized_catalogs": [path.name]}, tmp_path)
+    extension["papers"] = deepcopy(base["papers"])
+    extension["datasets"] = [{"dataset_id": "duplicate", "paper_id": "same-paper"}] * 2
+    path.write_text(json.dumps(extension))
+    with pytest.raises(ValueError, match="duplicate dataset_id"):
+        extend_catalog(base, {"normalized_catalogs": [path.name]}, tmp_path)
+
+
 def test_external_large_data_is_a_storage_declaration_not_a_download(tmp_path):
     import subprocess
     subprocess.run(["git", "init", "-q", str(tmp_path)], check=True)
