@@ -16,7 +16,7 @@ campaign = importlib.util.module_from_spec(spec); spec.loader.exec_module(campai
 def overlay(catalog):
     result = deepcopy(catalog); plan = campaign.design()
     result['result_series'] = [s for s in result['result_series'] if s['dataset_id'] not in
-                               {'roffe-2020-figure3-canonical-bp', 'roffe-damping-confirmation', 'roffe-canonical-bp-osd', 'roffe-canonical-bp-osd-fast'}]
+                               {'roffe-2020-figure3-canonical-bp', 'roffe-damping-confirmation', 'roffe-canonical-bp-osd', 'roffe-canonical-bp-osd-fast', 'roffe-joint-controls-runtime-budget'}]
     template = next(s for s in result['result_series'] if len(s['points']) >= 2)
     dataset = deepcopy(next(d for d in result['datasets'] if d['dataset_id'] == template['dataset_id']))
     dataset.update(dataset_id='osd-browser-fixture', label='Synthetic OSD workflow fixture', points=[])

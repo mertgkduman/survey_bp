@@ -1,0 +1,165 @@
+{
+  "points": [
+    {
+      "code": "toric11",
+      "family": "binary_ms",
+      "matched_x_p": 0.02,
+      "mean_ns": 135726.046875,
+      "n": 242,
+      "nonconverged": 10,
+      "ratio": 0.7417181747131418,
+      "reference_ns": 182988.703125
+    },
+    {
+      "code": "toric11",
+      "family": "qbp_ms",
+      "matched_x_p": 0.02,
+      "mean_ns": 216697.734375,
+      "n": 242,
+      "nonconverged": 0,
+      "ratio": 1.1842137283577188,
+      "reference_ns": 182988.703125
+    },
+    {
+      "code": "toric11",
+      "family": "binary_ms",
+      "matched_x_p": 0.08,
+      "mean_ns": 684107.015625,
+      "n": 242,
+      "nonconverged": 57,
+      "ratio": 0.8712171008350663,
+      "reference_ns": 785231.390625
+    },
+    {
+      "code": "toric11",
+      "family": "qbp_ms",
+      "matched_x_p": 0.08,
+      "mean_ns": 3446809.234375,
+      "n": 242,
+      "nonconverged": 29,
+      "ratio": 4.389545903955182,
+      "reference_ns": 785231.390625
+    },
+    {
+      "code": "toric13",
+      "family": "binary_ms",
+      "matched_x_p": 0.02,
+      "mean_ns": 325785.484375,
+      "n": 338,
+      "nonconverged": 13,
+      "ratio": 0.7956422040841902,
+      "reference_ns": 409462.296875
+    },
+    {
+      "code": "toric13",
+      "family": "qbp_ms",
+      "matched_x_p": 0.02,
+      "mean_ns": 1012938.53125,
+      "n": 338,
+      "nonconverged": 3,
+      "ratio": 2.473826134862005,
+      "reference_ns": 409462.296875
+    },
+    {
+      "code": "toric13",
+      "family": "binary_ms",
+      "matched_x_p": 0.08,
+      "mean_ns": 1208343.453125,
+      "n": 338,
+      "nonconverged": 54,
+      "ratio": 0.8513547309057751,
+      "reference_ns": 1419318.421875
+    },
+    {
+      "code": "toric13",
+      "family": "qbp_ms",
+      "matched_x_p": 0.08,
+      "mean_ns": 7193988.640625,
+      "n": 338,
+      "nonconverged": 32,
+      "ratio": 5.068622044038105,
+      "reference_ns": 1419318.421875
+    },
+    {
+      "code": "toric15",
+      "family": "binary_ms",
+      "matched_x_p": 0.02,
+      "mean_ns": 617645.09375,
+      "n": 450,
+      "nonconverged": 14,
+      "ratio": 0.6601622448580482,
+      "reference_ns": 935595.90625
+    },
+    {
+      "code": "toric15",
+      "family": "qbp_ms",
+      "matched_x_p": 0.02,
+      "mean_ns": 757143.765625,
+      "n": 450,
+      "nonconverged": 1,
+      "ratio": 0.8092636581317876,
+      "reference_ns": 935595.90625
+    },
+    {
+      "code": "toric15",
+      "family": "binary_ms",
+      "matched_x_p": 0.08,
+      "mean_ns": 2293414.8125,
+      "n": 450,
+      "nonconverged": 61,
+      "ratio": 0.9261229733871597,
+      "reference_ns": 2476361.0
+    },
+    {
+      "code": "toric15",
+      "family": "qbp_ms",
+      "matched_x_p": 0.08,
+      "mean_ns": 16435792.671875,
+      "n": 450,
+      "nonconverged": 43,
+      "ratio": 6.637074591255072,
+      "reference_ns": 2476361.0
+    },
+    {
+      "code": "toric9",
+      "family": "binary_ms",
+      "matched_x_p": 0.02,
+      "mean_ns": 60854.0,
+      "n": 162,
+      "nonconverged": 7,
+      "ratio": 0.8232919833027135,
+      "reference_ns": 73915.453125
+    },
+    {
+      "code": "toric9",
+      "family": "qbp_ms",
+      "matched_x_p": 0.02,
+      "mean_ns": 100737.796875,
+      "n": 162,
+      "nonconverged": 0,
+      "ratio": 1.3628787028422888,
+      "reference_ns": 73915.453125
+    },
+    {
+      "code": "toric9",
+      "family": "binary_ms",
+      "matched_x_p": 0.08,
+      "mean_ns": 249262.59375,
+      "n": 162,
+      "nonconverged": 35,
+      "ratio": 0.7604886064044855,
+      "reference_ns": 327766.375
+    },
+    {
+      "code": "toric9",
+      "family": "qbp_ms",
+      "matched_x_p": 0.08,
+      "mean_ns": 1904058.390625,
+      "n": 162,
+      "nonconverged": 21,
+      "ratio": 5.809193791233161,
+      "reference_ns": 327766.375
+    }
+  ],
+  "scope": "qualification only,64 fixed shots per arm, not fresh LER evidence; raw events .git/runtime-budget-profile"
+}

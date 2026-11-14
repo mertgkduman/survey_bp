@@ -1,0 +1,109 @@
+{
+  "engine_sha256": "f183a36f7410df888b1e7b562dd71f11a5b2433562fe67d97672fd2ffe25df4c",
+  "exact_terminal_comparisons": 144,
+  "failures": [],
+  "pilot": [
+    {
+      "code": "toric11",
+      "complete_sample_plus_decode_ns": 166426.5625,
+      "family": "binary_ms",
+      "matched_p": 0.02
+    },
+    {
+      "code": "toric11",
+      "complete_sample_plus_decode_ns": 660022.78125,
+      "family": "binary_ms",
+      "matched_p": 0.08
+    },
+    {
+      "code": "toric11",
+      "complete_sample_plus_decode_ns": 326449.1875,
+      "family": "qbp_ms",
+      "matched_p": 0.02
+    },
+    {
+      "code": "toric11",
+      "complete_sample_plus_decode_ns": 3045399.90625,
+      "family": "qbp_ms",
+      "matched_p": 0.08
+    },
+    {
+      "code": "toric13",
+      "complete_sample_plus_decode_ns": 407529.78125,
+      "family": "binary_ms",
+      "matched_p": 0.02
+    },
+    {
+      "code": "toric13",
+      "complete_sample_plus_decode_ns": 1275694.625,
+      "family": "binary_ms",
+      "matched_p": 0.08
+    },
+    {
+      "code": "toric13",
+      "complete_sample_plus_decode_ns": 466285.78125,
+      "family": "qbp_ms",
+      "matched_p": 0.02
+    },
+    {
+      "code": "toric13",
+      "complete_sample_plus_decode_ns": 8148466.4375,
+      "family": "qbp_ms",
+      "matched_p": 0.08
+    },
+    {
+      "code": "toric15",
+      "complete_sample_plus_decode_ns": 759831.6875,
+      "family": "binary_ms",
+      "matched_p": 0.02
+    },
+    {
+      "code": "toric15",
+      "complete_sample_plus_decode_ns": 2239407.0,
+      "family": "binary_ms",
+      "matched_p": 0.08
+    },
+    {
+      "code": "toric15",
+      "complete_sample_plus_decode_ns": 449251.40625,
+      "family": "qbp_ms",
+      "matched_p": 0.02
+    },
+    {
+      "code": "toric15",
+      "complete_sample_plus_decode_ns": 17539470.65625,
+      "family": "qbp_ms",
+      "matched_p": 0.08
+    },
+    {
+      "code": "toric9",
+      "complete_sample_plus_decode_ns": 94850.0,
+      "family": "binary_ms",
+      "matched_p": 0.02
+    },
+    {
+      "code": "toric9",
+      "complete_sample_plus_decode_ns": 247177.96875,
+      "family": "binary_ms",
+      "matched_p": 0.08
+    },
+    {
+      "code": "toric9",
+      "complete_sample_plus_decode_ns": 145832.40625,
+      "family": "qbp_ms",
+      "matched_p": 0.02
+    },
+    {
+      "code": "toric9",
+      "complete_sample_plus_decode_ns": 1533667.4375,
+      "family": "qbp_ms",
+      "matched_p": 0.08
+    }
+  ],
+  "scope": "binary and joint-Pauli min-sum; both scaling schedules; damping/scale/offset combined; exact candidate/belief/stopping correspondence; no shortcut on zero syndrome; final n-cap checks on each code/family/rate",
+  "status": "passed",
+  "stopping_cases": {
+    "capped": 72,
+    "converged": 56
+  }
+}

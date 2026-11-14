@@ -10,6 +10,15 @@ pytestmark=pytest.mark.skipif(shutil.which("node") is None, reason="JavaScript f
 ROOT=Path(__file__).resolve().parents[2]
 
 
+@pytest.mark.parametrize('mode,alpha,expected', [('constant', .75, 'α = 0.75'), ('1-2**(-iteration)', .9, 'αₜ = 0.9 × (1 − 2⁻ᵗ)')])
+def test_joint_tuned_scale_and_offset_are_explicit(mode, alpha, expected):
+    config = {'family': 'binary_css', 'check_rule': 'min_sum', 'v2c_damping': .5,
+              'max_iterations': 324, 'alpha_schedule': mode, 'alpha': alpha, 'beta': .25}
+    script = "require('./web/research/decoder-display.js');console.log(DecoderDisplay.describe({configuration:{effective_configuration:JSON.parse(process.argv[1])}}).label);"
+    label = subprocess.check_output(['node', '-e', script, json.dumps(config)], cwd=ROOT, text=True)
+    assert expected in label and 'β = 0.25' in label and 'T = 324' in label and 'd = 0.5' in label
+
+
 def display():
     code="""require('./web/research/decoder-display.js');const c=require('./web/research/catalog.json');const labels=DecoderDisplay.labels(c);console.log(JSON.stringify(c.result_series.map(s=>({...s,display:labels.get(s.series_id)}))));"""
     return json.loads(subprocess.check_output(['node','-e',code],cwd=ROOT,text=True))

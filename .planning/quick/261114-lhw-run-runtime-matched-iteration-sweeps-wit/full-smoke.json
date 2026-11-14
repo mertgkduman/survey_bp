@@ -1,0 +1,20 @@
+{
+  "confirmation_caps": 10,
+  "confirmed_shots": 699,
+  "control_cap_evaluations": 963,
+  "controls_tested": 102,
+  "exact_resume": true,
+  "finalists": 5,
+  "full_ledger_audit": true,
+  "plan_sha256": "bc60325153afffb0dcc4e98090f088137be17bf3f26874dfa74ceab2c5a97ecd",
+  "scope": "one real QBP stratum; full80-control grid and local refinement;4096-shot finalist training; shortened128-shot confirmation cap, no production pooling",
+  "selected_calibration_runtime_ratio": 1.029050317064598,
+  "selected_cap": 23,
+  "status": "passed",
+  "winner": {
+    "alpha": 1.0,
+    "alpha_mode": "constant",
+    "beta": 0.0,
+    "damping": 0.3
+  }
+}

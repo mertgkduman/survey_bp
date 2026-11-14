@@ -31,7 +31,9 @@ function describe(decoder,series={}){
   const joint=['a5','b2'].includes(series.code_id);algorithm=arm==='qbp'?'Q-BP':arm==='bp'?'Binary BP':joint?'Q-BPGD':'BPGD';rule='SP';precision='float64';add('d',0);if(arm==='qbp'||arm==='bp')add('T',100);else{const match=arm.match(/_t(\d+)/);add('Tᵣ',match?Number(match[1]):undefined);const rounds=arm.match(/_r(\d+)/);add('R',rounds?Number(rounds[1]):'n');if(arm.includes('random'))parameters.push({symbol:'order',value:'random',text:'order = random'});}if(!joint)add('cᵥ',25);else add('c',null);add('p₀','p');
  }
  if(effective.budget_status==='curve_inferred_not_source_specified')add('budget','inferred');
- if(effective.alpha_schedule==='1-2**(-iteration)')add('αₜ','1 − 2⁻ᵗ');
+ if(effective.alpha_schedule==='1-2**(-iteration)')add('αₜ',effective.alpha!=null&&effective.alpha!==1?`${effective.alpha} × (1 − 2⁻ᵗ)`:'1 − 2⁻ᵗ');
+ else if(effective.check_rule==='min_sum'&&effective.alpha!=null)add('α',effective.alpha);
+ if(effective.check_rule==='min_sum'&&effective.beta!=null)add('β',effective.beta);
  if(effective.postprocessing?.method==='OSD_0')algorithm='BP+OSD-0';
  if(effective.postprocessing?.method==='OSD_CS'){algorithm='BP+OSD-CS';add('λ',effective.postprocessing.order);}
  if(dataset==='pfister-presentation-local-pilots'&&arm.startsWith('bp4_'))retired='Retired experimental Q8 clipping of Q-BP state';
