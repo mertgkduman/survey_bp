@@ -5,11 +5,11 @@ current_phase: 11
 current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
-stopped_at: Runtime-budget array61824235 running; first45 confirmed control/cap measurements audited/published; complete collector61824236 pending
-last_updated: "2026-11-14T21:15:18.444970+00:00"
+stopped_at: Runtime-budget study complete218/218;1464 confirmations audited/published; four length450 OSD points remain running
+last_updated: "2026-11-15T00:02:38.162455+00:00"
 last_activity: 2026-11-14
-last_activity_desc: Quick261114-lhw launches218 joint damping/scale/offset workers and fresh cap histories; array61824235, collector61824236;144 exact cases/65 tests/12 browser groups.
-state_head: 4d73d1a
+last_activity_desc: Quick261114-pna validates1464 complete runtime measurements and mixed gains; actual timing145/218 within10%; lossless archives and full catalogs refreshed.
+state_head: 7fcae85
 progress:
   total_phases: 14
   completed_phases: 8
@@ -34,7 +34,10 @@ Total Phases: 14
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
-Last activity: 2026-11-14 — quick261114-lhw prepares joint-control tuning and runtime-matched iteration studies
+Last activity: 2026-11-14 — quick261114-pna checks completed runtime-budget and related results
+Last Activity Description: All218 runtime workers and collector61824236 complete0:0. Independently reconciled1464 fresh rows/249,888 shots/29,280 failures plus218 frozen selections;163,668 tuning rows remain separate. Only1/107 extended-cap BP strata improves LER; joint-control median LER and mean-iteration ratios remain1.00 across the grid. Offset zero selected217/218; alpha magnitude1 selected217/218. Actual selected timing145/218 within10%,36 over1.1 and37 below.9, so strict runtime claims use qualified subsets. At p_X=.02, same-channel BP remains orders of magnitude above OSD0. Full434MiB verification and70MiB tuning CSV retained locally and committed losslessly as gzip with byte hashes/roundtrip checks; no raw data or source edits. Refreshed public308 curves/2627 points/12 codes/0 circuits; old227 raw-series point subsets preserved.52 regressions and7 real-data browser groups pass. MacKay T100 confirmation now40/40(112,619,245 shots/791 failures); rare274 QBP point100M/11 failures ends at1.1e-7. OSD212 fully audited points retained; four length450 points run, two completed338/p=.01 points await final OSD audit. Checked findings/figure/selected-point CSV linked from study RESULTS.md. No new simulations, canonical/frozen/v1 changes or phase gate/counter changes.
+
+Prior runtime-budget launch activity: 2026-11-14 — quick261114-lhw prepares joint-control tuning and runtime-matched iteration studies
 Last Activity Description: Separately versioned traversal calls unchanged canonical binary/Pauli sweep helpers;144 exact candidate/belief/stopping checks pass across damping/scaling/offset. Joint search has80 coarse controls plus local refinement, then4096-shot finalist training and fresh20-failure/1e8-shot confirmation. Preserve each candidate/cap and earlier damping progression; match mean warmed same-CPU BP+OSD0 time within10%, with explicit saturation/over-budget status. Original109 code/rate grids retained for both families; BP X-only and Q-BP depolarizing1.5p remain distinct. Pilot finds Q-BP at T=n can already exceed reference1.2–6.6x, so lower caps are retained alongside n-cap controls. Real full search tested102 controls/963 control-caps,10 shortened confirmation caps/699 shots, exact resume/full audit; these qualification samples are not pooled.65 regression cases and12 Chromium groups pass, including exact scale/offset labels and time/reference CSV column. Frozen218-worker campaign launched as61824235 with complete collector61824236; workers have begun calibration/tuning, with first45 fresh control/cap measurements now independently audited(36,041 shots/900 failures), six completed point workers and5,496 retained training measurements. Active117 curves/1258 points/12 codes/0 circuits; all189 prior raw series unchanged and seven real-data browser groups pass. Remaining points continue; this is a partial snapshot. One CPU/2GiB per worker, one CPU/16GiB collector. Initial unlaunched2GiB-collector plan/source preserved; scientific design unchanged. Public112 curves/1246 points/12 codes/0 circuits before launch, with singleton/incompatible-policy filtering unchanged. No canonical, prior frozen simulation, v1 or phase-gate/counter changes.
 
 Prior OSD check activity: 2026-11-14 — quick261114-i9b checks current OSD results and explains source-matched performance
@@ -319,6 +322,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 | # | Description | Date | Commit | Status | Directory |
 |---|-------------|------|--------|--------|-----------|
+| 261114-pna | Check completed runtime-budget results and archive full evidence | 2026-11-14 | 7fcae85 | Complete;1464 rows/218 workers, timing caveats explicit | [261114-pna](./quick/261114-pna-audit-completed-runtime-budget-joint-con/) |
 | 261114-lhw | Joint damping/scaling/offset and runtime-matched iteration histories | 2026-11-14 | 8e903bc | Implementation/launch complete;218-worker array61824235 running | [261114-lhw](./quick/261114-lhw-run-runtime-matched-iteration-sweeps-wit/) |
 | 261114-i9b | Explain optimized OSD search and check212 terminal points/424 endpoints | 2026-11-14 | 2c8b6fe | Check complete; full interior audit61820674 continues | [261114-i9b](./quick/261114-i9b-audit-current-osd0-cs10-results-and-expl/) |
 | 261113-vj0 | Tabulate all current Roffe BP-OSD source points beside confirmed BP/Q-BP | 2026-11-13 | 04002e0 | Complete;108 paper points/109 grid rows, no new simulations | [261113-vj0](./quick/261113-vj0-extract-all-roffe-figure3-bp-osd-points-/) |
@@ -403,13 +407,13 @@ No requested decoding regime or named policy family is deferred beyond the first
 
 ## Session Continuity
 
-Latest comparison: quick261114-i9b, evidence2c8b6fe.212 terminal OSD0/CS10 points pass summary/manifest/CI/work and424 endpoint checks; full interior audit61820674 continues, with complete collector61820676 serialized afterward. See quick task COMPARISON.md for all109 source-rate rows and explicit pending values. Published workbench retains the173-point fully audited OSD snapshot pending refresh. PaperCS60 source reference and prior BP-family evidence remain distinct and preserved.
+Latest comparison: quick 261114-pna, evidence `7fcae85`. Runtime-budget tuning is complete: 218/218 workers and collector 61824236 completed; all 1,464 fresh confirmation rows are independently reconciled. Extra iterations improve observed binary BP LER in only 1/107 extended-cap strata. Joint-control median LER and mean-iteration ratios remain 1.00; pointwise gains and uncertainty remain in the report. Actual selected timing is within 10% at 145/218 points; 36 over-budget points are flagged. See the quick task FINDINGS.md, per-cap figure, selected-point CSV and full study RESULTS.md. Public workbench now has 308 curves/2,627 points/12 codes/0 circuits. Full evidence and training CSV are losslessly archived with raw-byte hashes; unchanged local raw files remain available. MacKay T100 confirmation is complete 40/40. OSD audit 61820674 completed; 212 audited OSD points are published, two completed length338/p=.01 endpoints await final audit, and four length450 points continue. Complete collector 61820676 remains dependent on the original array. No simulations were rerun or submitted, and phase gates/counters remain unchanged.
 
-Latest result: quick261113-v31, implementationc595969. Roffe damping is complete and published: all1526 tuning/436 independent confirmation points audited. Public104 curves/1073 points. See data/reproductions/roffe-2005-07016-damping/RESULTS.md and completion-status.json. Original failed publication history is retained; equal paper metadata now merges safely. Only the separate MacKay rare-event point remains running.
+Prior result: quick261113-v31, implementationc595969. Roffe damping is complete and published: all1526 tuning/436 independent confirmation points audited. Public104 curves/1073 points at that snapshot. See data/reproductions/roffe-2005-07016-damping/RESULTS.md and completion-status.json. Original failed publication history is retained; equal paper metadata now merges safely. The separate MacKay rare-event point subsequently completed, as recorded above.
 
 Historical launch: quick261113-q96, implementation4c8471f. Arrays61789908/61794900 and selection controller61789909 completed; final collector61794901 failed at catalog refresh after its full audit. Follow-up v31 repairs publication; do not resubmit simulations or change frozen files.
 
-Latest campaign: quick 261113-hk2, implementation `1b040da`. Old 88200 damping is canceled. Curve alignment favors inferred T=100, with 50 also plausible; no historical cap is asserted. Fresh baseline and training are audited; confirmation has 39/40 terminal points audited, with one rare Q-BP point running before the unchanged Roffe T=n study. The old 30-point long-budget MacKay results and displayed curves stay intact. See the hk2 summary for frozen plans, retrospective caveats, tests and accepted commands.
+Prior campaign: quick 261113-hk2, implementation `1b040da`. Old 88200 damping is canceled. Curve alignment favors inferred T=100, with 50 also plausible; no historical cap is asserted. Fresh baseline and training are audited; confirmation had 39/40 terminal points at that snapshot and is now complete 40/40. The old 30-point long-budget MacKay results and displayed curves stay intact. See the hk2 summary for frozen plans, retrospective caveats, tests and accepted commands.
 
 Latest literature research: spikes 054 (PARTIAL: bounded citation screening, not an exhaustive global ranking) and 055 (VALIDATED: explicit baseline evidence in the screened sources). Twelve direct BP baseline papers are listed with min-sum/SPA families and evidence locations; foundational code benchmarks and BP+OSD/BP+SSF hybrids are separate. JSON/CSV and an offline consistency verifier accompany the report. This source list does not certify reproduction settings or authorize simulations. Scientific phase progress is unchanged.
 
