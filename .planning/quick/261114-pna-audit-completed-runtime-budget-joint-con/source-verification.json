@@ -1,0 +1,40 @@
+{
+  "status": "passed",
+  "source_receipts": [
+    {
+      "study": "roffe-2005-07016-runtime-budget",
+      "plan_sha256": "6551628b646126758e2c549fdbe0d909a3f04d0388d20c9d95c73b8b4a69e94c",
+      "verified_sha256": "913df020472d8def76c7a31fbb1a128c207cf44191cb5a1597ddb4b9b9677aac",
+      "counts": {
+        "confirmation_measurements": 1464,
+        "confirmed_failures": 29280,
+        "confirmed_shots": 249888,
+        "finished_strata": 218,
+        "planned_strata": 218,
+        "schema": "runtime-budget-assessment-v1",
+        "tuning_measurements": 163668
+      }
+    },
+    {
+      "study": "roffe-2005-07016-osd-fast",
+      "plan_sha256": "b034513155d31da31ba6854f48f5416aac3dacc7b3abf022140e86b3f912c76b",
+      "verified_sha256": "17d90c8099ff06f1867318139bcbc98bcf47aba9f27de83fcec066b79e0f1d77",
+      "counts": {
+        "points": 212,
+        "shots": 318346784,
+        "failures": 4207
+      }
+    },
+    {
+      "study": "mackay-0304161-damping-t100/confirmation",
+      "plan_sha256": "f1b3da8fcc5c8bb1f32c28712c184207d35de40c8449b2c7ec963da6d6c64247",
+      "verified_sha256": "5c2b2e30ffcce7aa7eb71205841e4d80443ca63b49dc416519a1129fea2c2898",
+      "counts": {
+        "points": 40,
+        "shots": 112619245,
+        "failures": 791
+      }
+    }
+  ],
+  "scope": "frozen source/software, audit plan hashes, terminal source summaries; runtime per-row detailed checks retained separately; completed full-ledger scheduler audits reused"
+}

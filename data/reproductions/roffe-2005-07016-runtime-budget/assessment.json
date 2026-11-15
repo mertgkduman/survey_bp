@@ -1,9 +1,9 @@
 {
-  "confirmation_measurements": 45,
-  "confirmed_failures": 900,
-  "confirmed_shots": 36041,
-  "finished_strata": 6,
+  "confirmation_measurements": 1464,
+  "confirmed_failures": 29280,
+  "confirmed_shots": 249888,
+  "finished_strata": 218,
   "planned_strata": 218,
   "schema": "runtime-budget-assessment-v1",
-  "tuning_measurements": 5496
+  "tuning_measurements": 163668
 }

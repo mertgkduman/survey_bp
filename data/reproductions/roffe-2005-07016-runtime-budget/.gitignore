@@ -1,2 +1,6 @@
 results/
 dispatch.lock
+/verified.json
+/tuning-results.csv
+!/verified.json.gz
+!/tuning-results.csv.gz

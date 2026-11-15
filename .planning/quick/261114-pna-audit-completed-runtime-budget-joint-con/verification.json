@@ -1,0 +1,98 @@
+{
+  "status": "passed",
+  "confirmed_rows_independently_checked": 1464,
+  "selected_point_plans_checked": 218,
+  "full_ledger_audit_reused": "Slurm61824236 completed0:0",
+  "counter_stopping_ci_work_timing_checks": "all rows",
+  "source_verification": {
+    "status": "passed",
+    "source_receipts": [
+      {
+        "study": "roffe-2005-07016-runtime-budget",
+        "plan_sha256": "6551628b646126758e2c549fdbe0d909a3f04d0388d20c9d95c73b8b4a69e94c",
+        "verified_sha256": "913df020472d8def76c7a31fbb1a128c207cf44191cb5a1597ddb4b9b9677aac",
+        "counts": {
+          "confirmation_measurements": 1464,
+          "confirmed_failures": 29280,
+          "confirmed_shots": 249888,
+          "finished_strata": 218,
+          "planned_strata": 218,
+          "schema": "runtime-budget-assessment-v1",
+          "tuning_measurements": 163668
+        }
+      },
+      {
+        "study": "roffe-2005-07016-osd-fast",
+        "plan_sha256": "b034513155d31da31ba6854f48f5416aac3dacc7b3abf022140e86b3f912c76b",
+        "verified_sha256": "17d90c8099ff06f1867318139bcbc98bcf47aba9f27de83fcec066b79e0f1d77",
+        "counts": {
+          "points": 212,
+          "shots": 318346784,
+          "failures": 4207
+        }
+      },
+      {
+        "study": "mackay-0304161-damping-t100/confirmation",
+        "plan_sha256": "f1b3da8fcc5c8bb1f32c28712c184207d35de40c8449b2c7ec963da6d6c64247",
+        "verified_sha256": "5c2b2e30ffcce7aa7eb71205841e4d80443ca63b49dc416519a1129fea2c2898",
+        "counts": {
+          "points": 40,
+          "shots": 112619245,
+          "failures": 791
+        }
+      }
+    ],
+    "scope": "frozen source/software, audit plan hashes, terminal source summaries; runtime per-row detailed checks retained separately; completed full-ledger scheduler audits reused"
+  },
+  "catalog": {
+    "counts": {
+      "curves": 308,
+      "points": 2627,
+      "codes": 12,
+      "circuits": 0
+    },
+    "historical_series_point_subsets_preserved": 227
+  },
+  "regression_cases": 52,
+  "browser": {
+    "checks": [
+      "308 curves / 2627 rows; all public input and saved-decoder lists use the active view; GB46 and all three singleton circuits absent",
+      "Every remaining code: picker, legend, plotted collection, table, settings receipt and CSV agree",
+      "Empty active view clears plot/decoder/input state and stale matrices; reset, custom matrix and custom Stim still validate",
+      "Missing default A5/B2 inputs fall back to a displayed input in both DOM and experiment/plot state",
+      "Import refresh hides singleton, admits multi-rate circuit and updates availability; hiding the selected circuit clears its Stim bytes and download validation",
+      "Saved imports reapply eligibility after reload; internal three-qubit fixture remains hidden even with two rates",
+      "Empty mobile layout fits; archived v1 still loads its retained catalog"
+    ],
+    "errors": [],
+    "simulations": 0
+  },
+  "archive_roundtrip": {
+    "schema": "lossless-research-receipt-archives-v1",
+    "study": "roffe-joint-controls-runtime-budget",
+    "plan_sha256": "6551628b646126758e2c549fdbe0d909a3f04d0388d20c9d95c73b8b4a69e94c",
+    "files": [
+      {
+        "raw_path": "verified.json",
+        "raw_bytes": 454820367,
+        "raw_sha256": "913df020472d8def76c7a31fbb1a128c207cf44191cb5a1597ddb4b9b9677aac",
+        "archive_path": "verified.json.gz",
+        "archive_bytes": 33116516,
+        "archive_sha256": "5d148c616c6ab68cb7deb7a53922f9ab4fed7a681584d12e4623bfd9c8c7ca5e",
+        "lossless_roundtrip_checked": true
+      },
+      {
+        "raw_path": "tuning-results.csv",
+        "raw_bytes": 72740492,
+        "raw_sha256": "74c5e6fa5181cd9af0c087da7c35e13e3d462e3f20a47c7b52a1044abd037d85",
+        "archive_path": "tuning-results.csv.gz",
+        "archive_bytes": 13262462,
+        "archive_sha256": "cf4d1d488a04e2c30f3806d0b243274c40179224fb473c606890a32a07569817",
+        "lossless_roundtrip_checked": true
+      }
+    ],
+    "note": "Original raw files remain on the HPC filesystem unchanged. Reconstruct with gzip -dc archive.gz > raw_path. Frozen execution/report code continues to use raw paths."
+  },
+  "scientific_figure": "visually inspected; clipping/overlap repaired; proper log powers and minor grids",
+  "scope": "all completed runtime rows and selected source/summary evidence; no new simulations, no claim of replaying every shot anew"
+}
