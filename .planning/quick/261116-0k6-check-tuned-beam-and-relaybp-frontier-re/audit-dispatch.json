@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "sbatch",
+    "--parsable",
+    "--partition=common,scavenger",
+    "--account=pfisterlab",
+    "--nodes=1",
+    "--ntasks=1",
+    "--cpus-per-task=8",
+    "--mem=16G",
+    "--time=04:00:00",
+    "--job-name=frontier-partial-audit",
+    "--chdir=/hpc/group/pfisterlab/mg551/storage/survey_bp",
+    "--output=/hpc/group/pfisterlab/mg551/storage/survey_bp/.planning/quick/261116-0k6-check-tuned-beam-and-relaybp-frontier-re/audit-%j.log",
+    "--export=ALL,PYTHONPATH=/hpc/group/pfisterlab/mg551/storage/survey_bp/src,OMP_NUM_THREADS=1,OPENBLAS_NUM_THREADS=1,MKL_NUM_THREADS=1,NUMBA_NUM_THREADS=1",
+    "--wrap=/hpc/group/pfisterlab/mg551/storage/survey_bp/.venv/bin/python /hpc/group/pfisterlab/mg551/storage/survey_bp/.planning/quick/261116-0k6-check-tuned-beam-and-relaybp-frontier-re/audit_snapshot.py"
+  ],
+  "id": "61875143",
+  "scope": "independent read-only per-point audits plus derived report/catalog; no new simulations"
+}

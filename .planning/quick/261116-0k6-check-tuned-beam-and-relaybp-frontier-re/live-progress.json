@@ -1,0 +1,38 @@
+{
+  "points": [
+    {
+      "active_configuration": "toric11-binary_ms-p01000-beam-frontier-confirmation-49e6073902493c5b0c70",
+      "array_task": "61870314_0",
+      "code": "toric11",
+      "failures": 6,
+      "method": "beam",
+      "n": 242,
+      "p": 0.01,
+      "shots": 36216832,
+      "status": "nonterminal progress; no final LER or upper bound published"
+    },
+    {
+      "active_configuration": "toric15-binary_ms-p01000-beam-frontier-confirmation-49e6073902493c5b0c70",
+      "array_task": "61870314_112",
+      "code": "toric15",
+      "failures": 0,
+      "method": "beam",
+      "n": 450,
+      "p": 0.01,
+      "shots": 41138176,
+      "status": "nonterminal progress; no final LER or upper bound published"
+    },
+    {
+      "active_configuration": "toric15-binary_ms-p02000-beam-frontier-confirmation-b295cc81085e6b7d79be",
+      "array_task": "61870314_114",
+      "code": "toric15",
+      "failures": 11,
+      "method": "beam",
+      "n": 450,
+      "p": 0.02,
+      "shots": 24745984,
+      "status": "nonterminal progress; no final LER or upper bound published"
+    }
+  ],
+  "timestamp_utc": "2026-11-16T05:44:10.258088+00:00"
+}

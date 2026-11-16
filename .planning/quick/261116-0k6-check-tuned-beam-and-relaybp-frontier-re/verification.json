@@ -1,0 +1,108 @@
+{
+  "audit_cpus": 8,
+  "audit_elapsed": "00:08:50",
+  "audit_job": "61875143",
+  "audit_job_state": "COMPLETED0:0",
+  "browser_groups": 12,
+  "browsers": [
+    {
+      "checks": [
+        "427 curves / 3132 rows; all public input and saved-decoder lists use the active view; GB46 and all three singleton circuits absent",
+        "Every remaining code: picker, legend, plotted collection, table, settings receipt and CSV agree",
+        "Empty active view clears plot/decoder/input state and stale matrices; reset, custom matrix and custom Stim still validate",
+        "Missing default A5/B2 inputs fall back to a displayed input in both DOM and experiment/plot state",
+        "Import refresh hides singleton, admits multi-rate circuit and updates availability; hiding the selected circuit clears its Stim bytes and download validation",
+        "Saved imports reapply eligibility after reload; internal three-qubit fixture remains hidden even with two rates",
+        "Empty mobile layout fits; archived v1 still loads its retained catalog"
+      ],
+      "errors": [],
+      "simulations": 0
+    },
+    {
+      "checks": [
+        "Both search methods expose exact numerical, topology, solution and memory controls",
+        "Table/CSV retain both search methods, measured runtime ratios and all-path work",
+        "Downloaded settings preserve full search configuration and traversal version",
+        "Saved search decoder cannot silently turn into ordinary BP in experiment builder",
+        "Singleton/empty handling clears stale code and search-decoder selections"
+      ],
+      "errors": [],
+      "simulations": 0
+    }
+  ],
+  "catalog_counts": {
+    "after": {
+      "circuits": 0,
+      "codes": 12,
+      "curves": 427,
+      "points": 3132
+    },
+    "before": {
+      "circuits": 0,
+      "codes": 12,
+      "curves": 324,
+      "points": 2667
+    }
+  },
+  "catalog_history": {
+    "frontier_fresh_raw_points": 639,
+    "historical_raw_series_point_subsets_preserved": 800,
+    "new_raw_series": 718
+  },
+  "confirmation_summaries_independently_checked": 1255,
+  "frontier_receipt_sha256": "8c30a6eec66819c3dc20e8b630f7d2ca8fee3cc9f739ff7219edf8aee92fb865",
+  "frontier_workers_audited": 215,
+  "frontier_workers_planned": 218,
+  "full_ledger_reference_endpoint_checks": "all new finalists and confirmations; reused completed original full audit",
+  "full_original_audit": "61869372 COMPLETED0:0",
+  "new_simulations": 0,
+  "numeric_checks": "all original/new summaries, child manifests, hashes, denominator/stopping, exact CI, work bounds, time ratios and frozen finalist selection independently reconciled",
+  "original_receipt_sha256": "e7c6540576582fd14b86583d0451ff5cf400598a90306a6d35479725d4252138",
+  "original_workers_complete": 218,
+  "osd_receipt_sha256": "17d90c8099ff06f1867318139bcbc98bcf47aba9f27de83fcec066b79e0f1d77",
+  "phase_gates_changed": false,
+  "regression_cases": 53,
+  "remaining_live_workers": {
+    "points": [
+      {
+        "active_configuration": "toric11-binary_ms-p01000-beam-frontier-confirmation-49e6073902493c5b0c70",
+        "array_task": "61870314_0",
+        "code": "toric11",
+        "failures": 6,
+        "method": "beam",
+        "n": 242,
+        "p": 0.01,
+        "shots": 36216832,
+        "status": "nonterminal progress; no final LER or upper bound published"
+      },
+      {
+        "active_configuration": "toric15-binary_ms-p01000-beam-frontier-confirmation-49e6073902493c5b0c70",
+        "array_task": "61870314_112",
+        "code": "toric15",
+        "failures": 0,
+        "method": "beam",
+        "n": 450,
+        "p": 0.01,
+        "shots": 41138176,
+        "status": "nonterminal progress; no final LER or upper bound published"
+      },
+      {
+        "active_configuration": "toric15-binary_ms-p02000-beam-frontier-confirmation-b295cc81085e6b7d79be",
+        "array_task": "61870314_114",
+        "code": "toric15",
+        "failures": 11,
+        "method": "beam",
+        "n": 450,
+        "p": 0.02,
+        "shots": 24745984,
+        "status": "nonterminal progress; no final LER or upper bound published"
+      }
+    ],
+    "timestamp_utc": "2026-11-16T05:44:10.258088+00:00"
+  },
+  "scientific_figure": "PNG/PDF inspected; log powers, minor grid, no connections across controls, pending reference and beam points marked",
+  "scope": "completed-worker result check and partial publication; frontier not complete",
+  "source_software_code_pins": "passed through unchanged frozen loaders for original/frontier/OSD source",
+  "status": "passed",
+  "timestamp_utc": "2026-11-16T05:48:17.312612+00:00"
+}

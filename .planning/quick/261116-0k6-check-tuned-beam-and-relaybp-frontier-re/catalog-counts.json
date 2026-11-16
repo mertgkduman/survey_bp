@@ -1,0 +1,14 @@
+{
+  "before": {
+    "curves": 324,
+    "points": 2667,
+    "codes": 12,
+    "circuits": 0
+  },
+  "after": {
+    "curves": 427,
+    "points": 3132,
+    "codes": 12,
+    "circuits": 0
+  }
+}
