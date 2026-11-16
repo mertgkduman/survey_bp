@@ -1,0 +1,279 @@
+{
+  "engine_sha256": "f152db024e8e27449f5de4e3cb6a43f282cf817afdeadd17a0033b4c16730fd1",
+  "exact_real_code_comparisons": 128,
+  "failures": [],
+  "independent_oracle": "separate scalar min-sum equations, masking/tree orchestration and indexed RNG",
+  "oracle-events": {
+    "path": ".planning/quick/261115-sxj-tune-canonical-beam-search-and-relaybp-a/oracle-events.jsonl.gz",
+    "rows": 128,
+    "sha256": "3d82465838813a411f8ac718de8b72aaf6dd1286e3eae381f9275888228cef2b"
+  },
+  "paths": {
+    "beam_extra": 360,
+    "capped": 69,
+    "converged": 59,
+    "pruned": 83,
+    "relay_extra": 411
+  },
+  "pilot": [
+    {
+      "code": "toric9",
+      "cohort": "qualification pilot only, seed7392",
+      "controls": {
+        "alpha": 1.0,
+        "beta": 0.0,
+        "damping": 0.5,
+        "first_gamma": 0.125,
+        "gamma_high": 0.66,
+        "gamma_low": -0.24,
+        "initial": 20,
+        "method": "beam",
+        "paper_scale": true,
+        "per_unit": 20,
+        "rounds": 8,
+        "solutions": 1,
+        "units": 32,
+        "width": 4
+      },
+      "counts": {
+        "exact_success": 464,
+        "stabilizer_success": 48
+      },
+      "mean_iterations": 5.9296875,
+      "mean_us": 34.088291015625,
+      "method": "beam",
+      "p": 0.02,
+      "ratio": 0.407309477471229,
+      "reference_us": 83.691376953125,
+      "shots": 512
+    },
+    {
+      "code": "toric9",
+      "cohort": "qualification pilot only, seed7392",
+      "controls": {
+        "alpha": 1.0,
+        "beta": 0.0,
+        "damping": 0.5,
+        "first_gamma": 0.125,
+        "gamma_high": 0.66,
+        "gamma_low": -0.24,
+        "initial": 20,
+        "method": "relay",
+        "paper_scale": true,
+        "per_unit": 20,
+        "rounds": 8,
+        "solutions": 1,
+        "units": 32,
+        "width": 4
+      },
+      "counts": {
+        "exact_success": 460,
+        "stabilizer_success": 52
+      },
+      "mean_iterations": 5.716796875,
+      "mean_us": 32.006056640625,
+      "method": "relay",
+      "p": 0.02,
+      "ratio": 0.3824295621106985,
+      "reference_us": 83.691376953125,
+      "shots": 512
+    },
+    {
+      "code": "toric11",
+      "cohort": "qualification pilot only, seed7392",
+      "controls": {
+        "alpha": 1.0,
+        "beta": 0.0,
+        "damping": 0.5,
+        "first_gamma": 0.125,
+        "gamma_high": 0.66,
+        "gamma_low": -0.24,
+        "initial": 20,
+        "method": "beam",
+        "paper_scale": true,
+        "per_unit": 20,
+        "rounds": 8,
+        "solutions": 1,
+        "units": 32,
+        "width": 4
+      },
+      "counts": {
+        "exact_success": 456,
+        "stabilizer_success": 56
+      },
+      "mean_iterations": 8.1171875,
+      "mean_us": 51.66973046875,
+      "method": "beam",
+      "p": 0.02,
+      "ratio": 0.2469147788427327,
+      "reference_us": 209.261392578125,
+      "shots": 512
+    },
+    {
+      "code": "toric11",
+      "cohort": "qualification pilot only, seed7392",
+      "controls": {
+        "alpha": 1.0,
+        "beta": 0.0,
+        "damping": 0.5,
+        "first_gamma": 0.125,
+        "gamma_high": 0.66,
+        "gamma_low": -0.24,
+        "initial": 20,
+        "method": "relay",
+        "paper_scale": true,
+        "per_unit": 20,
+        "rounds": 8,
+        "solutions": 1,
+        "units": 32,
+        "width": 4
+      },
+      "counts": {
+        "exact_success": 449,
+        "stabilizer_success": 63
+      },
+      "mean_iterations": 7.802734375,
+      "mean_us": 50.52505859375,
+      "method": "relay",
+      "p": 0.02,
+      "ratio": 0.24144472122294192,
+      "reference_us": 209.261392578125,
+      "shots": 512
+    },
+    {
+      "code": "toric13",
+      "cohort": "qualification pilot only, seed7392",
+      "controls": {
+        "alpha": 1.0,
+        "beta": 0.0,
+        "damping": 0.5,
+        "first_gamma": 0.125,
+        "gamma_high": 0.66,
+        "gamma_low": -0.24,
+        "initial": 20,
+        "method": "beam",
+        "paper_scale": true,
+        "per_unit": 20,
+        "rounds": 8,
+        "solutions": 1,
+        "units": 32,
+        "width": 4
+      },
+      "counts": {
+        "exact_success": 435,
+        "stabilizer_success": 77
+      },
+      "mean_iterations": 10.0078125,
+      "mean_us": 75.917873046875,
+      "method": "beam",
+      "p": 0.02,
+      "ratio": 0.17630990052507578,
+      "reference_us": 430.59336328125,
+      "shots": 512
+    },
+    {
+      "code": "toric13",
+      "cohort": "qualification pilot only, seed7392",
+      "controls": {
+        "alpha": 1.0,
+        "beta": 0.0,
+        "damping": 0.5,
+        "first_gamma": 0.125,
+        "gamma_high": 0.66,
+        "gamma_low": -0.24,
+        "initial": 20,
+        "method": "relay",
+        "paper_scale": true,
+        "per_unit": 20,
+        "rounds": 8,
+        "solutions": 1,
+        "units": 32,
+        "width": 4
+      },
+      "counts": {
+        "exact_success": 436,
+        "stabilizer_success": 76
+      },
+      "mean_iterations": 8.6875,
+      "mean_us": 70.6590078125,
+      "method": "relay",
+      "p": 0.02,
+      "ratio": 0.16409683436376554,
+      "reference_us": 430.59336328125,
+      "shots": 512
+    },
+    {
+      "code": "toric15",
+      "cohort": "qualification pilot only, seed7392",
+      "controls": {
+        "alpha": 1.0,
+        "beta": 0.0,
+        "damping": 0.5,
+        "first_gamma": 0.125,
+        "gamma_high": 0.66,
+        "gamma_low": -0.24,
+        "initial": 20,
+        "method": "beam",
+        "paper_scale": true,
+        "per_unit": 20,
+        "rounds": 8,
+        "solutions": 1,
+        "units": 32,
+        "width": 4
+      },
+      "counts": {
+        "exact_success": 395,
+        "stabilizer_success": 117
+      },
+      "mean_iterations": 15.56640625,
+      "mean_us": 141.877533203125,
+      "method": "beam",
+      "p": 0.02,
+      "ratio": 0.12670402091728822,
+      "reference_us": 1119.7555703125,
+      "shots": 512
+    },
+    {
+      "code": "toric15",
+      "cohort": "qualification pilot only, seed7392",
+      "controls": {
+        "alpha": 1.0,
+        "beta": 0.0,
+        "damping": 0.5,
+        "first_gamma": 0.125,
+        "gamma_high": 0.66,
+        "gamma_low": -0.24,
+        "initial": 20,
+        "method": "relay",
+        "paper_scale": true,
+        "per_unit": 20,
+        "rounds": 8,
+        "solutions": 1,
+        "units": 32,
+        "width": 4
+      },
+      "counts": {
+        "exact_success": 373,
+        "stabilizer_success": 139
+      },
+      "mean_iterations": 12.083984375,
+      "mean_us": 122.02398046875,
+      "method": "relay",
+      "p": 0.02,
+      "ratio": 0.10897376508222745,
+      "reference_us": 1119.7555703125,
+      "shots": 512
+    }
+  ],
+  "pilot-events": {
+    "path": ".planning/quick/261115-sxj-tune-canonical-beam-search-and-relaybp-a/pilot-events.jsonl.gz",
+    "rows": 4096,
+    "sha256": "146769b5fffde74408bb2121ff2efe5f627a97405eb765b2a8aa419ce4d0c833"
+  },
+  "reference-events": {
+    "path": ".planning/quick/261115-sxj-tune-canonical-beam-search-and-relaybp-a/reference-events.jsonl.gz",
+    "rows": 2048,
+    "sha256": "00100ade9ab81a00abaa9ec3de27e965bfafc400dafcaf5adb173e6982dd719b"
+  },
+  "status": "passed"
+}

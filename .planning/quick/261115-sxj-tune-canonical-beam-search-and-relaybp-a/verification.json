@@ -1,0 +1,44 @@
+{
+  "browser": {
+    "checks": [
+      "Both search methods expose exact numerical, topology, solution and memory controls",
+      "Table/CSV retain both search methods, measured runtime ratios and all-path work",
+      "Downloaded settings preserve full search configuration and traversal version",
+      "Saved search decoder cannot silently turn into ordinary BP in experiment builder",
+      "Singleton/empty handling clears stale code and search-decoder selections"
+    ],
+    "errors": [],
+    "simulations": 0
+  },
+  "exact_real_code_comparisons": 128,
+  "final_source_regression_retry": 20,
+  "frozen_jobs": 218,
+  "latency_budget_ratios": [
+    0.5,
+    1,
+    2,
+    4
+  ],
+  "path_cases": {
+    "beam_extra": 360,
+    "capped": 69,
+    "converged": 59,
+    "pruned": 83,
+    "relay_extra": 411
+  },
+  "plan_sha256": "bd0b6527cbfe152957867896ce48855344b9ea7637317de52b1a07ab473a8ce0",
+  "production_simulations_at_prelaunch": 0,
+  "regression_cases": 72,
+  "scope": "prelaunch implementation and prospective protocol qualification; production scientific results are not complete",
+  "separate_seeds": [
+    2026111551,
+    2026111552,
+    2026111553
+  ],
+  "status": "passed",
+  "test_logs": [
+    ".git/roffe-search-regressions.log",
+    ".git/roffe-search-final-tests.log"
+  ],
+  "timestamp_utc": "2026-11-16T02:17:42.419138+00:00"
+}

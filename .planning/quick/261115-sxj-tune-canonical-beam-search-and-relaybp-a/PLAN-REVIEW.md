@@ -1,0 +1,11 @@
+# Inline plan and methodological review
+
+PASS. Applied GSD quick with validation inline; no agents or model/config changes.
+
+The comparison uses the same four matrices, original 109 error rates and X-only noise as the existing OSD-0 study. Pauli Q-BP and circuit-paper performance are explicitly outside this result identity. The two papers and prior source-informed controllers support the beam masking/warm-start/pruning and Relay dynamic-prior/posterior-transfer equations. The SplitMix64 RNG, floating-point policy, prior bound and numerical/topology tuning are declared controlled adaptations.
+
+Independent scalar equations and controller orchestration agree exactly in 128 real-code cases, including failed and converged segments, 360 beam expansions, 411 relay legs and 83 pruned branches. All path work is counted. Qualification pilots retain event ledgers and cannot enter the result extension. Repeat pilot timings illustrate hardware/load sensitivity and do not support an LER superiority claim.
+
+Coarse/finalist/confirmation use three separate seeds. The finite selection rule is prespecified and selection locks are immutable; full ledger/manifest/source/reference/endpoint audit gates publication. The 65,536-shot finalist cap improves rare-event selection precision but can still leave zero-failure ties; no global-optimality/equality claim is allowed. Twenty-failure confirmations use the existing stopping-aware exact intervals. Ineligible budget settings remain visible, actual ratios are reported, and the four upper runtime budgets do not imply exact time equality. Tail percentiles use explicit 1% logarithmic binning. One CPU is allocated per method/rate, and all decoding overhead is included consistently.
+
+Tests exercise end-to-end tuning/selection/confirmation, exact resume, full audits, mutation rejection, source qualification, numerical controls, seeded replay, cross-process Numba cache reload and dispatch dependencies. Browser checks cover search identities/controls, exports, saved settings, refusal of an unsupported plain-BP substitution, and stale/empty selections. Existing central multi-rate/evidence rules remain unchanged. No existing source plan, canonical kernel, archived v1 or Phase 11 gate is edited.

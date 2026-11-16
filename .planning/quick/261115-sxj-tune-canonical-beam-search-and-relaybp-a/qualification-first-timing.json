@@ -1,0 +1,264 @@
+{
+  "engine_sha256": "f152db024e8e27449f5de4e3cb6a43f282cf817afdeadd17a0033b4c16730fd1",
+  "exact_real_code_comparisons": 128,
+  "failures": [],
+  "independent_oracle": "separate scalar min-sum equations, masking/tree orchestration and indexed RNG",
+  "paths": {
+    "beam_extra": 360,
+    "capped": 69,
+    "converged": 59,
+    "pruned": 83,
+    "relay_extra": 411
+  },
+  "pilot": [
+    {
+      "code": "toric9",
+      "cohort": "qualification pilot only, seed7392",
+      "controls": {
+        "alpha": 1.0,
+        "beta": 0.0,
+        "damping": 0.5,
+        "first_gamma": 0.125,
+        "gamma_high": 0.66,
+        "gamma_low": -0.24,
+        "initial": 20,
+        "method": "beam",
+        "paper_scale": true,
+        "per_unit": 20,
+        "rounds": 8,
+        "solutions": 1,
+        "units": 32,
+        "width": 4
+      },
+      "counts": {
+        "exact_success": 464,
+        "stabilizer_success": 48
+      },
+      "mean_iterations": 5.9296875,
+      "mean_us": 67.758767578125,
+      "method": "beam",
+      "p": 0.02,
+      "ratio": 0.41508040316646416,
+      "reference_us": 163.24251171875,
+      "shots": 512
+    },
+    {
+      "code": "toric9",
+      "cohort": "qualification pilot only, seed7392",
+      "controls": {
+        "alpha": 1.0,
+        "beta": 0.0,
+        "damping": 0.5,
+        "first_gamma": 0.125,
+        "gamma_high": 0.66,
+        "gamma_low": -0.24,
+        "initial": 20,
+        "method": "relay",
+        "paper_scale": true,
+        "per_unit": 20,
+        "rounds": 8,
+        "solutions": 1,
+        "units": 32,
+        "width": 4
+      },
+      "counts": {
+        "exact_success": 460,
+        "stabilizer_success": 52
+      },
+      "mean_iterations": 5.716796875,
+      "mean_us": 57.922732421875,
+      "method": "relay",
+      "p": 0.02,
+      "ratio": 0.3548262754108433,
+      "reference_us": 163.24251171875,
+      "shots": 512
+    },
+    {
+      "code": "toric11",
+      "cohort": "qualification pilot only, seed7392",
+      "controls": {
+        "alpha": 1.0,
+        "beta": 0.0,
+        "damping": 0.5,
+        "first_gamma": 0.125,
+        "gamma_high": 0.66,
+        "gamma_low": -0.24,
+        "initial": 20,
+        "method": "beam",
+        "paper_scale": true,
+        "per_unit": 20,
+        "rounds": 8,
+        "solutions": 1,
+        "units": 32,
+        "width": 4
+      },
+      "counts": {
+        "exact_success": 456,
+        "stabilizer_success": 56
+      },
+      "mean_iterations": 8.1171875,
+      "mean_us": 95.252751953125,
+      "method": "beam",
+      "p": 0.02,
+      "ratio": 0.22776427474665484,
+      "reference_us": 418.20760546875,
+      "shots": 512
+    },
+    {
+      "code": "toric11",
+      "cohort": "qualification pilot only, seed7392",
+      "controls": {
+        "alpha": 1.0,
+        "beta": 0.0,
+        "damping": 0.5,
+        "first_gamma": 0.125,
+        "gamma_high": 0.66,
+        "gamma_low": -0.24,
+        "initial": 20,
+        "method": "relay",
+        "paper_scale": true,
+        "per_unit": 20,
+        "rounds": 8,
+        "solutions": 1,
+        "units": 32,
+        "width": 4
+      },
+      "counts": {
+        "exact_success": 449,
+        "stabilizer_success": 63
+      },
+      "mean_iterations": 7.802734375,
+      "mean_us": 99.55301171875,
+      "method": "relay",
+      "p": 0.02,
+      "ratio": 0.23804687054212112,
+      "reference_us": 418.20760546875,
+      "shots": 512
+    },
+    {
+      "code": "toric13",
+      "cohort": "qualification pilot only, seed7392",
+      "controls": {
+        "alpha": 1.0,
+        "beta": 0.0,
+        "damping": 0.5,
+        "first_gamma": 0.125,
+        "gamma_high": 0.66,
+        "gamma_low": -0.24,
+        "initial": 20,
+        "method": "beam",
+        "paper_scale": true,
+        "per_unit": 20,
+        "rounds": 8,
+        "solutions": 1,
+        "units": 32,
+        "width": 4
+      },
+      "counts": {
+        "exact_success": 435,
+        "stabilizer_success": 77
+      },
+      "mean_iterations": 10.0078125,
+      "mean_us": 175.26005859375,
+      "method": "beam",
+      "p": 0.02,
+      "ratio": 0.39117524115828517,
+      "reference_us": 448.034640625,
+      "shots": 512
+    },
+    {
+      "code": "toric13",
+      "cohort": "qualification pilot only, seed7392",
+      "controls": {
+        "alpha": 1.0,
+        "beta": 0.0,
+        "damping": 0.5,
+        "first_gamma": 0.125,
+        "gamma_high": 0.66,
+        "gamma_low": -0.24,
+        "initial": 20,
+        "method": "relay",
+        "paper_scale": true,
+        "per_unit": 20,
+        "rounds": 8,
+        "solutions": 1,
+        "units": 32,
+        "width": 4
+      },
+      "counts": {
+        "exact_success": 436,
+        "stabilizer_success": 76
+      },
+      "mean_iterations": 8.6875,
+      "mean_us": 111.250037109375,
+      "method": "relay",
+      "p": 0.02,
+      "ratio": 0.24830677590952177,
+      "reference_us": 448.034640625,
+      "shots": 512
+    },
+    {
+      "code": "toric15",
+      "cohort": "qualification pilot only, seed7392",
+      "controls": {
+        "alpha": 1.0,
+        "beta": 0.0,
+        "damping": 0.5,
+        "first_gamma": 0.125,
+        "gamma_high": 0.66,
+        "gamma_low": -0.24,
+        "initial": 20,
+        "method": "beam",
+        "paper_scale": true,
+        "per_unit": 20,
+        "rounds": 8,
+        "solutions": 1,
+        "units": 32,
+        "width": 4
+      },
+      "counts": {
+        "exact_success": 395,
+        "stabilizer_success": 117
+      },
+      "mean_iterations": 15.56640625,
+      "mean_us": 252.585880859375,
+      "method": "beam",
+      "p": 0.02,
+      "ratio": 0.10357546478589222,
+      "reference_us": 2438.665193359375,
+      "shots": 512
+    },
+    {
+      "code": "toric15",
+      "cohort": "qualification pilot only, seed7392",
+      "controls": {
+        "alpha": 1.0,
+        "beta": 0.0,
+        "damping": 0.5,
+        "first_gamma": 0.125,
+        "gamma_high": 0.66,
+        "gamma_low": -0.24,
+        "initial": 20,
+        "method": "relay",
+        "paper_scale": true,
+        "per_unit": 20,
+        "rounds": 8,
+        "solutions": 1,
+        "units": 32,
+        "width": 4
+      },
+      "counts": {
+        "exact_success": 373,
+        "stabilizer_success": 139
+      },
+      "mean_iterations": 12.083984375,
+      "mean_us": 225.461509765625,
+      "method": "relay",
+      "p": 0.02,
+      "ratio": 0.09245283459966937,
+      "reference_us": 2438.665193359375,
+      "shots": 512
+    }
+  ],
+  "status": "passed"
+}
