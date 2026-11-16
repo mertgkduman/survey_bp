@@ -158429,6 +158429,53 @@
         }
       ],
       "source_path": "data/reproductions/panteleev-2012-04068-lifted-product/verified.json.gz"
+    },
+    {
+      "assets": [
+        {
+          "availability": "tracked",
+          "kind": "markdown",
+          "label": "RESULTS.md",
+          "local_storage_path": null,
+          "path": "data/reproductions/lp1054-relay-gamma80-60/RESULTS.md",
+          "sha256": "008bde40aadef9fe9a2e47d419cdf5a06061b9905840fecd09bce5f799dd2a71",
+          "url": "data/reproductions/lp1054-relay-gamma80-60/RESULTS.md"
+        },
+        {
+          "availability": "tracked",
+          "kind": "csv",
+          "label": "results-table.csv",
+          "local_storage_path": null,
+          "path": "data/reproductions/lp1054-relay-gamma80-60/results-table.csv",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "url": "data/reproductions/lp1054-relay-gamma80-60/results-table.csv"
+        },
+        {
+          "availability": "tracked",
+          "kind": "gzip",
+          "label": "tuning-results.csv.gz",
+          "local_storage_path": null,
+          "path": "data/reproductions/lp1054-relay-gamma80-60/tuning-results.csv.gz",
+          "sha256": "517d9ecbe2f246504b0a5127cd9cab818f78f1684bf9d091bccfb0bc8b345c12",
+          "url": "data/reproductions/lp1054-relay-gamma80-60/tuning-results.csv.gz"
+        },
+        {
+          "availability": "tracked",
+          "kind": "gzip",
+          "label": "verified.json.gz",
+          "local_storage_path": null,
+          "path": "data/reproductions/lp1054-relay-gamma80-60/verified.json.gz",
+          "sha256": "c5e88c1c8c5eb941b0eee52535af852e6c9d99cfe735272a5c2c5b823cc201e7",
+          "url": "data/reproductions/lp1054-relay-gamma80-60/verified.json.gz"
+        }
+      ],
+      "caveat": "User-confirmed one80-sweep uniform-memory leg plus one60-sweep disordered-memory leg,140 maximum per CSS component. Code-capacity adaptation of Relay Eq4, not circuit-paper reproduction. Both logical components count. Numerical backgrounds are fixed source NMS or parent training-only selected BP settings; no parent fresh outcome enters selection. Independent noise/memory streams and four disjoint stage seeds. All selected and ablation confirmations remain separate. This140 budget differs from prior32/128 studies. New latency excludes provenance hashing and is not directly comparable to older instrumented timings.",
+      "dataset_id": "lp1054-relay-gamma80-60",
+      "evidence_status": "canonical_adaptation",
+      "label": "LP1054 RelayBP: tuned uniform80 and disordered60 gamma",
+      "paper_id": "panteleev-2012-04068-v2",
+      "points": [],
+      "source_path": "data/reproductions/lp1054-relay-gamma80-60/verified.json.gz"
     }
   ],
   "decoders": [
@@ -238271,6 +238318,32 @@
         "original_instruction_path": "data/reproductions/panteleev-2012-04068-lifted-product/README.md",
         "study_path": "data/reproductions/panteleev-2012-04068-lifted-product/plan.json"
       }
+    },
+    {
+      "code_ids": [
+        "lp1054"
+      ],
+      "dataset_id": "lp1054-relay-gamma80-60",
+      "dataset_ids": [
+        "lp1054-relay-gamma80-60"
+      ],
+      "decoder_ids": [],
+      "description": "User-confirmed one80-sweep uniform-memory leg plus one60-sweep disordered-memory leg,140 maximum per CSS component. Code-capacity adaptation of Relay Eq4, not circuit-paper reproduction. Both logical components count. Numerical backgrounds are fixed source NMS or parent training-only selected BP settings; no parent fresh outcome enters selection. Independent noise/memory streams and four disjoint stage seeds. All selected and ablation confirmations remain separate. This140 budget differs from prior32/128 studies. New latency excludes provenance hashing and is not directly comparable to older instrumented timings.",
+      "evidence_status": "canonical_adaptation",
+      "experiment_id": "lp1054-relay-gamma80-60",
+      "paper_ids": [
+        "panteleev-2012-04068-v2"
+      ],
+      "reproduction_recipe": {
+        "budget_note": "Collection audits retained cohorts; simulations use frozen point indices and must not overwrite completed evidence.",
+        "commands": [
+          "PYTHONPATH=src .venv/bin/python data/reproductions/lp1054-relay-gamma80-60/run.py --collect"
+        ],
+        "decoder_path": null,
+        "kind": "source_command",
+        "original_instruction_path": "data/reproductions/lp1054-relay-gamma80-60/README.md",
+        "study_path": "data/reproductions/lp1054-relay-gamma80-60/plan.json"
+      }
     }
   ],
   "extension_sources": [
@@ -238325,6 +238398,10 @@
     {
       "path": "data/reproductions/panteleev-2012-04068-lifted-product/catalog.json",
       "sha256": "2fcb8f472b5201d43270f3a88bd21cd9f809b526b5ad3f8731929416a04b57ee"
+    },
+    {
+      "path": "data/reproductions/lp1054-relay-gamma80-60/catalog.json",
+      "sha256": "30b72ed87859054ee6f55aefa9bd39a80bcbb224cc0bcdabd41cd8bfd0bd636f"
     }
   ],
   "limitations": [

@@ -151,3 +151,13 @@ def test_original_lifted_product_stack_exposes_family_budget_prior_and_precision
     row = json.loads(subprocess.check_output(['node','-e',script,json.dumps(config)],cwd=ROOT,text=True))
     assert row['algorithm']==algorithm and row['retired'] is None
     assert all(text in row['label'] for text in ('MS','d = 0.3','T = 32','λ = 10','precision = float64','p₀ = '+prior))
+
+
+def test_relay_gamma80_60_exposes_both_phase_caps_and_memory_coefficients():
+    config={'family':'binary_css','check_rule':'min_sum','message_resolution':'float64','noise_model':'depolarizing',
+        'prior':'2p/3','alpha':.8,'beta':.2,'max_iterations':140,
+        'search':{'method':'relay','initial':80,'per_unit':60,'units':1,'solutions':1,'damping':.3,
+            'first_gamma':.35,'gamma_low':-.254,'gamma_high':.985}}
+    script="require('./web/research/decoder-display.js');console.log(DecoderDisplay.describe({configuration:{effective_configuration:JSON.parse(process.argv[1])}}).label);"
+    label=subprocess.check_output(['node','-e',script,json.dumps(config)],cwd=ROOT,text=True)
+    assert all(s in label for s in ('RelayBP','I₀ = 80','I₊ = 60','U = 1','S = 1','γ₀ = 0.35','γₗ = -0.254','γₕ = 0.985','α = 0.8','β = 0.2','p₀ = 2p/3'))

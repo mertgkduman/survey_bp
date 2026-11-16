@@ -1,0 +1,48 @@
+{
+  "array": {
+    "argv": [
+      "sbatch",
+      "--parsable",
+      "--partition=common,scavenger",
+      "--account=pfisterlab",
+      "--nodes=1",
+      "--ntasks=1",
+      "--cpus-per-task=1",
+      "--mem=3G",
+      "--time=4-00:00:00",
+      "--requeue",
+      "--chdir=/hpc/group/pfisterlab/mg551/storage/survey_bp",
+      "--export=ALL,PYTHONPATH=/hpc/group/pfisterlab/mg551/storage/survey_bp/src,OMP_NUM_THREADS=1,OPENBLAS_NUM_THREADS=1,MKL_NUM_THREADS=1,NUMBA_NUM_THREADS=1",
+      "--job-name=lp1054-gamma80-60",
+      "--array=0-11%12",
+      "--signal=B:USR1@180",
+      "--output=/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/lp1054-relay-gamma80-60/results/point-%A_%a.log",
+      "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/lp1054-relay-gamma80-60/worker.sh"
+    ],
+    "id": "61942447",
+    "plan_sha256": "3f73fa64b6275e4c11663b043747bc3b76441d884865affd5878775904ea8c2d"
+  },
+  "collect": {
+    "argv": [
+      "sbatch",
+      "--parsable",
+      "--partition=common,scavenger",
+      "--account=pfisterlab",
+      "--nodes=1",
+      "--ntasks=1",
+      "--cpus-per-task=1",
+      "--mem=3G",
+      "--time=4-00:00:00",
+      "--requeue",
+      "--chdir=/hpc/group/pfisterlab/mg551/storage/survey_bp",
+      "--export=ALL,PYTHONPATH=/hpc/group/pfisterlab/mg551/storage/survey_bp/src,OMP_NUM_THREADS=1,OPENBLAS_NUM_THREADS=1,MKL_NUM_THREADS=1,NUMBA_NUM_THREADS=1",
+      "--job-name=lp1054-gamma-collect",
+      "--dependency=afterok:61942447",
+      "--mem=16G",
+      "--output=/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/lp1054-relay-gamma80-60/results/collect-%j.log",
+      "--wrap=export NUMBA_CACHE_DIR=\"/tmp/lp1054-gamma-collect-${SLURM_JOB_ID}\"; exec /hpc/group/pfisterlab/mg551/storage/survey_bp/.venv/bin/python /hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/lp1054-relay-gamma80-60/run.py --collect"
+    ],
+    "id": "61942448",
+    "plan_sha256": "3f73fa64b6275e4c11663b043747bc3b76441d884865affd5878775904ea8c2d"
+  }
+}

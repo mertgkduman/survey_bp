@@ -124,7 +124,8 @@
     "data/reproductions/roffe-2005-07016-runtime-budget/catalog.json",
     "data/reproductions/roffe-2005-07016-search/catalog.json",
     "data/reproductions/roffe-2005-07016-search-frontier/catalog.json",
-    "data/reproductions/panteleev-2012-04068-lifted-product/catalog.json"
+    "data/reproductions/panteleev-2012-04068-lifted-product/catalog.json",
+    "data/reproductions/lp1054-relay-gamma80-60/catalog.json"
   ],
   "public_retired_dataset_ids": [
     "mackay-unicycle-bp"

@@ -1,0 +1,390 @@
+{
+  "claim_limit": "User-confirmed one80-sweep uniform-memory leg plus one60-sweep disordered-memory leg,140 maximum per CSS component. Code-capacity adaptation of Relay Eq4, not circuit-paper reproduction. Both logical components count. Numerical backgrounds are fixed source NMS or parent training-only selected BP settings; no parent fresh outcome enters selection. Independent noise/memory streams and four disjoint stage seeds. All selected and ablation confirmations remain separate. This140 budget differs from prior32/128 studies. New latency excludes provenance hashing and is not directly comparable to older instrumented timings.",
+  "codes": {
+    "lp1054": {
+      "artifact": "data/reproductions/panteleev-2012-04068-lifted-product/code.npz",
+      "semantic_sha256": "152ba8594a1928dabb30ec9a731f7cf8c421a284dec7af3ca5c097c08b3b215b"
+    }
+  },
+  "jobs": [
+    {
+      "arm": "source_numerics",
+      "background": "source_numerics",
+      "id": "source_numerics-p0200",
+      "numeric_controls": {
+        "alpha": 0.625,
+        "beta": 0.0,
+        "damping": 0.0
+      },
+      "physical_p": 0.02
+    },
+    {
+      "arm": "prior_tuned_numerics",
+      "background": "prior_tuned_numerics",
+      "id": "prior_tuned_numerics-p0200",
+      "numeric_controls": {
+        "alpha": 0.8,
+        "beta": 0.2,
+        "damping": 0.3
+      },
+      "physical_p": 0.02
+    },
+    {
+      "arm": "source_numerics",
+      "background": "source_numerics",
+      "id": "source_numerics-p0400",
+      "numeric_controls": {
+        "alpha": 0.625,
+        "beta": 0.0,
+        "damping": 0.0
+      },
+      "physical_p": 0.04
+    },
+    {
+      "arm": "prior_tuned_numerics",
+      "background": "prior_tuned_numerics",
+      "id": "prior_tuned_numerics-p0400",
+      "numeric_controls": {
+        "alpha": 0.8,
+        "beta": 0.2,
+        "damping": 0.3
+      },
+      "physical_p": 0.04
+    },
+    {
+      "arm": "source_numerics",
+      "background": "source_numerics",
+      "id": "source_numerics-p0600",
+      "numeric_controls": {
+        "alpha": 0.625,
+        "beta": 0.0,
+        "damping": 0.0
+      },
+      "physical_p": 0.06
+    },
+    {
+      "arm": "prior_tuned_numerics",
+      "background": "prior_tuned_numerics",
+      "id": "prior_tuned_numerics-p0600",
+      "numeric_controls": {
+        "alpha": 0.8,
+        "beta": 0.2,
+        "damping": 0.3
+      },
+      "physical_p": 0.06
+    },
+    {
+      "arm": "source_numerics",
+      "background": "source_numerics",
+      "id": "source_numerics-p0800",
+      "numeric_controls": {
+        "alpha": 0.625,
+        "beta": 0.0,
+        "damping": 0.0
+      },
+      "physical_p": 0.08
+    },
+    {
+      "arm": "prior_tuned_numerics",
+      "background": "prior_tuned_numerics",
+      "id": "prior_tuned_numerics-p0800",
+      "numeric_controls": {
+        "alpha": 0.8,
+        "beta": 0.0,
+        "damping": 0.3
+      },
+      "physical_p": 0.08
+    },
+    {
+      "arm": "source_numerics",
+      "background": "source_numerics",
+      "id": "source_numerics-p1000",
+      "numeric_controls": {
+        "alpha": 0.625,
+        "beta": 0.0,
+        "damping": 0.0
+      },
+      "physical_p": 0.1
+    },
+    {
+      "arm": "prior_tuned_numerics",
+      "background": "prior_tuned_numerics",
+      "id": "prior_tuned_numerics-p1000",
+      "numeric_controls": {
+        "alpha": 0.8,
+        "beta": 0.0,
+        "damping": 0.3
+      },
+      "physical_p": 0.1
+    },
+    {
+      "arm": "source_numerics",
+      "background": "source_numerics",
+      "id": "source_numerics-p1200",
+      "numeric_controls": {
+        "alpha": 0.625,
+        "beta": 0.0,
+        "damping": 0.0
+      },
+      "physical_p": 0.12
+    },
+    {
+      "arm": "prior_tuned_numerics",
+      "background": "prior_tuned_numerics",
+      "id": "prior_tuned_numerics-p1200",
+      "numeric_controls": {
+        "alpha": 0.8,
+        "beta": 0.0,
+        "damping": 0.3
+      },
+      "physical_p": 0.12
+    }
+  ],
+  "label": "LP1054 RelayBP: tuned uniform80 and disordered60 gamma",
+  "paper_id": "panteleev-2012-04068-v2",
+  "parent_plan_sha256": "c9de0d13a53d0ce6abba76547c908e150cc3541bf1cfd4255e19bfd703c34ae9",
+  "parent_training": [
+    {
+      "numeric_controls": {
+        "alpha": 0.8,
+        "beta": 0.2,
+        "damping": 0.3
+      },
+      "physical_p": 0.02,
+      "selection_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/tuned_bp-p0200/selection.json",
+      "selection_sha256": "4d9fb59c63efe79c2c81417e4a68ffa0681deda1176ad2523f4a6bb44a390362"
+    },
+    {
+      "numeric_controls": {
+        "alpha": 0.8,
+        "beta": 0.2,
+        "damping": 0.3
+      },
+      "physical_p": 0.04,
+      "selection_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/tuned_bp-p0400/selection.json",
+      "selection_sha256": "9fd115875c01eea494963d915b7f06e533ae81880204b6a24e01d79484d3446b"
+    },
+    {
+      "numeric_controls": {
+        "alpha": 0.8,
+        "beta": 0.2,
+        "damping": 0.3
+      },
+      "physical_p": 0.06,
+      "selection_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/tuned_bp-p0600/selection.json",
+      "selection_sha256": "69b75ebbab066d08fb0a80c7c2a6c8eb6c707564f5510ec935e4e1fe2f90a2ee"
+    },
+    {
+      "numeric_controls": {
+        "alpha": 0.8,
+        "beta": 0.0,
+        "damping": 0.3
+      },
+      "physical_p": 0.08,
+      "selection_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/tuned_bp-p0800/selection.json",
+      "selection_sha256": "68192f4a5a67ae44a0d4b1313fd53fb93de11c215278b73fb7f9f06dfa4fc7fd"
+    },
+    {
+      "numeric_controls": {
+        "alpha": 0.8,
+        "beta": 0.0,
+        "damping": 0.3
+      },
+      "physical_p": 0.1,
+      "selection_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/tuned_bp-p1000/selection.json",
+      "selection_sha256": "d30cd3670b1066af4422437b1e67f8765a611cc2a69c9407cca6742582d19730"
+    },
+    {
+      "numeric_controls": {
+        "alpha": 0.8,
+        "beta": 0.0,
+        "damping": 0.3
+      },
+      "physical_p": 0.12,
+      "selection_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/tuned_bp-p1200/selection.json",
+      "selection_sha256": "0e3588e359d959f184788434d669057cc221e7961b8b0bc84594a7341cf1366e"
+    }
+  ],
+  "protocol": {
+    "additional_legs": 1,
+    "chunk_size": 1024,
+    "coarse_shots": 1024,
+    "disorder_windows": [
+      [
+        -0.75,
+        0.25
+      ],
+      [
+        -0.5,
+        0.0
+      ],
+      [
+        -0.5,
+        0.5
+      ],
+      [
+        -0.5,
+        1.0
+      ],
+      [
+        -0.375,
+        -0.125
+      ],
+      [
+        -0.254,
+        0.985
+      ],
+      [
+        -0.25,
+        0.25
+      ],
+      [
+        -0.25,
+        0.75
+      ],
+      [
+        -0.24,
+        0.66
+      ],
+      [
+        -0.161,
+        0.815
+      ],
+      [
+        -0.125,
+        0.125
+      ],
+      [
+        0.0,
+        0.5
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        0.125,
+        0.375
+      ],
+      [
+        0.25,
+        0.75
+      ],
+      [
+        0.375,
+        0.625
+      ],
+      [
+        0.5,
+        1.0
+      ],
+      [
+        0.625,
+        0.875
+      ]
+    ],
+    "disordered_iterations": 60,
+    "early_stop": "S=1; original-syndrome convergence ends each leg and skips the second leg if the first succeeds",
+    "finalist_failures": 40,
+    "finalist_shots": 32768,
+    "finalists": "top4 genuine-disorder controls plus best in each first-gamma band(negative/zero,small,medium,large), plus reset-zero control",
+    "first_gamma_grid": [
+      -0.5,
+      -0.25,
+      0.0,
+      0.125,
+      0.25,
+      0.35,
+      0.5,
+      0.625,
+      0.75,
+      0.875,
+      1.0
+    ],
+    "max_shots": 100000000,
+    "memory_seeds": {
+      "coarse": 2026111671,
+      "confirmation": 2026111674,
+      "finalist": 2026111672,
+      "refine": 2026111673
+    },
+    "refine_failures": 60,
+    "refine_shots": 131072,
+    "refinement": "all finalists plus coordinate neighbors of best genuine-disorder finalist on a new independent refinement cohort",
+    "roles": [
+      "gamma_selected",
+      "uniform_phase_only",
+      "disordered_phase_only",
+      "reset_zero_gamma",
+      "continuous_bp140"
+    ],
+    "seeds": {
+      "coarse": 2026111661,
+      "confirmation": 2026111664,
+      "finalist": 2026111662,
+      "refine": 2026111663
+    },
+    "selection": "minimum refinement-cohort block LER among genuine disorder settings; ties mean total sweeps, decode ns, control hash",
+    "target_failures": 20,
+    "uniform_iterations": 80
+  },
+  "source": {
+    "checks": "CSS commutation; n/k/ranks; paired logical quotient basis; independent explicit polynomial-index construction in tests",
+    "circulant_convention": "row0 has1 at exponent; inverse convention is an equivalent within-lift permutation",
+    "distance": "unknown; BP-OSD search found no nondegenerate word of weight<20; not a lower-bound certificate",
+    "example": "Example4, Eq12 and Example3 LP(A,A*)",
+    "exponents": [
+      [
+        1,
+        2,
+        4,
+        8,
+        16
+      ],
+      [
+        5,
+        10,
+        20,
+        9,
+        18
+      ],
+      [
+        25,
+        19,
+        7,
+        14,
+        28
+      ]
+    ],
+    "k": 140,
+    "lift": 31,
+    "n": 1054,
+    "paper": "arXiv:2012.04068v2",
+    "ranks": [
+      457,
+      457
+    ],
+    "rates": [
+      0.02,
+      0.04,
+      0.06,
+      0.08,
+      0.1,
+      0.12
+    ],
+    "semantic_sha256": "152ba8594a1928dabb30ec9a731f7cf8c421a284dec7af3ca5c097c08b3b215b",
+    "settings_limit": "Original LP paper provides no LER plot/rate grid/numeric iteration cap for1054. Controlled prospective depolarizing grid0.02,0.04,0.06,0.08,0.10,0.12. Budget32 and scale0.625 borrowed from cited BP-OSD paper, whose schedule is layered; this study uses canonical flooding. No original LP paper curve ordinates exist to compare.",
+    "source_archive_sha256": {
+      "1904.02703v3": "5aa90578b1a93e18dedf505784d3b2836b2fd5a9bbe91bff2617e5fc6603975e",
+      "2012.04068v2": "030b84d1df843b402d7c991ffb777d406be7e140e2803acec996a15201ec3a33"
+    },
+    "source_settings": {
+      "alpha": 0.625,
+      "budget_source": "cited arXiv:1904.02703v3, Section3; not stated for1054 in original LP paper",
+      "check_rule": "min_sum",
+      "max_iterations": 32
+    },
+    "title": "Quantum LDPC Codes with Almost Linear Minimum Distance"
+  },
+  "study_id": "lp1054-relay-gamma80-60"
+}

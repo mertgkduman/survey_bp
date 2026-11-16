@@ -1,0 +1,67 @@
+{
+  "datasets": [
+    {
+      "assets": [
+        {
+          "kind": "markdown",
+          "label": "RESULTS.md",
+          "path": "data/reproductions/lp1054-relay-gamma80-60/RESULTS.md"
+        },
+        {
+          "kind": "csv",
+          "label": "results-table.csv",
+          "path": "data/reproductions/lp1054-relay-gamma80-60/results-table.csv"
+        },
+        {
+          "kind": "gzip",
+          "label": "tuning-results.csv.gz",
+          "path": "data/reproductions/lp1054-relay-gamma80-60/tuning-results.csv.gz"
+        },
+        {
+          "kind": "gzip",
+          "label": "verified.json.gz",
+          "path": "data/reproductions/lp1054-relay-gamma80-60/verified.json.gz"
+        }
+      ],
+      "caveat": "User-confirmed one80-sweep uniform-memory leg plus one60-sweep disordered-memory leg,140 maximum per CSS component. Code-capacity adaptation of Relay Eq4, not circuit-paper reproduction. Both logical components count. Numerical backgrounds are fixed source NMS or parent training-only selected BP settings; no parent fresh outcome enters selection. Independent noise/memory streams and four disjoint stage seeds. All selected and ablation confirmations remain separate. This140 budget differs from prior32/128 studies. New latency excludes provenance hashing and is not directly comparable to older instrumented timings.",
+      "dataset_id": "lp1054-relay-gamma80-60",
+      "evidence_status": "canonical_adaptation",
+      "label": "LP1054 RelayBP: tuned uniform80 and disordered60 gamma",
+      "paper_id": "panteleev-2012-04068-v2",
+      "points": [],
+      "source_path": "data/reproductions/lp1054-relay-gamma80-60/verified.json.gz"
+    }
+  ],
+  "decoders": [],
+  "experiments": [
+    {
+      "code_ids": [
+        "lp1054"
+      ],
+      "dataset_id": "lp1054-relay-gamma80-60",
+      "dataset_ids": [
+        "lp1054-relay-gamma80-60"
+      ],
+      "decoder_ids": [],
+      "description": "User-confirmed one80-sweep uniform-memory leg plus one60-sweep disordered-memory leg,140 maximum per CSS component. Code-capacity adaptation of Relay Eq4, not circuit-paper reproduction. Both logical components count. Numerical backgrounds are fixed source NMS or parent training-only selected BP settings; no parent fresh outcome enters selection. Independent noise/memory streams and four disjoint stage seeds. All selected and ablation confirmations remain separate. This140 budget differs from prior32/128 studies. New latency excludes provenance hashing and is not directly comparable to older instrumented timings.",
+      "evidence_status": "canonical_adaptation",
+      "experiment_id": "lp1054-relay-gamma80-60",
+      "paper_ids": [
+        "panteleev-2012-04068-v2"
+      ],
+      "reproduction_recipe": {
+        "budget_note": "Collection audits retained cohorts; simulations use frozen point indices and must not overwrite completed evidence.",
+        "commands": [
+          "PYTHONPATH=src .venv/bin/python data/reproductions/lp1054-relay-gamma80-60/run.py --collect"
+        ],
+        "decoder_path": null,
+        "kind": "source_command",
+        "original_instruction_path": "data/reproductions/lp1054-relay-gamma80-60/README.md",
+        "study_path": "data/reproductions/lp1054-relay-gamma80-60/plan.json"
+      }
+    }
+  ],
+  "papers": [],
+  "result_series": [],
+  "schema": "research-catalog-extension-v1"
+}
