@@ -1,0 +1,447 @@
+{
+  "claim_limit": "Original LP paper provides no LER plot/rate grid/numeric iteration cap for1054. Controlled prospective depolarizing grid0.02,0.04,0.06,0.08,0.10,0.12. Budget32 and scale0.625 borrowed from cited BP-OSD paper, whose schedule is layered; this study uses canonical flooding. No original LP paper curve ordinates exist to compare. Original LP Example4, depolarizing code capacity. Q-BP, tuning, Relay and beam are canonical adaptations. Search128 is explicitly4x the documented BP cap. No native runtime or statistical paper agreement is claimed before confirmation.",
+  "codes": {
+    "lp1054": {
+      "artifact": "data/reproductions/panteleev-2012-04068-lifted-product/code.npz",
+      "semantic_sha256": "152ba8594a1928dabb30ec9a731f7cf8c421a284dec7af3ca5c097c08b3b215b"
+    }
+  },
+  "jobs": [
+    {
+      "arm": "bp",
+      "id": "bp-p0200",
+      "physical_p": 0.02
+    },
+    {
+      "arm": "qbp",
+      "id": "qbp-p0200",
+      "physical_p": 0.02
+    },
+    {
+      "arm": "osd0",
+      "id": "osd0-p0200",
+      "physical_p": 0.02
+    },
+    {
+      "arm": "cs10",
+      "id": "cs10-p0200",
+      "physical_p": 0.02
+    },
+    {
+      "arm": "qbp_osd0",
+      "id": "qbp_osd0-p0200",
+      "physical_p": 0.02
+    },
+    {
+      "arm": "qbp_cs10",
+      "id": "qbp_cs10-p0200",
+      "physical_p": 0.02
+    },
+    {
+      "arm": "tuned_bp",
+      "id": "tuned_bp-p0200",
+      "physical_p": 0.02
+    },
+    {
+      "arm": "tuned_qbp",
+      "id": "tuned_qbp-p0200",
+      "physical_p": 0.02
+    },
+    {
+      "arm": "relay32",
+      "id": "relay32-p0200",
+      "physical_p": 0.02
+    },
+    {
+      "arm": "relay128",
+      "id": "relay128-p0200",
+      "physical_p": 0.02
+    },
+    {
+      "arm": "beam32",
+      "id": "beam32-p0200",
+      "physical_p": 0.02
+    },
+    {
+      "arm": "beam128",
+      "id": "beam128-p0200",
+      "physical_p": 0.02
+    },
+    {
+      "arm": "bp",
+      "id": "bp-p0400",
+      "physical_p": 0.04
+    },
+    {
+      "arm": "qbp",
+      "id": "qbp-p0400",
+      "physical_p": 0.04
+    },
+    {
+      "arm": "osd0",
+      "id": "osd0-p0400",
+      "physical_p": 0.04
+    },
+    {
+      "arm": "cs10",
+      "id": "cs10-p0400",
+      "physical_p": 0.04
+    },
+    {
+      "arm": "qbp_osd0",
+      "id": "qbp_osd0-p0400",
+      "physical_p": 0.04
+    },
+    {
+      "arm": "qbp_cs10",
+      "id": "qbp_cs10-p0400",
+      "physical_p": 0.04
+    },
+    {
+      "arm": "tuned_bp",
+      "id": "tuned_bp-p0400",
+      "physical_p": 0.04
+    },
+    {
+      "arm": "tuned_qbp",
+      "id": "tuned_qbp-p0400",
+      "physical_p": 0.04
+    },
+    {
+      "arm": "relay32",
+      "id": "relay32-p0400",
+      "physical_p": 0.04
+    },
+    {
+      "arm": "relay128",
+      "id": "relay128-p0400",
+      "physical_p": 0.04
+    },
+    {
+      "arm": "beam32",
+      "id": "beam32-p0400",
+      "physical_p": 0.04
+    },
+    {
+      "arm": "beam128",
+      "id": "beam128-p0400",
+      "physical_p": 0.04
+    },
+    {
+      "arm": "bp",
+      "id": "bp-p0600",
+      "physical_p": 0.06
+    },
+    {
+      "arm": "qbp",
+      "id": "qbp-p0600",
+      "physical_p": 0.06
+    },
+    {
+      "arm": "osd0",
+      "id": "osd0-p0600",
+      "physical_p": 0.06
+    },
+    {
+      "arm": "cs10",
+      "id": "cs10-p0600",
+      "physical_p": 0.06
+    },
+    {
+      "arm": "qbp_osd0",
+      "id": "qbp_osd0-p0600",
+      "physical_p": 0.06
+    },
+    {
+      "arm": "qbp_cs10",
+      "id": "qbp_cs10-p0600",
+      "physical_p": 0.06
+    },
+    {
+      "arm": "tuned_bp",
+      "id": "tuned_bp-p0600",
+      "physical_p": 0.06
+    },
+    {
+      "arm": "tuned_qbp",
+      "id": "tuned_qbp-p0600",
+      "physical_p": 0.06
+    },
+    {
+      "arm": "relay32",
+      "id": "relay32-p0600",
+      "physical_p": 0.06
+    },
+    {
+      "arm": "relay128",
+      "id": "relay128-p0600",
+      "physical_p": 0.06
+    },
+    {
+      "arm": "beam32",
+      "id": "beam32-p0600",
+      "physical_p": 0.06
+    },
+    {
+      "arm": "beam128",
+      "id": "beam128-p0600",
+      "physical_p": 0.06
+    },
+    {
+      "arm": "bp",
+      "id": "bp-p0800",
+      "physical_p": 0.08
+    },
+    {
+      "arm": "qbp",
+      "id": "qbp-p0800",
+      "physical_p": 0.08
+    },
+    {
+      "arm": "osd0",
+      "id": "osd0-p0800",
+      "physical_p": 0.08
+    },
+    {
+      "arm": "cs10",
+      "id": "cs10-p0800",
+      "physical_p": 0.08
+    },
+    {
+      "arm": "qbp_osd0",
+      "id": "qbp_osd0-p0800",
+      "physical_p": 0.08
+    },
+    {
+      "arm": "qbp_cs10",
+      "id": "qbp_cs10-p0800",
+      "physical_p": 0.08
+    },
+    {
+      "arm": "tuned_bp",
+      "id": "tuned_bp-p0800",
+      "physical_p": 0.08
+    },
+    {
+      "arm": "tuned_qbp",
+      "id": "tuned_qbp-p0800",
+      "physical_p": 0.08
+    },
+    {
+      "arm": "relay32",
+      "id": "relay32-p0800",
+      "physical_p": 0.08
+    },
+    {
+      "arm": "relay128",
+      "id": "relay128-p0800",
+      "physical_p": 0.08
+    },
+    {
+      "arm": "beam32",
+      "id": "beam32-p0800",
+      "physical_p": 0.08
+    },
+    {
+      "arm": "beam128",
+      "id": "beam128-p0800",
+      "physical_p": 0.08
+    },
+    {
+      "arm": "bp",
+      "id": "bp-p1000",
+      "physical_p": 0.1
+    },
+    {
+      "arm": "qbp",
+      "id": "qbp-p1000",
+      "physical_p": 0.1
+    },
+    {
+      "arm": "osd0",
+      "id": "osd0-p1000",
+      "physical_p": 0.1
+    },
+    {
+      "arm": "cs10",
+      "id": "cs10-p1000",
+      "physical_p": 0.1
+    },
+    {
+      "arm": "qbp_osd0",
+      "id": "qbp_osd0-p1000",
+      "physical_p": 0.1
+    },
+    {
+      "arm": "qbp_cs10",
+      "id": "qbp_cs10-p1000",
+      "physical_p": 0.1
+    },
+    {
+      "arm": "tuned_bp",
+      "id": "tuned_bp-p1000",
+      "physical_p": 0.1
+    },
+    {
+      "arm": "tuned_qbp",
+      "id": "tuned_qbp-p1000",
+      "physical_p": 0.1
+    },
+    {
+      "arm": "relay32",
+      "id": "relay32-p1000",
+      "physical_p": 0.1
+    },
+    {
+      "arm": "relay128",
+      "id": "relay128-p1000",
+      "physical_p": 0.1
+    },
+    {
+      "arm": "beam32",
+      "id": "beam32-p1000",
+      "physical_p": 0.1
+    },
+    {
+      "arm": "beam128",
+      "id": "beam128-p1000",
+      "physical_p": 0.1
+    },
+    {
+      "arm": "bp",
+      "id": "bp-p1200",
+      "physical_p": 0.12
+    },
+    {
+      "arm": "qbp",
+      "id": "qbp-p1200",
+      "physical_p": 0.12
+    },
+    {
+      "arm": "osd0",
+      "id": "osd0-p1200",
+      "physical_p": 0.12
+    },
+    {
+      "arm": "cs10",
+      "id": "cs10-p1200",
+      "physical_p": 0.12
+    },
+    {
+      "arm": "qbp_osd0",
+      "id": "qbp_osd0-p1200",
+      "physical_p": 0.12
+    },
+    {
+      "arm": "qbp_cs10",
+      "id": "qbp_cs10-p1200",
+      "physical_p": 0.12
+    },
+    {
+      "arm": "tuned_bp",
+      "id": "tuned_bp-p1200",
+      "physical_p": 0.12
+    },
+    {
+      "arm": "tuned_qbp",
+      "id": "tuned_qbp-p1200",
+      "physical_p": 0.12
+    },
+    {
+      "arm": "relay32",
+      "id": "relay32-p1200",
+      "physical_p": 0.12
+    },
+    {
+      "arm": "relay128",
+      "id": "relay128-p1200",
+      "physical_p": 0.12
+    },
+    {
+      "arm": "beam32",
+      "id": "beam32-p1200",
+      "physical_p": 0.12
+    },
+    {
+      "arm": "beam128",
+      "id": "beam128-p1200",
+      "physical_p": 0.12
+    }
+  ],
+  "label": "Panteleev-Kalachev lifted product [[1054,140]]: full canonical decoder stack",
+  "paper_id": "panteleev-2012-04068-v2",
+  "protocol": {
+    "coarse_shots": 512,
+    "finalist_failures": 40,
+    "finalist_shots": 8192,
+    "jobs": "one single-threaded CPU per arm/physical-rate point, both components counted",
+    "max_shots": 100000000,
+    "search_budgets": "32 or128 cumulative sweeps per CSS component; complete branch/relay work included",
+    "seeds": {
+      "coarse": 2026111601,
+      "confirmation": 2026111603,
+      "finalist": 2026111602
+    },
+    "selection": "minimum finalist block LER; exact ties total BP sweeps, warmed decode ns, configuration hash",
+    "target_failures": 20
+  },
+  "source": {
+    "checks": "CSS commutation; n/k/ranks; paired logical quotient basis; independent explicit polynomial-index construction in tests",
+    "circulant_convention": "row0 has1 at exponent; inverse convention is an equivalent within-lift permutation",
+    "distance": "unknown; BP-OSD search found no nondegenerate word of weight<20; not a lower-bound certificate",
+    "example": "Example4, Eq12 and Example3 LP(A,A*)",
+    "exponents": [
+      [
+        1,
+        2,
+        4,
+        8,
+        16
+      ],
+      [
+        5,
+        10,
+        20,
+        9,
+        18
+      ],
+      [
+        25,
+        19,
+        7,
+        14,
+        28
+      ]
+    ],
+    "k": 140,
+    "lift": 31,
+    "n": 1054,
+    "paper": "arXiv:2012.04068v2",
+    "ranks": [
+      457,
+      457
+    ],
+    "rates": [
+      0.02,
+      0.04,
+      0.06,
+      0.08,
+      0.1,
+      0.12
+    ],
+    "semantic_sha256": "152ba8594a1928dabb30ec9a731f7cf8c421a284dec7af3ca5c097c08b3b215b",
+    "settings_limit": "Original LP paper provides no LER plot/rate grid/numeric iteration cap for1054. Controlled prospective depolarizing grid0.02,0.04,0.06,0.08,0.10,0.12. Budget32 and scale0.625 borrowed from cited BP-OSD paper, whose schedule is layered; this study uses canonical flooding. No original LP paper curve ordinates exist to compare.",
+    "source_archive_sha256": {
+      "1904.02703v3": "5aa90578b1a93e18dedf505784d3b2836b2fd5a9bbe91bff2617e5fc6603975e",
+      "2012.04068v2": "030b84d1df843b402d7c991ffb777d406be7e140e2803acec996a15201ec3a33"
+    },
+    "source_settings": {
+      "alpha": 0.625,
+      "budget_source": "cited arXiv:1904.02703v3, Section3; not stated for1054 in original LP paper",
+      "check_rule": "min_sum",
+      "max_iterations": 32
+    },
+    "title": "Quantum LDPC Codes with Almost Linear Minimum Distance"
+  },
+  "study_id": "panteleev-lp1054-full-stack"
+}

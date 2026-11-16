@@ -273,6 +273,7 @@
     "BB72": "bb72",
     "C2": "c2",
     "GB46": "gb46",
+    "LP1054": "lp1054",
     "bb72-css": "bb72",
     "double_Gross": "double-gross",
     "double_Gross_288_12_18": "double-gross",
@@ -290,7 +291,8 @@
     "toric11",
     "toric13",
     "toric15",
-    "toric9"
+    "toric9",
+    "lp1054"
   ],
   "resolution": {
     "coefficients": [

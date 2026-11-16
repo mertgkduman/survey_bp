@@ -1,0 +1,496 @@
+{
+  "claim_limit": "Original LP paper provides no LER plot/rate grid/numeric iteration cap for1054. Controlled prospective depolarizing grid0.02,0.04,0.06,0.08,0.10,0.12. Budget32 and scale0.625 borrowed from cited BP-OSD paper, whose schedule is layered; this study uses canonical flooding. No original LP paper curve ordinates exist to compare. Original LP Example4, depolarizing code capacity. Q-BP, tuning, Relay and beam are canonical adaptations. Search128 is explicitly4x the documented BP cap. No native runtime or statistical paper agreement is claimed before confirmation.",
+  "codes": {
+    "lp1054": {
+      "artifact": "data/reproductions/panteleev-2012-04068-lifted-product/code.npz",
+      "semantic_sha256": "152ba8594a1928dabb30ec9a731f7cf8c421a284dec7af3ca5c097c08b3b215b"
+    }
+  },
+  "implementation_sha256": {
+    "data/reproductions/bp_study_runtime.py": "3b951325d11c974dbf479aeebd7747c9d5bbeabb5189a85e0f7156be2f64b46f",
+    "data/reproductions/mackay-0304161-unicycle/codes.json": "3e8bfec031c6f3291599669e85fc3369caefa9113d4bc05b11d43d21d8ce7d7b",
+    "data/reproductions/mackay-0304161-unicycle/codes/unicycle274.npz": "1b9db00324dc3e52636deecfb92559005e31a4ed7a2200e8088421f4409ee81c",
+    "data/reproductions/mackay-0304161-unicycle/codes/unicycle74.npz": "63d4611d984507a6d58294ba216db5dabf3c72578a934cfcee5a2d52b9332834",
+    "data/reproductions/mackay-0304161-unicycle/run.py": "73eee81703693e6bafd5b4db076b6f55749407a9340873938dd90940897376d3",
+    "data/reproductions/mackay-0304161-unicycle/source.json": "05a8196bedf8f80e35b15ee95cecfb0c2c8612c7c775ea69b584e941b11a7385",
+    "data/reproductions/panteleev-2012-04068-lifted-product/README.md": "4a1a48edb209e35c26e9b771ddd20751bca975eaa319b613509c0a2c1afee22d",
+    "data/reproductions/panteleev-2012-04068-lifted-product/code.npz": "8d4dfbd27d0e39d4ccacc1a6bdbc1b69f400c0f843eaa0661d7d765ff61cecee",
+    "data/reproductions/panteleev-2012-04068-lifted-product/design.json": "715691d2160fb336983ffdd2352e797b8c74f9aa590dbaf5f37513666fd65851",
+    "data/reproductions/panteleev-2012-04068-lifted-product/engine.py": "247ccef7024307d2d308cc7a65be4e2b37dd51e426f53b19eddf1571ecc63da5",
+    "data/reproductions/panteleev-2012-04068-lifted-product/qualification.json": "84dff212eb67da949f2203fd6d03b9760f6cc4e566fc54aa76077ce654a56334",
+    "data/reproductions/panteleev-2012-04068-lifted-product/report.py": "916b4c614fe47a3cd1fc7d4dca354cb5fe93008a8927a418b68c9fbe2a00305d",
+    "data/reproductions/panteleev-2012-04068-lifted-product/run.py": "2c53d2cdf27023337f1814867d0beae4bee47fe1754a5ed193504e86ba81d190",
+    "data/reproductions/panteleev-2012-04068-lifted-product/source.json": "0bbe991f8b4e4a04e538dc76fc54b11ce9f2fbb7077f908b7594e0dd7849269a",
+    "data/reproductions/panteleev-2012-04068-lifted-product/source.py": "944064e3082882e314d852ce625b6e8456d274430083dbfe5c14a56e396195a1",
+    "data/reproductions/roffe-2005-07016-runtime-budget/engine.py": "f183a36f7410df888b1e7b562dd71f11a5b2433562fe67d97672fd2ffe25df4c",
+    "data/reproductions/roffe-2005-07016-search/engine.py": "f152db024e8e27449f5de4e3cb6a43f282cf817afdeadd17a0033b4c16730fd1",
+    "data/reproductions/yao-2312-10950-bpgd-completion/run.py": "9039e5987330d873090d4346fd906bd7b957f8d1bf000645e9b34e412f96b855",
+    "data/reproductions/yao-2312-10950-non-osd/codes.json": "68e644bf28d8c217ed07bfddf44cd1ff03ce2f3a6de4076407d63bd57d252cac",
+    "data/reproductions/yao-2312-10950-non-osd/run_point.py": "89bbc5a825d545dd890ef59a5ed1f7642c1458615fb9b810dae587824d0fee78",
+    "data/reproductions/yao-2312-10950-non-osd/source_points.json": "f42c214770997ae514a4fb0347b52776cb93a8fa800483a4a2215905711aada9",
+    "src/bp_registry/artifacts.py": "f849d5bf59cf3c49c9ad3b3d81c5f0d0dd29ccb849ed326bfa4358c8143772ad",
+    "src/bp_registry/canonical/compiled.py": "59d0ff3e917bde882f37380388fff98283bd900290af41ef630e4e0cc9ea124a",
+    "src/bp_registry/canonical/kernel.py": "1fe94ecd88959367a503be24a8ba1b9102f178f20928a971b2dd98ebf0cec262",
+    "src/bp_registry/canonical/numerics.py": "7e0c176f5dfcbf9e5bf5ddfa8c932bd36f506de7894bd8a114ddcd8edaf8fd85",
+    "src/bp_registry/canonical/schedules.py": "f562c1507bfa48b4d8c1fff8a54b4285bdc6c3718036a5057b01f98902659015",
+    "src/bp_registry/canonical/update_context.py": "433d652d473bdd20f093a16229ab71d2afa0cb8aa88d673166fdc599efbdfa9e",
+    "src/bp_registry/check_numerics.py": "363da286d3c8e155fca742e8f366c52c3558652e4a3047a8cf82455f2a0bb07e",
+    "src/bp_registry/code_constructions.py": "d541281fc93cc26906fe3baa968070ac90a9056b370f94250029b9cacb00f004",
+    "src/bp_registry/compiled_contracts.py": "0ba497deffa1cd9837ddc1158520cb7328d3cb4eb582fb2e130212597e733abb",
+    "src/bp_registry/css.py": "898da0ba65a326c4eec887d17f32d6d745d7b50840b1f850deafc0bbc5b2c41a",
+    "src/bp_registry/postprocessing/osd.py": "b2e4b1685afb20f5c10acaad31837184fb654004d05e027e2438431659b59586",
+    "src/bp_registry/profile_contracts.py": "4021a27cbad2a424ea55c445eb133fd1d8ee1409c66284c52175bdf0db94a59c",
+    "src/bp_registry/quaternary/algebra.py": "32fff80358ea45310e4d7ce6a324c64d8a3e198976482c9a8a248cde960a8a3f",
+    "src/bp_registry/quaternary/compiled.py": "5ca0850e10f19ecb1e3c1e20b4b6fdaa9ed2a499375a41ce4ddbb754f5608e9b",
+    "src/bp_registry/quaternary/kernel.py": "6a13a2d0da70ec9a458d7d3b43a860d474ec6a04c5b1914f7c7a3dd102a8366d",
+    "src/bp_registry/quaternary/numerics.py": "d3368e2dd8a15f2e78d67d345f346204361df51e685127a2cbd8870a0036b199",
+    "src/bp_registry/quaternary/problems.py": "09b3d4302e538996bded44e5d9393211b8aeefc852ff11430c3e66655c5036d2",
+    "src/bp_registry/resolution.py": "81d0a70c6b9ac370cc1f45d3e9a031d503d9765ec3aad5f3301b4e2f9ade8ab3",
+    "src/bp_registry/unicycle.py": "6fcf71dcf87eb70117ca580e994297595b6fbf2bcd582d0846798a3f74f971ac"
+  },
+  "jobs": [
+    {
+      "arm": "bp",
+      "id": "bp-p0200",
+      "physical_p": 0.02
+    },
+    {
+      "arm": "qbp",
+      "id": "qbp-p0200",
+      "physical_p": 0.02
+    },
+    {
+      "arm": "osd0",
+      "id": "osd0-p0200",
+      "physical_p": 0.02
+    },
+    {
+      "arm": "cs10",
+      "id": "cs10-p0200",
+      "physical_p": 0.02
+    },
+    {
+      "arm": "qbp_osd0",
+      "id": "qbp_osd0-p0200",
+      "physical_p": 0.02
+    },
+    {
+      "arm": "qbp_cs10",
+      "id": "qbp_cs10-p0200",
+      "physical_p": 0.02
+    },
+    {
+      "arm": "tuned_bp",
+      "id": "tuned_bp-p0200",
+      "physical_p": 0.02
+    },
+    {
+      "arm": "tuned_qbp",
+      "id": "tuned_qbp-p0200",
+      "physical_p": 0.02
+    },
+    {
+      "arm": "relay32",
+      "id": "relay32-p0200",
+      "physical_p": 0.02
+    },
+    {
+      "arm": "relay128",
+      "id": "relay128-p0200",
+      "physical_p": 0.02
+    },
+    {
+      "arm": "beam32",
+      "id": "beam32-p0200",
+      "physical_p": 0.02
+    },
+    {
+      "arm": "beam128",
+      "id": "beam128-p0200",
+      "physical_p": 0.02
+    },
+    {
+      "arm": "bp",
+      "id": "bp-p0400",
+      "physical_p": 0.04
+    },
+    {
+      "arm": "qbp",
+      "id": "qbp-p0400",
+      "physical_p": 0.04
+    },
+    {
+      "arm": "osd0",
+      "id": "osd0-p0400",
+      "physical_p": 0.04
+    },
+    {
+      "arm": "cs10",
+      "id": "cs10-p0400",
+      "physical_p": 0.04
+    },
+    {
+      "arm": "qbp_osd0",
+      "id": "qbp_osd0-p0400",
+      "physical_p": 0.04
+    },
+    {
+      "arm": "qbp_cs10",
+      "id": "qbp_cs10-p0400",
+      "physical_p": 0.04
+    },
+    {
+      "arm": "tuned_bp",
+      "id": "tuned_bp-p0400",
+      "physical_p": 0.04
+    },
+    {
+      "arm": "tuned_qbp",
+      "id": "tuned_qbp-p0400",
+      "physical_p": 0.04
+    },
+    {
+      "arm": "relay32",
+      "id": "relay32-p0400",
+      "physical_p": 0.04
+    },
+    {
+      "arm": "relay128",
+      "id": "relay128-p0400",
+      "physical_p": 0.04
+    },
+    {
+      "arm": "beam32",
+      "id": "beam32-p0400",
+      "physical_p": 0.04
+    },
+    {
+      "arm": "beam128",
+      "id": "beam128-p0400",
+      "physical_p": 0.04
+    },
+    {
+      "arm": "bp",
+      "id": "bp-p0600",
+      "physical_p": 0.06
+    },
+    {
+      "arm": "qbp",
+      "id": "qbp-p0600",
+      "physical_p": 0.06
+    },
+    {
+      "arm": "osd0",
+      "id": "osd0-p0600",
+      "physical_p": 0.06
+    },
+    {
+      "arm": "cs10",
+      "id": "cs10-p0600",
+      "physical_p": 0.06
+    },
+    {
+      "arm": "qbp_osd0",
+      "id": "qbp_osd0-p0600",
+      "physical_p": 0.06
+    },
+    {
+      "arm": "qbp_cs10",
+      "id": "qbp_cs10-p0600",
+      "physical_p": 0.06
+    },
+    {
+      "arm": "tuned_bp",
+      "id": "tuned_bp-p0600",
+      "physical_p": 0.06
+    },
+    {
+      "arm": "tuned_qbp",
+      "id": "tuned_qbp-p0600",
+      "physical_p": 0.06
+    },
+    {
+      "arm": "relay32",
+      "id": "relay32-p0600",
+      "physical_p": 0.06
+    },
+    {
+      "arm": "relay128",
+      "id": "relay128-p0600",
+      "physical_p": 0.06
+    },
+    {
+      "arm": "beam32",
+      "id": "beam32-p0600",
+      "physical_p": 0.06
+    },
+    {
+      "arm": "beam128",
+      "id": "beam128-p0600",
+      "physical_p": 0.06
+    },
+    {
+      "arm": "bp",
+      "id": "bp-p0800",
+      "physical_p": 0.08
+    },
+    {
+      "arm": "qbp",
+      "id": "qbp-p0800",
+      "physical_p": 0.08
+    },
+    {
+      "arm": "osd0",
+      "id": "osd0-p0800",
+      "physical_p": 0.08
+    },
+    {
+      "arm": "cs10",
+      "id": "cs10-p0800",
+      "physical_p": 0.08
+    },
+    {
+      "arm": "qbp_osd0",
+      "id": "qbp_osd0-p0800",
+      "physical_p": 0.08
+    },
+    {
+      "arm": "qbp_cs10",
+      "id": "qbp_cs10-p0800",
+      "physical_p": 0.08
+    },
+    {
+      "arm": "tuned_bp",
+      "id": "tuned_bp-p0800",
+      "physical_p": 0.08
+    },
+    {
+      "arm": "tuned_qbp",
+      "id": "tuned_qbp-p0800",
+      "physical_p": 0.08
+    },
+    {
+      "arm": "relay32",
+      "id": "relay32-p0800",
+      "physical_p": 0.08
+    },
+    {
+      "arm": "relay128",
+      "id": "relay128-p0800",
+      "physical_p": 0.08
+    },
+    {
+      "arm": "beam32",
+      "id": "beam32-p0800",
+      "physical_p": 0.08
+    },
+    {
+      "arm": "beam128",
+      "id": "beam128-p0800",
+      "physical_p": 0.08
+    },
+    {
+      "arm": "bp",
+      "id": "bp-p1000",
+      "physical_p": 0.1
+    },
+    {
+      "arm": "qbp",
+      "id": "qbp-p1000",
+      "physical_p": 0.1
+    },
+    {
+      "arm": "osd0",
+      "id": "osd0-p1000",
+      "physical_p": 0.1
+    },
+    {
+      "arm": "cs10",
+      "id": "cs10-p1000",
+      "physical_p": 0.1
+    },
+    {
+      "arm": "qbp_osd0",
+      "id": "qbp_osd0-p1000",
+      "physical_p": 0.1
+    },
+    {
+      "arm": "qbp_cs10",
+      "id": "qbp_cs10-p1000",
+      "physical_p": 0.1
+    },
+    {
+      "arm": "tuned_bp",
+      "id": "tuned_bp-p1000",
+      "physical_p": 0.1
+    },
+    {
+      "arm": "tuned_qbp",
+      "id": "tuned_qbp-p1000",
+      "physical_p": 0.1
+    },
+    {
+      "arm": "relay32",
+      "id": "relay32-p1000",
+      "physical_p": 0.1
+    },
+    {
+      "arm": "relay128",
+      "id": "relay128-p1000",
+      "physical_p": 0.1
+    },
+    {
+      "arm": "beam32",
+      "id": "beam32-p1000",
+      "physical_p": 0.1
+    },
+    {
+      "arm": "beam128",
+      "id": "beam128-p1000",
+      "physical_p": 0.1
+    },
+    {
+      "arm": "bp",
+      "id": "bp-p1200",
+      "physical_p": 0.12
+    },
+    {
+      "arm": "qbp",
+      "id": "qbp-p1200",
+      "physical_p": 0.12
+    },
+    {
+      "arm": "osd0",
+      "id": "osd0-p1200",
+      "physical_p": 0.12
+    },
+    {
+      "arm": "cs10",
+      "id": "cs10-p1200",
+      "physical_p": 0.12
+    },
+    {
+      "arm": "qbp_osd0",
+      "id": "qbp_osd0-p1200",
+      "physical_p": 0.12
+    },
+    {
+      "arm": "qbp_cs10",
+      "id": "qbp_cs10-p1200",
+      "physical_p": 0.12
+    },
+    {
+      "arm": "tuned_bp",
+      "id": "tuned_bp-p1200",
+      "physical_p": 0.12
+    },
+    {
+      "arm": "tuned_qbp",
+      "id": "tuned_qbp-p1200",
+      "physical_p": 0.12
+    },
+    {
+      "arm": "relay32",
+      "id": "relay32-p1200",
+      "physical_p": 0.12
+    },
+    {
+      "arm": "relay128",
+      "id": "relay128-p1200",
+      "physical_p": 0.12
+    },
+    {
+      "arm": "beam32",
+      "id": "beam32-p1200",
+      "physical_p": 0.12
+    },
+    {
+      "arm": "beam128",
+      "id": "beam128-p1200",
+      "physical_p": 0.12
+    }
+  ],
+  "label": "Panteleev-Kalachev lifted product [[1054,140]]: full canonical decoder stack",
+  "paper_id": "panteleev-2012-04068-v2",
+  "protocol": {
+    "coarse_shots": 512,
+    "finalist_failures": 40,
+    "finalist_shots": 8192,
+    "jobs": "one single-threaded CPU per arm/physical-rate point, both components counted",
+    "max_shots": 100000000,
+    "search_budgets": "32 or128 cumulative sweeps per CSS component; complete branch/relay work included",
+    "seeds": {
+      "coarse": 2026111601,
+      "confirmation": 2026111603,
+      "finalist": 2026111602
+    },
+    "selection": "minimum finalist block LER; exact ties total BP sweeps, warmed decode ns, configuration hash",
+    "target_failures": 20
+  },
+  "schema": "canonical-bp-study-v1",
+  "software": {
+    "numba": "0.64.0",
+    "numpy": "2.2.6",
+    "python": "3.12.2",
+    "scipy": "1.17.1"
+  },
+  "source": {
+    "checks": "CSS commutation; n/k/ranks; paired logical quotient basis; independent explicit polynomial-index construction in tests",
+    "circulant_convention": "row0 has1 at exponent; inverse convention is an equivalent within-lift permutation",
+    "distance": "unknown; BP-OSD search found no nondegenerate word of weight<20; not a lower-bound certificate",
+    "example": "Example4, Eq12 and Example3 LP(A,A*)",
+    "exponents": [
+      [
+        1,
+        2,
+        4,
+        8,
+        16
+      ],
+      [
+        5,
+        10,
+        20,
+        9,
+        18
+      ],
+      [
+        25,
+        19,
+        7,
+        14,
+        28
+      ]
+    ],
+    "k": 140,
+    "lift": 31,
+    "n": 1054,
+    "paper": "arXiv:2012.04068v2",
+    "ranks": [
+      457,
+      457
+    ],
+    "rates": [
+      0.02,
+      0.04,
+      0.06,
+      0.08,
+      0.1,
+      0.12
+    ],
+    "semantic_sha256": "152ba8594a1928dabb30ec9a731f7cf8c421a284dec7af3ca5c097c08b3b215b",
+    "settings_limit": "Original LP paper provides no LER plot/rate grid/numeric iteration cap for1054. Controlled prospective depolarizing grid0.02,0.04,0.06,0.08,0.10,0.12. Budget32 and scale0.625 borrowed from cited BP-OSD paper, whose schedule is layered; this study uses canonical flooding. No original LP paper curve ordinates exist to compare.",
+    "source_archive_sha256": {
+      "1904.02703v3": "5aa90578b1a93e18dedf505784d3b2836b2fd5a9bbe91bff2617e5fc6603975e",
+      "2012.04068v2": "030b84d1df843b402d7c991ffb777d406be7e140e2803acec996a15201ec3a33"
+    },
+    "source_settings": {
+      "alpha": 0.625,
+      "budget_source": "cited arXiv:1904.02703v3, Section3; not stated for1054 in original LP paper",
+      "check_rule": "min_sum",
+      "max_iterations": 32
+    },
+    "title": "Quantum LDPC Codes with Almost Linear Minimum Distance"
+  },
+  "study_id": "panteleev-lp1054-full-stack"
+}

@@ -1,0 +1,70 @@
+{
+  "array": {
+    "argv": [
+      "sbatch",
+      "--parsable",
+      "--partition=common,scavenger",
+      "--account=pfisterlab",
+      "--nodes=1",
+      "--ntasks=1",
+      "--cpus-per-task=1",
+      "--mem=3G",
+      "--time=4-00:00:00",
+      "--requeue",
+      "--chdir=/hpc/group/pfisterlab/mg551/storage/survey_bp",
+      "--export=ALL,PYTHONPATH=/hpc/group/pfisterlab/mg551/storage/survey_bp/src,OMP_NUM_THREADS=1,OPENBLAS_NUM_THREADS=1,MKL_NUM_THREADS=1,NUMBA_NUM_THREADS=1",
+      "--job-name=lp1054-stack",
+      "--array=0-71%72",
+      "--output=/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/panteleev-2012-04068-lifted-product/results/worker-%A_%a.log",
+      "--wrap=export NUMBA_CACHE_DIR=\"/tmp/lp1054-${SLURM_JOB_ID}\"; mkdir -p \"$NUMBA_CACHE_DIR\"; exec /hpc/group/pfisterlab/mg551/storage/survey_bp/.venv/bin/python /hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/panteleev-2012-04068-lifted-product/run.py --index \"$SLURM_ARRAY_TASK_ID\""
+    ],
+    "id": "61930050",
+    "plan_sha256": "c9de0d13a53d0ce6abba76547c908e150cc3541bf1cfd4255e19bfd703c34ae9"
+  },
+  "audit": {
+    "argv": [
+      "sbatch",
+      "--parsable",
+      "--partition=common,scavenger",
+      "--account=pfisterlab",
+      "--nodes=1",
+      "--ntasks=1",
+      "--cpus-per-task=1",
+      "--mem=3G",
+      "--time=4-00:00:00",
+      "--requeue",
+      "--chdir=/hpc/group/pfisterlab/mg551/storage/survey_bp",
+      "--export=ALL,PYTHONPATH=/hpc/group/pfisterlab/mg551/storage/survey_bp/src,OMP_NUM_THREADS=1,OPENBLAS_NUM_THREADS=1,MKL_NUM_THREADS=1,NUMBA_NUM_THREADS=1",
+      "--job-name=lp1054-audit",
+      "--array=0-71%72",
+      "--dependency=aftercorr:61930050",
+      "--output=/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/panteleev-2012-04068-lifted-product/results/audit-%A_%a.log",
+      "--wrap=export NUMBA_CACHE_DIR=\"/tmp/lp1054-${SLURM_JOB_ID}\"; mkdir -p \"$NUMBA_CACHE_DIR\"; exec /hpc/group/pfisterlab/mg551/storage/survey_bp/.venv/bin/python /hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/panteleev-2012-04068-lifted-product/run.py --audit --index \"$SLURM_ARRAY_TASK_ID\""
+    ],
+    "id": "61930127",
+    "plan_sha256": "c9de0d13a53d0ce6abba76547c908e150cc3541bf1cfd4255e19bfd703c34ae9"
+  },
+  "collect": {
+    "argv": [
+      "sbatch",
+      "--parsable",
+      "--partition=common,scavenger",
+      "--account=pfisterlab",
+      "--nodes=1",
+      "--ntasks=1",
+      "--cpus-per-task=1",
+      "--mem=3G",
+      "--time=4-00:00:00",
+      "--requeue",
+      "--chdir=/hpc/group/pfisterlab/mg551/storage/survey_bp",
+      "--export=ALL,PYTHONPATH=/hpc/group/pfisterlab/mg551/storage/survey_bp/src,OMP_NUM_THREADS=1,OPENBLAS_NUM_THREADS=1,MKL_NUM_THREADS=1,NUMBA_NUM_THREADS=1",
+      "--job-name=lp1054-collect",
+      "--dependency=afterok:61930127",
+      "--mem=16G",
+      "--output=/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/panteleev-2012-04068-lifted-product/results/collect-%j.log",
+      "--wrap=export NUMBA_CACHE_DIR=\"/tmp/lp1054-${SLURM_JOB_ID}\"; mkdir -p \"$NUMBA_CACHE_DIR\"; exec /hpc/group/pfisterlab/mg551/storage/survey_bp/.venv/bin/python /hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/panteleev-2012-04068-lifted-product/run.py --collect"
+    ],
+    "id": "61930188",
+    "plan_sha256": "c9de0d13a53d0ce6abba76547c908e150cc3541bf1cfd4255e19bfd703c34ae9"
+  }
+}

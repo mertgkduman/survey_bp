@@ -140,3 +140,14 @@ def test_osd_methods_are_distinct_and_show_bp_budget_and_search_depth():
     assert a['algorithm']=='BP+OSD-0' and b['algorithm']=='BP+OSD-CS'
     assert 'λ = 10' in b['label'] and 'T = 162' in a['label']
     assert 'αₜ = 1 − 2⁻ᵗ' in b['label'] and 'noise = X-only' in b['label']
+
+
+@pytest.mark.parametrize('family,algorithm,prior',[('bp','BP+OSD-CS','2p/3'),('bp4','Q-BP+OSD-CS','p')])
+def test_original_lifted_product_stack_exposes_family_budget_prior_and_precision(family,algorithm,prior):
+    config = {'family':family,'check_rule':'min_sum','precision':'float64','v2c_damping':.3,
+        'alpha':.625,'beta':.2,'max_iterations':32,'noise_model':'depolarizing',
+        'execution_backend':'lp1054-canonical-stack-v1','postprocessing':{'method':'OSD_CS','order':10}}
+    script = "require('./web/research/decoder-display.js');console.log(JSON.stringify(DecoderDisplay.describe({configuration:{effective_configuration:JSON.parse(process.argv[1])}})));"
+    row = json.loads(subprocess.check_output(['node','-e',script,json.dumps(config)],cwd=ROOT,text=True))
+    assert row['algorithm']==algorithm and row['retired'] is None
+    assert all(text in row['label'] for text in ('MS','d = 0.3','T = 32','λ = 10','precision = float64','p₀ = '+prior))

@@ -1,0 +1,644 @@
+{
+  "plan_sha256": "c9de0d13a53d0ce6abba76547c908e150cc3541bf1cfd4255e19bfd703c34ae9",
+  "reason": "Array aftercorr held behind an unfinished earlier index despite completed corresponding tasks; release only successful complete source tasks.",
+  "released": [
+    {
+      "action": "clear satisfied dependency after source0:0 verification; full frozen independent auditor unchanged",
+      "audit_job": "61930127_12",
+      "completion_sha256": "f3fd0f69a9efa3d0782cb42df0685f8ee4a62c35326417a7235675fe995ac47d",
+      "index": 12,
+      "job": "bp-p0400",
+      "original_dependency": "aftercorr:61930050",
+      "source_job": "61930050_12",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "action": "clear satisfied dependency after source0:0 verification; full frozen independent auditor unchanged",
+      "audit_job": "61930127_13",
+      "completion_sha256": "3d8c65efb3e22d8e0a65b66851ff8985741f49a52ee03df7550f968795e6c2de",
+      "index": 13,
+      "job": "qbp-p0400",
+      "original_dependency": "aftercorr:61930050",
+      "source_job": "61930050_13",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "action": "clear satisfied dependency after source0:0 verification; full frozen independent auditor unchanged",
+      "audit_job": "61930127_14",
+      "completion_sha256": "40a3a1f35d675584a79174807cae2ebbdf4f35a3f7c401b201aae02629b86499",
+      "index": 14,
+      "job": "osd0-p0400",
+      "original_dependency": "aftercorr:61930050",
+      "source_job": "61930050_14",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "action": "clear satisfied dependency after source0:0 verification; full frozen independent auditor unchanged",
+      "audit_job": "61930127_15",
+      "completion_sha256": "8dbbf641e0067d2da617fc3a59b62bc7711057a0f4d21508c473148c1a91db35",
+      "index": 15,
+      "job": "cs10-p0400",
+      "original_dependency": "aftercorr:61930050",
+      "source_job": "61930050_15",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "action": "clear satisfied dependency after source0:0 verification; full frozen independent auditor unchanged",
+      "audit_job": "61930127_18",
+      "completion_sha256": "c18e31cf7d0a991cea724ee13774f156f94df450961c1985432e545060870ba3",
+      "index": 18,
+      "job": "tuned_bp-p0400",
+      "original_dependency": "aftercorr:61930050",
+      "source_job": "61930050_18",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "action": "clear satisfied dependency after source0:0 verification; full frozen independent auditor unchanged",
+      "audit_job": "61930127_20",
+      "completion_sha256": "24659c51b72611532d29f2153776697e3ed733324925b25fe4f1a050b72f5b8c",
+      "index": 20,
+      "job": "relay32-p0400",
+      "original_dependency": "aftercorr:61930050",
+      "source_job": "61930050_20",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "action": "clear satisfied dependency after source0:0 verification; full frozen independent auditor unchanged",
+      "audit_job": "61930127_22",
+      "completion_sha256": "513de3623936fa673d725fb6e6564d872a326013507e6e4180ec69b5077388f0",
+      "index": 22,
+      "job": "beam32-p0400",
+      "original_dependency": "aftercorr:61930050",
+      "source_job": "61930050_22",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "action": "clear satisfied dependency after source0:0 verification; full frozen independent auditor unchanged",
+      "audit_job": "61930127_23",
+      "completion_sha256": "0302b258d99bde39405947e96d8a4114b75780faacd2aee18f7bd39a886e463a",
+      "index": 23,
+      "job": "beam128-p0400",
+      "original_dependency": "aftercorr:61930050",
+      "source_job": "61930050_23",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "action": "clear satisfied dependency after source0:0 verification; full frozen independent auditor unchanged",
+      "audit_job": "61930127_24",
+      "completion_sha256": "4d46de5244a24c1aa8245a14934adc849571c244e3a798e486bfc34005f63c71",
+      "index": 24,
+      "job": "bp-p0600",
+      "original_dependency": "aftercorr:61930050",
+      "source_job": "61930050_24",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "action": "clear satisfied dependency after source0:0 verification; full frozen independent auditor unchanged",
+      "audit_job": "61930127_25",
+      "completion_sha256": "24c536367ac90db7beec91f5882e6247c132cf178a5797ead4a492cc1aa2e051",
+      "index": 25,
+      "job": "qbp-p0600",
+      "original_dependency": "aftercorr:61930050",
+      "source_job": "61930050_25",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "action": "clear satisfied dependency after source0:0 verification; full frozen independent auditor unchanged",
+      "audit_job": "61930127_26",
+      "completion_sha256": "2c91dcc21a1e0e10c0170119aac83c1bc0934662b3c58b8dafb41ebb0508e6b0",
+      "index": 26,
+      "job": "osd0-p0600",
+      "original_dependency": "aftercorr:61930050",
+      "source_job": "61930050_26",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "action": "clear satisfied dependency after source0:0 verification; full frozen independent auditor unchanged",
+      "audit_job": "61930127_27",
+      "completion_sha256": "a20608e5058a52225cadb783e828abcf72162341a81a39bb0a63105764b319ac",
+      "index": 27,
+      "job": "cs10-p0600",
+      "original_dependency": "aftercorr:61930050",
+      "source_job": "61930050_27",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "action": "clear satisfied dependency after source0:0 verification; full frozen independent auditor unchanged",
+      "audit_job": "61930127_28",
+      "completion_sha256": "3f7812d3f4ca1935f8f047521038b1aa19820e39bee834e9fc7d6c9943d7be50",
+      "index": 28,
+      "job": "qbp_osd0-p0600",
+      "original_dependency": "aftercorr:61930050",
+      "source_job": "61930050_28",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "action": "clear satisfied dependency after source0:0 verification; full frozen independent auditor unchanged",
+      "audit_job": "61930127_29",
+      "completion_sha256": "83c5b6303f32a1e9539d4fbbbf05ffd2e02d11ccd7079b70a03c6f21809d9827",
+      "index": 29,
+      "job": "qbp_cs10-p0600",
+      "original_dependency": "aftercorr:61930050",
+      "source_job": "61930050_29",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "action": "clear satisfied dependency after source0:0 verification; full frozen independent auditor unchanged",
+      "audit_job": "61930127_30",
+      "completion_sha256": "6f267a300f206684ec6fb8fdb6b00403946fb53e34d06f9caad99a4874ee10c8",
+      "index": 30,
+      "job": "tuned_bp-p0600",
+      "original_dependency": "aftercorr:61930050",
+      "source_job": "61930050_30",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "action": "clear satisfied dependency after source0:0 verification; full frozen independent auditor unchanged",
+      "audit_job": "61930127_31",
+      "completion_sha256": "802fab66bf4920e535aadaf66f9c54e3c663d275d2aca2c402c744b936a9c00e",
+      "index": 31,
+      "job": "tuned_qbp-p0600",
+      "original_dependency": "aftercorr:61930050",
+      "source_job": "61930050_31",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "action": "clear satisfied dependency after source0:0 verification; full frozen independent auditor unchanged",
+      "audit_job": "61930127_32",
+      "completion_sha256": "7f00a2b5ba61d07c4ebe10a55234c4c7ebf64084ab2aa4db8fb82e72a79c8e1a",
+      "index": 32,
+      "job": "relay32-p0600",
+      "original_dependency": "aftercorr:61930050",
+      "source_job": "61930050_32",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "action": "clear satisfied dependency after source0:0 verification; full frozen independent auditor unchanged",
+      "audit_job": "61930127_34",
+      "completion_sha256": "c26036d373bdba817074bf0a09cc38daa3a62c01a1c28583f8f5eda1d4e6bd5a",
+      "index": 34,
+      "job": "beam32-p0600",
+      "original_dependency": "aftercorr:61930050",
+      "source_job": "61930050_34",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "action": "clear satisfied dependency after source0:0 verification; full frozen independent auditor unchanged",
+      "audit_job": "61930127_35",
+      "completion_sha256": "887d83b758cda2fe314ea743d8d9e8191b0ca587527469361a409b582e4bd9eb",
+      "index": 35,
+      "job": "beam128-p0600",
+      "original_dependency": "aftercorr:61930050",
+      "source_job": "61930050_35",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "action": "clear satisfied dependency after source0:0 verification; full frozen independent auditor unchanged",
+      "audit_job": "61930127_36",
+      "completion_sha256": "14fddad39909e289acf4ed2fa8493ae969c3fb29612b9a5ea02b6786bfacfc24",
+      "index": 36,
+      "job": "bp-p0800",
+      "original_dependency": "aftercorr:61930050",
+      "source_job": "61930050_36",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "action": "clear satisfied dependency after source0:0 verification; full frozen independent auditor unchanged",
+      "audit_job": "61930127_37",
+      "completion_sha256": "4224a9efbe33fa83ff296f54e2e26ffc89bb99d54e212e096bb882422ef2e797",
+      "index": 37,
+      "job": "qbp-p0800",
+      "original_dependency": "aftercorr:61930050",
+      "source_job": "61930050_37",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "action": "clear satisfied dependency after source0:0 verification; full frozen independent auditor unchanged",
+      "audit_job": "61930127_38",
+      "completion_sha256": "b1e5f293fa6b7b8473e9ac8057adb66b140fc774eb1e3a94c11350a1d67b9aea",
+      "index": 38,
+      "job": "osd0-p0800",
+      "original_dependency": "aftercorr:61930050",
+      "source_job": "61930050_38",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "action": "clear satisfied dependency after source0:0 verification; full frozen independent auditor unchanged",
+      "audit_job": "61930127_39",
+      "completion_sha256": "f14a0932253c764cfb42476f442fad43796b8d43a60219a8657f7f47a85a81a0",
+      "index": 39,
+      "job": "cs10-p0800",
+      "original_dependency": "aftercorr:61930050",
+      "source_job": "61930050_39",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "action": "clear satisfied dependency after source0:0 verification; full frozen independent auditor unchanged",
+      "audit_job": "61930127_40",
+      "completion_sha256": "e56948b079d595e3426b0d57e180cb29207b46db83bcdab1792dfaab2fe44448",
+      "index": 40,
+      "job": "qbp_osd0-p0800",
+      "original_dependency": "aftercorr:61930050",
+      "source_job": "61930050_40",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "action": "clear satisfied dependency after source0:0 verification; full frozen independent auditor unchanged",
+      "audit_job": "61930127_41",
+      "completion_sha256": "390dad1270261d1411d54fbe42ff9dcf7ea2b3f26aa0b8f9fd5a6663524f6071",
+      "index": 41,
+      "job": "qbp_cs10-p0800",
+      "original_dependency": "aftercorr:61930050",
+      "source_job": "61930050_41",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "action": "clear satisfied dependency after source0:0 verification; full frozen independent auditor unchanged",
+      "audit_job": "61930127_42",
+      "completion_sha256": "a2df43a1c62b300df311eaf752e7ed750f37b6f016e3e549ff975937861e33ff",
+      "index": 42,
+      "job": "tuned_bp-p0800",
+      "original_dependency": "aftercorr:61930050",
+      "source_job": "61930050_42",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "action": "clear satisfied dependency after source0:0 verification; full frozen independent auditor unchanged",
+      "audit_job": "61930127_43",
+      "completion_sha256": "bf5d722eddd8e0c636dcc3e46d77ddd2a9cd869532b2c653b8fe1b3e6c1ec0c2",
+      "index": 43,
+      "job": "tuned_qbp-p0800",
+      "original_dependency": "aftercorr:61930050",
+      "source_job": "61930050_43",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "action": "clear satisfied dependency after source0:0 verification; full frozen independent auditor unchanged",
+      "audit_job": "61930127_44",
+      "completion_sha256": "21c5ee9b80e053ea3413b726bc513ac98fa596bd961c1488d53dc6be52ab82a7",
+      "index": 44,
+      "job": "relay32-p0800",
+      "original_dependency": "aftercorr:61930050",
+      "source_job": "61930050_44",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "action": "clear satisfied dependency after source0:0 verification; full frozen independent auditor unchanged",
+      "audit_job": "61930127_46",
+      "completion_sha256": "79b6ca86b37b95f65463102eb16bb0061f549ee9e4f697a3da254a97b61330c8",
+      "index": 46,
+      "job": "beam32-p0800",
+      "original_dependency": "aftercorr:61930050",
+      "source_job": "61930050_46",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "action": "clear satisfied dependency after source0:0 verification; full frozen independent auditor unchanged",
+      "audit_job": "61930127_48",
+      "completion_sha256": "821f303d45089e86edcd282e5f0c2b96742a39bbae7fe6d1b55aa0058852e99c",
+      "index": 48,
+      "job": "bp-p1000",
+      "original_dependency": "aftercorr:61930050",
+      "source_job": "61930050_48",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "action": "clear satisfied dependency after source0:0 verification; full frozen independent auditor unchanged",
+      "audit_job": "61930127_49",
+      "completion_sha256": "e723f76ab32714a0df104e68a1ff6c51201f6290fa9edeb1a8dd9c767b382b26",
+      "index": 49,
+      "job": "qbp-p1000",
+      "original_dependency": "aftercorr:61930050",
+      "source_job": "61930050_49",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "action": "clear satisfied dependency after source0:0 verification; full frozen independent auditor unchanged",
+      "audit_job": "61930127_50",
+      "completion_sha256": "5653922975cc73fafd32475856d987b4355d0aafe0305236bdf063adf0351a0d",
+      "index": 50,
+      "job": "osd0-p1000",
+      "original_dependency": "aftercorr:61930050",
+      "source_job": "61930050_50",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "action": "clear satisfied dependency after source0:0 verification; full frozen independent auditor unchanged",
+      "audit_job": "61930127_51",
+      "completion_sha256": "78cb21111c77aac09bcdeec012d57a2a7cd7141e40d01dddb830f40803b1cd3f",
+      "index": 51,
+      "job": "cs10-p1000",
+      "original_dependency": "aftercorr:61930050",
+      "source_job": "61930050_51",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "action": "clear satisfied dependency after source0:0 verification; full frozen independent auditor unchanged",
+      "audit_job": "61930127_52",
+      "completion_sha256": "b82e28a99f06996190908771582fd7df11f0ea761e437d29ca652b53b6bcaa2a",
+      "index": 52,
+      "job": "qbp_osd0-p1000",
+      "original_dependency": "aftercorr:61930050",
+      "source_job": "61930050_52",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "action": "clear satisfied dependency after source0:0 verification; full frozen independent auditor unchanged",
+      "audit_job": "61930127_53",
+      "completion_sha256": "31ec5d45e1fceebe4a920747d839a40c34d8fe03270ab12e381d8f466f7d1efc",
+      "index": 53,
+      "job": "qbp_cs10-p1000",
+      "original_dependency": "aftercorr:61930050",
+      "source_job": "61930050_53",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "action": "clear satisfied dependency after source0:0 verification; full frozen independent auditor unchanged",
+      "audit_job": "61930127_54",
+      "completion_sha256": "593e7ef9e4e2ac985b8d6e353e68d477f4167e7081ed4247df9ecc5ef36b05ac",
+      "index": 54,
+      "job": "tuned_bp-p1000",
+      "original_dependency": "aftercorr:61930050",
+      "source_job": "61930050_54",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "action": "clear satisfied dependency after source0:0 verification; full frozen independent auditor unchanged",
+      "audit_job": "61930127_55",
+      "completion_sha256": "cbaa2065e9d48f72ad53c8283bd43046160aa49758635b89151dfeaa5586101f",
+      "index": 55,
+      "job": "tuned_qbp-p1000",
+      "original_dependency": "aftercorr:61930050",
+      "source_job": "61930050_55",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "action": "clear satisfied dependency after source0:0 verification; full frozen independent auditor unchanged",
+      "audit_job": "61930127_56",
+      "completion_sha256": "c3b47fc0f442017c0387f331f5ecfe0d285690fa7494e1c509d71ae7c7fd4164",
+      "index": 56,
+      "job": "relay32-p1000",
+      "original_dependency": "aftercorr:61930050",
+      "source_job": "61930050_56",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "action": "clear satisfied dependency after source0:0 verification; full frozen independent auditor unchanged",
+      "audit_job": "61930127_58",
+      "completion_sha256": "9c1899d8ed601e7874460b48d6164209ebf3d50ebedda56a6ce513777bfb59d5",
+      "index": 58,
+      "job": "beam32-p1000",
+      "original_dependency": "aftercorr:61930050",
+      "source_job": "61930050_58",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "action": "clear satisfied dependency after source0:0 verification; full frozen independent auditor unchanged",
+      "audit_job": "61930127_60",
+      "completion_sha256": "7b267594d1103f8019d59f94eb4e08f040499d7576fa170234293deefb835ae7",
+      "index": 60,
+      "job": "bp-p1200",
+      "original_dependency": "aftercorr:61930050",
+      "source_job": "61930050_60",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "action": "clear satisfied dependency after source0:0 verification; full frozen independent auditor unchanged",
+      "audit_job": "61930127_61",
+      "completion_sha256": "713b55e3d90d9bcc4f04d19acd57f92ff4a9f3e6f15fbc508b2723f0178f928f",
+      "index": 61,
+      "job": "qbp-p1200",
+      "original_dependency": "aftercorr:61930050",
+      "source_job": "61930050_61",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "action": "clear satisfied dependency after source0:0 verification; full frozen independent auditor unchanged",
+      "audit_job": "61930127_62",
+      "completion_sha256": "38213ae048af02dc41a918f2f2cf9801ac8beee11dd3c5ca27a0ba07a7307105",
+      "index": 62,
+      "job": "osd0-p1200",
+      "original_dependency": "aftercorr:61930050",
+      "source_job": "61930050_62",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "action": "clear satisfied dependency after source0:0 verification; full frozen independent auditor unchanged",
+      "audit_job": "61930127_63",
+      "completion_sha256": "e4c6458be87bf448c1d801cf52e966b4e1e1fea9ee684f537411690bd1d06b35",
+      "index": 63,
+      "job": "cs10-p1200",
+      "original_dependency": "aftercorr:61930050",
+      "source_job": "61930050_63",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "action": "clear satisfied dependency after source0:0 verification; full frozen independent auditor unchanged",
+      "audit_job": "61930127_64",
+      "completion_sha256": "fad5c7cf37c3bed0ca10dc4c9cb4d8b770def05598774d7510fbac8cf82082fb",
+      "index": 64,
+      "job": "qbp_osd0-p1200",
+      "original_dependency": "aftercorr:61930050",
+      "source_job": "61930050_64",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "action": "clear satisfied dependency after source0:0 verification; full frozen independent auditor unchanged",
+      "audit_job": "61930127_65",
+      "completion_sha256": "c265b1e1c247f27963f16b1770767ff1f02fd2251c602f0dcc19f35f9f0b10c4",
+      "index": 65,
+      "job": "qbp_cs10-p1200",
+      "original_dependency": "aftercorr:61930050",
+      "source_job": "61930050_65",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "action": "clear satisfied dependency after source0:0 verification; full frozen independent auditor unchanged",
+      "audit_job": "61930127_66",
+      "completion_sha256": "15f592f94f67244156ef2abfffdd8d3efd711f7c1f339faa8b130dff289fcf71",
+      "index": 66,
+      "job": "tuned_bp-p1200",
+      "original_dependency": "aftercorr:61930050",
+      "source_job": "61930050_66",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "action": "clear satisfied dependency after source0:0 verification; full frozen independent auditor unchanged",
+      "audit_job": "61930127_67",
+      "completion_sha256": "c924ca898045e70fe29a1282a198ecf0f138fd6ff0be1b32991f8a0014941584",
+      "index": 67,
+      "job": "tuned_qbp-p1200",
+      "original_dependency": "aftercorr:61930050",
+      "source_job": "61930050_67",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "action": "clear satisfied dependency after source0:0 verification; full frozen independent auditor unchanged",
+      "audit_job": "61930127_68",
+      "completion_sha256": "1f35f0e2e693a2dd90e56d08e07bb8467e8e193269030b9e1d0a4d27f270ad60",
+      "index": 68,
+      "job": "relay32-p1200",
+      "original_dependency": "aftercorr:61930050",
+      "source_job": "61930050_68",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "action": "clear satisfied dependency after source0:0 verification; full frozen independent auditor unchanged",
+      "audit_job": "61930127_70",
+      "completion_sha256": "359fce313dd629fa36a56ad7016803de96bb41739c2dd5aabe44b32fd6f80cef",
+      "index": 70,
+      "job": "beam32-p1200",
+      "original_dependency": "aftercorr:61930050",
+      "source_job": "61930050_70",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    }
+  ],
+  "time_utc": "2026-11-16T19:52:14.128591+00:00"
+}

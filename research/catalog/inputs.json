@@ -174,6 +174,20 @@
         "kind": "css_artifact",
         "path": "data/reproductions/roffe-2005-07016-bp/codes/toric9.npz"
       }
+    },
+    {
+      "code_id": "lp1054",
+      "aliases": [
+        "LP1054"
+      ],
+      "label": "Lifted product [[1054,140]], distance unverified",
+      "artifact_path": "data/reproductions/panteleev-2012-04068-lifted-product/code.npz",
+      "asset_label": "Original lifted-product Example4 CSS matrices",
+      "asset_kind": "code_artifact",
+      "execution": {
+        "kind": "css_artifact",
+        "path": "data/reproductions/panteleev-2012-04068-lifted-product/code.npz"
+      }
     }
   ],
   "circuits": [

@@ -89,6 +89,15 @@
       "evidence_path": "literature_policies/PAPERS.md",
       "registered_scope": "mechanism-only assessment",
       "evidence_status": "mapped_blocked"
+    },
+    {
+      "paper_id": "panteleev-2012-04068-v2",
+      "title": "Quantum LDPC Codes with Almost Linear Minimum Distance",
+      "identity": "arXiv:2012.04068v2",
+      "kind": "paper",
+      "evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/source.json",
+      "registered_scope": "Original Example4 LP1054 full canonical stack; controlled grid and borrowed32-iteration budget; no source LER curve",
+      "source_url": "https://arxiv.org/abs/2012.04068v2"
     }
   ],
   "study_paths": [
@@ -114,7 +123,8 @@
     "data/reproductions/roffe-2005-07016-osd-fast/catalog.json",
     "data/reproductions/roffe-2005-07016-runtime-budget/catalog.json",
     "data/reproductions/roffe-2005-07016-search/catalog.json",
-    "data/reproductions/roffe-2005-07016-search-frontier/catalog.json"
+    "data/reproductions/roffe-2005-07016-search-frontier/catalog.json",
+    "data/reproductions/panteleev-2012-04068-lifted-product/catalog.json"
   ],
   "public_retired_dataset_ids": [
     "mackay-unicycle-bp"

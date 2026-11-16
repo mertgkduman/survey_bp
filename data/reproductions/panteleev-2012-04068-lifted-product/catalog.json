@@ -1,0 +1,67 @@
+{
+  "datasets": [
+    {
+      "assets": [
+        {
+          "kind": "markdown",
+          "label": "RESULTS.md",
+          "path": "data/reproductions/panteleev-2012-04068-lifted-product/RESULTS.md"
+        },
+        {
+          "kind": "csv",
+          "label": "results-table.csv",
+          "path": "data/reproductions/panteleev-2012-04068-lifted-product/results-table.csv"
+        },
+        {
+          "kind": "gzip",
+          "label": "tuning-results.csv.gz",
+          "path": "data/reproductions/panteleev-2012-04068-lifted-product/tuning-results.csv.gz"
+        },
+        {
+          "kind": "gzip",
+          "label": "verified.json.gz",
+          "path": "data/reproductions/panteleev-2012-04068-lifted-product/verified.json.gz"
+        }
+      ],
+      "caveat": "Original LP paper provides no LER plot/rate grid/numeric iteration cap for1054. Controlled prospective depolarizing grid0.02,0.04,0.06,0.08,0.10,0.12. Budget32 and scale0.625 borrowed from cited BP-OSD paper, whose schedule is layered; this study uses canonical flooding. No original LP paper curve ordinates exist to compare. Original LP Example4, depolarizing code capacity. Q-BP, tuning, Relay and beam are canonical adaptations. Search128 is explicitly4x the documented BP cap. No native runtime or statistical paper agreement is claimed before confirmation.",
+      "dataset_id": "panteleev-lp1054-full-stack",
+      "evidence_status": "canonical_adaptation",
+      "label": "Panteleev-Kalachev lifted product [[1054,140]]: full canonical decoder stack",
+      "paper_id": "panteleev-2012-04068-v2",
+      "points": [],
+      "source_path": "data/reproductions/panteleev-2012-04068-lifted-product/verified.json.gz"
+    }
+  ],
+  "decoders": [],
+  "experiments": [
+    {
+      "code_ids": [
+        "lp1054"
+      ],
+      "dataset_id": "panteleev-lp1054-full-stack",
+      "dataset_ids": [
+        "panteleev-lp1054-full-stack"
+      ],
+      "decoder_ids": [],
+      "description": "Original LP paper provides no LER plot/rate grid/numeric iteration cap for1054. Controlled prospective depolarizing grid0.02,0.04,0.06,0.08,0.10,0.12. Budget32 and scale0.625 borrowed from cited BP-OSD paper, whose schedule is layered; this study uses canonical flooding. No original LP paper curve ordinates exist to compare. Original LP Example4, depolarizing code capacity. Q-BP, tuning, Relay and beam are canonical adaptations. Search128 is explicitly4x the documented BP cap. No native runtime or statistical paper agreement is claimed before confirmation.",
+      "evidence_status": "canonical_adaptation",
+      "experiment_id": "panteleev-lp1054-full-stack",
+      "paper_ids": [
+        "panteleev-2012-04068-v2"
+      ],
+      "reproduction_recipe": {
+        "budget_note": "Collection audits retained evidence. Frozen single-CPU workers use run.py --index INDEX; never overwrite a completed cohort.",
+        "commands": [
+          "PYTHONPATH=src .venv/bin/python data/reproductions/panteleev-2012-04068-lifted-product/run.py --collect"
+        ],
+        "decoder_path": null,
+        "kind": "source_command",
+        "original_instruction_path": "data/reproductions/panteleev-2012-04068-lifted-product/README.md",
+        "study_path": "data/reproductions/panteleev-2012-04068-lifted-product/plan.json"
+      }
+    }
+  ],
+  "papers": [],
+  "result_series": [],
+  "schema": "research-catalog-extension-v1"
+}
