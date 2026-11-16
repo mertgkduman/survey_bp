@@ -1,0 +1,11 @@
+{
+  "checks": [
+    "Actual publisher output preserves80/60 caps and both gamma regimes in a compatible multi-rate curve",
+    "Settings export retains exact coefficients, memory seeds and distinct execution backend",
+    "Saved Relay gamma controller cannot silently become ordinary BP in the experiment builder",
+    "Same-rate cohorts cannot qualify the curve; stale input and saved gamma selections clear"
+  ],
+  "errors": [],
+  "fixture": "synthetic publisher data; no scientific measurements",
+  "simulations": 0
+}

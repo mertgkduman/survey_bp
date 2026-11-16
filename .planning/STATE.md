@@ -5,11 +5,11 @@ current_phase: 11
 current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
-stopped_at: LP1054 check publishes68 audited points; four p=.02 simulations continue with automatic audits/collector
-last_updated: "2026-11-16T21:37:14.628239+00:00"
+stopped_at: LP1054 gamma80/60 array 61942447 running 12 single-CPU workers; fresh results pending; implementation 177417b7
+last_updated: "2026-11-16T22:41:43.946901+00:00"
 last_activity: 2026-11-16
-last_activity_desc: Quick261116-mkh checks68 LP1054 confirmations; low-p tuned BP competitive with joint OSD0, joint CS10 leads middle-rate estimates; four rare points continue.
-state_head: a75222da
+last_activity_desc: Quick 261116-nf0 launches confirmed 140-sweep Relay gamma tuning, matched controls and phase ablations; 12 point workers running.
+state_head: 177417b7
 progress:
   total_phases: 14
   completed_phases: 8
@@ -34,7 +34,10 @@ Total Phases: 14
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
-Last activity: 2026-11-16 — quick261116-mkh checks original lifted-product decoder results
+Last activity: 2026-11-16 — quick261116-nf0 launches Relay gamma80/60 tuning
+Last Activity Description: User confirmed exactly80 uniform-gamma +one60 disordered-gamma leg, max140/component. New frozen lp1054-relay-gamma80-60 retains parent code/rates and unchanged canonical/search kernels. Source and parent training-selected numerical backgrounds,11 gamma0 values×18 intervals+zero control=199 coarse policies/point; independent finalist/refinement/fresh seeds and separate memory RNG. Fresh selected/phase ablations/reset-zero/matchedBP140 stop20 failures or100M, exact-control duplicates deduped. Typed gamma work and external-hash-free controller timing explicit;1024-shot atomic chunks and deadline requeue. Array61942447 has12 single-CPU/3GiB workers with fresh-process audits in same allocations; collector61942448 queued.64 scientific tests,56 catalog tests,11 Chromium groups and96 pilot shots pass; frozen/source/parent pins remain valid. Initial workers tuning; no fresh gamma measurements yet. Public443/3194/13/0 unchanged and1543 old raw-series point multisets preserved. No old frozen/raw/canonical/v1/model/config or phase gate/counter changes.
+
+Prior lifted-product result check:
 Last Activity Description: LP1054 campaign68/72 simulations complete;68 full audits published(6,054,571 fresh decoder shots/1,360 failures,1,892 separate training settings). Four p=.02 simulations(Q-BP+CS10,tunedQBP,beam32/128) continue; both late tunedBP/Relay128 p=.02 full audits completed and are included. Existing one-CPU allocations/stopping and collector61930188 retained; eight satisfied audit dependencies released with verified source0:0 and hashes. Independent1,960-summary/manifest/count/interval/work/selection/source reconciliation passes. At p=.06/.08, joint CS10 LER3.17e-4/6.68e-4 is5.38x/16.33x lower than tunedQBP; .04 intervals overlap. Current binary search does not match joint OSD at middle rates;128 permits4x directed-edge work. Scientific3-panel PNG/PDF inspected. Public443 curves/3194 points/13 codes/0 circuits; all1538 historical point multisets preserved.55 catalog tests and11 Chromium groups pass. Original paper has no1054 source LER grid/cap; borrowed32/.625, schedule difference and provenance-instrumented timing remain explicit. No new simulations, frozen/raw/kernel/v1/model/config/phase-gate/counter edits; campaign remains running. Late p=.02 tuned BP LER1.20e-5(113x below baseline) and Relay1281.49e-5 have intervals overlapping joint OSD0(1.85e-5); no rare-point superiority claim.
 
 Prior original lifted-product launch:
@@ -334,6 +337,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 | # | Description | Date | Commit | Status | Directory |
 |---|-------------|------|--------|--------|-----------|
+| 261116-nf0 | Tune RelayBP uniform80/disordered60 gamma with matched controls | 2026-11-16 | 177417b7 | 12 single-CPU workers tuning; fresh results pending | [261116-nf0](./quick/261116-nf0-tune-relaybp-uniform-gamma80-and-disorde/) |
 | 261116-mkh | Check original lifted-product results and decoder comparisons | 2026-11-16 | a75222da |68 audited points published; four rare simulations continue | [261116-mkh](./quick/261116-mkh-check-original-lifted-product-campaign-r/) |
 | 261116-jzy | Launch original lifted-product full decoder stack | 2026-11-16 | 53fabae |72 single-CPU workers;50 audited points published; campaign running | [261116-jzy](./quick/261116-jzy-reproduce-lifted-product-paper-codes-wit/) |
 | 261116-0k6 | Check broader beam/RelayBP results and latency tradeoffs | 2026-11-16 | 77aba5a | Verified215/218 workers;639 fresh settings published | [261116-0k6](./quick/261116-0k6-check-tuned-beam-and-relaybp-frontier-re/) |
