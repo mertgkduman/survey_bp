@@ -1,9 +1,9 @@
 {
-  "confirmation_measurements": 639,
-  "confirmed_failures": 12780,
-  "confirmed_shots": 27243865,
-  "finished_strata": 215,
+  "confirmation_measurements": 642,
+  "confirmed_failures": 12814,
+  "confirmed_shots": 271658248,
+  "finished_strata": 218,
   "planned_strata": 218,
   "schema": "canonical-css-search-assessment-v1",
-  "tuning_measurements": 2063
+  "tuning_measurements": 2079
 }

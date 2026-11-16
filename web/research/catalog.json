@@ -131510,7 +131510,7 @@
           "label": "All search results",
           "local_storage_path": null,
           "path": "data/reproductions/roffe-2005-07016-search-frontier/RESULTS.md",
-          "sha256": "1ab8303ccf5fd477d9fa5c5493d6d90993afeac37a71c44b73e0be459db3b822",
+          "sha256": "929a1c334ed9dd4f8d2521f9c462344a06a7739ea8e0ab8b657b725c1f611a8b",
           "url": "data/reproductions/roffe-2005-07016-search-frontier/RESULTS.md"
         },
         {
@@ -131519,7 +131519,7 @@
           "label": "Every fresh selected point",
           "local_storage_path": null,
           "path": "data/reproductions/roffe-2005-07016-search-frontier/results-table.csv",
-          "sha256": "4b27588bcb0345c08620765c6f195830ee081ac5efcceb9eb6ba3d03861c780f",
+          "sha256": "ea924e21f89b8f934a6e50f883505e5a04c6b51a04b108df336a653895bd092e",
           "url": "data/reproductions/roffe-2005-07016-search-frontier/results-table.csv"
         },
         {
@@ -131528,7 +131528,7 @@
           "label": "Separate tuning history",
           "local_storage_path": null,
           "path": "data/reproductions/roffe-2005-07016-search-frontier/tuning-results.csv.gz",
-          "sha256": "7de6bfb7cdd8e82ea6028347dc38b72d06d8152f41223fab4aecfe254df4ed2d",
+          "sha256": "ac8b85f518cfc72fdb4667acd6a89fd7c5046b0e77a96966edb18887ef840270",
           "url": "data/reproductions/roffe-2005-07016-search-frontier/tuning-results.csv.gz"
         },
         {
@@ -131537,7 +131537,7 @@
           "label": "Full audit receipt",
           "local_storage_path": null,
           "path": "data/reproductions/roffe-2005-07016-search-frontier/verified.json.gz",
-          "sha256": "8c30a6eec66819c3dc20e8b630f7d2ca8fee3cc9f739ff7219edf8aee92fb865",
+          "sha256": "610d5fd4c73dbc4097ea362a687febecd7ac51d167bca6aed41d05b7ea583aa1",
           "url": "data/reproductions/roffe-2005-07016-search-frontier/verified.json.gz"
         }
       ],
@@ -137906,6 +137906,47 @@
           "work_unit": "iterations",
           "x": 0.01,
           "y": 5.796106870936929e-06
+        },
+        {
+          "ci_high": 2.348962000572016e-07,
+          "ci_low": 7.653930480892834e-08,
+          "failures": 14,
+          "iteration_unit": "all BP segment sweeps",
+          "mean_directed_edge_updates": 4612.05646576,
+          "mean_iterations": 4.76637257,
+          "mean_seconds": 5.889609695232e-05,
+          "mean_work": 4.76637257,
+          "metadata": {
+            "budget_targets": [
+              0.5,
+              1.0,
+              2.0,
+              4.0
+            ],
+            "cohort_kind": "search_fresh_confirmation",
+            "denominator_definition": "all retained iid shots; original syndrome mismatch or nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 3.481479526413654e-05,
+              "0.95": 0.0003299091193138743,
+              "0.99": 0.0004106431130864383
+            },
+            "ledger_sha256": "9ee6efaf5faf8fee12103f33cbd5fd603745759f1051e296d3caab2f9fc59166",
+            "runtime_ratio_to_bp_osd0": 0.4477102020959455,
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111563,
+            "selection_sha256": "c20ea9c9e03a71056883653afee7b3e9e962ea6e0c4a8825cfc911d2a3fb896b",
+            "source_evidence_path": "data/reproductions/roffe-2005-07016-search-frontier/results/toric11-binary_ms-p01000-beam-frontier/confirmation/toric11-binary_ms-p01000-beam-frontier-confirmation-49e6073902493c5b0c70/summary.json",
+            "stop_reason": "max_shots",
+            "summary_sha256": "b3b0e304c9e8737e48855fd94dbc6bf2e2fd33ff30a7b269e309b9f1ebce1576"
+          },
+          "n": 100000000,
+          "runtime_scope": "warm full search decoder including all branches/legs and selection",
+          "status": "complete",
+          "type_i": 0,
+          "type_ii": 14,
+          "work_unit": "iterations",
+          "x": 0.01,
+          "y": 1.4e-07
         },
         {
           "ci_high": 0.34982569910029804,
@@ -149284,6 +149325,47 @@
           "y": 0.00022411474675033618
         },
         {
+          "ci_high": 6.68045994712909e-07,
+          "ci_low": 2.750577559149809e-07,
+          "failures": 20,
+          "iteration_unit": "all BP segment sweeps",
+          "mean_directed_edge_updates": 48529.93305596523,
+          "mean_iterations": 27.008792084311967,
+          "mean_seconds": 0.00024966160205346094,
+          "mean_work": 27.008792084311967,
+          "metadata": {
+            "budget_targets": [
+              0.5,
+              1.0,
+              2.0,
+              4.0
+            ],
+            "cohort_kind": "search_fresh_confirmation",
+            "denominator_definition": "all retained iid shots; original syndrome mismatch or nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 4.7868278223393126e-05,
+              "0.95": 0.0010155692857660526,
+              "0.99": 0.0020997608981445258
+            },
+            "ledger_sha256": "d1413981fc76881d5ed1a473b7a1b38b4125c0160afb18bd14198858df30710e",
+            "runtime_ratio_to_bp_osd0": 0.21914696912767073,
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111563,
+            "selection_sha256": "483ccf339baed414a178d7f008205293b19c52913f953e40524a35c69cc64806",
+            "source_evidence_path": "data/reproductions/roffe-2005-07016-search-frontier/results/toric15-binary_ms-p02000-beam-frontier/confirmation/toric15-binary_ms-p02000-beam-frontier-confirmation-b295cc81085e6b7d79be/summary.json",
+            "stop_reason": "target_block_failures",
+            "summary_sha256": "f4695b5aa6ea78318c92b6cd0e5f094ddf7db656f46950daec477a6b3ac6e713"
+          },
+          "n": 44414383,
+          "runtime_scope": "warm full search decoder including all branches/legs and selection",
+          "status": "complete",
+          "type_i": 3,
+          "type_ii": 17,
+          "work_unit": "iterations",
+          "x": 0.02,
+          "y": 4.503045781363213e-07
+        },
+        {
           "ci_high": 0.08898412789106071,
           "ci_low": 0.03752407175810884,
           "failures": 20,
@@ -150470,6 +150552,47 @@
           "work_unit": "iterations",
           "x": 0.09,
           "y": 0.30303030303030304
+        },
+        {
+          "ci_high": 3.688879386074778e-08,
+          "ci_low": 0.0,
+          "failures": 0,
+          "iteration_unit": "all BP segment sweeps",
+          "mean_directed_edge_updates": 14616.7781098,
+          "mean_iterations": 8.12317513,
+          "mean_seconds": 8.845700496985e-05,
+          "mean_work": 8.12317513,
+          "metadata": {
+            "budget_targets": [
+              0.5,
+              1.0,
+              2.0,
+              4.0
+            ],
+            "cohort_kind": "search_fresh_confirmation",
+            "denominator_definition": "all retained iid shots; original syndrome mismatch or nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 2.910577163083559e-05,
+              "0.95": 0.0005010626365612987,
+              "0.99": 0.0006113916385221648
+            },
+            "ledger_sha256": "3d055e83080c5561911b13a88d92415d6e6b696063c0af7697ae22042ce3efef",
+            "runtime_ratio_to_bp_osd0": 0.230631383295473,
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111563,
+            "selection_sha256": "cf9428f238e873036e0b8eb77027f17cba2d0cac0445c745b29f7c5b25d492a4",
+            "source_evidence_path": "data/reproductions/roffe-2005-07016-search-frontier/results/toric15-binary_ms-p01000-beam-frontier/confirmation/toric15-binary_ms-p01000-beam-frontier-confirmation-49e6073902493c5b0c70/summary.json",
+            "stop_reason": "max_shots",
+            "summary_sha256": "ad6150d5cf73a1885a8b837b9fdb04b2564ca16c8e7b625bffe06d0b2dd80a4c"
+          },
+          "n": 100000000,
+          "runtime_scope": "warm full search decoder including all branches/legs and selection",
+          "status": "upper_bound",
+          "type_i": 0,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.01,
+          "y": 0.0
         },
         {
           "ci_high": 0.5784967155118717,
@@ -212234,6 +212357,64 @@
       },
       "configuration": {
         "effective_configuration": {
+          "alpha": 1.0,
+          "alpha_schedule": "constant",
+          "beta": 0.25,
+          "branch_count": 1,
+          "check_cap": null,
+          "check_rule": "min_sum",
+          "execution_backend": "canonical-css-search-traversal-v1",
+          "family": "binary_css",
+          "first_iteration": 1,
+          "hard_decision": "min_llr",
+          "initial_iterations": 50,
+          "iterations_per_branch": 242,
+          "iterations_per_unit": 40,
+          "max_iterations": 15410,
+          "message_resolution": "float64",
+          "noise_model": "x_only",
+          "numerical_profile": "bp-flooding-policy-v2; float64; exact_unity",
+          "prior": "p",
+          "schedule": "flooding",
+          "search": {
+            "alpha": 1.0,
+            "beta": 0.25,
+            "damping": 0.0,
+            "first_gamma": 0.125,
+            "gamma_high": 0.66,
+            "gamma_low": -0.24,
+            "initial": 50,
+            "method": "beam",
+            "paper_scale": false,
+            "per_unit": 40,
+            "rounds": 12,
+            "solutions": 1,
+            "units": 384,
+            "width": 16
+          },
+          "unit_limit": 384,
+          "v2c_damping": 0.0,
+          "zero_syndrome_shortcut": false
+        },
+        "settings_status": "exact_campaign_arm",
+        "source_path": "data/reproductions/roffe-2005-07016-search-frontier/plan.json"
+      },
+      "decoder_id": "roffe-beam-relay-frontier-finalists:toric11:de7400f41672032d",
+      "evidence_status": "canonical_adaptation",
+      "label": "Beam search, MS, d=0, alpha=1, beta=0.25, T0=50, T=40, units=384, S=1, width=16, depth=12, scale=constant, X-only"
+    },
+    {
+      "asset": {
+        "availability": "tracked",
+        "kind": "decoder_source",
+        "label": "Frozen tuned search protocol",
+        "local_storage_path": null,
+        "path": "data/reproductions/roffe-2005-07016-search-frontier/plan.json",
+        "sha256": "8bbc025040915c299af18d09edd90bf443cc0ba2df8b33f2a0e7db5a254aa3a1",
+        "url": "data/reproductions/roffe-2005-07016-search-frontier/plan.json"
+      },
+      "configuration": {
+        "effective_configuration": {
           "alpha": 1.1,
           "alpha_schedule": "1-2**(-iteration)",
           "beta": 0.0,
@@ -226154,6 +226335,64 @@
       },
       "configuration": {
         "effective_configuration": {
+          "alpha": 1.0,
+          "alpha_schedule": "constant",
+          "beta": 0.25,
+          "branch_count": 1,
+          "check_cap": null,
+          "check_rule": "min_sum",
+          "execution_backend": "canonical-css-search-traversal-v1",
+          "family": "binary_css",
+          "first_iteration": 1,
+          "hard_decision": "min_llr",
+          "initial_iterations": 50,
+          "iterations_per_branch": 450,
+          "iterations_per_unit": 40,
+          "max_iterations": 15410,
+          "message_resolution": "float64",
+          "noise_model": "x_only",
+          "numerical_profile": "bp-flooding-policy-v2; float64; exact_unity",
+          "prior": "p",
+          "schedule": "flooding",
+          "search": {
+            "alpha": 1.0,
+            "beta": 0.25,
+            "damping": 0.0,
+            "first_gamma": 0.125,
+            "gamma_high": 0.66,
+            "gamma_low": -0.24,
+            "initial": 50,
+            "method": "beam",
+            "paper_scale": false,
+            "per_unit": 40,
+            "rounds": 12,
+            "solutions": 1,
+            "units": 384,
+            "width": 16
+          },
+          "unit_limit": 384,
+          "v2c_damping": 0.0,
+          "zero_syndrome_shortcut": false
+        },
+        "settings_status": "exact_campaign_arm",
+        "source_path": "data/reproductions/roffe-2005-07016-search-frontier/plan.json"
+      },
+      "decoder_id": "roffe-beam-relay-frontier-finalists:toric15:f918290302730944",
+      "evidence_status": "canonical_adaptation",
+      "label": "Beam search, MS, d=0, alpha=1, beta=0.25, T0=50, T=40, units=384, S=1, width=16, depth=12, scale=constant, X-only"
+    },
+    {
+      "asset": {
+        "availability": "tracked",
+        "kind": "decoder_source",
+        "label": "Frozen tuned search protocol",
+        "local_storage_path": null,
+        "path": "data/reproductions/roffe-2005-07016-search-frontier/plan.json",
+        "sha256": "8bbc025040915c299af18d09edd90bf443cc0ba2df8b33f2a0e7db5a254aa3a1",
+        "url": "data/reproductions/roffe-2005-07016-search-frontier/plan.json"
+      },
+      "configuration": {
+        "effective_configuration": {
           "alpha": 1.1,
           "alpha_schedule": "1-2**(-iteration)",
           "beta": 0.0,
@@ -234490,7 +234729,7 @@
     },
     {
       "path": "data/reproductions/roffe-2005-07016-search-frontier/catalog.json",
-      "sha256": "4398785e6c5c4b281fc688ca3ebebcf01890e2c8a23af0fccb54c76abf56791e"
+      "sha256": "69d9c3de657411a6b435b0102df98f3b6e324c1bee057a86c106b09e7ec8291f"
     }
   ],
   "limitations": [
@@ -383803,6 +384042,58 @@
       "channel_kind": "x_only",
       "code_id": "toric11",
       "dataset_id": "roffe-beam-relay-frontier-finalists",
+      "decoder_id": "roffe-beam-relay-frontier-finalists:toric11:de7400f41672032d",
+      "label": "Beam search, MS, d=0, alpha=1, beta=0.25, T0=50, T=40, units=384, S=1, width=16, depth=12, scale=constant, X-only",
+      "points": [
+        {
+          "ci_high": 2.348962000572016e-07,
+          "ci_low": 7.653930480892834e-08,
+          "failures": 14,
+          "iteration_unit": "all BP segment sweeps",
+          "mean_directed_edge_updates": 4612.05646576,
+          "mean_iterations": 4.76637257,
+          "mean_seconds": 5.889609695232e-05,
+          "mean_work": 4.76637257,
+          "metadata": {
+            "budget_targets": [
+              0.5,
+              1.0,
+              2.0,
+              4.0
+            ],
+            "cohort_kind": "search_fresh_confirmation",
+            "denominator_definition": "all retained iid shots; original syndrome mismatch or nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 3.481479526413654e-05,
+              "0.95": 0.0003299091193138743,
+              "0.99": 0.0004106431130864383
+            },
+            "ledger_sha256": "9ee6efaf5faf8fee12103f33cbd5fd603745759f1051e296d3caab2f9fc59166",
+            "runtime_ratio_to_bp_osd0": 0.4477102020959455,
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111563,
+            "selection_sha256": "c20ea9c9e03a71056883653afee7b3e9e962ea6e0c4a8825cfc911d2a3fb896b",
+            "source_evidence_path": "data/reproductions/roffe-2005-07016-search-frontier/results/toric11-binary_ms-p01000-beam-frontier/confirmation/toric11-binary_ms-p01000-beam-frontier-confirmation-49e6073902493c5b0c70/summary.json",
+            "stop_reason": "max_shots",
+            "summary_sha256": "b3b0e304c9e8737e48855fd94dbc6bf2e2fd33ff30a7b269e309b9f1ebce1576"
+          },
+          "n": 100000000,
+          "runtime_scope": "warm full search decoder including all branches/legs and selection",
+          "status": "complete",
+          "type_i": 0,
+          "type_ii": 14,
+          "work_unit": "iterations",
+          "x": 0.01,
+          "y": 1.4e-07
+        }
+      ],
+      "series_id": "roffe-beam-relay-frontier-finalists:toric11:de7400f41672032d",
+      "source_decoder_id": "roffe-beam-relay-frontier-finalists:toric11:de7400f41672032d"
+    },
+    {
+      "channel_kind": "x_only",
+      "code_id": "toric11",
+      "dataset_id": "roffe-beam-relay-frontier-finalists",
       "decoder_id": "roffe-beam-relay-frontier-finalists:toric11:5d0b51907b875419",
       "label": "RelayBP, MS, d=0, alpha=1.1, beta=0, T0=20, T=20, units=32, S=1, gamma0=0.125, gamma=[0,0.75], scale=paper ramp, X-only",
       "points": [
@@ -397625,6 +397916,47 @@
       "label": "Beam search, MS, d=0.5, alpha=1, beta=0, T0=50, T=40, units=384, S=4, width=16, depth=12, scale=constant, X-only",
       "points": [
         {
+          "ci_high": 6.68045994712909e-07,
+          "ci_low": 2.750577559149809e-07,
+          "failures": 20,
+          "iteration_unit": "all BP segment sweeps",
+          "mean_directed_edge_updates": 48529.93305596523,
+          "mean_iterations": 27.008792084311967,
+          "mean_seconds": 0.00024966160205346094,
+          "mean_work": 27.008792084311967,
+          "metadata": {
+            "budget_targets": [
+              0.5,
+              1.0,
+              2.0,
+              4.0
+            ],
+            "cohort_kind": "search_fresh_confirmation",
+            "denominator_definition": "all retained iid shots; original syndrome mismatch or nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 4.7868278223393126e-05,
+              "0.95": 0.0010155692857660526,
+              "0.99": 0.0020997608981445258
+            },
+            "ledger_sha256": "d1413981fc76881d5ed1a473b7a1b38b4125c0160afb18bd14198858df30710e",
+            "runtime_ratio_to_bp_osd0": 0.21914696912767073,
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111563,
+            "selection_sha256": "483ccf339baed414a178d7f008205293b19c52913f953e40524a35c69cc64806",
+            "source_evidence_path": "data/reproductions/roffe-2005-07016-search-frontier/results/toric15-binary_ms-p02000-beam-frontier/confirmation/toric15-binary_ms-p02000-beam-frontier-confirmation-b295cc81085e6b7d79be/summary.json",
+            "stop_reason": "target_block_failures",
+            "summary_sha256": "f4695b5aa6ea78318c92b6cd0e5f094ddf7db656f46950daec477a6b3ac6e713"
+          },
+          "n": 44414383,
+          "runtime_scope": "warm full search decoder including all branches/legs and selection",
+          "status": "complete",
+          "type_i": 3,
+          "type_ii": 17,
+          "work_unit": "iterations",
+          "x": 0.02,
+          "y": 4.503045781363213e-07
+        },
+        {
           "ci_high": 0.08898412789106071,
           "ci_low": 0.03752407175810884,
           "failures": 20,
@@ -399002,6 +399334,58 @@
       ],
       "series_id": "roffe-beam-relay-frontier-finalists:toric15:92849456b00236d9",
       "source_decoder_id": "roffe-beam-relay-frontier-finalists:toric15:92849456b00236d9"
+    },
+    {
+      "channel_kind": "x_only",
+      "code_id": "toric15",
+      "dataset_id": "roffe-beam-relay-frontier-finalists",
+      "decoder_id": "roffe-beam-relay-frontier-finalists:toric15:f918290302730944",
+      "label": "Beam search, MS, d=0, alpha=1, beta=0.25, T0=50, T=40, units=384, S=1, width=16, depth=12, scale=constant, X-only",
+      "points": [
+        {
+          "ci_high": 3.688879386074778e-08,
+          "ci_low": 0.0,
+          "failures": 0,
+          "iteration_unit": "all BP segment sweeps",
+          "mean_directed_edge_updates": 14616.7781098,
+          "mean_iterations": 8.12317513,
+          "mean_seconds": 8.845700496985e-05,
+          "mean_work": 8.12317513,
+          "metadata": {
+            "budget_targets": [
+              0.5,
+              1.0,
+              2.0,
+              4.0
+            ],
+            "cohort_kind": "search_fresh_confirmation",
+            "denominator_definition": "all retained iid shots; original syndrome mismatch or nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 2.910577163083559e-05,
+              "0.95": 0.0005010626365612987,
+              "0.99": 0.0006113916385221648
+            },
+            "ledger_sha256": "3d055e83080c5561911b13a88d92415d6e6b696063c0af7697ae22042ce3efef",
+            "runtime_ratio_to_bp_osd0": 0.230631383295473,
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111563,
+            "selection_sha256": "cf9428f238e873036e0b8eb77027f17cba2d0cac0445c745b29f7c5b25d492a4",
+            "source_evidence_path": "data/reproductions/roffe-2005-07016-search-frontier/results/toric15-binary_ms-p01000-beam-frontier/confirmation/toric15-binary_ms-p01000-beam-frontier-confirmation-49e6073902493c5b0c70/summary.json",
+            "stop_reason": "max_shots",
+            "summary_sha256": "ad6150d5cf73a1885a8b837b9fdb04b2564ca16c8e7b625bffe06d0b2dd80a4c"
+          },
+          "n": 100000000,
+          "runtime_scope": "warm full search decoder including all branches/legs and selection",
+          "status": "upper_bound",
+          "type_i": 0,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.01,
+          "y": 0.0
+        }
+      ],
+      "series_id": "roffe-beam-relay-frontier-finalists:toric15:f918290302730944",
+      "source_decoder_id": "roffe-beam-relay-frontier-finalists:toric15:f918290302730944"
     },
     {
       "channel_kind": "x_only",
