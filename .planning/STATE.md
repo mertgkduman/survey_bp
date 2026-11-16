@@ -5,11 +5,11 @@ current_phase: 11
 current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
-stopped_at: Broader beam/RelayBP215/218 workers audited,639 settings published; three rare beam points continue; final collector61870315 pending
-last_updated: "2026-11-16T05:53:08.649303+00:00"
+stopped_at: Original lifted-product72-point full stack launched;50 audited points published; remaining workers and automatic audits/collector continue
+last_updated: "2026-11-16T19:59:33.357166+00:00"
 last_activity: 2026-11-16
-last_activity_desc: Quick261116-0k6 audits639 broader search confirmations/27.24M shots; useful beam latency tradeoffs, remaining rare points explicit.
-state_head: 77aba5a
+last_activity_desc: Quick261116-jzy launches LP1054 full stack on72 single-CPU points;50 full audits published with controlled-budget/source caveats.
+state_head: 53fabae
 progress:
   total_phases: 14
   completed_phases: 8
@@ -34,7 +34,10 @@ Total Phases: 14
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
-Last activity: 2026-11-16 — quick261116-0k6 checks broader beam/RelayBP results
+Last activity: 2026-11-16 — quick261116-jzy launches original lifted-product full stack
+Last Activity Description: User-selected original Panteleev–Kalachev2012.04068v2 Example4 reconstructed as LP1054/k140/ranks457+457, independently checked against polynomial coefficient expansion. No source LER/grid/cap exists for1054; controlled depolarizing .02/.04/.06/.08/.10/.12 and NMS32/.625 borrowed from cited1904.02703 are explicit adaptations with flooding/layered schedule difference. Twelve families/variants per rate, including ordinary/correlated BP+OSD0/CS10, BP/QBP numerical tuning and Relay/beam32/128. One CPU per point, disjoint coarse/finalist/fresh seeds,20 failures or100M fresh shots. Frozen array61930050, point audits61930127 and collector61930188 continue. Snapshot50/72 workers:273,537 shots/1,000 failures,1,140 separate training settings,12 displayed compatible curves/44 displayed points. Public440 curves/3178 points/13 codes/0 circuits; all1520 prior series point arrays unchanged.20 new/61 unique scientific tests,55 catalog tests and16 browser groups pass, including new LP input/stale exports and final13-code public flow; old NFS cleanup-only flake passes retry. Provenance-instrumented timing scope documented. Prior beam frontier now218/218/642 settings/271.66M shots in separate9dba3da. No canonical/prior frozen/raw/v1/model/config/phase-gate/counter changes; campaign remains running. Implementation53fabae.
+
+Prior beam/RelayBP check(earlier snapshot, superseded by automatic full collector):
 Last Activity Description: Original218-worker/full-audit campaign complete(616 settings/11,477,871 shots). Broader snapshot215/218 passes unchanged full-ledger/reference/endpoint/proposal/source audits via61875143(8 CPUs/16GiB,8m50s):639 fresh settings/27,243,865 shots/12,780 failures,2,063 separate training measurements. Independently reconcile1,255 old/new summaries/manifests/hashes/counts/stopping/CI/work/ratio/selection. At X-only p=.02,1x-role beam LER4.65e-5/2.70e-5/3.47e-6 on lengths162/242/338 uses.490/.366/.216 times same-CPU OSD0. Length162 intervals overlap;242/338 estimates remain3.0x/2.5x higher than OSD0. Beam242 improves14.8x versus first search; Relay remains less accurate at these examples. Actual1x budget fits93/106 beam,92/109 Relay;30 over-budget rows flagged. Three beam rare points(242/.01,450/.01,450/.02) remain active; no provisional rate/bound published. Full tables/role comparisons/PNG/PDF saved. Public427 curves/3132 points/12 codes/0 circuits; all800 historical raw series retain point subsets.53 regressions/12 Chromium groups pass, including empty/stale/custom/v1 flows. No simulations or frozen/raw/kernel/config/gate/counter changes; automatic final collector61870315 still awaits remaining workers.
 
 Prior beam/RelayBP launch: 2026-11-15 — quick261115-sxj tunes beam search and RelayBP against OSD latency
@@ -328,6 +331,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 | # | Description | Date | Commit | Status | Directory |
 |---|-------------|------|--------|--------|-----------|
+| 261116-jzy | Launch original lifted-product full decoder stack | 2026-11-16 | 53fabae |72 single-CPU workers;50 audited points published; campaign running | [261116-jzy](./quick/261116-jzy-reproduce-lifted-product-paper-codes-wit/) |
 | 261116-0k6 | Check broader beam/RelayBP results and latency tradeoffs | 2026-11-16 | 77aba5a | Verified215/218 workers;639 fresh settings published | [261116-0k6](./quick/261116-0k6-check-tuned-beam-and-relaybp-frontier-re/) |
 | 261115-sxj | Tune beam search and RelayBP for LER versus OSD0 latency | 2026-11-15 | 1154bbf | Qualified;114-worker snapshot published; broader frontier running | [261115-sxj](./quick/261115-sxj-tune-canonical-beam-search-and-relaybp-a/) |
 | 261114-pna | Check completed runtime-budget results and archive full evidence | 2026-11-14 | 7fcae85 | Complete;1464 rows/218 workers, timing caveats explicit | [261114-pna](./quick/261114-pna-audit-completed-runtime-budget-joint-con/) |

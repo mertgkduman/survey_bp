@@ -28,11 +28,2483 @@
       "evidence_status": "canonical_adaptation",
       "label": "Panteleev-Kalachev lifted product [[1054,140]]: full canonical decoder stack",
       "paper_id": "panteleev-2012-04068-v2",
-      "points": [],
+      "points": [
+        {
+          "ci_high": 0.00253308261832387,
+          "ci_low": 0.0010436468187382968,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 74476.24903920061,
+          "mean_iterations": 5.005124263387138,
+          "mean_seconds": 0.0025157026308822274,
+          "mean_work": 5.005124263387138,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0023897237686948537,
+              "0.95": 0.003969517912966369,
+              "0.99": 0.005403813517520124
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/tuned_qbp-p0600/confirmation/30dca643b8a39cdfadd4dfa7/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "738ca7d67a0b0f8d60981a1d21d563e78ba8134bceea10aa0eecaf74b38fc0cc",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 11709,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.06,
+          "y": 0.0017080877957126996
+        },
+        {
+          "ci_high": 0.01614868930712646,
+          "ci_low": 0.006677150843571954,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 123553.51882160392,
+          "mean_iterations": 8.303327877795963,
+          "mean_seconds": 0.003964425952536825,
+          "mean_work": 8.303327877795963,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.003522745596538154,
+              "0.95": 0.006659616226132387,
+              "0.99": 0.014186446032570507
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/tuned_qbp-p0800/confirmation/30dca643b8a39cdfadd4dfa7/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "3919736c86883faad8bd73f039e7cd99340c7fa4388bbbb8738ca993180715ff",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 1833,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.08,
+          "y": 0.010911074740861976
+        },
+        {
+          "ci_high": 0.24592251248522312,
+          "ci_low": 0.10861266894743644,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 253344.8275862069,
+          "mean_iterations": 17.025862068965516,
+          "mean_seconds": 0.008400227137931034,
+          "mean_work": 17.025862068965516,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.006930023349974429,
+              "0.95": 0.016470023430846244,
+              "0.99": 0.016969081610824315
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/tuned_qbp-p1000/confirmation/30dca643b8a39cdfadd4dfa7/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "f9d952be69cdcee5a4df27fb234d1121b0cca7cccec864aeca187e35d2996f82",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 116,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.1,
+          "y": 0.1724137931034483
+        },
+        {
+          "ci_high": 0.0037054571309192656,
+          "ci_low": 0.0015271400594234804,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 56656.67374734474,
+          "mean_iterations": 3.807572160439835,
+          "mean_seconds": 0.002084709612020492,
+          "mean_work": 3.807572160439835,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0021207585071259714,
+              "0.95": 0.0027743951073645207,
+              "0.99": 0.004654571935386454
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/qbp-p0400/confirmation/43f20595d88e232668f7e5c0/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "be71d2ab12bd7a6822c550c820a4314725d910a35b9d8e904eb3a6d8fa990adf",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 8003,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.04,
+          "y": 0.0024990628514307135
+        },
+        {
+          "ci_high": 0.012178407795069264,
+          "ci_low": 0.005030267156150345,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 92100.59210526316,
+          "mean_iterations": 6.189555921052632,
+          "mean_seconds": 0.0030422145275493424,
+          "mean_work": 6.189555921052632,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.00271972856324333,
+              "0.95": 0.004843566220796605,
+              "0.99": 0.014045986170861889
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/qbp-p0600/confirmation/43f20595d88e232668f7e5c0/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "098b0f10c9f69aefb412b133d136682a9a0e9f6ea8e9ccc15d7ff32f3c6050cb",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 2432,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.06,
+          "y": 0.008223684210526315
+        },
+        {
+          "ci_high": 0.03688672546974083,
+          "ci_low": 0.015336005275369331,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 154714.8,
+          "mean_iterations": 10.3975,
+          "mean_seconds": 0.00603239758,
+          "mean_work": 10.3975,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.005297337042956695,
+              "0.95": 0.013100944897729627,
+              "0.99": 0.018013022067082888
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/qbp-p0800/confirmation/43f20595d88e232668f7e5c0/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "1ded9c5228b601576569fb5dac2e9d915b3671ac940e8b280d15e20c35ba2df7",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 800,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.08,
+          "y": 0.025
+        },
+        {
+          "ci_high": 0.316453469299049,
+          "ci_low": 0.1429948758235286,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 287902.9213483146,
+          "mean_iterations": 19.348314606741575,
+          "mean_seconds": 0.010208471640449438,
+          "mean_work": 19.348314606741575,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.00906591807199522,
+              "0.95": 0.017658094370241045,
+              "0.99": 0.021332901856464744
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/qbp-p1000/confirmation/43f20595d88e232668f7e5c0/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "f54ff7e941cce842644fbc49aafbf0583dd14f782fcd63a48c26fdb5a8256908",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 89,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.1,
+          "y": 0.2247191011235955
+        },
+        {
+          "ci_high": 0.9709441488712534,
+          "ci_low": 0.6641108624628791,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 456104.347826087,
+          "mean_iterations": 30.652173913043477,
+          "mean_seconds": 0.011543078739130436,
+          "mean_work": 30.652173913043477,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.012098502811718561,
+              "0.95": 0.012715648046279315,
+              "0.99": 0.012842804526742108
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/qbp-p1200/confirmation/43f20595d88e232668f7e5c0/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "6dafdcd02031e792ce0f9b6830e771ad1b860db75efa328bd470d4a095cb6a40",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 23,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.12,
+          "y": 0.8695652173913043
+        },
+        {
+          "ci_high": 0.0016853328645413134,
+          "ci_low": 0.0006942148019201962,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 53739.05709902846,
+          "mean_iterations": 7.2237941026078065,
+          "mean_seconds": 0.0009106780640304529,
+          "mean_work": 7.2237941026078065,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0008575238417276945,
+              "0.95": 0.0011673707057442274,
+              "0.99": 0.0014386582491568967
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/beam128-p0400/confirmation/4c1927fb3af77b80b904a94a/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "e1c2e79acfc34290ef2da75ca5002b6d682fe1764d131d560e57599f0b2b46f9",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 17601,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.04,
+          "y": 0.0011362990739162547
+        },
+        {
+          "ci_high": 0.015410605841877466,
+          "ci_low": 0.006370730682217597,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 100276.6225923998,
+          "mean_iterations": 13.481520041644977,
+          "mean_seconds": 0.0012650940515356586,
+          "mean_work": 13.481520041644977,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.00109971601112169,
+              "0.95": 0.0017380559074358674,
+              "0.99": 0.009340624455494747
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/beam128-p0600/confirmation/5e68c1099a79880588541401/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "aa751b37b2324df6af971d0b27ccb770285a2044636325a45c57381404ada55b",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 1921,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.06,
+          "y": 0.010411244143675169
+        },
+        {
+          "ci_high": 0.3131317634341264,
+          "ci_low": 0.14133689846537045,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 205509.33333333334,
+          "mean_iterations": 27.622222222222224,
+          "mean_seconds": 0.0015056423333333333,
+          "mean_work": 27.622222222222224,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0011790444128016698,
+              "0.95": 0.003189095633248142,
+              "0.99": 0.0035579730525035357
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/tuned_bp-p0800/confirmation/66586328b25732e133618128/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "715054b364325df8834ecff20e94ca4180ce6c00b251d813024e6aa76ea0e78e",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 90,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.08,
+          "y": 0.2222222222222222
+        },
+        {
+          "ci_high": 0.9504923546942066,
+          "ci_low": 0.6261582865113173,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 366110.0,
+          "mean_iterations": 49.208333333333336,
+          "mean_seconds": 0.0026822642083333334,
+          "mean_work": 49.208333333333336,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0026397417485213835,
+              "0.95": 0.003522745596538154,
+              "0.99": 0.0038146286914331313
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/tuned_bp-p1000/confirmation/66586328b25732e133618128/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "f1ff71ddbc886fb4a3c4242c8142c56dcbec66bf92f3a0fa2a1f9eccce9fb933",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 24,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.1,
+          "y": 0.8333333333333334
+        },
+        {
+          "ci_high": 1.0,
+          "ci_low": 0.8315665290169146,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 447516.0,
+          "mean_iterations": 60.15,
+          "mean_seconds": 0.0025240138999999997,
+          "mean_work": 60.15,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0026928005576666632,
+              "0.95": 0.00271972856324333,
+              "0.99": 0.0027469258488757634
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/tuned_bp-p1200/confirmation/66586328b25732e133618128/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "414dc521d0dd39d1e45896a6081726e0123a98e6ed7e0153701a6701dbbc97db",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 20,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.12,
+          "y": 1.0
+        },
+        {
+          "ci_high": 0.5896627838939661,
+          "ci_low": 0.29644392386585827,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 265957.64444444445,
+          "mean_iterations": 35.77777777777778,
+          "mean_seconds": 0.0034509318444444445,
+          "mean_work": 35.77777777777778,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0034191421696554247,
+              "0.95": 0.005192958575587388,
+              "0.99": 0.005244888161343261
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/beam32-p0800/confirmation/66dfbaef15fbef4825b436b2/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "82b5b6bb08f16924322766d6474a78f80faa875b6dd9703ed80bf44963178fb7",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 45,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.08,
+          "y": 0.4444444444444444
+        },
+        {
+          "ci_high": 1.0,
+          "ci_low": 0.8315665290169146,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 420635.4,
+          "mean_iterations": 56.6,
+          "mean_seconds": 0.0031102011499999998,
+          "mean_work": 56.6,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.003189095633248142,
+              "0.95": 0.0032531964554764294,
+              "0.99": 0.0033185857042315058
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/beam32-p1200/confirmation/66dfbaef15fbef4825b436b2/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "b9d254fc464ba900a8c713fa1d5d7f3cc1e168abd19fba2a4c4a10c9ac6936ea",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 20,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.12,
+          "y": 1.0
+        },
+        {
+          "ci_high": 0.002523602955003727,
+          "ci_low": 0.0010397385633944753,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 61636.85186760827,
+          "mean_iterations": 8.284523100484982,
+          "mean_seconds": 0.0006160563399132136,
+          "mean_work": 8.284523100484982,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.00042731687015663117,
+              "0.95": 0.0007098067118970294,
+              "0.99": 0.0020380072407427787
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/osd0-p0400/confirmation/69e7a16e91b319fa04e6258d/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "fcc5409cd762989e569d85b406b06179523269bc7b40764a0a0f4411035ffebb",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 11753,
+          "status": "complete",
+          "type_i": 0,
+          "type_ii": 20,
+          "work_unit": "iterations",
+          "x": 0.04,
+          "y": 0.0017016931847187952
+        },
+        {
+          "ci_high": 0.01180530706537967,
+          "ci_low": 0.004875681013941599,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 115695.11359107214,
+          "mean_iterations": 15.550418493423674,
+          "mean_seconds": 0.0016369582921482663,
+          "mean_work": 15.550418493423674,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0007386277107249635,
+              "0.95": 0.0022289385048244684,
+              "0.99": 0.0027743951073645207
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/osd0-p0600/confirmation/69e7a16e91b319fa04e6258d/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "2fd440c507f427ef8c368246030d0754e675b0047a1bf4838dcdfec35597086f",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 2509,
+          "status": "complete",
+          "type_i": 0,
+          "type_ii": 20,
+          "work_unit": "iterations",
+          "x": 0.06,
+          "y": 0.007971303308090873
+        },
+        {
+          "ci_high": 0.2254259174632824,
+          "ci_low": 0.09892711412983618,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 256240.62992125985,
+          "mean_iterations": 34.44094488188976,
+          "mean_seconds": 0.021723289645669292,
+          "mean_work": 34.44094488188976,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.001919895010555308,
+              "0.95": 0.004795610119600599,
+              "0.99": 0.005141543144145928
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/osd0-p0800/confirmation/69e7a16e91b319fa04e6258d/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "1d70265a01ab862ce8ffef9b07e08b77aa45228808f1f600063b4c97870503e1",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 127,
+          "status": "complete",
+          "type_i": 0,
+          "type_ii": 20,
+          "work_unit": "iterations",
+          "x": 0.08,
+          "y": 0.15748031496062992
+        },
+        {
+          "ci_high": 0.9064355606682571,
+          "ci_low": 0.5635249030586136,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 403190.76923076925,
+          "mean_iterations": 54.19230769230769,
+          "mean_seconds": 0.0029449173076923074,
+          "mean_work": 54.19230769230769,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0029745270753182267,
+              "0.95": 0.003776860090527853,
+              "0.99": 0.003969517912966369
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/osd0-p1000/confirmation/69e7a16e91b319fa04e6258d/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "5e2ade8597f17b1b4731fb10c63f2e82b285658d832180200db5c636dff62114",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 26,
+          "status": "complete",
+          "type_i": 0,
+          "type_ii": 20,
+          "work_unit": "iterations",
+          "x": 0.1,
+          "y": 0.7692307692307693
+        },
+        {
+          "ci_high": 0.9987349105020502,
+          "ci_low": 0.761840090063179,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 459862.85714285716,
+          "mean_iterations": 61.80952380952381,
+          "mean_seconds": 0.0033676024761904763,
+          "mean_work": 61.80952380952381,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0035579730525035357,
+              "0.95": 0.0036294883108588566,
+              "0.99": 0.0036294883108588566
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/osd0-p1200/confirmation/69e7a16e91b319fa04e6258d/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "3528bb0c494a41cc7674e5bef49d95ebd1a2381b8dded95b057f95801ab0d0c9",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 21,
+          "status": "complete",
+          "type_i": 0,
+          "type_ii": 20,
+          "work_unit": "iterations",
+          "x": 0.12,
+          "y": 0.9523809523809523
+        },
+        {
+          "ci_high": 0.002008949501590977,
+          "ci_low": 0.0008275873568607568,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 31541.77040298002,
+          "mean_iterations": 4.239485269217744,
+          "mean_seconds": 0.00029473886373179817,
+          "mean_work": 4.239485269217744,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.00027856783321448744,
+              "0.95": 0.0004106431130864383,
+              "0.99": 0.0005266218667555286
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/bp-p0200/confirmation/79ba8bebf6dc95c84aa86312/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "ae573cffbc85f51a0ec465fe5ac2e375ed85c92403da23baf86c929f68bf1ad9",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 14765,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.02,
+          "y": 0.0013545546901456147
+        },
+        {
+          "ci_high": 0.02583748178202638,
+          "ci_low": 0.010710645243949983,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 63305.03496503497,
+          "mean_iterations": 8.508741258741258,
+          "mean_seconds": 0.0005655629222027972,
+          "mean_work": 8.508741258741258,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0005010626365612987,
+              "0.95": 0.0009662793287936919,
+              "0.99": 0.0019390939606608608
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/bp-p0400/confirmation/79ba8bebf6dc95c84aa86312/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "b1f20c4ddbbb813a468894ac9d00db893dfb5018abb489bc6e48ed0f30f7b6a4",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 1144,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.04,
+          "y": 0.017482517482517484
+        },
+        {
+          "ci_high": 0.07840577054304504,
+          "ci_low": 0.032966813315125854,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 118841.06951871658,
+          "mean_iterations": 15.973262032085561,
+          "mean_seconds": 0.0008853527593582888,
+          "mean_work": 15.973262032085561,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0007763051472542922,
+              "0.95": 0.001882065494123427,
+              "0.99": 0.0022289385048244684
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/bp-p0600/confirmation/79ba8bebf6dc95c84aa86312/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "dc15fb9f1e50277d6c7ea6e4c47267a58c6309189a89e32ef2c330ca86058828",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 374,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.06,
+          "y": 0.053475935828877004
+        },
+        {
+          "ci_high": 0.493762138240782,
+          "ci_low": 0.23813837921348285,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 262429.0909090909,
+          "mean_iterations": 35.27272727272727,
+          "mean_seconds": 0.0018390524181818183,
+          "mean_work": 35.27272727272727,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0017208474331048193,
+              "0.95": 0.003189095633248142,
+              "0.99": 0.0032857284200311938
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/bp-p0800/confirmation/79ba8bebf6dc95c84aa86312/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "263f4ac47a6ae6348b5db465970d5a3a3360b66c98614cc41e73fbb1f32157a7",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 55,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.08,
+          "y": 0.36363636363636365
+        },
+        {
+          "ci_high": 0.9709441488712534,
+          "ci_low": 0.6641108624628791,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 396907.82608695654,
+          "mean_iterations": 53.34782608695652,
+          "mean_seconds": 0.0028290493913043476,
+          "mean_work": 53.34782608695652,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0029745270753182267,
+              "0.95": 0.003487866927265499,
+              "0.99": 0.003487866927265499
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/bp-p1000/confirmation/79ba8bebf6dc95c84aa86312/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "e0a63b79d81e636a115ce5ed9fd5906fcc770a7a5903dd85abd48590d27f53c8",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 23,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.1,
+          "y": 0.8695652173913043
+        },
+        {
+          "ci_high": 1.0,
+          "ci_low": 0.8315665290169146,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 459048.0,
+          "mean_iterations": 61.7,
+          "mean_seconds": 0.00250994255,
+          "mean_work": 61.7,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0025877284075300298,
+              "0.95": 0.002666139166006597,
+              "0.99": 0.002666139166006597
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/bp-p1200/confirmation/79ba8bebf6dc95c84aa86312/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "8f1eb44eaae10b452ce2bd803fb3a6eec0d402b53d633001877caada1b043ed6",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 20,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.12,
+          "y": 1.0
+        },
+        {
+          "ci_high": 0.9709441488712534,
+          "ci_low": 0.6641108624628791,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 383873.73913043475,
+          "mean_iterations": 51.65217391304348,
+          "mean_seconds": 0.002963594565217391,
+          "mean_work": 51.65217391304348,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.003157520428958556,
+              "0.95": 0.003385289276886559,
+              "0.99": 0.003385289276886559
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/beam32-p1000/confirmation/865a8ea26346ee4f996e70ba/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "c7d6a2df25d7b2e4240f0dc366833f613db93648414d1465b247aa907541263b",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 23,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.1,
+          "y": 0.8695652173913043
+        },
+        {
+          "ci_high": 0.0009126871481126329,
+          "ci_low": 0.000375874315143623,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 61243.296723580985,
+          "mean_iterations": 8.231625903707123,
+          "mean_seconds": 0.0005358975648054145,
+          "mean_work": 8.231625903707123,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0004230860100560705,
+              "0.95": 0.0006821102985150225,
+              "0.99": 0.003776860090527853
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/cs10-p0400/confirmation/876d870df9d0841291a07b93/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "ed34ae2a71cf419cc39711fb74ff11664193d3f2849c436681dc84204a9e0d23",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 32505,
+          "status": "complete",
+          "type_i": 0,
+          "type_ii": 20,
+          "work_unit": "iterations",
+          "x": 0.04,
+          "y": 0.0006152899553914783
+        },
+        {
+          "ci_high": 0.0030931823704329607,
+          "ci_low": 0.0012745978863750388,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 116993.76720901126,
+          "mean_iterations": 15.72496871088861,
+          "mean_seconds": 0.001193000878911139,
+          "mean_work": 15.72496871088861,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0007313145650742213,
+              "0.95": 0.004009213092096033,
+              "0.99": 0.0045628584799396665
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/cs10-p0600/confirmation/876d870df9d0841291a07b93/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "f677c26b38eff44c5332ff368a0352212fda6b8ecda7ea271bb55cf53d310736",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 9588,
+          "status": "complete",
+          "type_i": 0,
+          "type_ii": 20,
+          "work_unit": "iterations",
+          "x": 0.06,
+          "y": 0.0020859407592824365
+        },
+        {
+          "ci_high": 0.16344400327327366,
+          "ci_low": 0.07040189100432585,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 247705.7627118644,
+          "mean_iterations": 33.293785310734464,
+          "mean_seconds": 0.013282613220338984,
+          "mean_work": 33.293785310734464,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.001573439339528766,
+              "0.95": 0.007356359430133303,
+              "0.99": 0.007965883137930209
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/cs10-p0800/confirmation/876d870df9d0841291a07b93/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "aaff05b5a1316514770b2abbfee103af819925c5e3ea5dc568d927aa1a9d685d",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 177,
+          "status": "complete",
+          "type_i": 0,
+          "type_ii": 20,
+          "work_unit": "iterations",
+          "x": 0.08,
+          "y": 0.11299435028248588
+        },
+        {
+          "ci_high": 0.8412239621138461,
+          "ci_low": 0.4916766461900099,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 407147.5862068966,
+          "mean_iterations": 54.724137931034484,
+          "mean_seconds": 0.004995415551724137,
+          "mean_work": 54.724137931034484,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.004517681663306601,
+              "0.95": 0.007283524188250795,
+              "0.99": 0.007504222254678982
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/cs10-p1000/confirmation/876d870df9d0841291a07b93/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "5865d6032fd88c55d5d09fd00e2a1aeb08404f9b3050b1ddc6b60322fd3f9207",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 29,
+          "status": "complete",
+          "type_i": 0,
+          "type_ii": 20,
+          "work_unit": "iterations",
+          "x": 0.1,
+          "y": 0.6896551724137931
+        },
+        {
+          "ci_high": 0.9987349105020502,
+          "ci_low": 0.761840090063179,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 459862.85714285716,
+          "mean_iterations": 61.80952380952381,
+          "mean_seconds": 0.00605893180952381,
+          "mean_work": 61.80952380952381,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.006399760295112054,
+              "0.95": 0.006593679431814245,
+              "0.99": 0.006593679431814245
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/cs10-p1200/confirmation/876d870df9d0841291a07b93/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "dcd1ee0631c6a3ececd72be43021cb9fe57fed7b10ec168f0be3f68dd60d9aca",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 21,
+          "status": "complete",
+          "type_i": 0,
+          "type_ii": 20,
+          "work_unit": "iterations",
+          "x": 0.12,
+          "y": 0.9523809523809523
+        },
+        {
+          "ci_high": 0.0013536382805036072,
+          "ci_low": 0.0005575364342639613,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 90850.49691991786,
+          "mean_iterations": 6.1055441478439425,
+          "mean_seconds": 0.0031679991842117274,
+          "mean_work": 6.1055441478439425,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.00271972856324333,
+              "0.95": 0.004701117654740319,
+              "0.99": 0.013100944897729627
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/qbp_osd0-p0600/confirmation/9683981a7f9e971572830591/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "0429acecbb6d185303c11fdc99cf40016decce2e0dbc79b0db0be0c797cefecb",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 21915,
+          "status": "complete",
+          "type_i": 0,
+          "type_ii": 20,
+          "work_unit": "iterations",
+          "x": 0.06,
+          "y": 0.0009126169290440338
+        },
+        {
+          "ci_high": 0.0038809071158733863,
+          "ci_low": 0.0015995220067240394,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 152274.14212799372,
+          "mean_iterations": 10.233477293547965,
+          "mean_seconds": 0.005173194866378746,
+          "mean_work": 10.233477293547965,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.004089798275247163,
+              "0.95": 0.01011455782638612,
+              "0.99": 0.015059198328987205
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/qbp_osd0-p0800/confirmation/9683981a7f9e971572830591/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "9c6b6aab8009b1ac12762a5209c987ccf664d1faff5ffd86b774907b3560e38f",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 7641,
+          "status": "complete",
+          "type_i": 0,
+          "type_ii": 20,
+          "work_unit": "iterations",
+          "x": 0.08,
+          "y": 0.0026174584478471405
+        },
+        {
+          "ci_high": 0.11845755410767336,
+          "ci_low": 0.050367091703811775,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 281933.65853658534,
+          "mean_iterations": 18.947154471544714,
+          "mean_seconds": 0.020358055906504066,
+          "mean_work": 18.947154471544714,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.006593679431814245,
+              "0.95": 0.014328310492896212,
+              "0.99": 0.014762472629141462
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/qbp_osd0-p1000/confirmation/9683981a7f9e971572830591/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "40137e43116625186348270e150f9c1e24826413309b10e3fbcc5743295f8a59",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 246,
+          "status": "complete",
+          "type_i": 0,
+          "type_ii": 20,
+          "work_unit": "iterations",
+          "x": 0.1,
+          "y": 0.08130081300813008
+        },
+        {
+          "ci_high": 0.711728556209243,
+          "ci_low": 0.3809767940893837,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 452600.0,
+          "mean_iterations": 30.416666666666668,
+          "mean_seconds": 0.09472644422222222,
+          "mean_work": 30.416666666666668,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.012842804526742108,
+              "0.95": 0.013906917000853355,
+              "0.99": 2.9975932720558407
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/qbp_osd0-p1200/confirmation/9683981a7f9e971572830591/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "1284f627bdc492c9c0b0f93a2578a27e0a68c92015b898f76578a57ee816851b",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 36,
+          "status": "complete",
+          "type_i": 0,
+          "type_ii": 20,
+          "work_unit": "iterations",
+          "x": 0.12,
+          "y": 0.5555555555555556
+        },
+        {
+          "ci_high": 1.0,
+          "ci_low": 0.8315665290169146,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 431520.0,
+          "mean_iterations": 58.0,
+          "mean_seconds": 0.0030534940499999997,
+          "mean_work": 58.0,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.003064658220227444,
+              "0.95": 0.003126257850454016,
+              "0.99": 0.003157520428958556
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/relay32-p1200/confirmation/a65578a7c5ce6612f0cfc48a/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "8861f3c839dae65273129abfb4852d2c6ff04bd87e8b83feac905b4fabf533f4",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 20,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.12,
+          "y": 1.0
+        },
+        {
+          "ci_high": 0.9504923546942066,
+          "ci_low": 0.6261582865113173,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 339450.0,
+          "mean_iterations": 45.625,
+          "mean_seconds": 0.00409714,
+          "mean_work": 45.625,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0045628584799396665,
+              "0.95": 0.005141543144145928,
+              "0.99": 0.005141543144145928
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/relay32-p0800/confirmation/b439f9e9790e5368cdddba3f/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "f5288ad2f666761317b10393ea710aa80d86dd82bef509b36ae4caa4a02c7d3b",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 24,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.08,
+          "y": 0.8333333333333334
+        },
+        {
+          "ci_high": 0.884267786708496,
+          "ci_low": 0.5371512577238284,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 433724.44444444444,
+          "mean_iterations": 29.14814814814815,
+          "mean_seconds": 0.010937281666666666,
+          "mean_work": 29.14814814814815,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.01197871565516689,
+              "0.95": 0.012589750540870609,
+              "0.99": 0.012715648046279315
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/tuned_qbp-p1200/confirmation/b7fff02fcb7831f259d8e111/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "23b07604fee6b319988cbd5096917fed25b688628c9611a0d4321e6b728aaf48",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 27,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.12,
+          "y": 0.7407407407407407
+        },
+        {
+          "ci_high": 0.02708761106113964,
+          "ci_low": 0.011232595398645783,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 57112.740604949584,
+          "mean_iterations": 7.676443629697525,
+          "mean_seconds": 0.0010012458148487627,
+          "mean_work": 7.676443629697525,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0008923427483724443,
+              "0.95": 0.001557860732206699,
+              "0.99": 0.0032857284200311938
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/relay32-p0400/confirmation/bb7ff2b69e38703ee45f8609/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "a8355b3a4ed2faf968a8129dd41be3e8457aa9372f0caee0b0045c44e1c7afef",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 1091,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.04,
+          "y": 0.01833180568285976
+        },
+        {
+          "ci_high": 0.2254259174632824,
+          "ci_low": 0.09892711412983618,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 145402.20472440944,
+          "mean_iterations": 19.543307086614174,
+          "mean_seconds": 0.0018274480708661417,
+          "mean_work": 19.543307086614174,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0014822510327645998,
+              "0.95": 0.003665783193967445,
+              "0.99": 0.0044729521418877234
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/relay32-p0600/confirmation/bb7ff2b69e38703ee45f8609/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "1fa71255a3c51e49db0654b55d6aa56b71ce797601225f8860b4851427c85a67",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 127,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.06,
+          "y": 0.15748031496062992
+        },
+        {
+          "ci_high": 0.9987349105020502,
+          "ci_low": 0.761840090063179,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 423725.71428571426,
+          "mean_iterations": 56.95238095238095,
+          "mean_seconds": 0.00305809619047619,
+          "mean_work": 56.95238095238095,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.003064658220227444,
+              "0.95": 0.0032857284200311938,
+              "0.99": 0.0033517715612738207
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/relay32-p1000/confirmation/bb7ff2b69e38703ee45f8609/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "da9654f775eb2cdb44901f8943350eac0bd251c3ec033833fcd7a1ef07c3fc79",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 21,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.1,
+          "y": 0.9523809523809523
+        },
+        {
+          "ci_high": 0.0017338866647808406,
+          "ci_low": 0.0007142239084800752,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 54034.26911386486,
+          "mean_iterations": 7.263093289689034,
+          "mean_seconds": 0.0009271628641571195,
+          "mean_work": 7.263093289689034,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0008575238417276945,
+              "0.95": 0.001497073543092246,
+              "0.99": 0.0020178289512304743
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/beam32-p0400/confirmation/db7c96e0ee0aa5a13e02275d/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "b1119296c149e638258b39829053ca120b7a786fa3485a9b87f929a2e3bf3631",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 17108,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.04,
+          "y": 0.0011690437222352116
+        },
+        {
+          "ci_high": 0.0295124016250978,
+          "ci_low": 0.012245979969949614,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 117596.57142857143,
+          "mean_iterations": 15.812187812187812,
+          "mean_seconds": 0.0016875803346653344,
+          "mean_work": 15.812187812187812,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0016702375646581136,
+              "0.95": 0.003064658220227444,
+              "0.99": 0.0038527749783474627
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/beam32-p0600/confirmation/db7c96e0ee0aa5a13e02275d/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "aa064435a72a98d09c5835d168e875229ecbb76ed6e7f8de91a45c2b388a4fe3",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 1001,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.06,
+          "y": 0.01998001998001998
+        },
+        {
+          "ci_high": 0.002537198161838215,
+          "ci_low": 0.0010453435722479177,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 52389.31052181352,
+          "mean_iterations": 7.041573994867408,
+          "mean_seconds": 0.0004831994948674081,
+          "mean_work": 7.041573994867408,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0004581415230466453,
+              "0.95": 0.0007169047790159998,
+              "0.99": 0.0009472398086400274
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/tuned_bp-p0400/confirmation/ec1985ba0238dcd26e4a3619/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "552f12273e126004b3165e61e6177f5e2cc50dd28328cf9240e817f9760d48d2",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 11690,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.04,
+          "y": 0.001710863986313088
+        },
+        {
+          "ci_high": 0.02070022676446583,
+          "ci_low": 0.008569397077246507,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 91935.2834149755,
+          "mean_iterations": 12.356892932120363,
+          "mean_seconds": 0.0007581773044086774,
+          "mean_work": 12.356892932120363,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0006821102985150225,
+              "0.95": 0.0013285767559821722,
+              "0.99": 0.0020789711862817086
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/tuned_bp-p0600/confirmation/ec1985ba0238dcd26e4a3619/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "9fecba0d7103f5234d86249090a4f70adf2e9fc928f97cdea4ef3be23e01bc68",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 1429,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.06,
+          "y": 0.013995801259622114
+        },
+        {
+          "ci_high": 0.00047064218798780974,
+          "ci_low": 0.00019380347021750595,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 90313.1661352496,
+          "mean_iterations": 6.069433208014087,
+          "mean_seconds": 0.0030605511464014343,
+          "mean_work": 6.069433208014087,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0026397417485213835,
+              "0.95": 0.004701117654740319,
+              "0.99": 0.012465099545416445
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/qbp_cs10-p0600/confirmation/eca4964da72bd46abce26b2e/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "2c7797dab1e89cef37464cba4acb29b0b529a10943d71045f7a6666a2910e633",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 63039,
+          "status": "complete",
+          "type_i": 0,
+          "type_ii": 20,
+          "work_unit": "iterations",
+          "x": 0.06,
+          "y": 0.00031726391598851505
+        },
+        {
+          "ci_high": 0.0009912973158997748,
+          "ci_low": 0.00040825690767200615,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 152161.13877100946,
+          "mean_iterations": 10.225882981922679,
+          "mean_seconds": 0.005204455758044575,
+          "mean_work": 10.225882981922679,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.004341403281068079,
+              "0.95": 0.010525249433514282,
+              "0.99": 0.01970057695130696
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/qbp_cs10-p0800/confirmation/eca4964da72bd46abce26b2e/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "94decf43a7eeece1cb18b5b0cb03b90a15bc39912a4808e30f2dca5813781d9a",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 29927,
+          "status": "complete",
+          "type_i": 0,
+          "type_ii": 20,
+          "work_unit": "iterations",
+          "x": 0.08,
+          "y": 0.0006682928459250843
+        },
+        {
+          "ci_high": 0.1081048777072488,
+          "ci_low": 0.04583113372265664,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 279468.44444444444,
+          "mean_iterations": 18.78148148148148,
+          "mean_seconds": 0.02028734064814815,
+          "mean_work": 18.78148148148148,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.006593679431814245,
+              "0.95": 0.017834675313943456,
+              "0.99": 0.019121185897428967
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/qbp_cs10-p1000/confirmation/eca4964da72bd46abce26b2e/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "a31629c866ba036805112cb4e969a62304a2299a2e59f206b48e30a068274cf7",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 270,
+          "status": "complete",
+          "type_i": 0,
+          "type_ii": 20,
+          "work_unit": "iterations",
+          "x": 0.1,
+          "y": 0.07407407407407407
+        },
+        {
+          "ci_high": 0.6662109938869034,
+          "ci_low": 0.34780220935734085,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 454412.3076923077,
+          "mean_iterations": 30.53846153846154,
+          "mean_seconds": 0.09139138546153847,
+          "mean_work": 30.53846153846154,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.016145498902897994,
+              "0.95": 0.017138772426932562,
+              "0.99": 3.027569204776399
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/qbp_cs10-p1200/confirmation/eca4964da72bd46abce26b2e/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "967c5710ecd9755d8e8f93a9c1b002088c5c8cd1b0c7cb4b96513d2688b1a092",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 39,
+          "status": "complete",
+          "type_i": 0,
+          "type_ii": 20,
+          "work_unit": "iterations",
+          "x": 0.12,
+          "y": 0.5128205128205128
+        }
+      ],
       "source_path": "data/reproductions/panteleev-2012-04068-lifted-product/verified.json.gz"
     }
   ],
-  "decoders": [],
+  "decoders": [
+    {
+      "asset": {
+        "kind": "decoder_source",
+        "label": "Frozen LP1054 stack",
+        "path": "data/reproductions/panteleev-2012-04068-lifted-product/plan.json"
+      },
+      "configuration": {
+        "effective_configuration": {
+          "alpha": 0.8,
+          "alpha_schedule": "constant",
+          "beta": 0.0,
+          "check_rule": "min_sum",
+          "execution_backend": "lp1054-canonical-stack-v1",
+          "family": "bp4",
+          "max_iterations": 32,
+          "noise_model": "depolarizing",
+          "precision": "float64",
+          "study_controls": {
+            "alpha": 0.8,
+            "beta": 0.0,
+            "cap": 32,
+            "damping": 0.3,
+            "family": "qbp"
+          },
+          "v2c_damping": 0.3
+        },
+        "settings_status": "exact_campaign_arm",
+        "source_path": "data/reproductions/panteleev-2012-04068-lifted-product/plan.json"
+      },
+      "decoder_id": "panteleev-lp1054-full-stack:30dca643b8a39cdfadd4",
+      "evidence_status": "canonical_adaptation",
+      "label": "Q-BP, MS, d=0.3, alpha=0.8, beta=0, T=32"
+    },
+    {
+      "asset": {
+        "kind": "decoder_source",
+        "label": "Frozen LP1054 stack",
+        "path": "data/reproductions/panteleev-2012-04068-lifted-product/plan.json"
+      },
+      "configuration": {
+        "effective_configuration": {
+          "alpha": 0.625,
+          "alpha_schedule": "constant",
+          "beta": 0.0,
+          "check_rule": "min_sum",
+          "execution_backend": "lp1054-canonical-stack-v1",
+          "family": "bp4",
+          "max_iterations": 32,
+          "noise_model": "depolarizing",
+          "precision": "float64",
+          "study_controls": {
+            "alpha": 0.625,
+            "beta": 0.0,
+            "cap": 32,
+            "damping": 0.0,
+            "family": "qbp"
+          },
+          "v2c_damping": 0.0
+        },
+        "settings_status": "exact_campaign_arm",
+        "source_path": "data/reproductions/panteleev-2012-04068-lifted-product/plan.json"
+      },
+      "decoder_id": "panteleev-lp1054-full-stack:43f20595d88e232668f7",
+      "evidence_status": "canonical_adaptation",
+      "label": "Q-BP, MS, d=0, alpha=0.625, beta=0, T=32"
+    },
+    {
+      "asset": {
+        "kind": "decoder_source",
+        "label": "Frozen LP1054 stack",
+        "path": "data/reproductions/panteleev-2012-04068-lifted-product/plan.json"
+      },
+      "configuration": {
+        "effective_configuration": {
+          "alpha": 0.8,
+          "alpha_schedule": "constant",
+          "beta": 0.0,
+          "check_rule": "min_sum",
+          "execution_backend": "lp1054-canonical-stack-v1",
+          "family": "bp",
+          "max_iterations": 128,
+          "noise_model": "depolarizing",
+          "precision": "float64",
+          "search": {
+            "alpha": 0.8,
+            "beta": 0.0,
+            "damping": 0.3,
+            "first_gamma": 0.0,
+            "gamma_high": 1.0,
+            "gamma_low": -0.5,
+            "initial": 20,
+            "method": "beam",
+            "paper_scale": false,
+            "per_unit": 4,
+            "rounds": 24,
+            "solutions": 4,
+            "units": 24,
+            "width": 2
+          },
+          "study_controls": {
+            "alpha": 0.8,
+            "beta": 0.0,
+            "cap": 128,
+            "damping": 0.3,
+            "family": "bp",
+            "search": {
+              "alpha": 0.8,
+              "beta": 0.0,
+              "damping": 0.3,
+              "first_gamma": 0.0,
+              "gamma_high": 1.0,
+              "gamma_low": -0.5,
+              "initial": 20,
+              "method": "beam",
+              "paper_scale": false,
+              "per_unit": 4,
+              "rounds": 24,
+              "solutions": 4,
+              "units": 24,
+              "width": 2
+            }
+          },
+          "v2c_damping": 0.3
+        },
+        "settings_status": "exact_campaign_arm",
+        "source_path": "data/reproductions/panteleev-2012-04068-lifted-product/plan.json"
+      },
+      "decoder_id": "panteleev-lp1054-full-stack:4c1927fb3af77b80b904",
+      "evidence_status": "canonical_adaptation",
+      "label": "Beam search, MS, d=0.3, alpha=0.8, beta=0, T=128"
+    },
+    {
+      "asset": {
+        "kind": "decoder_source",
+        "label": "Frozen LP1054 stack",
+        "path": "data/reproductions/panteleev-2012-04068-lifted-product/plan.json"
+      },
+      "configuration": {
+        "effective_configuration": {
+          "alpha": 0.8,
+          "alpha_schedule": "constant",
+          "beta": 0.2,
+          "check_rule": "min_sum",
+          "execution_backend": "lp1054-canonical-stack-v1",
+          "family": "bp",
+          "max_iterations": 128,
+          "noise_model": "depolarizing",
+          "precision": "float64",
+          "search": {
+            "alpha": 0.8,
+            "beta": 0.2,
+            "damping": 0.3,
+            "first_gamma": 0.0,
+            "gamma_high": 0.66,
+            "gamma_low": -0.24,
+            "initial": 20,
+            "method": "beam",
+            "paper_scale": false,
+            "per_unit": 9,
+            "rounds": 12,
+            "solutions": 1,
+            "units": 12,
+            "width": 1
+          },
+          "study_controls": {
+            "alpha": 0.8,
+            "beta": 0.2,
+            "cap": 128,
+            "damping": 0.3,
+            "family": "bp",
+            "search": {
+              "alpha": 0.8,
+              "beta": 0.2,
+              "damping": 0.3,
+              "first_gamma": 0.0,
+              "gamma_high": 0.66,
+              "gamma_low": -0.24,
+              "initial": 20,
+              "method": "beam",
+              "paper_scale": false,
+              "per_unit": 9,
+              "rounds": 12,
+              "solutions": 1,
+              "units": 12,
+              "width": 1
+            }
+          },
+          "v2c_damping": 0.3
+        },
+        "settings_status": "exact_campaign_arm",
+        "source_path": "data/reproductions/panteleev-2012-04068-lifted-product/plan.json"
+      },
+      "decoder_id": "panteleev-lp1054-full-stack:5e68c1099a7988058854",
+      "evidence_status": "canonical_adaptation",
+      "label": "Beam search, MS, d=0.3, alpha=0.8, beta=0.2, T=128"
+    },
+    {
+      "asset": {
+        "kind": "decoder_source",
+        "label": "Frozen LP1054 stack",
+        "path": "data/reproductions/panteleev-2012-04068-lifted-product/plan.json"
+      },
+      "configuration": {
+        "effective_configuration": {
+          "alpha": 0.8,
+          "alpha_schedule": "constant",
+          "beta": 0.0,
+          "check_rule": "min_sum",
+          "execution_backend": "lp1054-canonical-stack-v1",
+          "family": "bp",
+          "max_iterations": 32,
+          "noise_model": "depolarizing",
+          "precision": "float64",
+          "study_controls": {
+            "alpha": 0.8,
+            "beta": 0.0,
+            "cap": 32,
+            "damping": 0.3,
+            "family": "bp"
+          },
+          "v2c_damping": 0.3
+        },
+        "settings_status": "exact_campaign_arm",
+        "source_path": "data/reproductions/panteleev-2012-04068-lifted-product/plan.json"
+      },
+      "decoder_id": "panteleev-lp1054-full-stack:66586328b25732e13361",
+      "evidence_status": "canonical_adaptation",
+      "label": "BP, MS, d=0.3, alpha=0.8, beta=0, T=32"
+    },
+    {
+      "asset": {
+        "kind": "decoder_source",
+        "label": "Frozen LP1054 stack",
+        "path": "data/reproductions/panteleev-2012-04068-lifted-product/plan.json"
+      },
+      "configuration": {
+        "effective_configuration": {
+          "alpha": 0.8,
+          "alpha_schedule": "constant",
+          "beta": 0.0,
+          "check_rule": "min_sum",
+          "execution_backend": "lp1054-canonical-stack-v1",
+          "family": "bp",
+          "max_iterations": 32,
+          "noise_model": "depolarizing",
+          "precision": "float64",
+          "search": {
+            "alpha": 0.8,
+            "beta": 0.0,
+            "damping": 0.3,
+            "first_gamma": 0.0,
+            "gamma_high": 0.66,
+            "gamma_low": -0.24,
+            "initial": 5,
+            "method": "beam",
+            "paper_scale": false,
+            "per_unit": 6,
+            "rounds": 4,
+            "solutions": 1,
+            "units": 4,
+            "width": 1
+          },
+          "study_controls": {
+            "alpha": 0.8,
+            "beta": 0.0,
+            "cap": 32,
+            "damping": 0.3,
+            "family": "bp",
+            "search": {
+              "alpha": 0.8,
+              "beta": 0.0,
+              "damping": 0.3,
+              "first_gamma": 0.0,
+              "gamma_high": 0.66,
+              "gamma_low": -0.24,
+              "initial": 5,
+              "method": "beam",
+              "paper_scale": false,
+              "per_unit": 6,
+              "rounds": 4,
+              "solutions": 1,
+              "units": 4,
+              "width": 1
+            }
+          },
+          "v2c_damping": 0.3
+        },
+        "settings_status": "exact_campaign_arm",
+        "source_path": "data/reproductions/panteleev-2012-04068-lifted-product/plan.json"
+      },
+      "decoder_id": "panteleev-lp1054-full-stack:66dfbaef15fbef4825b4",
+      "evidence_status": "canonical_adaptation",
+      "label": "Beam search, MS, d=0.3, alpha=0.8, beta=0, T=32"
+    },
+    {
+      "asset": {
+        "kind": "decoder_source",
+        "label": "Frozen LP1054 stack",
+        "path": "data/reproductions/panteleev-2012-04068-lifted-product/plan.json"
+      },
+      "configuration": {
+        "effective_configuration": {
+          "alpha": 0.625,
+          "alpha_schedule": "constant",
+          "beta": 0.0,
+          "check_rule": "min_sum",
+          "execution_backend": "lp1054-canonical-stack-v1",
+          "family": "bp",
+          "max_iterations": 32,
+          "noise_model": "depolarizing",
+          "postprocessing": {
+            "method": "OSD_0",
+            "order": 0
+          },
+          "precision": "float64",
+          "study_controls": {
+            "alpha": 0.625,
+            "beta": 0.0,
+            "cap": 32,
+            "damping": 0.0,
+            "family": "bp",
+            "osd": "OSD_0"
+          },
+          "v2c_damping": 0.0
+        },
+        "settings_status": "exact_campaign_arm",
+        "source_path": "data/reproductions/panteleev-2012-04068-lifted-product/plan.json"
+      },
+      "decoder_id": "panteleev-lp1054-full-stack:69e7a16e91b319fa04e6",
+      "evidence_status": "canonical_adaptation",
+      "label": "BP+OSD_0, MS, d=0, alpha=0.625, beta=0, T=32"
+    },
+    {
+      "asset": {
+        "kind": "decoder_source",
+        "label": "Frozen LP1054 stack",
+        "path": "data/reproductions/panteleev-2012-04068-lifted-product/plan.json"
+      },
+      "configuration": {
+        "effective_configuration": {
+          "alpha": 0.625,
+          "alpha_schedule": "constant",
+          "beta": 0.0,
+          "check_rule": "min_sum",
+          "execution_backend": "lp1054-canonical-stack-v1",
+          "family": "bp",
+          "max_iterations": 32,
+          "noise_model": "depolarizing",
+          "precision": "float64",
+          "study_controls": {
+            "alpha": 0.625,
+            "beta": 0.0,
+            "cap": 32,
+            "damping": 0.0,
+            "family": "bp"
+          },
+          "v2c_damping": 0.0
+        },
+        "settings_status": "exact_campaign_arm",
+        "source_path": "data/reproductions/panteleev-2012-04068-lifted-product/plan.json"
+      },
+      "decoder_id": "panteleev-lp1054-full-stack:79ba8bebf6dc95c84aa8",
+      "evidence_status": "canonical_adaptation",
+      "label": "BP, MS, d=0, alpha=0.625, beta=0, T=32"
+    },
+    {
+      "asset": {
+        "kind": "decoder_source",
+        "label": "Frozen LP1054 stack",
+        "path": "data/reproductions/panteleev-2012-04068-lifted-product/plan.json"
+      },
+      "configuration": {
+        "effective_configuration": {
+          "alpha": 1.0,
+          "alpha_schedule": "constant",
+          "beta": 0.2,
+          "check_rule": "min_sum",
+          "execution_backend": "lp1054-canonical-stack-v1",
+          "family": "bp",
+          "max_iterations": 32,
+          "noise_model": "depolarizing",
+          "precision": "float64",
+          "search": {
+            "alpha": 1.0,
+            "beta": 0.2,
+            "damping": 0.3,
+            "first_gamma": 0.0,
+            "gamma_high": 0.66,
+            "gamma_low": -0.24,
+            "initial": 5,
+            "method": "beam",
+            "paper_scale": false,
+            "per_unit": 6,
+            "rounds": 4,
+            "solutions": 1,
+            "units": 4,
+            "width": 1
+          },
+          "study_controls": {
+            "alpha": 1.0,
+            "beta": 0.2,
+            "cap": 32,
+            "damping": 0.3,
+            "family": "bp",
+            "search": {
+              "alpha": 1.0,
+              "beta": 0.2,
+              "damping": 0.3,
+              "first_gamma": 0.0,
+              "gamma_high": 0.66,
+              "gamma_low": -0.24,
+              "initial": 5,
+              "method": "beam",
+              "paper_scale": false,
+              "per_unit": 6,
+              "rounds": 4,
+              "solutions": 1,
+              "units": 4,
+              "width": 1
+            }
+          },
+          "v2c_damping": 0.3
+        },
+        "settings_status": "exact_campaign_arm",
+        "source_path": "data/reproductions/panteleev-2012-04068-lifted-product/plan.json"
+      },
+      "decoder_id": "panteleev-lp1054-full-stack:865a8ea26346ee4f996e",
+      "evidence_status": "canonical_adaptation",
+      "label": "Beam search, MS, d=0.3, alpha=1, beta=0.2, T=32"
+    },
+    {
+      "asset": {
+        "kind": "decoder_source",
+        "label": "Frozen LP1054 stack",
+        "path": "data/reproductions/panteleev-2012-04068-lifted-product/plan.json"
+      },
+      "configuration": {
+        "effective_configuration": {
+          "alpha": 0.625,
+          "alpha_schedule": "constant",
+          "beta": 0.0,
+          "check_rule": "min_sum",
+          "execution_backend": "lp1054-canonical-stack-v1",
+          "family": "bp",
+          "max_iterations": 32,
+          "noise_model": "depolarizing",
+          "postprocessing": {
+            "method": "OSD_CS",
+            "order": 10
+          },
+          "precision": "float64",
+          "study_controls": {
+            "alpha": 0.625,
+            "beta": 0.0,
+            "cap": 32,
+            "damping": 0.0,
+            "family": "bp",
+            "osd": "OSD_CS"
+          },
+          "v2c_damping": 0.0
+        },
+        "settings_status": "exact_campaign_arm",
+        "source_path": "data/reproductions/panteleev-2012-04068-lifted-product/plan.json"
+      },
+      "decoder_id": "panteleev-lp1054-full-stack:876d870df9d0841291a0",
+      "evidence_status": "canonical_adaptation",
+      "label": "BP+OSD_CS, MS, d=0, alpha=0.625, beta=0, T=32"
+    },
+    {
+      "asset": {
+        "kind": "decoder_source",
+        "label": "Frozen LP1054 stack",
+        "path": "data/reproductions/panteleev-2012-04068-lifted-product/plan.json"
+      },
+      "configuration": {
+        "effective_configuration": {
+          "alpha": 0.625,
+          "alpha_schedule": "constant",
+          "beta": 0.0,
+          "check_rule": "min_sum",
+          "execution_backend": "lp1054-canonical-stack-v1",
+          "family": "bp4",
+          "max_iterations": 32,
+          "noise_model": "depolarizing",
+          "postprocessing": {
+            "method": "OSD_0",
+            "order": 0
+          },
+          "precision": "float64",
+          "study_controls": {
+            "alpha": 0.625,
+            "beta": 0.0,
+            "cap": 32,
+            "damping": 0.0,
+            "family": "qbp",
+            "osd": "OSD_0"
+          },
+          "v2c_damping": 0.0
+        },
+        "settings_status": "exact_campaign_arm",
+        "source_path": "data/reproductions/panteleev-2012-04068-lifted-product/plan.json"
+      },
+      "decoder_id": "panteleev-lp1054-full-stack:9683981a7f9e97157283",
+      "evidence_status": "canonical_adaptation",
+      "label": "Q-BP+OSD_0, MS, d=0, alpha=0.625, beta=0, T=32"
+    },
+    {
+      "asset": {
+        "kind": "decoder_source",
+        "label": "Frozen LP1054 stack",
+        "path": "data/reproductions/panteleev-2012-04068-lifted-product/plan.json"
+      },
+      "configuration": {
+        "effective_configuration": {
+          "alpha": 1.0,
+          "alpha_schedule": "constant",
+          "beta": 0.0,
+          "check_rule": "min_sum",
+          "execution_backend": "lp1054-canonical-stack-v1",
+          "family": "bp",
+          "max_iterations": 32,
+          "noise_model": "depolarizing",
+          "precision": "float64",
+          "search": {
+            "alpha": 1.0,
+            "beta": 0.0,
+            "damping": 0.5,
+            "first_gamma": 0.0,
+            "gamma_high": 0.66,
+            "gamma_low": -0.24,
+            "initial": 5,
+            "method": "relay",
+            "paper_scale": false,
+            "per_unit": 6,
+            "rounds": 4,
+            "solutions": 1,
+            "units": 4,
+            "width": 1
+          },
+          "study_controls": {
+            "alpha": 1.0,
+            "beta": 0.0,
+            "cap": 32,
+            "damping": 0.5,
+            "family": "bp",
+            "search": {
+              "alpha": 1.0,
+              "beta": 0.0,
+              "damping": 0.5,
+              "first_gamma": 0.0,
+              "gamma_high": 0.66,
+              "gamma_low": -0.24,
+              "initial": 5,
+              "method": "relay",
+              "paper_scale": false,
+              "per_unit": 6,
+              "rounds": 4,
+              "solutions": 1,
+              "units": 4,
+              "width": 1
+            }
+          },
+          "v2c_damping": 0.5
+        },
+        "settings_status": "exact_campaign_arm",
+        "source_path": "data/reproductions/panteleev-2012-04068-lifted-product/plan.json"
+      },
+      "decoder_id": "panteleev-lp1054-full-stack:a65578a7c5ce6612f0cf",
+      "evidence_status": "canonical_adaptation",
+      "label": "RelayBP, MS, d=0.5, alpha=1, beta=0, T=32"
+    },
+    {
+      "asset": {
+        "kind": "decoder_source",
+        "label": "Frozen LP1054 stack",
+        "path": "data/reproductions/panteleev-2012-04068-lifted-product/plan.json"
+      },
+      "configuration": {
+        "effective_configuration": {
+          "alpha": 0.8,
+          "alpha_schedule": "constant",
+          "beta": 0.2,
+          "check_rule": "min_sum",
+          "execution_backend": "lp1054-canonical-stack-v1",
+          "family": "bp",
+          "max_iterations": 32,
+          "noise_model": "depolarizing",
+          "precision": "float64",
+          "search": {
+            "alpha": 0.8,
+            "beta": 0.2,
+            "damping": 0.3,
+            "first_gamma": 0.0,
+            "gamma_high": 0.66,
+            "gamma_low": -0.24,
+            "initial": 5,
+            "method": "relay",
+            "paper_scale": false,
+            "per_unit": 6,
+            "rounds": 4,
+            "solutions": 1,
+            "units": 4,
+            "width": 1
+          },
+          "study_controls": {
+            "alpha": 0.8,
+            "beta": 0.2,
+            "cap": 32,
+            "damping": 0.3,
+            "family": "bp",
+            "search": {
+              "alpha": 0.8,
+              "beta": 0.2,
+              "damping": 0.3,
+              "first_gamma": 0.0,
+              "gamma_high": 0.66,
+              "gamma_low": -0.24,
+              "initial": 5,
+              "method": "relay",
+              "paper_scale": false,
+              "per_unit": 6,
+              "rounds": 4,
+              "solutions": 1,
+              "units": 4,
+              "width": 1
+            }
+          },
+          "v2c_damping": 0.3
+        },
+        "settings_status": "exact_campaign_arm",
+        "source_path": "data/reproductions/panteleev-2012-04068-lifted-product/plan.json"
+      },
+      "decoder_id": "panteleev-lp1054-full-stack:b439f9e9790e5368cddd",
+      "evidence_status": "canonical_adaptation",
+      "label": "RelayBP, MS, d=0.3, alpha=0.8, beta=0.2, T=32"
+    },
+    {
+      "asset": {
+        "kind": "decoder_source",
+        "label": "Frozen LP1054 stack",
+        "path": "data/reproductions/panteleev-2012-04068-lifted-product/plan.json"
+      },
+      "configuration": {
+        "effective_configuration": {
+          "alpha": 1.0,
+          "alpha_schedule": "constant",
+          "beta": 0.2,
+          "check_rule": "min_sum",
+          "execution_backend": "lp1054-canonical-stack-v1",
+          "family": "bp4",
+          "max_iterations": 32,
+          "noise_model": "depolarizing",
+          "precision": "float64",
+          "study_controls": {
+            "alpha": 1.0,
+            "beta": 0.2,
+            "cap": 32,
+            "damping": 0.3,
+            "family": "qbp"
+          },
+          "v2c_damping": 0.3
+        },
+        "settings_status": "exact_campaign_arm",
+        "source_path": "data/reproductions/panteleev-2012-04068-lifted-product/plan.json"
+      },
+      "decoder_id": "panteleev-lp1054-full-stack:b7fff02fcb7831f259d8",
+      "evidence_status": "canonical_adaptation",
+      "label": "Q-BP, MS, d=0.3, alpha=1, beta=0.2, T=32"
+    },
+    {
+      "asset": {
+        "kind": "decoder_source",
+        "label": "Frozen LP1054 stack",
+        "path": "data/reproductions/panteleev-2012-04068-lifted-product/plan.json"
+      },
+      "configuration": {
+        "effective_configuration": {
+          "alpha": 0.8,
+          "alpha_schedule": "constant",
+          "beta": 0.0,
+          "check_rule": "min_sum",
+          "execution_backend": "lp1054-canonical-stack-v1",
+          "family": "bp",
+          "max_iterations": 32,
+          "noise_model": "depolarizing",
+          "precision": "float64",
+          "search": {
+            "alpha": 0.8,
+            "beta": 0.0,
+            "damping": 0.3,
+            "first_gamma": 0.0,
+            "gamma_high": 0.66,
+            "gamma_low": -0.24,
+            "initial": 5,
+            "method": "relay",
+            "paper_scale": false,
+            "per_unit": 6,
+            "rounds": 4,
+            "solutions": 1,
+            "units": 4,
+            "width": 1
+          },
+          "study_controls": {
+            "alpha": 0.8,
+            "beta": 0.0,
+            "cap": 32,
+            "damping": 0.3,
+            "family": "bp",
+            "search": {
+              "alpha": 0.8,
+              "beta": 0.0,
+              "damping": 0.3,
+              "first_gamma": 0.0,
+              "gamma_high": 0.66,
+              "gamma_low": -0.24,
+              "initial": 5,
+              "method": "relay",
+              "paper_scale": false,
+              "per_unit": 6,
+              "rounds": 4,
+              "solutions": 1,
+              "units": 4,
+              "width": 1
+            }
+          },
+          "v2c_damping": 0.3
+        },
+        "settings_status": "exact_campaign_arm",
+        "source_path": "data/reproductions/panteleev-2012-04068-lifted-product/plan.json"
+      },
+      "decoder_id": "panteleev-lp1054-full-stack:bb7ff2b69e38703ee45f",
+      "evidence_status": "canonical_adaptation",
+      "label": "RelayBP, MS, d=0.3, alpha=0.8, beta=0, T=32"
+    },
+    {
+      "asset": {
+        "kind": "decoder_source",
+        "label": "Frozen LP1054 stack",
+        "path": "data/reproductions/panteleev-2012-04068-lifted-product/plan.json"
+      },
+      "configuration": {
+        "effective_configuration": {
+          "alpha": 0.8,
+          "alpha_schedule": "constant",
+          "beta": 0.2,
+          "check_rule": "min_sum",
+          "execution_backend": "lp1054-canonical-stack-v1",
+          "family": "bp",
+          "max_iterations": 32,
+          "noise_model": "depolarizing",
+          "precision": "float64",
+          "search": {
+            "alpha": 0.8,
+            "beta": 0.2,
+            "damping": 0.3,
+            "first_gamma": 0.0,
+            "gamma_high": 0.66,
+            "gamma_low": -0.24,
+            "initial": 5,
+            "method": "beam",
+            "paper_scale": false,
+            "per_unit": 6,
+            "rounds": 4,
+            "solutions": 1,
+            "units": 4,
+            "width": 1
+          },
+          "study_controls": {
+            "alpha": 0.8,
+            "beta": 0.2,
+            "cap": 32,
+            "damping": 0.3,
+            "family": "bp",
+            "search": {
+              "alpha": 0.8,
+              "beta": 0.2,
+              "damping": 0.3,
+              "first_gamma": 0.0,
+              "gamma_high": 0.66,
+              "gamma_low": -0.24,
+              "initial": 5,
+              "method": "beam",
+              "paper_scale": false,
+              "per_unit": 6,
+              "rounds": 4,
+              "solutions": 1,
+              "units": 4,
+              "width": 1
+            }
+          },
+          "v2c_damping": 0.3
+        },
+        "settings_status": "exact_campaign_arm",
+        "source_path": "data/reproductions/panteleev-2012-04068-lifted-product/plan.json"
+      },
+      "decoder_id": "panteleev-lp1054-full-stack:db7c96e0ee0aa5a13e02",
+      "evidence_status": "canonical_adaptation",
+      "label": "Beam search, MS, d=0.3, alpha=0.8, beta=0.2, T=32"
+    },
+    {
+      "asset": {
+        "kind": "decoder_source",
+        "label": "Frozen LP1054 stack",
+        "path": "data/reproductions/panteleev-2012-04068-lifted-product/plan.json"
+      },
+      "configuration": {
+        "effective_configuration": {
+          "alpha": 0.8,
+          "alpha_schedule": "constant",
+          "beta": 0.2,
+          "check_rule": "min_sum",
+          "execution_backend": "lp1054-canonical-stack-v1",
+          "family": "bp",
+          "max_iterations": 32,
+          "noise_model": "depolarizing",
+          "precision": "float64",
+          "study_controls": {
+            "alpha": 0.8,
+            "beta": 0.2,
+            "cap": 32,
+            "damping": 0.3,
+            "family": "bp"
+          },
+          "v2c_damping": 0.3
+        },
+        "settings_status": "exact_campaign_arm",
+        "source_path": "data/reproductions/panteleev-2012-04068-lifted-product/plan.json"
+      },
+      "decoder_id": "panteleev-lp1054-full-stack:ec1985ba0238dcd26e4a",
+      "evidence_status": "canonical_adaptation",
+      "label": "BP, MS, d=0.3, alpha=0.8, beta=0.2, T=32"
+    },
+    {
+      "asset": {
+        "kind": "decoder_source",
+        "label": "Frozen LP1054 stack",
+        "path": "data/reproductions/panteleev-2012-04068-lifted-product/plan.json"
+      },
+      "configuration": {
+        "effective_configuration": {
+          "alpha": 0.625,
+          "alpha_schedule": "constant",
+          "beta": 0.0,
+          "check_rule": "min_sum",
+          "execution_backend": "lp1054-canonical-stack-v1",
+          "family": "bp4",
+          "max_iterations": 32,
+          "noise_model": "depolarizing",
+          "postprocessing": {
+            "method": "OSD_CS",
+            "order": 10
+          },
+          "precision": "float64",
+          "study_controls": {
+            "alpha": 0.625,
+            "beta": 0.0,
+            "cap": 32,
+            "damping": 0.0,
+            "family": "qbp",
+            "osd": "OSD_CS"
+          },
+          "v2c_damping": 0.0
+        },
+        "settings_status": "exact_campaign_arm",
+        "source_path": "data/reproductions/panteleev-2012-04068-lifted-product/plan.json"
+      },
+      "decoder_id": "panteleev-lp1054-full-stack:eca4964da72bd46abce2",
+      "evidence_status": "canonical_adaptation",
+      "label": "Q-BP+OSD_CS, MS, d=0, alpha=0.625, beta=0, T=32"
+    }
+  ],
   "experiments": [
     {
       "code_ids": [
@@ -42,7 +2514,26 @@
       "dataset_ids": [
         "panteleev-lp1054-full-stack"
       ],
-      "decoder_ids": [],
+      "decoder_ids": [
+        "panteleev-lp1054-full-stack:30dca643b8a39cdfadd4",
+        "panteleev-lp1054-full-stack:43f20595d88e232668f7",
+        "panteleev-lp1054-full-stack:4c1927fb3af77b80b904",
+        "panteleev-lp1054-full-stack:5e68c1099a7988058854",
+        "panteleev-lp1054-full-stack:66586328b25732e13361",
+        "panteleev-lp1054-full-stack:66dfbaef15fbef4825b4",
+        "panteleev-lp1054-full-stack:69e7a16e91b319fa04e6",
+        "panteleev-lp1054-full-stack:79ba8bebf6dc95c84aa8",
+        "panteleev-lp1054-full-stack:865a8ea26346ee4f996e",
+        "panteleev-lp1054-full-stack:876d870df9d0841291a0",
+        "panteleev-lp1054-full-stack:9683981a7f9e97157283",
+        "panteleev-lp1054-full-stack:a65578a7c5ce6612f0cf",
+        "panteleev-lp1054-full-stack:b439f9e9790e5368cddd",
+        "panteleev-lp1054-full-stack:b7fff02fcb7831f259d8",
+        "panteleev-lp1054-full-stack:bb7ff2b69e38703ee45f",
+        "panteleev-lp1054-full-stack:db7c96e0ee0aa5a13e02",
+        "panteleev-lp1054-full-stack:ec1985ba0238dcd26e4a",
+        "panteleev-lp1054-full-stack:eca4964da72bd46abce2"
+      ],
       "description": "Original LP paper provides no LER plot/rate grid/numeric iteration cap for1054. Controlled prospective depolarizing grid0.02,0.04,0.06,0.08,0.10,0.12. Budget32 and scale0.625 borrowed from cited BP-OSD paper, whose schedule is layered; this study uses canonical flooding. No original LP paper curve ordinates exist to compare. Original LP Example4, depolarizing code capacity. Q-BP, tuning, Relay and beam are canonical adaptations. Search128 is explicitly4x the documented BP cap. No native runtime or statistical paper agreement is claimed before confirmation.",
       "evidence_status": "canonical_adaptation",
       "experiment_id": "panteleev-lp1054-full-stack",
@@ -62,6 +2553,1805 @@
     }
   ],
   "papers": [],
-  "result_series": [],
+  "result_series": [
+    {
+      "channel_kind": "depolarizing",
+      "code_id": "lp1054",
+      "dataset_id": "panteleev-lp1054-full-stack",
+      "decoder_id": "panteleev-lp1054-full-stack:30dca643b8a39cdfadd4",
+      "label": "Q-BP, MS, d=0.3, alpha=0.8, beta=0, T=32",
+      "points": [
+        {
+          "ci_high": 0.00253308261832387,
+          "ci_low": 0.0010436468187382968,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 74476.24903920061,
+          "mean_iterations": 5.005124263387138,
+          "mean_seconds": 0.0025157026308822274,
+          "mean_work": 5.005124263387138,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0023897237686948537,
+              "0.95": 0.003969517912966369,
+              "0.99": 0.005403813517520124
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/tuned_qbp-p0600/confirmation/30dca643b8a39cdfadd4dfa7/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "738ca7d67a0b0f8d60981a1d21d563e78ba8134bceea10aa0eecaf74b38fc0cc",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 11709,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.06,
+          "y": 0.0017080877957126996
+        },
+        {
+          "ci_high": 0.01614868930712646,
+          "ci_low": 0.006677150843571954,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 123553.51882160392,
+          "mean_iterations": 8.303327877795963,
+          "mean_seconds": 0.003964425952536825,
+          "mean_work": 8.303327877795963,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.003522745596538154,
+              "0.95": 0.006659616226132387,
+              "0.99": 0.014186446032570507
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/tuned_qbp-p0800/confirmation/30dca643b8a39cdfadd4dfa7/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "3919736c86883faad8bd73f039e7cd99340c7fa4388bbbb8738ca993180715ff",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 1833,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.08,
+          "y": 0.010911074740861976
+        },
+        {
+          "ci_high": 0.24592251248522312,
+          "ci_low": 0.10861266894743644,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 253344.8275862069,
+          "mean_iterations": 17.025862068965516,
+          "mean_seconds": 0.008400227137931034,
+          "mean_work": 17.025862068965516,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.006930023349974429,
+              "0.95": 0.016470023430846244,
+              "0.99": 0.016969081610824315
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/tuned_qbp-p1000/confirmation/30dca643b8a39cdfadd4dfa7/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "f9d952be69cdcee5a4df27fb234d1121b0cca7cccec864aeca187e35d2996f82",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 116,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.1,
+          "y": 0.1724137931034483
+        }
+      ],
+      "series_id": "panteleev-lp1054-full-stack:30dca643b8a39cdfadd4",
+      "source_decoder_id": "panteleev-lp1054-full-stack:30dca643b8a39cdfadd4"
+    },
+    {
+      "channel_kind": "depolarizing",
+      "code_id": "lp1054",
+      "dataset_id": "panteleev-lp1054-full-stack",
+      "decoder_id": "panteleev-lp1054-full-stack:43f20595d88e232668f7",
+      "label": "Q-BP, MS, d=0, alpha=0.625, beta=0, T=32",
+      "points": [
+        {
+          "ci_high": 0.0037054571309192656,
+          "ci_low": 0.0015271400594234804,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 56656.67374734474,
+          "mean_iterations": 3.807572160439835,
+          "mean_seconds": 0.002084709612020492,
+          "mean_work": 3.807572160439835,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0021207585071259714,
+              "0.95": 0.0027743951073645207,
+              "0.99": 0.004654571935386454
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/qbp-p0400/confirmation/43f20595d88e232668f7e5c0/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "be71d2ab12bd7a6822c550c820a4314725d910a35b9d8e904eb3a6d8fa990adf",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 8003,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.04,
+          "y": 0.0024990628514307135
+        },
+        {
+          "ci_high": 0.012178407795069264,
+          "ci_low": 0.005030267156150345,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 92100.59210526316,
+          "mean_iterations": 6.189555921052632,
+          "mean_seconds": 0.0030422145275493424,
+          "mean_work": 6.189555921052632,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.00271972856324333,
+              "0.95": 0.004843566220796605,
+              "0.99": 0.014045986170861889
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/qbp-p0600/confirmation/43f20595d88e232668f7e5c0/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "098b0f10c9f69aefb412b133d136682a9a0e9f6ea8e9ccc15d7ff32f3c6050cb",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 2432,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.06,
+          "y": 0.008223684210526315
+        },
+        {
+          "ci_high": 0.03688672546974083,
+          "ci_low": 0.015336005275369331,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 154714.8,
+          "mean_iterations": 10.3975,
+          "mean_seconds": 0.00603239758,
+          "mean_work": 10.3975,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.005297337042956695,
+              "0.95": 0.013100944897729627,
+              "0.99": 0.018013022067082888
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/qbp-p0800/confirmation/43f20595d88e232668f7e5c0/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "1ded9c5228b601576569fb5dac2e9d915b3671ac940e8b280d15e20c35ba2df7",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 800,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.08,
+          "y": 0.025
+        },
+        {
+          "ci_high": 0.316453469299049,
+          "ci_low": 0.1429948758235286,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 287902.9213483146,
+          "mean_iterations": 19.348314606741575,
+          "mean_seconds": 0.010208471640449438,
+          "mean_work": 19.348314606741575,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.00906591807199522,
+              "0.95": 0.017658094370241045,
+              "0.99": 0.021332901856464744
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/qbp-p1000/confirmation/43f20595d88e232668f7e5c0/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "f54ff7e941cce842644fbc49aafbf0583dd14f782fcd63a48c26fdb5a8256908",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 89,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.1,
+          "y": 0.2247191011235955
+        },
+        {
+          "ci_high": 0.9709441488712534,
+          "ci_low": 0.6641108624628791,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 456104.347826087,
+          "mean_iterations": 30.652173913043477,
+          "mean_seconds": 0.011543078739130436,
+          "mean_work": 30.652173913043477,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.012098502811718561,
+              "0.95": 0.012715648046279315,
+              "0.99": 0.012842804526742108
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/qbp-p1200/confirmation/43f20595d88e232668f7e5c0/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "6dafdcd02031e792ce0f9b6830e771ad1b860db75efa328bd470d4a095cb6a40",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 23,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.12,
+          "y": 0.8695652173913043
+        }
+      ],
+      "series_id": "panteleev-lp1054-full-stack:43f20595d88e232668f7",
+      "source_decoder_id": "panteleev-lp1054-full-stack:43f20595d88e232668f7"
+    },
+    {
+      "channel_kind": "depolarizing",
+      "code_id": "lp1054",
+      "dataset_id": "panteleev-lp1054-full-stack",
+      "decoder_id": "panteleev-lp1054-full-stack:4c1927fb3af77b80b904",
+      "label": "Beam search, MS, d=0.3, alpha=0.8, beta=0, T=128",
+      "points": [
+        {
+          "ci_high": 0.0016853328645413134,
+          "ci_low": 0.0006942148019201962,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 53739.05709902846,
+          "mean_iterations": 7.2237941026078065,
+          "mean_seconds": 0.0009106780640304529,
+          "mean_work": 7.2237941026078065,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0008575238417276945,
+              "0.95": 0.0011673707057442274,
+              "0.99": 0.0014386582491568967
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/beam128-p0400/confirmation/4c1927fb3af77b80b904a94a/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "e1c2e79acfc34290ef2da75ca5002b6d682fe1764d131d560e57599f0b2b46f9",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 17601,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.04,
+          "y": 0.0011362990739162547
+        }
+      ],
+      "series_id": "panteleev-lp1054-full-stack:4c1927fb3af77b80b904",
+      "source_decoder_id": "panteleev-lp1054-full-stack:4c1927fb3af77b80b904"
+    },
+    {
+      "channel_kind": "depolarizing",
+      "code_id": "lp1054",
+      "dataset_id": "panteleev-lp1054-full-stack",
+      "decoder_id": "panteleev-lp1054-full-stack:5e68c1099a7988058854",
+      "label": "Beam search, MS, d=0.3, alpha=0.8, beta=0.2, T=128",
+      "points": [
+        {
+          "ci_high": 0.015410605841877466,
+          "ci_low": 0.006370730682217597,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 100276.6225923998,
+          "mean_iterations": 13.481520041644977,
+          "mean_seconds": 0.0012650940515356586,
+          "mean_work": 13.481520041644977,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.00109971601112169,
+              "0.95": 0.0017380559074358674,
+              "0.99": 0.009340624455494747
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/beam128-p0600/confirmation/5e68c1099a79880588541401/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "aa751b37b2324df6af971d0b27ccb770285a2044636325a45c57381404ada55b",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 1921,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.06,
+          "y": 0.010411244143675169
+        }
+      ],
+      "series_id": "panteleev-lp1054-full-stack:5e68c1099a7988058854",
+      "source_decoder_id": "panteleev-lp1054-full-stack:5e68c1099a7988058854"
+    },
+    {
+      "channel_kind": "depolarizing",
+      "code_id": "lp1054",
+      "dataset_id": "panteleev-lp1054-full-stack",
+      "decoder_id": "panteleev-lp1054-full-stack:66586328b25732e13361",
+      "label": "BP, MS, d=0.3, alpha=0.8, beta=0, T=32",
+      "points": [
+        {
+          "ci_high": 0.3131317634341264,
+          "ci_low": 0.14133689846537045,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 205509.33333333334,
+          "mean_iterations": 27.622222222222224,
+          "mean_seconds": 0.0015056423333333333,
+          "mean_work": 27.622222222222224,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0011790444128016698,
+              "0.95": 0.003189095633248142,
+              "0.99": 0.0035579730525035357
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/tuned_bp-p0800/confirmation/66586328b25732e133618128/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "715054b364325df8834ecff20e94ca4180ce6c00b251d813024e6aa76ea0e78e",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 90,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.08,
+          "y": 0.2222222222222222
+        },
+        {
+          "ci_high": 0.9504923546942066,
+          "ci_low": 0.6261582865113173,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 366110.0,
+          "mean_iterations": 49.208333333333336,
+          "mean_seconds": 0.0026822642083333334,
+          "mean_work": 49.208333333333336,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0026397417485213835,
+              "0.95": 0.003522745596538154,
+              "0.99": 0.0038146286914331313
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/tuned_bp-p1000/confirmation/66586328b25732e133618128/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "f1ff71ddbc886fb4a3c4242c8142c56dcbec66bf92f3a0fa2a1f9eccce9fb933",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 24,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.1,
+          "y": 0.8333333333333334
+        },
+        {
+          "ci_high": 1.0,
+          "ci_low": 0.8315665290169146,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 447516.0,
+          "mean_iterations": 60.15,
+          "mean_seconds": 0.0025240138999999997,
+          "mean_work": 60.15,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0026928005576666632,
+              "0.95": 0.00271972856324333,
+              "0.99": 0.0027469258488757634
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/tuned_bp-p1200/confirmation/66586328b25732e133618128/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "414dc521d0dd39d1e45896a6081726e0123a98e6ed7e0153701a6701dbbc97db",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 20,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.12,
+          "y": 1.0
+        }
+      ],
+      "series_id": "panteleev-lp1054-full-stack:66586328b25732e13361",
+      "source_decoder_id": "panteleev-lp1054-full-stack:66586328b25732e13361"
+    },
+    {
+      "channel_kind": "depolarizing",
+      "code_id": "lp1054",
+      "dataset_id": "panteleev-lp1054-full-stack",
+      "decoder_id": "panteleev-lp1054-full-stack:66dfbaef15fbef4825b4",
+      "label": "Beam search, MS, d=0.3, alpha=0.8, beta=0, T=32",
+      "points": [
+        {
+          "ci_high": 0.5896627838939661,
+          "ci_low": 0.29644392386585827,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 265957.64444444445,
+          "mean_iterations": 35.77777777777778,
+          "mean_seconds": 0.0034509318444444445,
+          "mean_work": 35.77777777777778,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0034191421696554247,
+              "0.95": 0.005192958575587388,
+              "0.99": 0.005244888161343261
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/beam32-p0800/confirmation/66dfbaef15fbef4825b436b2/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "82b5b6bb08f16924322766d6474a78f80faa875b6dd9703ed80bf44963178fb7",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 45,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.08,
+          "y": 0.4444444444444444
+        },
+        {
+          "ci_high": 1.0,
+          "ci_low": 0.8315665290169146,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 420635.4,
+          "mean_iterations": 56.6,
+          "mean_seconds": 0.0031102011499999998,
+          "mean_work": 56.6,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.003189095633248142,
+              "0.95": 0.0032531964554764294,
+              "0.99": 0.0033185857042315058
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/beam32-p1200/confirmation/66dfbaef15fbef4825b436b2/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "b9d254fc464ba900a8c713fa1d5d7f3cc1e168abd19fba2a4c4a10c9ac6936ea",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 20,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.12,
+          "y": 1.0
+        }
+      ],
+      "series_id": "panteleev-lp1054-full-stack:66dfbaef15fbef4825b4",
+      "source_decoder_id": "panteleev-lp1054-full-stack:66dfbaef15fbef4825b4"
+    },
+    {
+      "channel_kind": "depolarizing",
+      "code_id": "lp1054",
+      "dataset_id": "panteleev-lp1054-full-stack",
+      "decoder_id": "panteleev-lp1054-full-stack:69e7a16e91b319fa04e6",
+      "label": "BP+OSD_0, MS, d=0, alpha=0.625, beta=0, T=32",
+      "points": [
+        {
+          "ci_high": 0.002523602955003727,
+          "ci_low": 0.0010397385633944753,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 61636.85186760827,
+          "mean_iterations": 8.284523100484982,
+          "mean_seconds": 0.0006160563399132136,
+          "mean_work": 8.284523100484982,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.00042731687015663117,
+              "0.95": 0.0007098067118970294,
+              "0.99": 0.0020380072407427787
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/osd0-p0400/confirmation/69e7a16e91b319fa04e6258d/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "fcc5409cd762989e569d85b406b06179523269bc7b40764a0a0f4411035ffebb",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 11753,
+          "status": "complete",
+          "type_i": 0,
+          "type_ii": 20,
+          "work_unit": "iterations",
+          "x": 0.04,
+          "y": 0.0017016931847187952
+        },
+        {
+          "ci_high": 0.01180530706537967,
+          "ci_low": 0.004875681013941599,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 115695.11359107214,
+          "mean_iterations": 15.550418493423674,
+          "mean_seconds": 0.0016369582921482663,
+          "mean_work": 15.550418493423674,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0007386277107249635,
+              "0.95": 0.0022289385048244684,
+              "0.99": 0.0027743951073645207
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/osd0-p0600/confirmation/69e7a16e91b319fa04e6258d/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "2fd440c507f427ef8c368246030d0754e675b0047a1bf4838dcdfec35597086f",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 2509,
+          "status": "complete",
+          "type_i": 0,
+          "type_ii": 20,
+          "work_unit": "iterations",
+          "x": 0.06,
+          "y": 0.007971303308090873
+        },
+        {
+          "ci_high": 0.2254259174632824,
+          "ci_low": 0.09892711412983618,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 256240.62992125985,
+          "mean_iterations": 34.44094488188976,
+          "mean_seconds": 0.021723289645669292,
+          "mean_work": 34.44094488188976,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.001919895010555308,
+              "0.95": 0.004795610119600599,
+              "0.99": 0.005141543144145928
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/osd0-p0800/confirmation/69e7a16e91b319fa04e6258d/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "1d70265a01ab862ce8ffef9b07e08b77aa45228808f1f600063b4c97870503e1",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 127,
+          "status": "complete",
+          "type_i": 0,
+          "type_ii": 20,
+          "work_unit": "iterations",
+          "x": 0.08,
+          "y": 0.15748031496062992
+        },
+        {
+          "ci_high": 0.9064355606682571,
+          "ci_low": 0.5635249030586136,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 403190.76923076925,
+          "mean_iterations": 54.19230769230769,
+          "mean_seconds": 0.0029449173076923074,
+          "mean_work": 54.19230769230769,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0029745270753182267,
+              "0.95": 0.003776860090527853,
+              "0.99": 0.003969517912966369
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/osd0-p1000/confirmation/69e7a16e91b319fa04e6258d/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "5e2ade8597f17b1b4731fb10c63f2e82b285658d832180200db5c636dff62114",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 26,
+          "status": "complete",
+          "type_i": 0,
+          "type_ii": 20,
+          "work_unit": "iterations",
+          "x": 0.1,
+          "y": 0.7692307692307693
+        },
+        {
+          "ci_high": 0.9987349105020502,
+          "ci_low": 0.761840090063179,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 459862.85714285716,
+          "mean_iterations": 61.80952380952381,
+          "mean_seconds": 0.0033676024761904763,
+          "mean_work": 61.80952380952381,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0035579730525035357,
+              "0.95": 0.0036294883108588566,
+              "0.99": 0.0036294883108588566
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/osd0-p1200/confirmation/69e7a16e91b319fa04e6258d/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "3528bb0c494a41cc7674e5bef49d95ebd1a2381b8dded95b057f95801ab0d0c9",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 21,
+          "status": "complete",
+          "type_i": 0,
+          "type_ii": 20,
+          "work_unit": "iterations",
+          "x": 0.12,
+          "y": 0.9523809523809523
+        }
+      ],
+      "series_id": "panteleev-lp1054-full-stack:69e7a16e91b319fa04e6",
+      "source_decoder_id": "panteleev-lp1054-full-stack:69e7a16e91b319fa04e6"
+    },
+    {
+      "channel_kind": "depolarizing",
+      "code_id": "lp1054",
+      "dataset_id": "panteleev-lp1054-full-stack",
+      "decoder_id": "panteleev-lp1054-full-stack:79ba8bebf6dc95c84aa8",
+      "label": "BP, MS, d=0, alpha=0.625, beta=0, T=32",
+      "points": [
+        {
+          "ci_high": 0.002008949501590977,
+          "ci_low": 0.0008275873568607568,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 31541.77040298002,
+          "mean_iterations": 4.239485269217744,
+          "mean_seconds": 0.00029473886373179817,
+          "mean_work": 4.239485269217744,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.00027856783321448744,
+              "0.95": 0.0004106431130864383,
+              "0.99": 0.0005266218667555286
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/bp-p0200/confirmation/79ba8bebf6dc95c84aa86312/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "ae573cffbc85f51a0ec465fe5ac2e375ed85c92403da23baf86c929f68bf1ad9",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 14765,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.02,
+          "y": 0.0013545546901456147
+        },
+        {
+          "ci_high": 0.02583748178202638,
+          "ci_low": 0.010710645243949983,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 63305.03496503497,
+          "mean_iterations": 8.508741258741258,
+          "mean_seconds": 0.0005655629222027972,
+          "mean_work": 8.508741258741258,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0005010626365612987,
+              "0.95": 0.0009662793287936919,
+              "0.99": 0.0019390939606608608
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/bp-p0400/confirmation/79ba8bebf6dc95c84aa86312/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "b1f20c4ddbbb813a468894ac9d00db893dfb5018abb489bc6e48ed0f30f7b6a4",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 1144,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.04,
+          "y": 0.017482517482517484
+        },
+        {
+          "ci_high": 0.07840577054304504,
+          "ci_low": 0.032966813315125854,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 118841.06951871658,
+          "mean_iterations": 15.973262032085561,
+          "mean_seconds": 0.0008853527593582888,
+          "mean_work": 15.973262032085561,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0007763051472542922,
+              "0.95": 0.001882065494123427,
+              "0.99": 0.0022289385048244684
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/bp-p0600/confirmation/79ba8bebf6dc95c84aa86312/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "dc15fb9f1e50277d6c7ea6e4c47267a58c6309189a89e32ef2c330ca86058828",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 374,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.06,
+          "y": 0.053475935828877004
+        },
+        {
+          "ci_high": 0.493762138240782,
+          "ci_low": 0.23813837921348285,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 262429.0909090909,
+          "mean_iterations": 35.27272727272727,
+          "mean_seconds": 0.0018390524181818183,
+          "mean_work": 35.27272727272727,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0017208474331048193,
+              "0.95": 0.003189095633248142,
+              "0.99": 0.0032857284200311938
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/bp-p0800/confirmation/79ba8bebf6dc95c84aa86312/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "263f4ac47a6ae6348b5db465970d5a3a3360b66c98614cc41e73fbb1f32157a7",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 55,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.08,
+          "y": 0.36363636363636365
+        },
+        {
+          "ci_high": 0.9709441488712534,
+          "ci_low": 0.6641108624628791,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 396907.82608695654,
+          "mean_iterations": 53.34782608695652,
+          "mean_seconds": 0.0028290493913043476,
+          "mean_work": 53.34782608695652,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0029745270753182267,
+              "0.95": 0.003487866927265499,
+              "0.99": 0.003487866927265499
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/bp-p1000/confirmation/79ba8bebf6dc95c84aa86312/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "e0a63b79d81e636a115ce5ed9fd5906fcc770a7a5903dd85abd48590d27f53c8",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 23,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.1,
+          "y": 0.8695652173913043
+        },
+        {
+          "ci_high": 1.0,
+          "ci_low": 0.8315665290169146,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 459048.0,
+          "mean_iterations": 61.7,
+          "mean_seconds": 0.00250994255,
+          "mean_work": 61.7,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0025877284075300298,
+              "0.95": 0.002666139166006597,
+              "0.99": 0.002666139166006597
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/bp-p1200/confirmation/79ba8bebf6dc95c84aa86312/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "8f1eb44eaae10b452ce2bd803fb3a6eec0d402b53d633001877caada1b043ed6",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 20,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.12,
+          "y": 1.0
+        }
+      ],
+      "series_id": "panteleev-lp1054-full-stack:79ba8bebf6dc95c84aa8",
+      "source_decoder_id": "panteleev-lp1054-full-stack:79ba8bebf6dc95c84aa8"
+    },
+    {
+      "channel_kind": "depolarizing",
+      "code_id": "lp1054",
+      "dataset_id": "panteleev-lp1054-full-stack",
+      "decoder_id": "panteleev-lp1054-full-stack:865a8ea26346ee4f996e",
+      "label": "Beam search, MS, d=0.3, alpha=1, beta=0.2, T=32",
+      "points": [
+        {
+          "ci_high": 0.9709441488712534,
+          "ci_low": 0.6641108624628791,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 383873.73913043475,
+          "mean_iterations": 51.65217391304348,
+          "mean_seconds": 0.002963594565217391,
+          "mean_work": 51.65217391304348,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.003157520428958556,
+              "0.95": 0.003385289276886559,
+              "0.99": 0.003385289276886559
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/beam32-p1000/confirmation/865a8ea26346ee4f996e70ba/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "c7d6a2df25d7b2e4240f0dc366833f613db93648414d1465b247aa907541263b",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 23,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.1,
+          "y": 0.8695652173913043
+        }
+      ],
+      "series_id": "panteleev-lp1054-full-stack:865a8ea26346ee4f996e",
+      "source_decoder_id": "panteleev-lp1054-full-stack:865a8ea26346ee4f996e"
+    },
+    {
+      "channel_kind": "depolarizing",
+      "code_id": "lp1054",
+      "dataset_id": "panteleev-lp1054-full-stack",
+      "decoder_id": "panteleev-lp1054-full-stack:876d870df9d0841291a0",
+      "label": "BP+OSD_CS, MS, d=0, alpha=0.625, beta=0, T=32",
+      "points": [
+        {
+          "ci_high": 0.0009126871481126329,
+          "ci_low": 0.000375874315143623,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 61243.296723580985,
+          "mean_iterations": 8.231625903707123,
+          "mean_seconds": 0.0005358975648054145,
+          "mean_work": 8.231625903707123,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0004230860100560705,
+              "0.95": 0.0006821102985150225,
+              "0.99": 0.003776860090527853
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/cs10-p0400/confirmation/876d870df9d0841291a07b93/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "ed34ae2a71cf419cc39711fb74ff11664193d3f2849c436681dc84204a9e0d23",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 32505,
+          "status": "complete",
+          "type_i": 0,
+          "type_ii": 20,
+          "work_unit": "iterations",
+          "x": 0.04,
+          "y": 0.0006152899553914783
+        },
+        {
+          "ci_high": 0.0030931823704329607,
+          "ci_low": 0.0012745978863750388,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 116993.76720901126,
+          "mean_iterations": 15.72496871088861,
+          "mean_seconds": 0.001193000878911139,
+          "mean_work": 15.72496871088861,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0007313145650742213,
+              "0.95": 0.004009213092096033,
+              "0.99": 0.0045628584799396665
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/cs10-p0600/confirmation/876d870df9d0841291a07b93/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "f677c26b38eff44c5332ff368a0352212fda6b8ecda7ea271bb55cf53d310736",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 9588,
+          "status": "complete",
+          "type_i": 0,
+          "type_ii": 20,
+          "work_unit": "iterations",
+          "x": 0.06,
+          "y": 0.0020859407592824365
+        },
+        {
+          "ci_high": 0.16344400327327366,
+          "ci_low": 0.07040189100432585,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 247705.7627118644,
+          "mean_iterations": 33.293785310734464,
+          "mean_seconds": 0.013282613220338984,
+          "mean_work": 33.293785310734464,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.001573439339528766,
+              "0.95": 0.007356359430133303,
+              "0.99": 0.007965883137930209
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/cs10-p0800/confirmation/876d870df9d0841291a07b93/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "aaff05b5a1316514770b2abbfee103af819925c5e3ea5dc568d927aa1a9d685d",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 177,
+          "status": "complete",
+          "type_i": 0,
+          "type_ii": 20,
+          "work_unit": "iterations",
+          "x": 0.08,
+          "y": 0.11299435028248588
+        },
+        {
+          "ci_high": 0.8412239621138461,
+          "ci_low": 0.4916766461900099,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 407147.5862068966,
+          "mean_iterations": 54.724137931034484,
+          "mean_seconds": 0.004995415551724137,
+          "mean_work": 54.724137931034484,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.004517681663306601,
+              "0.95": 0.007283524188250795,
+              "0.99": 0.007504222254678982
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/cs10-p1000/confirmation/876d870df9d0841291a07b93/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "5865d6032fd88c55d5d09fd00e2a1aeb08404f9b3050b1ddc6b60322fd3f9207",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 29,
+          "status": "complete",
+          "type_i": 0,
+          "type_ii": 20,
+          "work_unit": "iterations",
+          "x": 0.1,
+          "y": 0.6896551724137931
+        },
+        {
+          "ci_high": 0.9987349105020502,
+          "ci_low": 0.761840090063179,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 459862.85714285716,
+          "mean_iterations": 61.80952380952381,
+          "mean_seconds": 0.00605893180952381,
+          "mean_work": 61.80952380952381,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.006399760295112054,
+              "0.95": 0.006593679431814245,
+              "0.99": 0.006593679431814245
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/cs10-p1200/confirmation/876d870df9d0841291a07b93/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "dcd1ee0631c6a3ececd72be43021cb9fe57fed7b10ec168f0be3f68dd60d9aca",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 21,
+          "status": "complete",
+          "type_i": 0,
+          "type_ii": 20,
+          "work_unit": "iterations",
+          "x": 0.12,
+          "y": 0.9523809523809523
+        }
+      ],
+      "series_id": "panteleev-lp1054-full-stack:876d870df9d0841291a0",
+      "source_decoder_id": "panteleev-lp1054-full-stack:876d870df9d0841291a0"
+    },
+    {
+      "channel_kind": "depolarizing",
+      "code_id": "lp1054",
+      "dataset_id": "panteleev-lp1054-full-stack",
+      "decoder_id": "panteleev-lp1054-full-stack:9683981a7f9e97157283",
+      "label": "Q-BP+OSD_0, MS, d=0, alpha=0.625, beta=0, T=32",
+      "points": [
+        {
+          "ci_high": 0.0013536382805036072,
+          "ci_low": 0.0005575364342639613,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 90850.49691991786,
+          "mean_iterations": 6.1055441478439425,
+          "mean_seconds": 0.0031679991842117274,
+          "mean_work": 6.1055441478439425,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.00271972856324333,
+              "0.95": 0.004701117654740319,
+              "0.99": 0.013100944897729627
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/qbp_osd0-p0600/confirmation/9683981a7f9e971572830591/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "0429acecbb6d185303c11fdc99cf40016decce2e0dbc79b0db0be0c797cefecb",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 21915,
+          "status": "complete",
+          "type_i": 0,
+          "type_ii": 20,
+          "work_unit": "iterations",
+          "x": 0.06,
+          "y": 0.0009126169290440338
+        },
+        {
+          "ci_high": 0.0038809071158733863,
+          "ci_low": 0.0015995220067240394,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 152274.14212799372,
+          "mean_iterations": 10.233477293547965,
+          "mean_seconds": 0.005173194866378746,
+          "mean_work": 10.233477293547965,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.004089798275247163,
+              "0.95": 0.01011455782638612,
+              "0.99": 0.015059198328987205
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/qbp_osd0-p0800/confirmation/9683981a7f9e971572830591/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "9c6b6aab8009b1ac12762a5209c987ccf664d1faff5ffd86b774907b3560e38f",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 7641,
+          "status": "complete",
+          "type_i": 0,
+          "type_ii": 20,
+          "work_unit": "iterations",
+          "x": 0.08,
+          "y": 0.0026174584478471405
+        },
+        {
+          "ci_high": 0.11845755410767336,
+          "ci_low": 0.050367091703811775,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 281933.65853658534,
+          "mean_iterations": 18.947154471544714,
+          "mean_seconds": 0.020358055906504066,
+          "mean_work": 18.947154471544714,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.006593679431814245,
+              "0.95": 0.014328310492896212,
+              "0.99": 0.014762472629141462
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/qbp_osd0-p1000/confirmation/9683981a7f9e971572830591/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "40137e43116625186348270e150f9c1e24826413309b10e3fbcc5743295f8a59",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 246,
+          "status": "complete",
+          "type_i": 0,
+          "type_ii": 20,
+          "work_unit": "iterations",
+          "x": 0.1,
+          "y": 0.08130081300813008
+        },
+        {
+          "ci_high": 0.711728556209243,
+          "ci_low": 0.3809767940893837,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 452600.0,
+          "mean_iterations": 30.416666666666668,
+          "mean_seconds": 0.09472644422222222,
+          "mean_work": 30.416666666666668,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.012842804526742108,
+              "0.95": 0.013906917000853355,
+              "0.99": 2.9975932720558407
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/qbp_osd0-p1200/confirmation/9683981a7f9e971572830591/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "1284f627bdc492c9c0b0f93a2578a27e0a68c92015b898f76578a57ee816851b",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 36,
+          "status": "complete",
+          "type_i": 0,
+          "type_ii": 20,
+          "work_unit": "iterations",
+          "x": 0.12,
+          "y": 0.5555555555555556
+        }
+      ],
+      "series_id": "panteleev-lp1054-full-stack:9683981a7f9e97157283",
+      "source_decoder_id": "panteleev-lp1054-full-stack:9683981a7f9e97157283"
+    },
+    {
+      "channel_kind": "depolarizing",
+      "code_id": "lp1054",
+      "dataset_id": "panteleev-lp1054-full-stack",
+      "decoder_id": "panteleev-lp1054-full-stack:a65578a7c5ce6612f0cf",
+      "label": "RelayBP, MS, d=0.5, alpha=1, beta=0, T=32",
+      "points": [
+        {
+          "ci_high": 1.0,
+          "ci_low": 0.8315665290169146,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 431520.0,
+          "mean_iterations": 58.0,
+          "mean_seconds": 0.0030534940499999997,
+          "mean_work": 58.0,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.003064658220227444,
+              "0.95": 0.003126257850454016,
+              "0.99": 0.003157520428958556
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/relay32-p1200/confirmation/a65578a7c5ce6612f0cfc48a/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "8861f3c839dae65273129abfb4852d2c6ff04bd87e8b83feac905b4fabf533f4",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 20,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.12,
+          "y": 1.0
+        }
+      ],
+      "series_id": "panteleev-lp1054-full-stack:a65578a7c5ce6612f0cf",
+      "source_decoder_id": "panteleev-lp1054-full-stack:a65578a7c5ce6612f0cf"
+    },
+    {
+      "channel_kind": "depolarizing",
+      "code_id": "lp1054",
+      "dataset_id": "panteleev-lp1054-full-stack",
+      "decoder_id": "panteleev-lp1054-full-stack:b439f9e9790e5368cddd",
+      "label": "RelayBP, MS, d=0.3, alpha=0.8, beta=0.2, T=32",
+      "points": [
+        {
+          "ci_high": 0.9504923546942066,
+          "ci_low": 0.6261582865113173,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 339450.0,
+          "mean_iterations": 45.625,
+          "mean_seconds": 0.00409714,
+          "mean_work": 45.625,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0045628584799396665,
+              "0.95": 0.005141543144145928,
+              "0.99": 0.005141543144145928
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/relay32-p0800/confirmation/b439f9e9790e5368cdddba3f/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "f5288ad2f666761317b10393ea710aa80d86dd82bef509b36ae4caa4a02c7d3b",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 24,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.08,
+          "y": 0.8333333333333334
+        }
+      ],
+      "series_id": "panteleev-lp1054-full-stack:b439f9e9790e5368cddd",
+      "source_decoder_id": "panteleev-lp1054-full-stack:b439f9e9790e5368cddd"
+    },
+    {
+      "channel_kind": "depolarizing",
+      "code_id": "lp1054",
+      "dataset_id": "panteleev-lp1054-full-stack",
+      "decoder_id": "panteleev-lp1054-full-stack:b7fff02fcb7831f259d8",
+      "label": "Q-BP, MS, d=0.3, alpha=1, beta=0.2, T=32",
+      "points": [
+        {
+          "ci_high": 0.884267786708496,
+          "ci_low": 0.5371512577238284,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 433724.44444444444,
+          "mean_iterations": 29.14814814814815,
+          "mean_seconds": 0.010937281666666666,
+          "mean_work": 29.14814814814815,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.01197871565516689,
+              "0.95": 0.012589750540870609,
+              "0.99": 0.012715648046279315
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/tuned_qbp-p1200/confirmation/b7fff02fcb7831f259d8e111/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "23b07604fee6b319988cbd5096917fed25b688628c9611a0d4321e6b728aaf48",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 27,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.12,
+          "y": 0.7407407407407407
+        }
+      ],
+      "series_id": "panteleev-lp1054-full-stack:b7fff02fcb7831f259d8",
+      "source_decoder_id": "panteleev-lp1054-full-stack:b7fff02fcb7831f259d8"
+    },
+    {
+      "channel_kind": "depolarizing",
+      "code_id": "lp1054",
+      "dataset_id": "panteleev-lp1054-full-stack",
+      "decoder_id": "panteleev-lp1054-full-stack:bb7ff2b69e38703ee45f",
+      "label": "RelayBP, MS, d=0.3, alpha=0.8, beta=0, T=32",
+      "points": [
+        {
+          "ci_high": 0.02708761106113964,
+          "ci_low": 0.011232595398645783,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 57112.740604949584,
+          "mean_iterations": 7.676443629697525,
+          "mean_seconds": 0.0010012458148487627,
+          "mean_work": 7.676443629697525,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0008923427483724443,
+              "0.95": 0.001557860732206699,
+              "0.99": 0.0032857284200311938
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/relay32-p0400/confirmation/bb7ff2b69e38703ee45f8609/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "a8355b3a4ed2faf968a8129dd41be3e8457aa9372f0caee0b0045c44e1c7afef",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 1091,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.04,
+          "y": 0.01833180568285976
+        },
+        {
+          "ci_high": 0.2254259174632824,
+          "ci_low": 0.09892711412983618,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 145402.20472440944,
+          "mean_iterations": 19.543307086614174,
+          "mean_seconds": 0.0018274480708661417,
+          "mean_work": 19.543307086614174,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0014822510327645998,
+              "0.95": 0.003665783193967445,
+              "0.99": 0.0044729521418877234
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/relay32-p0600/confirmation/bb7ff2b69e38703ee45f8609/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "1fa71255a3c51e49db0654b55d6aa56b71ce797601225f8860b4851427c85a67",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 127,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.06,
+          "y": 0.15748031496062992
+        },
+        {
+          "ci_high": 0.9987349105020502,
+          "ci_low": 0.761840090063179,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 423725.71428571426,
+          "mean_iterations": 56.95238095238095,
+          "mean_seconds": 0.00305809619047619,
+          "mean_work": 56.95238095238095,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.003064658220227444,
+              "0.95": 0.0032857284200311938,
+              "0.99": 0.0033517715612738207
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/relay32-p1000/confirmation/bb7ff2b69e38703ee45f8609/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "da9654f775eb2cdb44901f8943350eac0bd251c3ec033833fcd7a1ef07c3fc79",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 21,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.1,
+          "y": 0.9523809523809523
+        }
+      ],
+      "series_id": "panteleev-lp1054-full-stack:bb7ff2b69e38703ee45f",
+      "source_decoder_id": "panteleev-lp1054-full-stack:bb7ff2b69e38703ee45f"
+    },
+    {
+      "channel_kind": "depolarizing",
+      "code_id": "lp1054",
+      "dataset_id": "panteleev-lp1054-full-stack",
+      "decoder_id": "panteleev-lp1054-full-stack:db7c96e0ee0aa5a13e02",
+      "label": "Beam search, MS, d=0.3, alpha=0.8, beta=0.2, T=32",
+      "points": [
+        {
+          "ci_high": 0.0017338866647808406,
+          "ci_low": 0.0007142239084800752,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 54034.26911386486,
+          "mean_iterations": 7.263093289689034,
+          "mean_seconds": 0.0009271628641571195,
+          "mean_work": 7.263093289689034,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0008575238417276945,
+              "0.95": 0.001497073543092246,
+              "0.99": 0.0020178289512304743
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/beam32-p0400/confirmation/db7c96e0ee0aa5a13e02275d/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "b1119296c149e638258b39829053ca120b7a786fa3485a9b87f929a2e3bf3631",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 17108,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.04,
+          "y": 0.0011690437222352116
+        },
+        {
+          "ci_high": 0.0295124016250978,
+          "ci_low": 0.012245979969949614,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 117596.57142857143,
+          "mean_iterations": 15.812187812187812,
+          "mean_seconds": 0.0016875803346653344,
+          "mean_work": 15.812187812187812,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0016702375646581136,
+              "0.95": 0.003064658220227444,
+              "0.99": 0.0038527749783474627
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/beam32-p0600/confirmation/db7c96e0ee0aa5a13e02275d/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "aa064435a72a98d09c5835d168e875229ecbb76ed6e7f8de91a45c2b388a4fe3",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 1001,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.06,
+          "y": 0.01998001998001998
+        }
+      ],
+      "series_id": "panteleev-lp1054-full-stack:db7c96e0ee0aa5a13e02",
+      "source_decoder_id": "panteleev-lp1054-full-stack:db7c96e0ee0aa5a13e02"
+    },
+    {
+      "channel_kind": "depolarizing",
+      "code_id": "lp1054",
+      "dataset_id": "panteleev-lp1054-full-stack",
+      "decoder_id": "panteleev-lp1054-full-stack:ec1985ba0238dcd26e4a",
+      "label": "BP, MS, d=0.3, alpha=0.8, beta=0.2, T=32",
+      "points": [
+        {
+          "ci_high": 0.002537198161838215,
+          "ci_low": 0.0010453435722479177,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 52389.31052181352,
+          "mean_iterations": 7.041573994867408,
+          "mean_seconds": 0.0004831994948674081,
+          "mean_work": 7.041573994867408,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0004581415230466453,
+              "0.95": 0.0007169047790159998,
+              "0.99": 0.0009472398086400274
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/tuned_bp-p0400/confirmation/ec1985ba0238dcd26e4a3619/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "552f12273e126004b3165e61e6177f5e2cc50dd28328cf9240e817f9760d48d2",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 11690,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.04,
+          "y": 0.001710863986313088
+        },
+        {
+          "ci_high": 0.02070022676446583,
+          "ci_low": 0.008569397077246507,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 91935.2834149755,
+          "mean_iterations": 12.356892932120363,
+          "mean_seconds": 0.0007581773044086774,
+          "mean_work": 12.356892932120363,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0006821102985150225,
+              "0.95": 0.0013285767559821722,
+              "0.99": 0.0020789711862817086
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/tuned_bp-p0600/confirmation/ec1985ba0238dcd26e4a3619/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "9fecba0d7103f5234d86249090a4f70adf2e9fc928f97cdea4ef3be23e01bc68",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 1429,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.06,
+          "y": 0.013995801259622114
+        }
+      ],
+      "series_id": "panteleev-lp1054-full-stack:ec1985ba0238dcd26e4a",
+      "source_decoder_id": "panteleev-lp1054-full-stack:ec1985ba0238dcd26e4a"
+    },
+    {
+      "channel_kind": "depolarizing",
+      "code_id": "lp1054",
+      "dataset_id": "panteleev-lp1054-full-stack",
+      "decoder_id": "panteleev-lp1054-full-stack:eca4964da72bd46abce2",
+      "label": "Q-BP+OSD_CS, MS, d=0, alpha=0.625, beta=0, T=32",
+      "points": [
+        {
+          "ci_high": 0.00047064218798780974,
+          "ci_low": 0.00019380347021750595,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 90313.1661352496,
+          "mean_iterations": 6.069433208014087,
+          "mean_seconds": 0.0030605511464014343,
+          "mean_work": 6.069433208014087,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0026397417485213835,
+              "0.95": 0.004701117654740319,
+              "0.99": 0.012465099545416445
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/qbp_cs10-p0600/confirmation/eca4964da72bd46abce26b2e/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "2c7797dab1e89cef37464cba4acb29b0b529a10943d71045f7a6666a2910e633",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 63039,
+          "status": "complete",
+          "type_i": 0,
+          "type_ii": 20,
+          "work_unit": "iterations",
+          "x": 0.06,
+          "y": 0.00031726391598851505
+        },
+        {
+          "ci_high": 0.0009912973158997748,
+          "ci_low": 0.00040825690767200615,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 152161.13877100946,
+          "mean_iterations": 10.225882981922679,
+          "mean_seconds": 0.005204455758044575,
+          "mean_work": 10.225882981922679,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.004341403281068079,
+              "0.95": 0.010525249433514282,
+              "0.99": 0.01970057695130696
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/qbp_cs10-p0800/confirmation/eca4964da72bd46abce26b2e/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "94decf43a7eeece1cb18b5b0cb03b90a15bc39912a4808e30f2dca5813781d9a",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 29927,
+          "status": "complete",
+          "type_i": 0,
+          "type_ii": 20,
+          "work_unit": "iterations",
+          "x": 0.08,
+          "y": 0.0006682928459250843
+        },
+        {
+          "ci_high": 0.1081048777072488,
+          "ci_low": 0.04583113372265664,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 279468.44444444444,
+          "mean_iterations": 18.78148148148148,
+          "mean_seconds": 0.02028734064814815,
+          "mean_work": 18.78148148148148,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.006593679431814245,
+              "0.95": 0.017834675313943456,
+              "0.99": 0.019121185897428967
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/qbp_cs10-p1000/confirmation/eca4964da72bd46abce26b2e/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "a31629c866ba036805112cb4e969a62304a2299a2e59f206b48e30a068274cf7",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 270,
+          "status": "complete",
+          "type_i": 0,
+          "type_ii": 20,
+          "work_unit": "iterations",
+          "x": 0.1,
+          "y": 0.07407407407407407
+        },
+        {
+          "ci_high": 0.6662109938869034,
+          "ci_low": 0.34780220935734085,
+          "failures": 20,
+          "iteration_unit": "all component and search sweeps",
+          "mean_directed_edge_updates": 454412.3076923077,
+          "mean_iterations": 30.53846153846154,
+          "mean_seconds": 0.09139138546153847,
+          "mean_work": 30.53846153846154,
+          "metadata": {
+            "cohort_kind": "lp1054_fresh_confirmation",
+            "denominator_definition": "all iid shots; original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.016145498902897994,
+              "0.95": 0.017138772426932562,
+              "0.99": 3.027569204776399
+            },
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111603,
+            "source_evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/results/qbp_cs10-p1200/confirmation/eca4964da72bd46abce26b2e/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "967c5710ecd9755d8e8f93a9c1b002088c5c8cd1b0c7cb4b96513d2688b1a092",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 39,
+          "status": "complete",
+          "type_i": 0,
+          "type_ii": 20,
+          "work_unit": "iterations",
+          "x": 0.12,
+          "y": 0.5128205128205128
+        }
+      ],
+      "series_id": "panteleev-lp1054-full-stack:eca4964da72bd46abce2",
+      "source_decoder_id": "panteleev-lp1054-full-stack:eca4964da72bd46abce2"
+    }
+  ],
   "schema": "research-catalog-extension-v1"
 }

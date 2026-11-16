@@ -1,0 +1,11 @@
+{
+  "checks": [
+    "Both search methods expose exact numerical, topology, solution and memory controls",
+    "Table/CSV retain both search methods, measured runtime ratios and all-path work",
+    "Downloaded settings preserve full search configuration and traversal version",
+    "Saved search decoder cannot silently turn into ordinary BP in experiment builder",
+    "Singleton/empty handling clears stale code and search-decoder selections"
+  ],
+  "errors": [],
+  "simulations": 0
+}
