@@ -1,6 +1,6 @@
 ---
 id: 261115-sxj
-status: executing
+status: launched
 workflow: gsd-quick --validate (inline execution)
 ---
 
@@ -14,3 +14,5 @@ User requests trying beam search and RelayBP after the joint BP controls failed 
 4. Freeze immutable design/source/software/code hashes after meaningful validation; submit checkpointable Slurm work and a dependent full-audit collector. Record scheduling and early audited results if available. Integrate qualified confirmations into the central catalog without defeating multi-error-rate eligibility or changing archived v1. Update GSD records, commit and push. A launched campaign remains running, not scientifically complete.
 
 Acceptance: exact numerical/controller qualification, source labels and seeds explicit, LER-first selection subject to measured latency bands with deterministic ties, complete event ledgers and restart safety, same-channel OSD comparison, usable report including every retained setting and honest unavailable values. No hidden truth enters a decoder. Phase 11 gates and counters remain unchanged.
+
+Execution refinement: initial confirmations exposed a coarse zero-failure screening limitation: selecting only fastest tied proposals can exclude stronger arms from all four budget finalists. Preserve the first campaign and launch a separately frozen follow-up, reusing only parent training/proposal specifications, retaining budget-spanning and multiple-solution arms, with new finalist/confirmation seeds1562/1563. Each follow-up worker depends on its corresponding parent worker; final publication also requires the complete parent audit. Document the adaptive design timing explicitly. No original result is relabeled, pooled or rerun.

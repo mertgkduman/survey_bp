@@ -1,0 +1,13 @@
+{
+  "engine_reused_without_change": true,
+  "frontier_plan_sha256": "8bbc025040915c299af18d09edd90bf443cc0ba2df8b33f2a0e7db5a254aa3a1",
+  "initial_test_failure": "NFS temporary-directory cleanup only; body checks completed; cleanup tolerant retry passed",
+  "new_confirmation_seed": 2026111563,
+  "new_finalist_seed": 2026111562,
+  "parent_complete_full_audit_required_before_publication": true,
+  "parent_confirmation_outcomes_read_by_selector": false,
+  "regression_cases": 7,
+  "scope": "orchestration qualification, miniature fresh-seed full-ledger/endpoint/resume check; no claim of complete production results",
+  "source_plan_sha256": "bd0b6527cbfe152957867896ce48855344b9ea7637317de52b1a07ab473a8ce0",
+  "status": "passed"
+}
