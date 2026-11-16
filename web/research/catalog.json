@@ -158502,7 +158502,7 @@
           "label": "RESULTS.md",
           "local_storage_path": null,
           "path": "data/reproductions/lp1054-relay-gamma80-60/RESULTS.md",
-          "sha256": "a4e3af84b388360ad943fc8cac6a41d608ac98359b717e5d07e554be4d897c4b",
+          "sha256": "7c1c79672fbe0552b2a38d9b05295fc4eb3f510ce235f24b81e8aed37250a53d",
           "url": "data/reproductions/lp1054-relay-gamma80-60/RESULTS.md"
         },
         {
@@ -158511,7 +158511,7 @@
           "label": "results-table.csv",
           "local_storage_path": null,
           "path": "data/reproductions/lp1054-relay-gamma80-60/results-table.csv",
-          "sha256": "4b19822d7fd87898f21225abd839cbd3c3fddb21bc9cf6ffbaea8d99f885ee61",
+          "sha256": "2b85ab991674e7b07d604eed7537e5589a713b37ac636bbedbffbb472b429203",
           "url": "data/reproductions/lp1054-relay-gamma80-60/results-table.csv"
         },
         {
@@ -158520,7 +158520,7 @@
           "label": "tuning-results.csv.gz",
           "local_storage_path": null,
           "path": "data/reproductions/lp1054-relay-gamma80-60/tuning-results.csv.gz",
-          "sha256": "c97fff9e0fa923e0cb7110a3f1c26cda46a7c6fdba98a0a877cd63e4f49dca98",
+          "sha256": "fcf1dcc81c602d60c40a15b642d23a549edbe4497fd0d398a49e6444bd50d5b8",
           "url": "data/reproductions/lp1054-relay-gamma80-60/tuning-results.csv.gz"
         },
         {
@@ -158529,7 +158529,7 @@
           "label": "verified.json.gz",
           "local_storage_path": null,
           "path": "data/reproductions/lp1054-relay-gamma80-60/verified.json.gz",
-          "sha256": "2055b7f1fbd6095437353f0aa78a005183ff6050bebd3ed6a8a53e7cbfdad2d7",
+          "sha256": "f5136723cdb331c3f4e5238faebce6110f73dcf39cf888cb6cd378a3686b58c6",
           "url": "data/reproductions/lp1054-relay-gamma80-60/verified.json.gz"
         }
       ],
@@ -158539,6 +158539,167 @@
       "label": "LP1054 RelayBP: tuned uniform80 and disordered60 gamma",
       "paper_id": "panteleev-2012-04068-v2",
       "points": [
+        {
+          "ci_high": 0.16434823209235103,
+          "ci_low": 0.0708101622002994,
+          "failures": 20,
+          "iteration_unit": "all component/relay sweeps",
+          "mean_directed_edge_updates": 317637.2727272727,
+          "mean_iterations": 42.69318181818182,
+          "mean_seconds": 0.002808473460227273,
+          "mean_work": 42.69318181818182,
+          "metadata": {
+            "cohort_kind": "relay_gamma_fresh_confirmation",
+            "denominator_definition": "all iid shots; either original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.001621116124955827,
+              "0.95": 0.010215703404649982,
+              "0.99": 0.018013022067082888
+            },
+            "mean_disorder_draws": 137.73863636363637,
+            "mean_gamma_bias_updates": 44998.61363636364,
+            "memory_clips": 0,
+            "memory_seed": 2026918874,
+            "roles": [
+              "reset_zero_gamma"
+            ],
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111664,
+            "source_evidence_path": "data/reproductions/lp1054-relay-gamma80-60/results/prior_tuned_numerics-p0800/confirmation/0f259459ecabb6e97afc72d5/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "57878156bb4e87a3b950a3d224790b46fc0649928a56591de3c7708093f14992",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 176,
+          "runtime_scope": "warm complete controller; includes gamma draws and solver path-state storage; excludes external hashing/serialization/sampling/evaluation",
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.08,
+          "y": 0.11363636363636363
+        },
+        {
+          "ci_high": 0.8206163507648881,
+          "ci_low": 0.47187995521011944,
+          "failures": 20,
+          "iteration_unit": "all component/relay sweeps",
+          "mean_directed_edge_updates": 1208256.0,
+          "mean_iterations": 162.4,
+          "mean_seconds": 0.007811338666666667,
+          "mean_work": 162.4,
+          "metadata": {
+            "cohort_kind": "relay_gamma_fresh_confirmation",
+            "denominator_definition": "all iid shots; either original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.007579264477225772,
+              "0.95": 0.01349791662907573,
+              "0.99": 0.014045986170861889
+            },
+            "mean_disorder_draws": 1054.0,
+            "mean_gamma_bias_updates": 171169.6,
+            "memory_clips": 0,
+            "memory_seed": 2027120674,
+            "roles": [
+              "uniform_phase_only",
+              "reset_zero_gamma"
+            ],
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111664,
+            "source_evidence_path": "data/reproductions/lp1054-relay-gamma80-60/results/prior_tuned_numerics-p1000/confirmation/0f259459ecabb6e97afc72d5/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "8f4682b09efce53fa26fc58c8de797dd2555b3caa8976254f22510b908a6e87d",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 30,
+          "runtime_scope": "warm complete controller; includes gamma draws and solver path-state storage; excludes external hashing/serialization/sampling/evaluation",
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.1,
+          "y": 0.6666666666666666
+        },
+        {
+          "ci_high": 0.2755060414622239,
+          "ci_low": 0.12282893122170677,
+          "failures": 20,
+          "iteration_unit": "all component/relay sweeps",
+          "mean_directed_edge_updates": 413461.7475728155,
+          "mean_iterations": 55.57281553398058,
+          "mean_seconds": 0.00353964027184466,
+          "mean_work": 55.57281553398058,
+          "metadata": {
+            "cohort_kind": "relay_gamma_fresh_confirmation",
+            "denominator_definition": "all iid shots; either original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0017554364665102263,
+              "0.95": 0.010014413689491209,
+              "0.99": 0.014328310492896212
+            },
+            "mean_disorder_draws": 255.8252427184466,
+            "mean_gamma_bias_updates": 58573.74757281553,
+            "memory_clips": 505703,
+            "memory_seed": 2026918874,
+            "roles": [
+              "uniform_phase_only"
+            ],
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111664,
+            "source_evidence_path": "data/reproductions/lp1054-relay-gamma80-60/results/source_numerics-p0800/confirmation/196c975c0ad56001ff4f2c32/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "a594624c9d58faa1554784f7525e14d27f60c784187af63969d4987ed8916845",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 103,
+          "runtime_scope": "warm complete controller; includes gamma draws and solver path-state storage; excludes external hashing/serialization/sampling/evaluation",
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.08,
+          "y": 0.1941747572815534
+        },
+        {
+          "ci_high": 0.928681382801945,
+          "ci_low": 0.5929625677213226,
+          "failures": 20,
+          "iteration_unit": "all component/relay sweeps",
+          "mean_directed_edge_updates": 1381756.8,
+          "mean_iterations": 185.72,
+          "mean_seconds": 0.00851137016,
+          "mean_work": 185.72,
+          "metadata": {
+            "cohort_kind": "relay_gamma_fresh_confirmation",
+            "denominator_definition": "all iid shots; either original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.007504222254678982,
+              "0.95": 0.013100944897729627,
+              "0.99": 0.01349791662907573
+            },
+            "mean_disorder_draws": 1306.96,
+            "mean_gamma_bias_updates": 195748.88,
+            "memory_clips": 116219,
+            "memory_seed": 2027120674,
+            "roles": [
+              "uniform_phase_only"
+            ],
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111664,
+            "source_evidence_path": "data/reproductions/lp1054-relay-gamma80-60/results/source_numerics-p1000/confirmation/196c975c0ad56001ff4f2c32/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "60dce7065da1ddf94bc019ecb06d7974e0f9b5bd7303f6e790a119c3997e3695",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 25,
+          "runtime_scope": "warm complete controller; includes gamma draws and solver path-state storage; excludes external hashing/serialization/sampling/evaluation",
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.1,
+          "y": 0.8
+        },
         {
           "ci_high": 0.028383174447541,
           "ci_low": 0.011773882551682924,
@@ -158580,6 +158741,167 @@
           "y": 0.01921229586935639
         },
         {
+          "ci_high": 0.16434823209235103,
+          "ci_low": 0.0708101622002994,
+          "failures": 20,
+          "iteration_unit": "all component/relay sweeps",
+          "mean_directed_edge_updates": 317637.2727272727,
+          "mean_iterations": 42.69318181818182,
+          "mean_seconds": 0.0023081633125,
+          "mean_work": 42.69318181818182,
+          "metadata": {
+            "cohort_kind": "relay_gamma_fresh_confirmation",
+            "denominator_definition": "all iid shots; either original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0012767361486356102,
+              "0.95": 0.008455945468245643,
+              "0.99": 0.014471593597825174
+            },
+            "mean_disorder_draws": 0.0,
+            "mean_gamma_bias_updates": 0.0,
+            "memory_clips": 0,
+            "memory_seed": 2026918874,
+            "roles": [
+              "continuous_bp140"
+            ],
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111664,
+            "source_evidence_path": "data/reproductions/lp1054-relay-gamma80-60/results/prior_tuned_numerics-p0800/confirmation/3e3b48b78794789c6e626282/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "9402a601755fde30cb8a522384e58d2dba0a6b8a61a756e91b295b806a275b5c",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 176,
+          "runtime_scope": "warm complete controller; includes gamma draws and solver path-state storage; excludes external hashing/serialization/sampling/evaluation",
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.08,
+          "y": 0.11363636363636363
+        },
+        {
+          "ci_high": 0.8206163507648881,
+          "ci_low": 0.47187995521011944,
+          "failures": 20,
+          "iteration_unit": "all component/relay sweeps",
+          "mean_directed_edge_updates": 1201312.0,
+          "mean_iterations": 161.46666666666667,
+          "mean_seconds": 0.0070310693,
+          "mean_work": 161.46666666666667,
+          "metadata": {
+            "cohort_kind": "relay_gamma_fresh_confirmation",
+            "denominator_definition": "all iid shots; either original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.006930023349974429,
+              "0.95": 0.012341682718234104,
+              "0.99": 0.012341682718234104
+            },
+            "mean_disorder_draws": 0.0,
+            "mean_gamma_bias_updates": 0.0,
+            "memory_clips": 0,
+            "memory_seed": 2027120674,
+            "roles": [
+              "continuous_bp140"
+            ],
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111664,
+            "source_evidence_path": "data/reproductions/lp1054-relay-gamma80-60/results/prior_tuned_numerics-p1000/confirmation/3e3b48b78794789c6e626282/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "b5f322d30be2819fa27b74544b5243916a85b80399b01c9b3f4f45ef34abbf2f",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 30,
+          "runtime_scope": "warm complete controller; includes gamma draws and solver path-state storage; excludes external hashing/serialization/sampling/evaluation",
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.1,
+          "y": 0.6666666666666666
+        },
+        {
+          "ci_high": 0.8206163507648881,
+          "ci_low": 0.47187995521011944,
+          "failures": 20,
+          "iteration_unit": "all component/relay sweeps",
+          "mean_directed_edge_updates": 1208256.0,
+          "mean_iterations": 162.4,
+          "mean_seconds": 0.007752177233333333,
+          "mean_work": 162.4,
+          "metadata": {
+            "cohort_kind": "relay_gamma_fresh_confirmation",
+            "denominator_definition": "all iid shots; either original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.007579264477225772,
+              "0.95": 0.01349791662907573,
+              "0.99": 0.014471593597825174
+            },
+            "mean_disorder_draws": 1054.0,
+            "mean_gamma_bias_updates": 171169.6,
+            "memory_clips": 248629,
+            "memory_seed": 2027120674,
+            "roles": [
+              "gamma_selected",
+              "disordered_phase_only"
+            ],
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111664,
+            "source_evidence_path": "data/reproductions/lp1054-relay-gamma80-60/results/prior_tuned_numerics-p1000/confirmation/4f4f8e8fdf5e7e03a7c6d34f/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "320f8d75accd501f83329727b0d318fb750468459bdc037e4839aa697ead3558",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 30,
+          "runtime_scope": "warm complete controller; includes gamma draws and solver path-state storage; excludes external hashing/serialization/sampling/evaluation",
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.1,
+          "y": 0.6666666666666666
+        },
+        {
+          "ci_high": 0.14162260874708033,
+          "ci_low": 0.060616660878802214,
+          "failures": 20,
+          "iteration_unit": "all component/relay sweeps",
+          "mean_directed_edge_updates": 363144.5853658537,
+          "mean_iterations": 48.80975609756098,
+          "mean_seconds": 0.003188445014634146,
+          "mean_work": 48.80975609756098,
+          "metadata": {
+            "cohort_kind": "relay_gamma_fresh_confirmation",
+            "denominator_definition": "all iid shots; either original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0016537005590674392,
+              "0.95": 0.009915261078704166,
+              "0.99": 0.017310160151201886
+            },
+            "mean_disorder_draws": 215.94146341463414,
+            "mean_gamma_bias_updates": 51445.48292682927,
+            "memory_clips": 749115,
+            "memory_seed": 2026918874,
+            "roles": [
+              "uniform_phase_only"
+            ],
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111664,
+            "source_evidence_path": "data/reproductions/lp1054-relay-gamma80-60/results/prior_tuned_numerics-p0800/confirmation/4f6e0011dd36dabcb097f826/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "a751418f2f6a062612001c5c6334c07818c4c567cd884fe78b72411b358b9900",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 205,
+          "runtime_scope": "warm complete controller; includes gamma draws and solver path-state storage; excludes external hashing/serialization/sampling/evaluation",
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.08,
+          "y": 0.0975609756097561
+        },
+        {
           "ci_high": 0.06320901283745224,
           "ci_low": 0.026466868223661018,
           "failures": 20,
@@ -158618,6 +158940,86 @@
           "work_unit": "iterations",
           "x": 0.06,
           "y": 0.043010752688172046
+        },
+        {
+          "ci_high": 0.316453469299049,
+          "ci_low": 0.1429948758235286,
+          "failures": 20,
+          "iteration_unit": "all component/relay sweeps",
+          "mean_directed_edge_updates": 452000.8988764045,
+          "mean_iterations": 60.752808988764045,
+          "mean_seconds": 0.0030238638764044944,
+          "mean_work": 60.752808988764045,
+          "metadata": {
+            "cohort_kind": "relay_gamma_fresh_confirmation",
+            "denominator_definition": "all iid shots; either original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0017038093397077417,
+              "0.95": 0.007887013007851693,
+              "0.99": 0.01297123257200953
+            },
+            "mean_disorder_draws": 0.0,
+            "mean_gamma_bias_updates": 0.0,
+            "memory_clips": 0,
+            "memory_seed": 2026918874,
+            "roles": [
+              "continuous_bp140"
+            ],
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111664,
+            "source_evidence_path": "data/reproductions/lp1054-relay-gamma80-60/results/source_numerics-p0800/confirmation/778e3835c325d1632c5ce0ac/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "93271a88f22ee64802cde14b387e43d8216c6fc175acaeb50d39571c3779c0bc",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 89,
+          "runtime_scope": "warm complete controller; includes gamma draws and solver path-state storage; excludes external hashing/serialization/sampling/evaluation",
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.08,
+          "y": 0.2247191011235955
+        },
+        {
+          "ci_high": 0.9064355606682571,
+          "ci_low": 0.5635249030586136,
+          "failures": 20,
+          "iteration_unit": "all component/relay sweeps",
+          "mean_directed_edge_updates": 1406160.0,
+          "mean_iterations": 189.0,
+          "mean_seconds": 0.007637680307692308,
+          "mean_work": 189.0,
+          "metadata": {
+            "cohort_kind": "relay_gamma_fresh_confirmation",
+            "denominator_definition": "all iid shots; either original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.007211410087377025,
+              "0.95": 0.01174268763372894,
+              "0.99": 0.011860114510066229
+            },
+            "mean_disorder_draws": 0.0,
+            "mean_gamma_bias_updates": 0.0,
+            "memory_clips": 0,
+            "memory_seed": 2027120674,
+            "roles": [
+              "continuous_bp140"
+            ],
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111664,
+            "source_evidence_path": "data/reproductions/lp1054-relay-gamma80-60/results/source_numerics-p1000/confirmation/778e3835c325d1632c5ce0ac/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "f5dc58354b3e986d044e07b22dcea051b42e315bd07c2f3bb574ccf064d86087",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 26,
+          "runtime_scope": "warm complete controller; includes gamma draws and solver path-state storage; excludes external hashing/serialization/sampling/evaluation",
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.1,
+          "y": 0.7692307692307693
         },
         {
           "ci_high": 0.03721052824132324,
@@ -158661,6 +159063,86 @@
           "y": 0.025220680958385876
         },
         {
+          "ci_high": 0.15738234206268475,
+          "ci_low": 0.06767076136358333,
+          "failures": 20,
+          "iteration_unit": "all component/relay sweeps",
+          "mean_directed_edge_updates": 318949.5652173913,
+          "mean_iterations": 42.869565217391305,
+          "mean_seconds": 0.0028556757989130436,
+          "mean_work": 42.869565217391305,
+          "metadata": {
+            "cohort_kind": "relay_gamma_fresh_confirmation",
+            "denominator_definition": "all iid shots; either original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.001621116124955827,
+              "0.95": 0.010215703404649982,
+              "0.99": 0.018013022067082888
+            },
+            "mean_disorder_draws": 143.20652173913044,
+            "mean_gamma_bias_updates": 45184.52173913043,
+            "memory_clips": 8944,
+            "memory_seed": 2026918874,
+            "roles": [
+              "disordered_phase_only"
+            ],
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111664,
+            "source_evidence_path": "data/reproductions/lp1054-relay-gamma80-60/results/prior_tuned_numerics-p0800/confirmation/8e8624ce6391a2ec91b8513a/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "895a377e569f6015b9bb1f8335ffb127a2047beadd999a8d0117292278b75cf3",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 184,
+          "runtime_scope": "warm complete controller; includes gamma draws and solver path-state storage; excludes external hashing/serialization/sampling/evaluation",
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.08,
+          "y": 0.10869565217391304
+        },
+        {
+          "ci_high": 0.2888614651201928,
+          "ci_low": 0.12934216094386652,
+          "failures": 20,
+          "iteration_unit": "all component/relay sweeps",
+          "mean_directed_edge_updates": 493848.97959183675,
+          "mean_iterations": 66.37755102040816,
+          "mean_seconds": 0.00409512806122449,
+          "mean_work": 66.37755102040816,
+          "metadata": {
+            "cohort_kind": "relay_gamma_fresh_confirmation",
+            "denominator_definition": "all iid shots; either original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0020789711862817086,
+              "0.95": 0.010421039043083447,
+              "0.99": 0.016470023430846244
+            },
+            "mean_disorder_draws": 322.6530612244898,
+            "mean_gamma_bias_updates": 69961.9387755102,
+            "memory_clips": 11708,
+            "memory_seed": 2026918874,
+            "roles": [
+              "disordered_phase_only"
+            ],
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111664,
+            "source_evidence_path": "data/reproductions/lp1054-relay-gamma80-60/results/source_numerics-p0800/confirmation/b38e6c3502205abb06b1816a/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "b3a82300b6a2c1562305d3a3305fcee5b5181cab960513994b5262dfbc6b6860",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 98,
+          "runtime_scope": "warm complete controller; includes gamma draws and solver path-state storage; excludes external hashing/serialization/sampling/evaluation",
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.08,
+          "y": 0.20408163265306123
+        },
+        {
           "ci_high": 0.06320901283745224,
           "ci_low": 0.026466868223661018,
           "failures": 20,
@@ -158700,6 +159182,86 @@
           "work_unit": "iterations",
           "x": 0.06,
           "y": 0.043010752688172046
+        },
+        {
+          "ci_high": 0.34182011882105273,
+          "ci_low": 0.15579071279561826,
+          "failures": 20,
+          "iteration_unit": "all component/relay sweeps",
+          "mean_directed_edge_updates": 452025.3658536585,
+          "mean_iterations": 60.75609756097561,
+          "mean_seconds": 0.0037526346341463417,
+          "mean_work": 60.75609756097561,
+          "metadata": {
+            "cohort_kind": "relay_gamma_fresh_confirmation",
+            "denominator_definition": "all iid shots; either original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.002058387313150207,
+              "0.95": 0.010317860438696482,
+              "0.99": 0.015670662168529387
+            },
+            "mean_disorder_draws": 269.9268292682927,
+            "mean_gamma_bias_updates": 64036.92682926829,
+            "memory_clips": 0,
+            "memory_seed": 2026918874,
+            "roles": [
+              "reset_zero_gamma"
+            ],
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111664,
+            "source_evidence_path": "data/reproductions/lp1054-relay-gamma80-60/results/source_numerics-p0800/confirmation/c20f734b83841f0847ec73dc/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "bd476e3ecfe77c909166ecdd1dffb975ff03b56a0a8a7e10517c5a72f6a75428",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 82,
+          "runtime_scope": "warm complete controller; includes gamma draws and solver path-state storage; excludes external hashing/serialization/sampling/evaluation",
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.08,
+          "y": 0.24390243902439024
+        },
+        {
+          "ci_high": 0.9064355606682571,
+          "ci_low": 0.5635249030586136,
+          "failures": 20,
+          "iteration_unit": "all component/relay sweeps",
+          "mean_directed_edge_updates": 1406160.0,
+          "mean_iterations": 189.0,
+          "mean_seconds": 0.008577560807692309,
+          "mean_work": 189.0,
+          "metadata": {
+            "cohort_kind": "relay_gamma_fresh_confirmation",
+            "denominator_definition": "all iid shots; either original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.007965883137930209,
+              "0.95": 0.01297123257200953,
+              "0.99": 0.01297123257200953
+            },
+            "mean_disorder_draws": 1256.6923076923076,
+            "mean_gamma_bias_updates": 199206.0,
+            "memory_clips": 0,
+            "memory_seed": 2027120674,
+            "roles": [
+              "reset_zero_gamma"
+            ],
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111664,
+            "source_evidence_path": "data/reproductions/lp1054-relay-gamma80-60/results/source_numerics-p1000/confirmation/c20f734b83841f0847ec73dc/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "66e376498c595b402e3eb7936a37c7b6449b85ad2a710636f995cbbb8981ce5d",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 26,
+          "runtime_scope": "warm complete controller; includes gamma draws and solver path-state storage; excludes external hashing/serialization/sampling/evaluation",
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.1,
+          "y": 0.7692307692307693
         },
         {
           "ci_high": 0.026365529294602143,
@@ -158743,6 +159305,86 @@
           "y": 0.01784121320249777
         },
         {
+          "ci_high": 0.9504923546942066,
+          "ci_low": 0.6261582865113173,
+          "failures": 20,
+          "iteration_unit": "all component/relay sweeps",
+          "mean_directed_edge_updates": 1394380.0,
+          "mean_iterations": 187.41666666666666,
+          "mean_seconds": 0.008591816958333333,
+          "mean_work": 187.41666666666666,
+          "metadata": {
+            "cohort_kind": "relay_gamma_fresh_confirmation",
+            "denominator_definition": "all iid shots; either original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.007504222254678982,
+              "0.95": 0.01323195434670692,
+              "0.99": 0.013632895795366489
+            },
+            "mean_disorder_draws": 1317.5,
+            "mean_gamma_bias_updates": 197537.16666666666,
+            "memory_clips": 121584,
+            "memory_seed": 2027120674,
+            "roles": [
+              "gamma_selected"
+            ],
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111664,
+            "source_evidence_path": "data/reproductions/lp1054-relay-gamma80-60/results/source_numerics-p1000/confirmation/da05577f09efe796819504c7/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "61de8ea0b27f3ba20d6b9d9ba61ec23da8919ff8763f51495043ec96b97077ad",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 24,
+          "runtime_scope": "warm complete controller; includes gamma draws and solver path-state storage; excludes external hashing/serialization/sampling/evaluation",
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.1,
+          "y": 0.8333333333333334
+        },
+        {
+          "ci_high": 0.9064355606682571,
+          "ci_low": 0.5635249030586136,
+          "failures": 20,
+          "iteration_unit": "all component/relay sweeps",
+          "mean_directed_edge_updates": 1406160.0,
+          "mean_iterations": 189.0,
+          "mean_seconds": 0.008586985423076924,
+          "mean_work": 189.0,
+          "metadata": {
+            "cohort_kind": "relay_gamma_fresh_confirmation",
+            "denominator_definition": "all iid shots; either original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.008045541969309511,
+              "0.95": 0.01297123257200953,
+              "0.99": 0.013100944897729627
+            },
+            "mean_disorder_draws": 1256.6923076923076,
+            "mean_gamma_bias_updates": 199206.0,
+            "memory_clips": 813,
+            "memory_seed": 2027120674,
+            "roles": [
+              "disordered_phase_only"
+            ],
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111664,
+            "source_evidence_path": "data/reproductions/lp1054-relay-gamma80-60/results/source_numerics-p1000/confirmation/dff1d5e76a4e5836f4f92659/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "6b1de4e60aac13a8e1418f8d4b45ea1629fa831bd89446843a6606ef9e83f971",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 26,
+          "runtime_scope": "warm complete controller; includes gamma draws and solver path-state storage; excludes external hashing/serialization/sampling/evaluation",
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.1,
+          "y": 0.7692307692307693
+        },
+        {
           "ci_high": 0.028383174447541,
           "ci_low": 0.011773882551682924,
           "failures": 20,
@@ -158782,6 +159424,86 @@
           "work_unit": "iterations",
           "x": 0.06,
           "y": 0.01921229586935639
+        },
+        {
+          "ci_high": 0.27050185840821844,
+          "ci_low": 0.12040398010661924,
+          "failures": 20,
+          "iteration_unit": "all component/relay sweeps",
+          "mean_directed_edge_updates": 417702.85714285716,
+          "mean_iterations": 56.142857142857146,
+          "mean_seconds": 0.0035710893619047617,
+          "mean_work": 56.142857142857146,
+          "metadata": {
+            "cohort_kind": "relay_gamma_fresh_confirmation",
+            "denominator_definition": "all iid shots; either original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0017907207394870818,
+              "0.95": 0.01011455782638612,
+              "0.99": 0.014186446032570507
+            },
+            "mean_disorder_draws": 260.9904761904762,
+            "mean_gamma_bias_updates": 59174.57142857143,
+            "memory_clips": 521859,
+            "memory_seed": 2026918874,
+            "roles": [
+              "gamma_selected"
+            ],
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111664,
+            "source_evidence_path": "data/reproductions/lp1054-relay-gamma80-60/results/source_numerics-p0800/confirmation/fb783273c4f722e029993f0c/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "05092e42025bbd6a424dab4775584127d1a6a5094c12db1600d817e32d9f01b9",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 105,
+          "runtime_scope": "warm complete controller; includes gamma draws and solver path-state storage; excludes external hashing/serialization/sampling/evaluation",
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.08,
+          "y": 0.19047619047619047
+        },
+        {
+          "ci_high": 0.17603357435975964,
+          "ci_low": 0.07610663087485975,
+          "failures": 20,
+          "iteration_unit": "all component/relay sweeps",
+          "mean_directed_edge_updates": 356802.43902439025,
+          "mean_iterations": 47.957317073170735,
+          "mean_seconds": 0.0032041800243902438,
+          "mean_work": 47.957317073170735,
+          "metadata": {
+            "cohort_kind": "relay_gamma_fresh_confirmation",
+            "denominator_definition": "all iid shots; either original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.001621116124955827,
+              "0.95": 0.010215703404649982,
+              "0.99": 0.018013022067082888
+            },
+            "mean_disorder_draws": 205.65853658536585,
+            "mean_gamma_bias_updates": 50547.01219512195,
+            "memory_clips": 563479,
+            "memory_seed": 2026918874,
+            "roles": [
+              "gamma_selected"
+            ],
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111664,
+            "source_evidence_path": "data/reproductions/lp1054-relay-gamma80-60/results/prior_tuned_numerics-p0800/confirmation/fdb191e99e373bdb6eaddb2c/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "8742b6c53e9eeffcbf37fd3fc4f4d71fbc717fdff0e239f880f3257cc98bab12",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 164,
+          "runtime_scope": "warm complete controller; includes gamma draws and solver path-state storage; excludes external hashing/serialization/sampling/evaluation",
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.08,
+          "y": 0.12195121951219512
         }
       ],
       "source_path": "data/reproductions/lp1054-relay-gamma80-60/verified.json.gz"
@@ -237727,6 +238449,104 @@
         "effective_configuration": {
           "alpha": 0.8,
           "alpha_schedule": "constant",
+          "beta": 0.0,
+          "check_cap": null,
+          "check_rule": "min_sum",
+          "decoding_scope": "separate_xz",
+          "execution_backend": "lp1054-relay-gamma80-60-v1",
+          "family": "binary_css",
+          "max_iterations": 140,
+          "message_resolution": "float64",
+          "noise_model": "depolarizing",
+          "prior": "2p/3",
+          "search": {
+            "alpha": 0.8,
+            "beta": 0.0,
+            "damping": 0.3,
+            "first_gamma": 0.0,
+            "gamma_high": 0.0,
+            "gamma_low": 0.0,
+            "initial": 80,
+            "method": "relay",
+            "paper_scale": false,
+            "per_unit": 60,
+            "rounds": 1,
+            "solutions": 1,
+            "units": 1,
+            "width": 1
+          },
+          "v2c_damping": 0.3
+        },
+        "settings_status": "exact_campaign_arm",
+        "source_path": "data/reproductions/lp1054-relay-gamma80-60/plan.json"
+      },
+      "decoder_id": "lp1054-relay-gamma80-60:0f259459ecabb6e97afc",
+      "evidence_status": "canonical_adaptation",
+      "label": "RelayBP80/60, d=0.3, alpha=0.8, beta=0"
+    },
+    {
+      "asset": {
+        "availability": "tracked",
+        "kind": "decoder_source",
+        "label": "Frozen80/60 gamma protocol",
+        "local_storage_path": null,
+        "path": "data/reproductions/lp1054-relay-gamma80-60/plan.json",
+        "sha256": "3f73fa64b6275e4c11663b043747bc3b76441d884865affd5878775904ea8c2d",
+        "url": "data/reproductions/lp1054-relay-gamma80-60/plan.json"
+      },
+      "configuration": {
+        "effective_configuration": {
+          "alpha": 0.625,
+          "alpha_schedule": "constant",
+          "beta": 0.0,
+          "check_cap": null,
+          "check_rule": "min_sum",
+          "decoding_scope": "separate_xz",
+          "execution_backend": "lp1054-relay-gamma80-60-v1",
+          "family": "binary_css",
+          "max_iterations": 140,
+          "message_resolution": "float64",
+          "noise_model": "depolarizing",
+          "prior": "2p/3",
+          "search": {
+            "alpha": 0.625,
+            "beta": 0.0,
+            "damping": 0.0,
+            "first_gamma": 0.125,
+            "gamma_high": 0.0,
+            "gamma_low": 0.0,
+            "initial": 80,
+            "method": "relay",
+            "paper_scale": false,
+            "per_unit": 60,
+            "rounds": 1,
+            "solutions": 1,
+            "units": 1,
+            "width": 1
+          },
+          "v2c_damping": 0.0
+        },
+        "settings_status": "exact_campaign_arm",
+        "source_path": "data/reproductions/lp1054-relay-gamma80-60/plan.json"
+      },
+      "decoder_id": "lp1054-relay-gamma80-60:196c975c0ad56001ff4f",
+      "evidence_status": "canonical_adaptation",
+      "label": "RelayBP80/60, d=0, alpha=0.625, beta=0"
+    },
+    {
+      "asset": {
+        "availability": "tracked",
+        "kind": "decoder_source",
+        "label": "Frozen80/60 gamma protocol",
+        "local_storage_path": null,
+        "path": "data/reproductions/lp1054-relay-gamma80-60/plan.json",
+        "sha256": "3f73fa64b6275e4c11663b043747bc3b76441d884865affd5878775904ea8c2d",
+        "url": "data/reproductions/lp1054-relay-gamma80-60/plan.json"
+      },
+      "configuration": {
+        "effective_configuration": {
+          "alpha": 0.8,
+          "alpha_schedule": "constant",
           "beta": 0.2,
           "check_cap": null,
           "check_rule": "min_sum",
@@ -237745,6 +238565,137 @@
       "decoder_id": "lp1054-relay-gamma80-60:2a6d007d1f60e209afe6",
       "evidence_status": "canonical_adaptation",
       "label": "Continuous BP140, d=0.3, alpha=0.8, beta=0.2"
+    },
+    {
+      "asset": {
+        "availability": "tracked",
+        "kind": "decoder_source",
+        "label": "Frozen80/60 gamma protocol",
+        "local_storage_path": null,
+        "path": "data/reproductions/lp1054-relay-gamma80-60/plan.json",
+        "sha256": "3f73fa64b6275e4c11663b043747bc3b76441d884865affd5878775904ea8c2d",
+        "url": "data/reproductions/lp1054-relay-gamma80-60/plan.json"
+      },
+      "configuration": {
+        "effective_configuration": {
+          "alpha": 0.8,
+          "alpha_schedule": "constant",
+          "beta": 0.0,
+          "check_cap": null,
+          "check_rule": "min_sum",
+          "decoding_scope": "separate_xz",
+          "execution_backend": "lp1054-relay-gamma80-60-v1",
+          "family": "binary_css",
+          "max_iterations": 140,
+          "message_resolution": "float64",
+          "noise_model": "depolarizing",
+          "prior": "2p/3",
+          "v2c_damping": 0.3
+        },
+        "settings_status": "exact_campaign_arm",
+        "source_path": "data/reproductions/lp1054-relay-gamma80-60/plan.json"
+      },
+      "decoder_id": "lp1054-relay-gamma80-60:3e3b48b78794789c6e62",
+      "evidence_status": "canonical_adaptation",
+      "label": "Continuous BP140, d=0.3, alpha=0.8, beta=0"
+    },
+    {
+      "asset": {
+        "availability": "tracked",
+        "kind": "decoder_source",
+        "label": "Frozen80/60 gamma protocol",
+        "local_storage_path": null,
+        "path": "data/reproductions/lp1054-relay-gamma80-60/plan.json",
+        "sha256": "3f73fa64b6275e4c11663b043747bc3b76441d884865affd5878775904ea8c2d",
+        "url": "data/reproductions/lp1054-relay-gamma80-60/plan.json"
+      },
+      "configuration": {
+        "effective_configuration": {
+          "alpha": 0.8,
+          "alpha_schedule": "constant",
+          "beta": 0.0,
+          "check_cap": null,
+          "check_rule": "min_sum",
+          "decoding_scope": "separate_xz",
+          "execution_backend": "lp1054-relay-gamma80-60-v1",
+          "family": "binary_css",
+          "max_iterations": 140,
+          "message_resolution": "float64",
+          "noise_model": "depolarizing",
+          "prior": "2p/3",
+          "search": {
+            "alpha": 0.8,
+            "beta": 0.0,
+            "damping": 0.3,
+            "first_gamma": 0.0,
+            "gamma_high": 0.375,
+            "gamma_low": 0.0,
+            "initial": 80,
+            "method": "relay",
+            "paper_scale": false,
+            "per_unit": 60,
+            "rounds": 1,
+            "solutions": 1,
+            "units": 1,
+            "width": 1
+          },
+          "v2c_damping": 0.3
+        },
+        "settings_status": "exact_campaign_arm",
+        "source_path": "data/reproductions/lp1054-relay-gamma80-60/plan.json"
+      },
+      "decoder_id": "lp1054-relay-gamma80-60:4f4f8e8fdf5e7e03a7c6",
+      "evidence_status": "canonical_adaptation",
+      "label": "RelayBP80/60, d=0.3, alpha=0.8, beta=0"
+    },
+    {
+      "asset": {
+        "availability": "tracked",
+        "kind": "decoder_source",
+        "label": "Frozen80/60 gamma protocol",
+        "local_storage_path": null,
+        "path": "data/reproductions/lp1054-relay-gamma80-60/plan.json",
+        "sha256": "3f73fa64b6275e4c11663b043747bc3b76441d884865affd5878775904ea8c2d",
+        "url": "data/reproductions/lp1054-relay-gamma80-60/plan.json"
+      },
+      "configuration": {
+        "effective_configuration": {
+          "alpha": 0.8,
+          "alpha_schedule": "constant",
+          "beta": 0.0,
+          "check_cap": null,
+          "check_rule": "min_sum",
+          "decoding_scope": "separate_xz",
+          "execution_backend": "lp1054-relay-gamma80-60-v1",
+          "family": "binary_css",
+          "max_iterations": 140,
+          "message_resolution": "float64",
+          "noise_model": "depolarizing",
+          "prior": "2p/3",
+          "search": {
+            "alpha": 0.8,
+            "beta": 0.0,
+            "damping": 0.3,
+            "first_gamma": 0.0625,
+            "gamma_high": 0.0,
+            "gamma_low": 0.0,
+            "initial": 80,
+            "method": "relay",
+            "paper_scale": false,
+            "per_unit": 60,
+            "rounds": 1,
+            "solutions": 1,
+            "units": 1,
+            "width": 1
+          },
+          "v2c_damping": 0.3
+        },
+        "settings_status": "exact_campaign_arm",
+        "source_path": "data/reproductions/lp1054-relay-gamma80-60/plan.json"
+      },
+      "decoder_id": "lp1054-relay-gamma80-60:4f6e0011dd36dabcb097",
+      "evidence_status": "canonical_adaptation",
+      "label": "RelayBP80/60, d=0.3, alpha=0.8, beta=0"
     },
     {
       "asset": {
@@ -237825,6 +238776,104 @@
         "source_path": "data/reproductions/lp1054-relay-gamma80-60/plan.json"
       },
       "decoder_id": "lp1054-relay-gamma80-60:8c8ae6cdc52b7cc2ab69",
+      "evidence_status": "canonical_adaptation",
+      "label": "RelayBP80/60, d=0, alpha=0.625, beta=0"
+    },
+    {
+      "asset": {
+        "availability": "tracked",
+        "kind": "decoder_source",
+        "label": "Frozen80/60 gamma protocol",
+        "local_storage_path": null,
+        "path": "data/reproductions/lp1054-relay-gamma80-60/plan.json",
+        "sha256": "3f73fa64b6275e4c11663b043747bc3b76441d884865affd5878775904ea8c2d",
+        "url": "data/reproductions/lp1054-relay-gamma80-60/plan.json"
+      },
+      "configuration": {
+        "effective_configuration": {
+          "alpha": 0.8,
+          "alpha_schedule": "constant",
+          "beta": 0.0,
+          "check_cap": null,
+          "check_rule": "min_sum",
+          "decoding_scope": "separate_xz",
+          "execution_backend": "lp1054-relay-gamma80-60-v1",
+          "family": "binary_css",
+          "max_iterations": 140,
+          "message_resolution": "float64",
+          "noise_model": "depolarizing",
+          "prior": "2p/3",
+          "search": {
+            "alpha": 0.8,
+            "beta": 0.0,
+            "damping": 0.3,
+            "first_gamma": 0.0,
+            "gamma_high": 0.125,
+            "gamma_low": -0.125,
+            "initial": 80,
+            "method": "relay",
+            "paper_scale": false,
+            "per_unit": 60,
+            "rounds": 1,
+            "solutions": 1,
+            "units": 1,
+            "width": 1
+          },
+          "v2c_damping": 0.3
+        },
+        "settings_status": "exact_campaign_arm",
+        "source_path": "data/reproductions/lp1054-relay-gamma80-60/plan.json"
+      },
+      "decoder_id": "lp1054-relay-gamma80-60:8e8624ce6391a2ec91b8",
+      "evidence_status": "canonical_adaptation",
+      "label": "RelayBP80/60, d=0.3, alpha=0.8, beta=0"
+    },
+    {
+      "asset": {
+        "availability": "tracked",
+        "kind": "decoder_source",
+        "label": "Frozen80/60 gamma protocol",
+        "local_storage_path": null,
+        "path": "data/reproductions/lp1054-relay-gamma80-60/plan.json",
+        "sha256": "3f73fa64b6275e4c11663b043747bc3b76441d884865affd5878775904ea8c2d",
+        "url": "data/reproductions/lp1054-relay-gamma80-60/plan.json"
+      },
+      "configuration": {
+        "effective_configuration": {
+          "alpha": 0.625,
+          "alpha_schedule": "constant",
+          "beta": 0.0,
+          "check_cap": null,
+          "check_rule": "min_sum",
+          "decoding_scope": "separate_xz",
+          "execution_backend": "lp1054-relay-gamma80-60-v1",
+          "family": "binary_css",
+          "max_iterations": 140,
+          "message_resolution": "float64",
+          "noise_model": "depolarizing",
+          "prior": "2p/3",
+          "search": {
+            "alpha": 0.625,
+            "beta": 0.0,
+            "damping": 0.0,
+            "first_gamma": 0.0,
+            "gamma_high": 0.25,
+            "gamma_low": -0.125,
+            "initial": 80,
+            "method": "relay",
+            "paper_scale": false,
+            "per_unit": 60,
+            "rounds": 1,
+            "solutions": 1,
+            "units": 1,
+            "width": 1
+          },
+          "v2c_damping": 0.0
+        },
+        "settings_status": "exact_campaign_arm",
+        "source_path": "data/reproductions/lp1054-relay-gamma80-60/plan.json"
+      },
+      "decoder_id": "lp1054-relay-gamma80-60:b38e6c3502205abb06b1",
       "evidence_status": "canonical_adaptation",
       "label": "RelayBP80/60, d=0, alpha=0.625, beta=0"
     },
@@ -237938,6 +238987,104 @@
       },
       "configuration": {
         "effective_configuration": {
+          "alpha": 0.625,
+          "alpha_schedule": "constant",
+          "beta": 0.0,
+          "check_cap": null,
+          "check_rule": "min_sum",
+          "decoding_scope": "separate_xz",
+          "execution_backend": "lp1054-relay-gamma80-60-v1",
+          "family": "binary_css",
+          "max_iterations": 140,
+          "message_resolution": "float64",
+          "noise_model": "depolarizing",
+          "prior": "2p/3",
+          "search": {
+            "alpha": 0.625,
+            "beta": 0.0,
+            "damping": 0.0,
+            "first_gamma": 0.125,
+            "gamma_high": 0.125,
+            "gamma_low": -0.125,
+            "initial": 80,
+            "method": "relay",
+            "paper_scale": false,
+            "per_unit": 60,
+            "rounds": 1,
+            "solutions": 1,
+            "units": 1,
+            "width": 1
+          },
+          "v2c_damping": 0.0
+        },
+        "settings_status": "exact_campaign_arm",
+        "source_path": "data/reproductions/lp1054-relay-gamma80-60/plan.json"
+      },
+      "decoder_id": "lp1054-relay-gamma80-60:da05577f09efe7968195",
+      "evidence_status": "canonical_adaptation",
+      "label": "RelayBP80/60, d=0, alpha=0.625, beta=0"
+    },
+    {
+      "asset": {
+        "availability": "tracked",
+        "kind": "decoder_source",
+        "label": "Frozen80/60 gamma protocol",
+        "local_storage_path": null,
+        "path": "data/reproductions/lp1054-relay-gamma80-60/plan.json",
+        "sha256": "3f73fa64b6275e4c11663b043747bc3b76441d884865affd5878775904ea8c2d",
+        "url": "data/reproductions/lp1054-relay-gamma80-60/plan.json"
+      },
+      "configuration": {
+        "effective_configuration": {
+          "alpha": 0.625,
+          "alpha_schedule": "constant",
+          "beta": 0.0,
+          "check_cap": null,
+          "check_rule": "min_sum",
+          "decoding_scope": "separate_xz",
+          "execution_backend": "lp1054-relay-gamma80-60-v1",
+          "family": "binary_css",
+          "max_iterations": 140,
+          "message_resolution": "float64",
+          "noise_model": "depolarizing",
+          "prior": "2p/3",
+          "search": {
+            "alpha": 0.625,
+            "beta": 0.0,
+            "damping": 0.0,
+            "first_gamma": 0.0,
+            "gamma_high": 0.125,
+            "gamma_low": -0.125,
+            "initial": 80,
+            "method": "relay",
+            "paper_scale": false,
+            "per_unit": 60,
+            "rounds": 1,
+            "solutions": 1,
+            "units": 1,
+            "width": 1
+          },
+          "v2c_damping": 0.0
+        },
+        "settings_status": "exact_campaign_arm",
+        "source_path": "data/reproductions/lp1054-relay-gamma80-60/plan.json"
+      },
+      "decoder_id": "lp1054-relay-gamma80-60:dff1d5e76a4e5836f4f9",
+      "evidence_status": "canonical_adaptation",
+      "label": "RelayBP80/60, d=0, alpha=0.625, beta=0"
+    },
+    {
+      "asset": {
+        "availability": "tracked",
+        "kind": "decoder_source",
+        "label": "Frozen80/60 gamma protocol",
+        "local_storage_path": null,
+        "path": "data/reproductions/lp1054-relay-gamma80-60/plan.json",
+        "sha256": "3f73fa64b6275e4c11663b043747bc3b76441d884865affd5878775904ea8c2d",
+        "url": "data/reproductions/lp1054-relay-gamma80-60/plan.json"
+      },
+      "configuration": {
+        "effective_configuration": {
           "alpha": 0.8,
           "alpha_schedule": "constant",
           "beta": 0.2,
@@ -237974,6 +239121,104 @@
       "decoder_id": "lp1054-relay-gamma80-60:e29536acaf6bdc9a2529",
       "evidence_status": "canonical_adaptation",
       "label": "RelayBP80/60, d=0.3, alpha=0.8, beta=0.2"
+    },
+    {
+      "asset": {
+        "availability": "tracked",
+        "kind": "decoder_source",
+        "label": "Frozen80/60 gamma protocol",
+        "local_storage_path": null,
+        "path": "data/reproductions/lp1054-relay-gamma80-60/plan.json",
+        "sha256": "3f73fa64b6275e4c11663b043747bc3b76441d884865affd5878775904ea8c2d",
+        "url": "data/reproductions/lp1054-relay-gamma80-60/plan.json"
+      },
+      "configuration": {
+        "effective_configuration": {
+          "alpha": 0.625,
+          "alpha_schedule": "constant",
+          "beta": 0.0,
+          "check_cap": null,
+          "check_rule": "min_sum",
+          "decoding_scope": "separate_xz",
+          "execution_backend": "lp1054-relay-gamma80-60-v1",
+          "family": "binary_css",
+          "max_iterations": 140,
+          "message_resolution": "float64",
+          "noise_model": "depolarizing",
+          "prior": "2p/3",
+          "search": {
+            "alpha": 0.625,
+            "beta": 0.0,
+            "damping": 0.0,
+            "first_gamma": 0.125,
+            "gamma_high": 0.25,
+            "gamma_low": -0.125,
+            "initial": 80,
+            "method": "relay",
+            "paper_scale": false,
+            "per_unit": 60,
+            "rounds": 1,
+            "solutions": 1,
+            "units": 1,
+            "width": 1
+          },
+          "v2c_damping": 0.0
+        },
+        "settings_status": "exact_campaign_arm",
+        "source_path": "data/reproductions/lp1054-relay-gamma80-60/plan.json"
+      },
+      "decoder_id": "lp1054-relay-gamma80-60:fb783273c4f722e02999",
+      "evidence_status": "canonical_adaptation",
+      "label": "RelayBP80/60, d=0, alpha=0.625, beta=0"
+    },
+    {
+      "asset": {
+        "availability": "tracked",
+        "kind": "decoder_source",
+        "label": "Frozen80/60 gamma protocol",
+        "local_storage_path": null,
+        "path": "data/reproductions/lp1054-relay-gamma80-60/plan.json",
+        "sha256": "3f73fa64b6275e4c11663b043747bc3b76441d884865affd5878775904ea8c2d",
+        "url": "data/reproductions/lp1054-relay-gamma80-60/plan.json"
+      },
+      "configuration": {
+        "effective_configuration": {
+          "alpha": 0.8,
+          "alpha_schedule": "constant",
+          "beta": 0.0,
+          "check_cap": null,
+          "check_rule": "min_sum",
+          "decoding_scope": "separate_xz",
+          "execution_backend": "lp1054-relay-gamma80-60-v1",
+          "family": "binary_css",
+          "max_iterations": 140,
+          "message_resolution": "float64",
+          "noise_model": "depolarizing",
+          "prior": "2p/3",
+          "search": {
+            "alpha": 0.8,
+            "beta": 0.0,
+            "damping": 0.3,
+            "first_gamma": 0.0625,
+            "gamma_high": 0.125,
+            "gamma_low": -0.125,
+            "initial": 80,
+            "method": "relay",
+            "paper_scale": false,
+            "per_unit": 60,
+            "rounds": 1,
+            "solutions": 1,
+            "units": 1,
+            "width": 1
+          },
+          "v2c_damping": 0.3
+        },
+        "settings_status": "exact_campaign_arm",
+        "source_path": "data/reproductions/lp1054-relay-gamma80-60/plan.json"
+      },
+      "decoder_id": "lp1054-relay-gamma80-60:fdb191e99e373bdb6ead",
+      "evidence_status": "canonical_adaptation",
+      "label": "RelayBP80/60, d=0.3, alpha=0.8, beta=0"
     }
   ],
   "experiments": [
@@ -238969,12 +240214,23 @@
         "lp1054-relay-gamma80-60"
       ],
       "decoder_ids": [
+        "lp1054-relay-gamma80-60:0f259459ecabb6e97afc",
+        "lp1054-relay-gamma80-60:196c975c0ad56001ff4f",
         "lp1054-relay-gamma80-60:2a6d007d1f60e209afe6",
+        "lp1054-relay-gamma80-60:3e3b48b78794789c6e62",
+        "lp1054-relay-gamma80-60:4f4f8e8fdf5e7e03a7c6",
+        "lp1054-relay-gamma80-60:4f6e0011dd36dabcb097",
         "lp1054-relay-gamma80-60:778e3835c325d1632c5c",
         "lp1054-relay-gamma80-60:8c8ae6cdc52b7cc2ab69",
+        "lp1054-relay-gamma80-60:8e8624ce6391a2ec91b8",
+        "lp1054-relay-gamma80-60:b38e6c3502205abb06b1",
         "lp1054-relay-gamma80-60:c20f734b83841f0847ec",
         "lp1054-relay-gamma80-60:cf7bc33890ae43694aec",
-        "lp1054-relay-gamma80-60:e29536acaf6bdc9a2529"
+        "lp1054-relay-gamma80-60:da05577f09efe7968195",
+        "lp1054-relay-gamma80-60:dff1d5e76a4e5836f4f9",
+        "lp1054-relay-gamma80-60:e29536acaf6bdc9a2529",
+        "lp1054-relay-gamma80-60:fb783273c4f722e02999",
+        "lp1054-relay-gamma80-60:fdb191e99e373bdb6ead"
       ],
       "description": "User-confirmed one80-sweep uniform-memory leg plus one60-sweep disordered-memory leg,140 maximum per CSS component. Code-capacity adaptation of Relay Eq4, not circuit-paper reproduction. Both logical components count. Numerical backgrounds are fixed source NMS or parent training-only selected BP settings; no parent fresh outcome enters selection. Independent noise/memory streams and four disjoint stage seeds. All selected and ablation confirmations remain separate. This140 budget differs from prior32/128 studies. New latency excludes provenance hashing and is not directly comparable to older instrumented timings.",
       "evidence_status": "canonical_adaptation",
@@ -240450,7 +241706,7 @@
     },
     {
       "path": "data/reproductions/lp1054-relay-gamma80-60/catalog.json",
-      "sha256": "ba3a6cfd00992dd5f5cec4e7ae68169546c8e184604158716dc6f2f32005824a"
+      "sha256": "d37d660c06532d1796816fedec27d25dd2fdb45e48ab3101b9507174cbec4972"
     },
     {
       "path": "research/catalog/paper-figures.json",
@@ -414900,6 +416156,189 @@
       "channel_kind": "depolarizing",
       "code_id": "lp1054",
       "dataset_id": "lp1054-relay-gamma80-60",
+      "decoder_id": "lp1054-relay-gamma80-60:0f259459ecabb6e97afc",
+      "label": "RelayBP80/60, d=0.3, alpha=0.8, beta=0",
+      "points": [
+        {
+          "ci_high": 0.16434823209235103,
+          "ci_low": 0.0708101622002994,
+          "failures": 20,
+          "iteration_unit": "all component/relay sweeps",
+          "mean_directed_edge_updates": 317637.2727272727,
+          "mean_iterations": 42.69318181818182,
+          "mean_seconds": 0.002808473460227273,
+          "mean_work": 42.69318181818182,
+          "metadata": {
+            "cohort_kind": "relay_gamma_fresh_confirmation",
+            "denominator_definition": "all iid shots; either original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.001621116124955827,
+              "0.95": 0.010215703404649982,
+              "0.99": 0.018013022067082888
+            },
+            "mean_disorder_draws": 137.73863636363637,
+            "mean_gamma_bias_updates": 44998.61363636364,
+            "memory_clips": 0,
+            "memory_seed": 2026918874,
+            "roles": [
+              "reset_zero_gamma"
+            ],
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111664,
+            "source_evidence_path": "data/reproductions/lp1054-relay-gamma80-60/results/prior_tuned_numerics-p0800/confirmation/0f259459ecabb6e97afc72d5/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "57878156bb4e87a3b950a3d224790b46fc0649928a56591de3c7708093f14992",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 176,
+          "runtime_scope": "warm complete controller; includes gamma draws and solver path-state storage; excludes external hashing/serialization/sampling/evaluation",
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.08,
+          "y": 0.11363636363636363
+        },
+        {
+          "ci_high": 0.8206163507648881,
+          "ci_low": 0.47187995521011944,
+          "failures": 20,
+          "iteration_unit": "all component/relay sweeps",
+          "mean_directed_edge_updates": 1208256.0,
+          "mean_iterations": 162.4,
+          "mean_seconds": 0.007811338666666667,
+          "mean_work": 162.4,
+          "metadata": {
+            "cohort_kind": "relay_gamma_fresh_confirmation",
+            "denominator_definition": "all iid shots; either original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.007579264477225772,
+              "0.95": 0.01349791662907573,
+              "0.99": 0.014045986170861889
+            },
+            "mean_disorder_draws": 1054.0,
+            "mean_gamma_bias_updates": 171169.6,
+            "memory_clips": 0,
+            "memory_seed": 2027120674,
+            "roles": [
+              "uniform_phase_only",
+              "reset_zero_gamma"
+            ],
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111664,
+            "source_evidence_path": "data/reproductions/lp1054-relay-gamma80-60/results/prior_tuned_numerics-p1000/confirmation/0f259459ecabb6e97afc72d5/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "8f4682b09efce53fa26fc58c8de797dd2555b3caa8976254f22510b908a6e87d",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 30,
+          "runtime_scope": "warm complete controller; includes gamma draws and solver path-state storage; excludes external hashing/serialization/sampling/evaluation",
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.1,
+          "y": 0.6666666666666666
+        }
+      ],
+      "series_id": "lp1054-relay-gamma80-60:0f259459ecabb6e97afc",
+      "source_decoder_id": "lp1054-relay-gamma80-60:0f259459ecabb6e97afc"
+    },
+    {
+      "channel_kind": "depolarizing",
+      "code_id": "lp1054",
+      "dataset_id": "lp1054-relay-gamma80-60",
+      "decoder_id": "lp1054-relay-gamma80-60:196c975c0ad56001ff4f",
+      "label": "RelayBP80/60, d=0, alpha=0.625, beta=0",
+      "points": [
+        {
+          "ci_high": 0.2755060414622239,
+          "ci_low": 0.12282893122170677,
+          "failures": 20,
+          "iteration_unit": "all component/relay sweeps",
+          "mean_directed_edge_updates": 413461.7475728155,
+          "mean_iterations": 55.57281553398058,
+          "mean_seconds": 0.00353964027184466,
+          "mean_work": 55.57281553398058,
+          "metadata": {
+            "cohort_kind": "relay_gamma_fresh_confirmation",
+            "denominator_definition": "all iid shots; either original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0017554364665102263,
+              "0.95": 0.010014413689491209,
+              "0.99": 0.014328310492896212
+            },
+            "mean_disorder_draws": 255.8252427184466,
+            "mean_gamma_bias_updates": 58573.74757281553,
+            "memory_clips": 505703,
+            "memory_seed": 2026918874,
+            "roles": [
+              "uniform_phase_only"
+            ],
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111664,
+            "source_evidence_path": "data/reproductions/lp1054-relay-gamma80-60/results/source_numerics-p0800/confirmation/196c975c0ad56001ff4f2c32/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "a594624c9d58faa1554784f7525e14d27f60c784187af63969d4987ed8916845",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 103,
+          "runtime_scope": "warm complete controller; includes gamma draws and solver path-state storage; excludes external hashing/serialization/sampling/evaluation",
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.08,
+          "y": 0.1941747572815534
+        },
+        {
+          "ci_high": 0.928681382801945,
+          "ci_low": 0.5929625677213226,
+          "failures": 20,
+          "iteration_unit": "all component/relay sweeps",
+          "mean_directed_edge_updates": 1381756.8,
+          "mean_iterations": 185.72,
+          "mean_seconds": 0.00851137016,
+          "mean_work": 185.72,
+          "metadata": {
+            "cohort_kind": "relay_gamma_fresh_confirmation",
+            "denominator_definition": "all iid shots; either original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.007504222254678982,
+              "0.95": 0.013100944897729627,
+              "0.99": 0.01349791662907573
+            },
+            "mean_disorder_draws": 1306.96,
+            "mean_gamma_bias_updates": 195748.88,
+            "memory_clips": 116219,
+            "memory_seed": 2027120674,
+            "roles": [
+              "uniform_phase_only"
+            ],
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111664,
+            "source_evidence_path": "data/reproductions/lp1054-relay-gamma80-60/results/source_numerics-p1000/confirmation/196c975c0ad56001ff4f2c32/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "60dce7065da1ddf94bc019ecb06d7974e0f9b5bd7303f6e790a119c3997e3695",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 25,
+          "runtime_scope": "warm complete controller; includes gamma draws and solver path-state storage; excludes external hashing/serialization/sampling/evaluation",
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.1,
+          "y": 0.8
+        }
+      ],
+      "series_id": "lp1054-relay-gamma80-60:196c975c0ad56001ff4f",
+      "source_decoder_id": "lp1054-relay-gamma80-60:196c975c0ad56001ff4f"
+    },
+    {
+      "channel_kind": "depolarizing",
+      "code_id": "lp1054",
+      "dataset_id": "lp1054-relay-gamma80-60",
       "decoder_id": "lp1054-relay-gamma80-60:2a6d007d1f60e209afe6",
       "label": "Continuous BP140, d=0.3, alpha=0.8, beta=0.2",
       "points": [
@@ -414951,6 +416390,200 @@
       "channel_kind": "depolarizing",
       "code_id": "lp1054",
       "dataset_id": "lp1054-relay-gamma80-60",
+      "decoder_id": "lp1054-relay-gamma80-60:3e3b48b78794789c6e62",
+      "label": "Continuous BP140, d=0.3, alpha=0.8, beta=0",
+      "points": [
+        {
+          "ci_high": 0.16434823209235103,
+          "ci_low": 0.0708101622002994,
+          "failures": 20,
+          "iteration_unit": "all component/relay sweeps",
+          "mean_directed_edge_updates": 317637.2727272727,
+          "mean_iterations": 42.69318181818182,
+          "mean_seconds": 0.0023081633125,
+          "mean_work": 42.69318181818182,
+          "metadata": {
+            "cohort_kind": "relay_gamma_fresh_confirmation",
+            "denominator_definition": "all iid shots; either original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0012767361486356102,
+              "0.95": 0.008455945468245643,
+              "0.99": 0.014471593597825174
+            },
+            "mean_disorder_draws": 0.0,
+            "mean_gamma_bias_updates": 0.0,
+            "memory_clips": 0,
+            "memory_seed": 2026918874,
+            "roles": [
+              "continuous_bp140"
+            ],
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111664,
+            "source_evidence_path": "data/reproductions/lp1054-relay-gamma80-60/results/prior_tuned_numerics-p0800/confirmation/3e3b48b78794789c6e626282/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "9402a601755fde30cb8a522384e58d2dba0a6b8a61a756e91b295b806a275b5c",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 176,
+          "runtime_scope": "warm complete controller; includes gamma draws and solver path-state storage; excludes external hashing/serialization/sampling/evaluation",
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.08,
+          "y": 0.11363636363636363
+        },
+        {
+          "ci_high": 0.8206163507648881,
+          "ci_low": 0.47187995521011944,
+          "failures": 20,
+          "iteration_unit": "all component/relay sweeps",
+          "mean_directed_edge_updates": 1201312.0,
+          "mean_iterations": 161.46666666666667,
+          "mean_seconds": 0.0070310693,
+          "mean_work": 161.46666666666667,
+          "metadata": {
+            "cohort_kind": "relay_gamma_fresh_confirmation",
+            "denominator_definition": "all iid shots; either original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.006930023349974429,
+              "0.95": 0.012341682718234104,
+              "0.99": 0.012341682718234104
+            },
+            "mean_disorder_draws": 0.0,
+            "mean_gamma_bias_updates": 0.0,
+            "memory_clips": 0,
+            "memory_seed": 2027120674,
+            "roles": [
+              "continuous_bp140"
+            ],
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111664,
+            "source_evidence_path": "data/reproductions/lp1054-relay-gamma80-60/results/prior_tuned_numerics-p1000/confirmation/3e3b48b78794789c6e626282/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "b5f322d30be2819fa27b74544b5243916a85b80399b01c9b3f4f45ef34abbf2f",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 30,
+          "runtime_scope": "warm complete controller; includes gamma draws and solver path-state storage; excludes external hashing/serialization/sampling/evaluation",
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.1,
+          "y": 0.6666666666666666
+        }
+      ],
+      "series_id": "lp1054-relay-gamma80-60:3e3b48b78794789c6e62",
+      "source_decoder_id": "lp1054-relay-gamma80-60:3e3b48b78794789c6e62"
+    },
+    {
+      "channel_kind": "depolarizing",
+      "code_id": "lp1054",
+      "dataset_id": "lp1054-relay-gamma80-60",
+      "decoder_id": "lp1054-relay-gamma80-60:4f4f8e8fdf5e7e03a7c6",
+      "label": "RelayBP80/60, d=0.3, alpha=0.8, beta=0",
+      "points": [
+        {
+          "ci_high": 0.8206163507648881,
+          "ci_low": 0.47187995521011944,
+          "failures": 20,
+          "iteration_unit": "all component/relay sweeps",
+          "mean_directed_edge_updates": 1208256.0,
+          "mean_iterations": 162.4,
+          "mean_seconds": 0.007752177233333333,
+          "mean_work": 162.4,
+          "metadata": {
+            "cohort_kind": "relay_gamma_fresh_confirmation",
+            "denominator_definition": "all iid shots; either original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.007579264477225772,
+              "0.95": 0.01349791662907573,
+              "0.99": 0.014471593597825174
+            },
+            "mean_disorder_draws": 1054.0,
+            "mean_gamma_bias_updates": 171169.6,
+            "memory_clips": 248629,
+            "memory_seed": 2027120674,
+            "roles": [
+              "gamma_selected",
+              "disordered_phase_only"
+            ],
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111664,
+            "source_evidence_path": "data/reproductions/lp1054-relay-gamma80-60/results/prior_tuned_numerics-p1000/confirmation/4f4f8e8fdf5e7e03a7c6d34f/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "320f8d75accd501f83329727b0d318fb750468459bdc037e4839aa697ead3558",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 30,
+          "runtime_scope": "warm complete controller; includes gamma draws and solver path-state storage; excludes external hashing/serialization/sampling/evaluation",
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.1,
+          "y": 0.6666666666666666
+        }
+      ],
+      "series_id": "lp1054-relay-gamma80-60:4f4f8e8fdf5e7e03a7c6",
+      "source_decoder_id": "lp1054-relay-gamma80-60:4f4f8e8fdf5e7e03a7c6"
+    },
+    {
+      "channel_kind": "depolarizing",
+      "code_id": "lp1054",
+      "dataset_id": "lp1054-relay-gamma80-60",
+      "decoder_id": "lp1054-relay-gamma80-60:4f6e0011dd36dabcb097",
+      "label": "RelayBP80/60, d=0.3, alpha=0.8, beta=0",
+      "points": [
+        {
+          "ci_high": 0.14162260874708033,
+          "ci_low": 0.060616660878802214,
+          "failures": 20,
+          "iteration_unit": "all component/relay sweeps",
+          "mean_directed_edge_updates": 363144.5853658537,
+          "mean_iterations": 48.80975609756098,
+          "mean_seconds": 0.003188445014634146,
+          "mean_work": 48.80975609756098,
+          "metadata": {
+            "cohort_kind": "relay_gamma_fresh_confirmation",
+            "denominator_definition": "all iid shots; either original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0016537005590674392,
+              "0.95": 0.009915261078704166,
+              "0.99": 0.017310160151201886
+            },
+            "mean_disorder_draws": 215.94146341463414,
+            "mean_gamma_bias_updates": 51445.48292682927,
+            "memory_clips": 749115,
+            "memory_seed": 2026918874,
+            "roles": [
+              "uniform_phase_only"
+            ],
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111664,
+            "source_evidence_path": "data/reproductions/lp1054-relay-gamma80-60/results/prior_tuned_numerics-p0800/confirmation/4f6e0011dd36dabcb097f826/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "a751418f2f6a062612001c5c6334c07818c4c567cd884fe78b72411b358b9900",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 205,
+          "runtime_scope": "warm complete controller; includes gamma draws and solver path-state storage; excludes external hashing/serialization/sampling/evaluation",
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.08,
+          "y": 0.0975609756097561
+        }
+      ],
+      "series_id": "lp1054-relay-gamma80-60:4f6e0011dd36dabcb097",
+      "source_decoder_id": "lp1054-relay-gamma80-60:4f6e0011dd36dabcb097"
+    },
+    {
+      "channel_kind": "depolarizing",
+      "code_id": "lp1054",
+      "dataset_id": "lp1054-relay-gamma80-60",
       "decoder_id": "lp1054-relay-gamma80-60:778e3835c325d1632c5c",
       "label": "Continuous BP140, d=0, alpha=0.625, beta=0",
       "points": [
@@ -414993,6 +416626,86 @@
           "work_unit": "iterations",
           "x": 0.06,
           "y": 0.043010752688172046
+        },
+        {
+          "ci_high": 0.316453469299049,
+          "ci_low": 0.1429948758235286,
+          "failures": 20,
+          "iteration_unit": "all component/relay sweeps",
+          "mean_directed_edge_updates": 452000.8988764045,
+          "mean_iterations": 60.752808988764045,
+          "mean_seconds": 0.0030238638764044944,
+          "mean_work": 60.752808988764045,
+          "metadata": {
+            "cohort_kind": "relay_gamma_fresh_confirmation",
+            "denominator_definition": "all iid shots; either original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0017038093397077417,
+              "0.95": 0.007887013007851693,
+              "0.99": 0.01297123257200953
+            },
+            "mean_disorder_draws": 0.0,
+            "mean_gamma_bias_updates": 0.0,
+            "memory_clips": 0,
+            "memory_seed": 2026918874,
+            "roles": [
+              "continuous_bp140"
+            ],
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111664,
+            "source_evidence_path": "data/reproductions/lp1054-relay-gamma80-60/results/source_numerics-p0800/confirmation/778e3835c325d1632c5ce0ac/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "93271a88f22ee64802cde14b387e43d8216c6fc175acaeb50d39571c3779c0bc",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 89,
+          "runtime_scope": "warm complete controller; includes gamma draws and solver path-state storage; excludes external hashing/serialization/sampling/evaluation",
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.08,
+          "y": 0.2247191011235955
+        },
+        {
+          "ci_high": 0.9064355606682571,
+          "ci_low": 0.5635249030586136,
+          "failures": 20,
+          "iteration_unit": "all component/relay sweeps",
+          "mean_directed_edge_updates": 1406160.0,
+          "mean_iterations": 189.0,
+          "mean_seconds": 0.007637680307692308,
+          "mean_work": 189.0,
+          "metadata": {
+            "cohort_kind": "relay_gamma_fresh_confirmation",
+            "denominator_definition": "all iid shots; either original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.007211410087377025,
+              "0.95": 0.01174268763372894,
+              "0.99": 0.011860114510066229
+            },
+            "mean_disorder_draws": 0.0,
+            "mean_gamma_bias_updates": 0.0,
+            "memory_clips": 0,
+            "memory_seed": 2027120674,
+            "roles": [
+              "continuous_bp140"
+            ],
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111664,
+            "source_evidence_path": "data/reproductions/lp1054-relay-gamma80-60/results/source_numerics-p1000/confirmation/778e3835c325d1632c5ce0ac/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "f5dc58354b3e986d044e07b22dcea051b42e315bd07c2f3bb574ccf064d86087",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 26,
+          "runtime_scope": "warm complete controller; includes gamma draws and solver path-state storage; excludes external hashing/serialization/sampling/evaluation",
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.1,
+          "y": 0.7692307692307693
         }
       ],
       "series_id": "lp1054-relay-gamma80-60:778e3835c325d1632c5c",
@@ -415054,6 +416767,108 @@
       "channel_kind": "depolarizing",
       "code_id": "lp1054",
       "dataset_id": "lp1054-relay-gamma80-60",
+      "decoder_id": "lp1054-relay-gamma80-60:8e8624ce6391a2ec91b8",
+      "label": "RelayBP80/60, d=0.3, alpha=0.8, beta=0",
+      "points": [
+        {
+          "ci_high": 0.15738234206268475,
+          "ci_low": 0.06767076136358333,
+          "failures": 20,
+          "iteration_unit": "all component/relay sweeps",
+          "mean_directed_edge_updates": 318949.5652173913,
+          "mean_iterations": 42.869565217391305,
+          "mean_seconds": 0.0028556757989130436,
+          "mean_work": 42.869565217391305,
+          "metadata": {
+            "cohort_kind": "relay_gamma_fresh_confirmation",
+            "denominator_definition": "all iid shots; either original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.001621116124955827,
+              "0.95": 0.010215703404649982,
+              "0.99": 0.018013022067082888
+            },
+            "mean_disorder_draws": 143.20652173913044,
+            "mean_gamma_bias_updates": 45184.52173913043,
+            "memory_clips": 8944,
+            "memory_seed": 2026918874,
+            "roles": [
+              "disordered_phase_only"
+            ],
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111664,
+            "source_evidence_path": "data/reproductions/lp1054-relay-gamma80-60/results/prior_tuned_numerics-p0800/confirmation/8e8624ce6391a2ec91b8513a/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "895a377e569f6015b9bb1f8335ffb127a2047beadd999a8d0117292278b75cf3",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 184,
+          "runtime_scope": "warm complete controller; includes gamma draws and solver path-state storage; excludes external hashing/serialization/sampling/evaluation",
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.08,
+          "y": 0.10869565217391304
+        }
+      ],
+      "series_id": "lp1054-relay-gamma80-60:8e8624ce6391a2ec91b8",
+      "source_decoder_id": "lp1054-relay-gamma80-60:8e8624ce6391a2ec91b8"
+    },
+    {
+      "channel_kind": "depolarizing",
+      "code_id": "lp1054",
+      "dataset_id": "lp1054-relay-gamma80-60",
+      "decoder_id": "lp1054-relay-gamma80-60:b38e6c3502205abb06b1",
+      "label": "RelayBP80/60, d=0, alpha=0.625, beta=0",
+      "points": [
+        {
+          "ci_high": 0.2888614651201928,
+          "ci_low": 0.12934216094386652,
+          "failures": 20,
+          "iteration_unit": "all component/relay sweeps",
+          "mean_directed_edge_updates": 493848.97959183675,
+          "mean_iterations": 66.37755102040816,
+          "mean_seconds": 0.00409512806122449,
+          "mean_work": 66.37755102040816,
+          "metadata": {
+            "cohort_kind": "relay_gamma_fresh_confirmation",
+            "denominator_definition": "all iid shots; either original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0020789711862817086,
+              "0.95": 0.010421039043083447,
+              "0.99": 0.016470023430846244
+            },
+            "mean_disorder_draws": 322.6530612244898,
+            "mean_gamma_bias_updates": 69961.9387755102,
+            "memory_clips": 11708,
+            "memory_seed": 2026918874,
+            "roles": [
+              "disordered_phase_only"
+            ],
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111664,
+            "source_evidence_path": "data/reproductions/lp1054-relay-gamma80-60/results/source_numerics-p0800/confirmation/b38e6c3502205abb06b1816a/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "b3a82300b6a2c1562305d3a3305fcee5b5181cab960513994b5262dfbc6b6860",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 98,
+          "runtime_scope": "warm complete controller; includes gamma draws and solver path-state storage; excludes external hashing/serialization/sampling/evaluation",
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.08,
+          "y": 0.20408163265306123
+        }
+      ],
+      "series_id": "lp1054-relay-gamma80-60:b38e6c3502205abb06b1",
+      "source_decoder_id": "lp1054-relay-gamma80-60:b38e6c3502205abb06b1"
+    },
+    {
+      "channel_kind": "depolarizing",
+      "code_id": "lp1054",
+      "dataset_id": "lp1054-relay-gamma80-60",
       "decoder_id": "lp1054-relay-gamma80-60:c20f734b83841f0847ec",
       "label": "RelayBP80/60, d=0, alpha=0.625, beta=0",
       "points": [
@@ -415097,6 +416912,86 @@
           "work_unit": "iterations",
           "x": 0.06,
           "y": 0.043010752688172046
+        },
+        {
+          "ci_high": 0.34182011882105273,
+          "ci_low": 0.15579071279561826,
+          "failures": 20,
+          "iteration_unit": "all component/relay sweeps",
+          "mean_directed_edge_updates": 452025.3658536585,
+          "mean_iterations": 60.75609756097561,
+          "mean_seconds": 0.0037526346341463417,
+          "mean_work": 60.75609756097561,
+          "metadata": {
+            "cohort_kind": "relay_gamma_fresh_confirmation",
+            "denominator_definition": "all iid shots; either original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.002058387313150207,
+              "0.95": 0.010317860438696482,
+              "0.99": 0.015670662168529387
+            },
+            "mean_disorder_draws": 269.9268292682927,
+            "mean_gamma_bias_updates": 64036.92682926829,
+            "memory_clips": 0,
+            "memory_seed": 2026918874,
+            "roles": [
+              "reset_zero_gamma"
+            ],
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111664,
+            "source_evidence_path": "data/reproductions/lp1054-relay-gamma80-60/results/source_numerics-p0800/confirmation/c20f734b83841f0847ec73dc/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "bd476e3ecfe77c909166ecdd1dffb975ff03b56a0a8a7e10517c5a72f6a75428",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 82,
+          "runtime_scope": "warm complete controller; includes gamma draws and solver path-state storage; excludes external hashing/serialization/sampling/evaluation",
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.08,
+          "y": 0.24390243902439024
+        },
+        {
+          "ci_high": 0.9064355606682571,
+          "ci_low": 0.5635249030586136,
+          "failures": 20,
+          "iteration_unit": "all component/relay sweeps",
+          "mean_directed_edge_updates": 1406160.0,
+          "mean_iterations": 189.0,
+          "mean_seconds": 0.008577560807692309,
+          "mean_work": 189.0,
+          "metadata": {
+            "cohort_kind": "relay_gamma_fresh_confirmation",
+            "denominator_definition": "all iid shots; either original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.007965883137930209,
+              "0.95": 0.01297123257200953,
+              "0.99": 0.01297123257200953
+            },
+            "mean_disorder_draws": 1256.6923076923076,
+            "mean_gamma_bias_updates": 199206.0,
+            "memory_clips": 0,
+            "memory_seed": 2027120674,
+            "roles": [
+              "reset_zero_gamma"
+            ],
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111664,
+            "source_evidence_path": "data/reproductions/lp1054-relay-gamma80-60/results/source_numerics-p1000/confirmation/c20f734b83841f0847ec73dc/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "66e376498c595b402e3eb7936a37c7b6449b85ad2a710636f995cbbb8981ce5d",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 26,
+          "runtime_scope": "warm complete controller; includes gamma draws and solver path-state storage; excludes external hashing/serialization/sampling/evaluation",
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.1,
+          "y": 0.7692307692307693
         }
       ],
       "series_id": "lp1054-relay-gamma80-60:c20f734b83841f0847ec",
@@ -415158,6 +417053,108 @@
       "channel_kind": "depolarizing",
       "code_id": "lp1054",
       "dataset_id": "lp1054-relay-gamma80-60",
+      "decoder_id": "lp1054-relay-gamma80-60:da05577f09efe7968195",
+      "label": "RelayBP80/60, d=0, alpha=0.625, beta=0",
+      "points": [
+        {
+          "ci_high": 0.9504923546942066,
+          "ci_low": 0.6261582865113173,
+          "failures": 20,
+          "iteration_unit": "all component/relay sweeps",
+          "mean_directed_edge_updates": 1394380.0,
+          "mean_iterations": 187.41666666666666,
+          "mean_seconds": 0.008591816958333333,
+          "mean_work": 187.41666666666666,
+          "metadata": {
+            "cohort_kind": "relay_gamma_fresh_confirmation",
+            "denominator_definition": "all iid shots; either original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.007504222254678982,
+              "0.95": 0.01323195434670692,
+              "0.99": 0.013632895795366489
+            },
+            "mean_disorder_draws": 1317.5,
+            "mean_gamma_bias_updates": 197537.16666666666,
+            "memory_clips": 121584,
+            "memory_seed": 2027120674,
+            "roles": [
+              "gamma_selected"
+            ],
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111664,
+            "source_evidence_path": "data/reproductions/lp1054-relay-gamma80-60/results/source_numerics-p1000/confirmation/da05577f09efe796819504c7/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "61de8ea0b27f3ba20d6b9d9ba61ec23da8919ff8763f51495043ec96b97077ad",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 24,
+          "runtime_scope": "warm complete controller; includes gamma draws and solver path-state storage; excludes external hashing/serialization/sampling/evaluation",
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.1,
+          "y": 0.8333333333333334
+        }
+      ],
+      "series_id": "lp1054-relay-gamma80-60:da05577f09efe7968195",
+      "source_decoder_id": "lp1054-relay-gamma80-60:da05577f09efe7968195"
+    },
+    {
+      "channel_kind": "depolarizing",
+      "code_id": "lp1054",
+      "dataset_id": "lp1054-relay-gamma80-60",
+      "decoder_id": "lp1054-relay-gamma80-60:dff1d5e76a4e5836f4f9",
+      "label": "RelayBP80/60, d=0, alpha=0.625, beta=0",
+      "points": [
+        {
+          "ci_high": 0.9064355606682571,
+          "ci_low": 0.5635249030586136,
+          "failures": 20,
+          "iteration_unit": "all component/relay sweeps",
+          "mean_directed_edge_updates": 1406160.0,
+          "mean_iterations": 189.0,
+          "mean_seconds": 0.008586985423076924,
+          "mean_work": 189.0,
+          "metadata": {
+            "cohort_kind": "relay_gamma_fresh_confirmation",
+            "denominator_definition": "all iid shots; either original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.008045541969309511,
+              "0.95": 0.01297123257200953,
+              "0.99": 0.013100944897729627
+            },
+            "mean_disorder_draws": 1256.6923076923076,
+            "mean_gamma_bias_updates": 199206.0,
+            "memory_clips": 813,
+            "memory_seed": 2027120674,
+            "roles": [
+              "disordered_phase_only"
+            ],
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111664,
+            "source_evidence_path": "data/reproductions/lp1054-relay-gamma80-60/results/source_numerics-p1000/confirmation/dff1d5e76a4e5836f4f92659/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "6b1de4e60aac13a8e1418f8d4b45ea1629fa831bd89446843a6606ef9e83f971",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 26,
+          "runtime_scope": "warm complete controller; includes gamma draws and solver path-state storage; excludes external hashing/serialization/sampling/evaluation",
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.1,
+          "y": 0.7692307692307693
+        }
+      ],
+      "series_id": "lp1054-relay-gamma80-60:dff1d5e76a4e5836f4f9",
+      "source_decoder_id": "lp1054-relay-gamma80-60:dff1d5e76a4e5836f4f9"
+    },
+    {
+      "channel_kind": "depolarizing",
+      "code_id": "lp1054",
+      "dataset_id": "lp1054-relay-gamma80-60",
       "decoder_id": "lp1054-relay-gamma80-60:e29536acaf6bdc9a2529",
       "label": "RelayBP80/60, d=0.3, alpha=0.8, beta=0.2",
       "points": [
@@ -415205,6 +417202,108 @@
       ],
       "series_id": "lp1054-relay-gamma80-60:e29536acaf6bdc9a2529",
       "source_decoder_id": "lp1054-relay-gamma80-60:e29536acaf6bdc9a2529"
+    },
+    {
+      "channel_kind": "depolarizing",
+      "code_id": "lp1054",
+      "dataset_id": "lp1054-relay-gamma80-60",
+      "decoder_id": "lp1054-relay-gamma80-60:fb783273c4f722e02999",
+      "label": "RelayBP80/60, d=0, alpha=0.625, beta=0",
+      "points": [
+        {
+          "ci_high": 0.27050185840821844,
+          "ci_low": 0.12040398010661924,
+          "failures": 20,
+          "iteration_unit": "all component/relay sweeps",
+          "mean_directed_edge_updates": 417702.85714285716,
+          "mean_iterations": 56.142857142857146,
+          "mean_seconds": 0.0035710893619047617,
+          "mean_work": 56.142857142857146,
+          "metadata": {
+            "cohort_kind": "relay_gamma_fresh_confirmation",
+            "denominator_definition": "all iid shots; either original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.0017907207394870818,
+              "0.95": 0.01011455782638612,
+              "0.99": 0.014186446032570507
+            },
+            "mean_disorder_draws": 260.9904761904762,
+            "mean_gamma_bias_updates": 59174.57142857143,
+            "memory_clips": 521859,
+            "memory_seed": 2026918874,
+            "roles": [
+              "gamma_selected"
+            ],
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111664,
+            "source_evidence_path": "data/reproductions/lp1054-relay-gamma80-60/results/source_numerics-p0800/confirmation/fb783273c4f722e029993f0c/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "05092e42025bbd6a424dab4775584127d1a6a5094c12db1600d817e32d9f01b9",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 105,
+          "runtime_scope": "warm complete controller; includes gamma draws and solver path-state storage; excludes external hashing/serialization/sampling/evaluation",
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.08,
+          "y": 0.19047619047619047
+        }
+      ],
+      "series_id": "lp1054-relay-gamma80-60:fb783273c4f722e02999",
+      "source_decoder_id": "lp1054-relay-gamma80-60:fb783273c4f722e02999"
+    },
+    {
+      "channel_kind": "depolarizing",
+      "code_id": "lp1054",
+      "dataset_id": "lp1054-relay-gamma80-60",
+      "decoder_id": "lp1054-relay-gamma80-60:fdb191e99e373bdb6ead",
+      "label": "RelayBP80/60, d=0.3, alpha=0.8, beta=0",
+      "points": [
+        {
+          "ci_high": 0.17603357435975964,
+          "ci_low": 0.07610663087485975,
+          "failures": 20,
+          "iteration_unit": "all component/relay sweeps",
+          "mean_directed_edge_updates": 356802.43902439025,
+          "mean_iterations": 47.957317073170735,
+          "mean_seconds": 0.0032041800243902438,
+          "mean_work": 47.957317073170735,
+          "metadata": {
+            "cohort_kind": "relay_gamma_fresh_confirmation",
+            "denominator_definition": "all iid shots; either original syndrome mismatch or either nontrivial logical residual",
+            "latency_quantiles_seconds": {
+              "0.5": 0.001621116124955827,
+              "0.95": 0.010215703404649982,
+              "0.99": 0.018013022067082888
+            },
+            "mean_disorder_draws": 205.65853658536585,
+            "mean_gamma_bias_updates": 50547.01219512195,
+            "memory_clips": 563479,
+            "memory_seed": 2026918874,
+            "roles": [
+              "gamma_selected"
+            ],
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111664,
+            "source_evidence_path": "data/reproductions/lp1054-relay-gamma80-60/results/prior_tuned_numerics-p0800/confirmation/fdb191e99e373bdb6eaddb2c/summary.json",
+            "stop_reason": "target_failures",
+            "summary_sha256": "8742b6c53e9eeffcbf37fd3fc4f4d71fbc717fdff0e239f880f3257cc98bab12",
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 164,
+          "runtime_scope": "warm complete controller; includes gamma draws and solver path-state storage; excludes external hashing/serialization/sampling/evaluation",
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.08,
+          "y": 0.12195121951219512
+        }
+      ],
+      "series_id": "lp1054-relay-gamma80-60:fdb191e99e373bdb6ead",
+      "source_decoder_id": "lp1054-relay-gamma80-60:fdb191e99e373bdb6ead"
     }
   ],
   "schema_version": 1,
