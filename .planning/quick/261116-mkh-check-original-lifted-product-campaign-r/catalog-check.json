@@ -7,9 +7,31 @@
   },
   "after": {
     "curves": 443,
-    "points": 3193,
+    "points": 3194,
     "codes": 13,
     "circuits": 0
   },
-  "preserved_raw_series": 1538
+  "preserved_raw_series": 1538,
+  "prior_snapshots": [
+    {
+      "base": "1c0bd4b4",
+      "before": {
+        "curves": 440,
+        "points": 3178,
+        "codes": 13,
+        "circuits": 0
+      },
+      "preserved_raw_series": 1538
+    },
+    {
+      "base": "2cad9b43",
+      "before": {
+        "curves": 443,
+        "points": 3193,
+        "codes": 13,
+        "circuits": 0
+      },
+      "preserved_raw_series": 1542
+    }
+  ]
 }

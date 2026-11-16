@@ -83,7 +83,8 @@ def verify():
     for rate in plan['source']['rates']:
         for a,b in [('qbp','bp'),('tuned_qbp','qbp'),('tuned_bp','bp'),
                     ('qbp_cs10','tuned_qbp'),('qbp_cs10','cs10'),('qbp_cs10','qbp_osd0'),
-                    ('beam128','qbp_cs10'),('relay128','qbp_cs10')]:
+                    ('beam128','qbp_cs10'),('relay128','qbp_cs10'),
+                    ('tuned_bp','qbp_osd0'),('relay128','tuned_bp')]:
             if (a,rate) not in index or (b,rate) not in index:continue
             x,y = index[a,rate],index[b,rate]
             comparisons.append({'p':rate,'numerator':a,'denominator':b,'ler_ratio':x['ler']/y['ler'] if y['ler'] else None,
@@ -108,9 +109,9 @@ def plot(checked):
     import matplotlib.pyplot as plt
     from matplotlib.ticker import LogLocator,LogFormatterMathtext,NullFormatter
     panels = [
-        ('BP and numerical tuning (32 sweeps)',('bp','tuned_bp','qbp','tuned_qbp')),
+        ('BP and pointwise tuning (32 sweeps)',('bp','tuned_bp','qbp','tuned_qbp')),
         ('OSD postprocessing (32 BP sweeps)',('cs10','osd0','qbp','qbp_osd0','qbp_cs10')),
-        ('Binary beam/Relay search',('tuned_bp','qbp_cs10','beam32','beam128','relay32','relay128'))]
+        ('Pointwise-tuned binary search',('tuned_bp','qbp_cs10','beam32','beam128','relay32','relay128'))]
     labels = {'bp':'BP','tuned_bp':'Tuned BP','qbp':'Q-BP','tuned_qbp':'Tuned Q-BP',
         'osd0':'BP+OSD-0','cs10':'BP+CS-10','qbp_osd0':'Q-BP+OSD-0','qbp_cs10':'Q-BP+CS-10',
         'beam32':'Beam32','beam128':'Beam128','relay32':'Relay32','relay128':'Relay128'}
@@ -121,8 +122,10 @@ def plot(checked):
             rows = sorted((p for p in checked['points'] if p['arm']==arm),key=lambda p:p['p'])
             if not rows:continue
             rate = np.array([p['ler'] for p in rows]);lo = np.array([p['ci_low'] for p in rows]);hi = np.array([p['ci_high'] for p in rows])
+            pointwise = arm.startswith(('tuned_','beam','relay'))
+            marker = ('v' if arm.endswith('128') else 's') if pointwise else 'o-'
             ax.errorbar([p['p'] for p in rows],rate,yerr=np.array([rate-lo,hi-rate]),
-                fmt='o--' if arm.endswith('128') else 'o-',color=colors[arm],label=labels[arm],
+                fmt=marker,color=colors[arm],label=labels[arm],
                 linewidth=1.3,markersize=4,capsize=2,elinewidth=.65,alpha=.95)
         ax.set_title(title,fontsize=10.5);ax.set_yscale('log');ax.set_xlim(.015,.125)
         ax.set_ylim(3e-6,1.15);ax.set_xticks([.02,.04,.06,.08,.10,.12])
@@ -132,7 +135,7 @@ def plot(checked):
         ax.set_xlabel('Physical depolarizing probability p');ax.legend(loc='lower right',fontsize=7.5,framealpha=.95)
     axes[0].set_ylabel('Block failure probability (either logical component)')
     fig.suptitle('Original lifted product [[1054,140]] — canonical decoder comparison',fontsize=13)
-    fig.text(.5,.025,f'{checked["audited"]}/72 audited points; 95% pointwise intervals; pending points omitted. Search128 permits 4x work. Controlled adaptation; no source LER curve.',ha='center',fontsize=8)
+    fig.text(.5,.025,f'{checked["audited"]}/72 audited points; 95% intervals. Tuned controls vary by rate; only fixed profiles are connected. Search128 permits 4x work. No source LER curve.',ha='center',fontsize=8)
     fig.tight_layout(rect=(0,.06,1,.94))
     for suffix in ('png','pdf'):fig.savefig(ROOT/('decoder-comparison.'+suffix),dpi=190)
     plt.close(fig)

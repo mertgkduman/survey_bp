@@ -1,24 +1,34 @@
 {
-  "all_summary_manifest_checks": 1854,
-  "audited": 66,
-  "awaiting_audit": [
-    {
-      "arm": "tuned_bp",
-      "id": "tuned_bp-p0200",
-      "physical_p": 0.02
-    },
-    {
-      "arm": "relay128",
-      "id": "relay128-p0200",
-      "physical_p": 0.02
-    }
-  ],
+  "all_summary_manifest_checks": 1960,
+  "audited": 68,
+  "awaiting_audit": [],
   "comparisons": [
     {
       "ci95_overlap": false,
       "denominator": "bp",
       "ler_ratio": 0.10319545981911962,
       "numerator": "qbp",
+      "p": 0.02
+    },
+    {
+      "ci95_overlap": false,
+      "denominator": "bp",
+      "ler_ratio": 0.00884247694757576,
+      "numerator": "tuned_bp",
+      "p": 0.02
+    },
+    {
+      "ci95_overlap": true,
+      "denominator": "qbp_osd0",
+      "ler_ratio": 0.6491797427327297,
+      "numerator": "tuned_bp",
+      "p": 0.02
+    },
+    {
+      "ci95_overlap": true,
+      "denominator": "tuned_bp",
+      "ler_ratio": 1.2464391579535115,
+      "numerator": "relay128",
       "p": 0.02
     },
     {
@@ -74,6 +84,20 @@
       "ci95_overlap": false,
       "denominator": "qbp_cs10",
       "ler_ratio": 26.165560437505842,
+      "numerator": "relay128",
+      "p": 0.04
+    },
+    {
+      "ci95_overlap": false,
+      "denominator": "qbp_osd0",
+      "ler_ratio": 13.073053892215569,
+      "numerator": "tuned_bp",
+      "p": 0.04
+    },
+    {
+      "ci95_overlap": true,
+      "denominator": "tuned_bp",
+      "ler_ratio": 1.0928297653547725,
       "numerator": "relay128",
       "p": 0.04
     },
@@ -135,6 +159,20 @@
     },
     {
       "ci95_overlap": false,
+      "denominator": "qbp_osd0",
+      "ler_ratio": 15.335899230230932,
+      "numerator": "tuned_bp",
+      "p": 0.06
+    },
+    {
+      "ci95_overlap": true,
+      "denominator": "tuned_bp",
+      "ler_ratio": 1.244773519163763,
+      "numerator": "relay128",
+      "p": 0.06
+    },
+    {
+      "ci95_overlap": false,
       "denominator": "bp",
       "ler_ratio": 0.06875,
       "numerator": "qbp",
@@ -186,6 +224,20 @@
       "ci95_overlap": false,
       "denominator": "qbp_cs10",
       "ler_ratio": 340.07954545454544,
+      "numerator": "relay128",
+      "p": 0.08
+    },
+    {
+      "ci95_overlap": false,
+      "denominator": "qbp_osd0",
+      "ler_ratio": 84.89999999999999,
+      "numerator": "tuned_bp",
+      "p": 0.08
+    },
+    {
+      "ci95_overlap": true,
+      "denominator": "tuned_bp",
+      "ler_ratio": 1.0227272727272727,
       "numerator": "relay128",
       "p": 0.08
     },
@@ -246,6 +298,20 @@
       "p": 0.1
     },
     {
+      "ci95_overlap": false,
+      "denominator": "qbp_osd0",
+      "ler_ratio": 10.25,
+      "numerator": "tuned_bp",
+      "p": 0.1
+    },
+    {
+      "ci95_overlap": true,
+      "denominator": "tuned_bp",
+      "ler_ratio": 1.0,
+      "numerator": "relay128",
+      "p": 0.1
+    },
+    {
       "ci95_overlap": true,
       "denominator": "bp",
       "ler_ratio": 0.8695652173913043,
@@ -300,11 +366,25 @@
       "ler_ratio": 1.9500000000000002,
       "numerator": "relay128",
       "p": 0.12
+    },
+    {
+      "ci95_overlap": false,
+      "denominator": "qbp_osd0",
+      "ler_ratio": 1.7999999999999998,
+      "numerator": "tuned_bp",
+      "p": 0.12
+    },
+    {
+      "ci95_overlap": true,
+      "denominator": "tuned_bp",
+      "ler_ratio": 1.0,
+      "numerator": "relay128",
+      "p": 0.12
     }
   ],
   "completed_simulations": 68,
-  "fresh_failures": 1320,
-  "fresh_shots": 3045149,
+  "fresh_failures": 1360,
+  "fresh_shots": 6054571,
   "plan_sha256": "c9de0d13a53d0ce6abba76547c908e150cc3541bf1cfd4255e19bfd703c34ae9",
   "planned": 72,
   "points": [
@@ -417,6 +497,27 @@
       "summary_sha256": "fe3676f831fba2e3abdbd0ef25e852aca7a0bcbe481368cb58b1ac904963038c"
     },
     {
+      "arm": "tuned_bp",
+      "ci_high": 1.7769262276933935e-05,
+      "ci_low": 7.316255485181931e-06,
+      "controls": {
+        "alpha": 0.8,
+        "beta": 0.2,
+        "cap": 32,
+        "damping": 0.3,
+        "family": "bp"
+      },
+      "failures": 20,
+      "instrumented_mean_seconds": 0.000329628257480472,
+      "ler": 1.1977618621843224e-05,
+      "mean_directed_edge_updates": 30692.287431705117,
+      "mean_iterations": 4.125307450497999,
+      "p": 0.02,
+      "shots": 1669781,
+      "source_summary": "data/reproductions/panteleev-2012-04068-lifted-product/results/tuned_bp-p0200/confirmation/ec1985ba0238dcd26e4a3619/summary.json",
+      "summary_sha256": "fc0224cc9c80496fc18672ec4f22ae38f754f5f967e61ab8a543df24c3d488aa"
+    },
+    {
       "arm": "relay32",
       "ci_high": 0.00020106108981443133,
       "ci_low": 8.278815988066743e-05,
@@ -452,6 +553,43 @@
       "shots": 147567,
       "source_summary": "data/reproductions/panteleev-2012-04068-lifted-product/results/relay32-p0200/confirmation/b439f9e9790e5368cdddba3f/summary.json",
       "summary_sha256": "d3ea4803c0875ee59ddf39127b3a0b4d9ba7052d1db6bc74dd3a59db73f9d599"
+    },
+    {
+      "arm": "relay128",
+      "ci_high": 2.2148290137900937e-05,
+      "ci_low": 9.119271891274923e-06,
+      "controls": {
+        "alpha": 0.8,
+        "beta": 0.2,
+        "cap": 128,
+        "damping": 0.3,
+        "family": "bp",
+        "search": {
+          "alpha": 0.8,
+          "beta": 0.2,
+          "damping": 0.3,
+          "first_gamma": 0.0,
+          "gamma_high": 0.66,
+          "gamma_low": -0.24,
+          "initial": 20,
+          "method": "relay",
+          "paper_scale": false,
+          "per_unit": 9,
+          "rounds": 12,
+          "solutions": 1,
+          "units": 12,
+          "width": 1
+        }
+      },
+      "failures": 20,
+      "instrumented_mean_seconds": 0.0007696631485569641,
+      "ler": 1.4929372869298565e-05,
+      "mean_directed_edge_updates": 30702.000909198807,
+      "mean_iterations": 4.126613025429947,
+      "p": 0.02,
+      "shots": 1339641,
+      "source_summary": "data/reproductions/panteleev-2012-04068-lifted-product/results/relay128-p0200/confirmation/80e8125d3e99fe0de3832784/summary.json",
+      "summary_sha256": "2f02bcd2e595d22b3bf761367109ac8ccbb849cdfd6866fd5072a82d03c59cb1"
     },
     {
       "arm": "bp",
@@ -2079,9 +2217,9 @@
   "schema": "lp1054-independent-result-check-v1",
   "scope": "Both logical components; shared iid depolarizing stream; disjoint training/fresh seeds;20-failure precision. Search128 is4x the32 baseline work ceiling. Latency includes provenance instrumentation. Original LP paper has no LER curve/grid/cap;32/.625 borrowed from cited BP-OSD paper and flooding differs from its layered schedule. No native/paper agreement or simultaneous superiority claim.",
   "stage_counts": {
-    "coarse": 1664,
-    "finalist": 124
+    "coarse": 1760,
+    "finalist": 132
   },
-  "training_measurements": 1788,
-  "verified_sha256": "3929a3757fd437da3e64a426f80c8d8a09c0de9808a467a945b815acaf0c1c2d"
+  "training_measurements": 1892,
+  "verified_sha256": "2692ca6b6d1f3fe1175b438232ddadf4900835abeed8c8e94bd85d40609f52e1"
 }

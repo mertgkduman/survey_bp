@@ -1,6 +1,6 @@
 # Lifted-product [[1054,140]] full decoder stack
 
-66/72 arm/rate workers independently audited. Fresh confirmation only below.
+68/72 arm/rate workers independently audited. Fresh confirmation only below.
 
 Original LP paper provides no LER plot/rate grid/numeric iteration cap for1054. Controlled prospective depolarizing grid0.02,0.04,0.06,0.08,0.10,0.12. Budget32 and scale0.625 borrowed from cited BP-OSD paper, whose schedule is layered; this study uses canonical flooding. No original LP paper curve ordinates exist to compare. Original LP Example4, depolarizing code capacity. Q-BP, tuning, Relay and beam are canonical adaptations. Search128 is explicitly4x the documented BP cap. No native runtime or statistical paper agreement is claimed before confirmation.
 
@@ -13,7 +13,9 @@ Noise: independent I/X/Y/Z, probabilities1-p,p/3,p/3,p/3. Both X/Z residuals cou
 | osd0 | 0.02 | 225526 | 8.86816e-05 | [5.41698e-05, 0.00013156] | 6.33468e-07 | 4.243 | 31566.9 | 327.25 |
 | qbp | 0.02 | 143078 | 0.000139784 | [8.53857e-05, 0.000207369] | 9.98526e-07 | 2.246 | 33425.0 | 1258.39 |
 | qbp_osd0 | 0.02 | 1083988 | 1.84504e-05 | [1.127e-05, 2.73718e-05] | 1.3179e-07 | 2.244 | 33391.4 | 1415.03 |
+| relay128 | 0.02 | 1339641 | 1.49294e-05 | [9.11927e-06, 2.21483e-05] | 1.06639e-07 | 4.127 | 30702.0 | 769.66 |
 | relay32 | 0.02 | 147567 | 0.000135532 | [8.27882e-05, 0.000201061] | 9.68148e-07 | 4.134 | 30760.1 | 753.02 |
+| tuned_bp | 0.02 | 1669781 | 1.19776e-05 | [7.31626e-06, 1.77693e-05] | 8.55549e-08 | 4.125 | 30692.3 | 329.63 |
 | beam128 | 0.04 | 17601 | 0.0011363 | [0.000694215, 0.00168533] | 8.121e-06 | 7.224 | 53739.1 | 910.68 |
 | beam32 | 0.04 | 17108 | 0.00116904 | [0.000714224, 0.00173389] | 8.35516e-06 | 7.263 | 54034.3 | 927.16 |
 | bp | 0.04 | 1144 | 0.0174825 | [0.0107106, 0.0258375] | 0.000125972 | 8.509 | 63305.0 | 565.56 |
