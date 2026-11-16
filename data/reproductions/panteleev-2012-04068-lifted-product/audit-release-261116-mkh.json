@@ -1,0 +1,103 @@
+{
+  "plan_sha256": "c9de0d13a53d0ce6abba76547c908e150cc3541bf1cfd4255e19bfd703c34ae9",
+  "reason": "Release only satisfied corresponding audit dependencies after source COMPLETED0:0 and completion/selection checks; unchanged frozen full scientific auditors.",
+  "released": [
+    {
+      "audit_job": "61930127_21",
+      "completion_sha256": "e0496c623a414a9ac8d0fe032f29506ad6df6dba24469143aecfca79d4aef1fc",
+      "index": 21,
+      "job": "relay128-p0400",
+      "selection_sha256": "0bb4f429695f5e7ce8fc6a4754ebb7c1bffb28783a8327196012362de0d0ffc5",
+      "source_job": "61930050_21",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "audit_job": "61930127_33",
+      "completion_sha256": "be82ad1cab5e743cf66ed829fab56a634e9f35e4b819f5fde9718b2f0e148171",
+      "index": 33,
+      "job": "relay128-p0600",
+      "selection_sha256": "0b77e8bb6411243d131ca33d1d36f211f90fd29aa27544382b4a05850f699c23",
+      "source_job": "61930050_33",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "audit_job": "61930127_45",
+      "completion_sha256": "0aa8936df012788b70c88452778f71d5eeb7672c4dcbf01a218c85ce7aa4086b",
+      "index": 45,
+      "job": "relay128-p0800",
+      "selection_sha256": "d3019ecb8d9ad7c00320c98f2f08c02064beddfb2b1918e986df9dda01bf6dd8",
+      "source_job": "61930050_45",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "audit_job": "61930127_47",
+      "completion_sha256": "a693daececa089f27dade0b954d028c9c14ded7692bb10db42ff2b8f1626bc4a",
+      "index": 47,
+      "job": "beam128-p0800",
+      "selection_sha256": "c3d0aab920ca8575da89bfc60721c13f6a1d42e324ec6eae586be414572d18af",
+      "source_job": "61930050_47",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "audit_job": "61930127_57",
+      "completion_sha256": "78e8aa91b0a60fff491ba4e2732c18cec7bd1e1fd896cd7312bf3a5b59bb31ad",
+      "index": 57,
+      "job": "relay128-p1000",
+      "selection_sha256": "b38dac4a80c7f88df4adb9eeacb65c5d3a39f64414aaf438629ac327e47b4011",
+      "source_job": "61930050_57",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "audit_job": "61930127_59",
+      "completion_sha256": "39900c85c3b358f22c7d0154e32f722fa19eb3092f22f27eb63cadd481e908c7",
+      "index": 59,
+      "job": "beam128-p1000",
+      "selection_sha256": "ab3763af0b77fd68f91aeb5b4ace06f45e7212f6e113b6446b4788628bbff989",
+      "source_job": "61930050_59",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "audit_job": "61930127_69",
+      "completion_sha256": "1c5d0920ed07cf2ae4ee12c5b249987e997852e93243b3452f1cbd68f027727a",
+      "index": 69,
+      "job": "relay128-p1200",
+      "selection_sha256": "0b303e780471971a70e8f34406fa3cf521ad20a6c5e5a828e58db1563ad20624",
+      "source_job": "61930050_69",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    },
+    {
+      "audit_job": "61930127_71",
+      "completion_sha256": "fbe5dd9d5fb92ce3dd16edd10751819003ac044d06cfce727c206b6a7844e2ac",
+      "index": 71,
+      "job": "beam128-p1200",
+      "selection_sha256": "5bf2462bbc6b0a0555de3b32e072a375018038bf3f48066de7a83a074a3a3c26",
+      "source_job": "61930050_71",
+      "source_state": [
+        "COMPLETED",
+        "0:0"
+      ]
+    }
+  ],
+  "time_utc": "2026-11-16T21:15:40.980635+00:00"
+}

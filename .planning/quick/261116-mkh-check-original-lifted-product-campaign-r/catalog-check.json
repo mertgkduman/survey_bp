@@ -1,0 +1,15 @@
+{
+  "before": {
+    "curves": 440,
+    "points": 3178,
+    "codes": 13,
+    "circuits": 0
+  },
+  "after": {
+    "curves": 443,
+    "points": 3193,
+    "codes": 13,
+    "circuits": 0
+  },
+  "preserved_raw_series": 1538
+}
