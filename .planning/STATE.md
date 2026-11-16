@@ -5,11 +5,11 @@ current_phase: 11
 current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
-stopped_at: LP1054 gamma80/60 array 61942447 running 12 single-CPU workers; fresh results pending; implementation 177417b7
-last_updated: "2026-11-16T22:41:43.946901+00:00"
+stopped_at: Paper figure views verified; gamma 2/12 and original LP 70/72 audited; remaining jobs continue
+last_updated: "2026-11-16T23:13:00.854743+00:00"
 last_activity: 2026-11-16
-last_activity_desc: Quick 261116-nf0 launches confirmed 140-sweep Relay gamma tuning, matched controls and phase ablations; 12 point workers running.
-state_head: 177417b7
+last_activity_desc: Quick 261116-ote adds paper figure views with reproduction/additional group toggles and checks audited LP snapshots.
+state_head: 44262d66
 progress:
   total_phases: 14
   completed_phases: 8
@@ -34,6 +34,10 @@ Total Phases: 14
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
+Last activity: 2026-11-16 — quick 261116-ote checks results and adds paper figure views
+Last Activity Description: Clickable paper titles open named figures with default-on paper reproductions and default-off additional comparisons, group/mixed-state controls, scoped exports and unchanged central multi-rate eligibility. Source-backed metadata preserves Yao figure conflicts, Roffe CS60 versus local CS10/OSD0, MacKay inferred budget/metric limits and LP Example 4 without a fabricated LER figure. New imports and stale selections reconcile; 88 relevant tests and 14 Chromium groups pass after scoped fixes. Gamma 2/12 strata audited (6 fresh policies, 4926 shots/120 failures, 440 training settings); p=.06 source/tuned gamma LER .02522/.01784 versus BP140 .04301/.01921, overlapping intervals. Both select gamma0=0. Original LP 70/72 audited (11,236,743 shots/1400 failures); new p=.02 Beam32 and QBP+CS10 LERs 7.35e-6/8.12e-6 overlap. Outstanding workers/audits continue unchanged. Public counts 443/3195/13/0, all 1543 prior raw point multisets preserved. No frozen/raw/kernel/v1/model/phase-gate/counter changes.
+
+Prior gamma launch:
 Last activity: 2026-11-16 — quick261116-nf0 launches Relay gamma80/60 tuning
 Last Activity Description: User confirmed exactly80 uniform-gamma +one60 disordered-gamma leg, max140/component. New frozen lp1054-relay-gamma80-60 retains parent code/rates and unchanged canonical/search kernels. Source and parent training-selected numerical backgrounds,11 gamma0 values×18 intervals+zero control=199 coarse policies/point; independent finalist/refinement/fresh seeds and separate memory RNG. Fresh selected/phase ablations/reset-zero/matchedBP140 stop20 failures or100M, exact-control duplicates deduped. Typed gamma work and external-hash-free controller timing explicit;1024-shot atomic chunks and deadline requeue. Array61942447 has12 single-CPU/3GiB workers with fresh-process audits in same allocations; collector61942448 queued.64 scientific tests,56 catalog tests,11 Chromium groups and96 pilot shots pass; frozen/source/parent pins remain valid. Initial workers tuning; no fresh gamma measurements yet. Public443/3194/13/0 unchanged and1543 old raw-series point multisets preserved. No old frozen/raw/canonical/v1/model/config or phase gate/counter changes.
 
@@ -337,6 +341,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 | # | Description | Date | Commit | Status | Directory |
 |---|-------------|------|--------|--------|-----------|
+| 261116-ote | Check LP results and add paper figure views with grouped curve controls | 2026-11-16 | 781055fb | Verified; gamma 2/12 and original LP 70/72 audited, campaigns running | [261116-ote](./quick/261116-ote-check-lp1054-results-and-add-paper-figur/) |
 | 261116-nf0 | Tune RelayBP uniform80/disordered60 gamma with matched controls | 2026-11-16 | 177417b7 | 12 single-CPU workers tuning; fresh results pending | [261116-nf0](./quick/261116-nf0-tune-relaybp-uniform-gamma80-and-disorde/) |
 | 261116-mkh | Check original lifted-product results and decoder comparisons | 2026-11-16 | a75222da |68 audited points published; four rare simulations continue | [261116-mkh](./quick/261116-mkh-check-original-lifted-product-campaign-r/) |
 | 261116-jzy | Launch original lifted-product full decoder stack | 2026-11-16 | 53fabae |72 single-CPU workers;50 audited points published; campaign running | [261116-jzy](./quick/261116-jzy-reproduce-lifted-product-paper-codes-wit/) |

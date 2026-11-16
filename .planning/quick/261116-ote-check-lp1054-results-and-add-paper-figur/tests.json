@@ -1,0 +1,20 @@
+{
+  "distinct_tests_passed_after_fixes": 88,
+  "full_run": {
+    "passed": 85,
+    "failed_before_fixes": 3
+  },
+  "focused_final_run": {
+    "passed": 4,
+    "failed": 0
+  },
+  "browser_groups_passed": 14,
+  "browser_page_errors": 0,
+  "fixes": [
+    "Optional source ordinates follow the normalized schema",
+    "Plural dataset context relationships checked",
+    "Missing comparison contexts retain explicit no-command recipes",
+    "Duplicate dataset diagnostics preserved",
+    "Stable browser locator and verification-owned HTTP server"
+  ]
+}

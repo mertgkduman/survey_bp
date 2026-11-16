@@ -1,0 +1,230 @@
+{
+  "checked_at": "2026-11-16T23:07:05.923231+00:00",
+  "scope": "Audited fresh evidence only; no tuning samples enter these estimates. Pointwise intervals do not establish superiority.",
+  "lp1054-relay-gamma80-60": {
+    "finished": 2,
+    "planned": 12,
+    "fresh_policies": 6,
+    "shots": 4926,
+    "failures": 120,
+    "training_measurements": 440,
+    "verified_sha256": "2055b7f1fbd6095437353f0aa78a005183ff6050bebd3ed6a8a53e7cbfdad2d7",
+    "fresh": [
+      {
+        "job": "source_numerics-p0600",
+        "p": 0.06,
+        "roles": [
+          "gamma_selected",
+          "disordered_phase_only"
+        ],
+        "controls": {
+          "alpha": 0.625,
+          "beta": 0.0,
+          "cap": 140,
+          "damping": 0.0,
+          "family": "bp",
+          "search": {
+            "alpha": 0.625,
+            "beta": 0.0,
+            "damping": 0.0,
+            "first_gamma": 0.0,
+            "gamma_high": 0.375,
+            "gamma_low": 0.0,
+            "initial": 80,
+            "method": "relay",
+            "paper_scale": false,
+            "per_unit": 60,
+            "rounds": 1,
+            "solutions": 1,
+            "units": 1,
+            "width": 1
+          }
+        },
+        "shots": 793,
+        "failures": 20,
+        "ler": 0.025220680958385876,
+        "ci95": [
+          0.015471967435415058,
+          0.03721052824132324
+        ],
+        "mean_iterations": 20.095838587641865,
+        "mean_seconds": 0.0012835375145018916
+      },
+      {
+        "job": "source_numerics-p0600",
+        "p": 0.06,
+        "roles": [
+          "uniform_phase_only",
+          "reset_zero_gamma"
+        ],
+        "controls": {
+          "alpha": 0.625,
+          "beta": 0.0,
+          "cap": 140,
+          "damping": 0.0,
+          "family": "bp",
+          "search": {
+            "alpha": 0.625,
+            "beta": 0.0,
+            "damping": 0.0,
+            "first_gamma": 0.0,
+            "gamma_high": 0.0,
+            "gamma_low": 0.0,
+            "initial": 80,
+            "method": "relay",
+            "paper_scale": false,
+            "per_unit": 60,
+            "rounds": 1,
+            "solutions": 1,
+            "units": 1,
+            "width": 1
+          }
+        },
+        "shots": 465,
+        "failures": 20,
+        "ler": 0.043010752688172046,
+        "ci95": [
+          0.026466868223661018,
+          0.06320901283745224
+        ],
+        "mean_iterations": 21.12258064516129,
+        "mean_seconds": 0.001337171341935484
+      },
+      {
+        "job": "source_numerics-p0600",
+        "p": 0.06,
+        "roles": [
+          "continuous_bp140"
+        ],
+        "controls": {
+          "alpha": 0.625,
+          "beta": 0.0,
+          "cap": 140,
+          "damping": 0.0,
+          "family": "bp"
+        },
+        "shots": 465,
+        "failures": 20,
+        "ler": 0.043010752688172046,
+        "ci95": [
+          0.026466868223661018,
+          0.06320901283745224
+        ],
+        "mean_iterations": 21.12258064516129,
+        "mean_seconds": 0.001112438935483871
+      },
+      {
+        "job": "prior_tuned_numerics-p0600",
+        "p": 0.06,
+        "roles": [
+          "gamma_selected",
+          "disordered_phase_only"
+        ],
+        "controls": {
+          "alpha": 0.8,
+          "beta": 0.2,
+          "cap": 140,
+          "damping": 0.3,
+          "family": "bp",
+          "search": {
+            "alpha": 0.8,
+            "beta": 0.2,
+            "damping": 0.3,
+            "first_gamma": 0.0,
+            "gamma_high": 0.5,
+            "gamma_low": -0.375,
+            "initial": 80,
+            "method": "relay",
+            "paper_scale": false,
+            "per_unit": 60,
+            "rounds": 1,
+            "solutions": 1,
+            "units": 1,
+            "width": 1
+          }
+        },
+        "shots": 1121,
+        "failures": 20,
+        "ler": 0.01784121320249777,
+        "ci95": [
+          0.01093107158272717,
+          0.026365529294602143
+        ],
+        "mean_iterations": 14.72435325602141,
+        "mean_seconds": 0.0007624496940231935
+      },
+      {
+        "job": "prior_tuned_numerics-p0600",
+        "p": 0.06,
+        "roles": [
+          "uniform_phase_only",
+          "reset_zero_gamma"
+        ],
+        "controls": {
+          "alpha": 0.8,
+          "beta": 0.2,
+          "cap": 140,
+          "damping": 0.3,
+          "family": "bp",
+          "search": {
+            "alpha": 0.8,
+            "beta": 0.2,
+            "damping": 0.3,
+            "first_gamma": 0.0,
+            "gamma_high": 0.0,
+            "gamma_low": 0.0,
+            "initial": 80,
+            "method": "relay",
+            "paper_scale": false,
+            "per_unit": 60,
+            "rounds": 1,
+            "solutions": 1,
+            "units": 1,
+            "width": 1
+          }
+        },
+        "shots": 1041,
+        "failures": 20,
+        "ler": 0.01921229586935639,
+        "ci95": [
+          0.011773882551682924,
+          0.028383174447541
+        ],
+        "mean_iterations": 14.748318924111432,
+        "mean_seconds": 0.0007817598808837656
+      },
+      {
+        "job": "prior_tuned_numerics-p0600",
+        "p": 0.06,
+        "roles": [
+          "continuous_bp140"
+        ],
+        "controls": {
+          "alpha": 0.8,
+          "beta": 0.2,
+          "cap": 140,
+          "damping": 0.3,
+          "family": "bp"
+        },
+        "shots": 1041,
+        "failures": 20,
+        "ler": 0.01921229586935639,
+        "ci95": [
+          0.011773882551682924,
+          0.028383174447541
+        ],
+        "mean_iterations": 14.748318924111432,
+        "mean_seconds": 0.0006508999433237272
+      }
+    ]
+  },
+  "panteleev-2012-04068-lifted-product": {
+    "finished": 70,
+    "planned": 72,
+    "fresh_policies": 70,
+    "shots": 11236743,
+    "failures": 1400,
+    "training_measurements": 1960,
+    "verified_sha256": "4b27ceba2799b5235f071cd9888939e33ab70b3759961a37a065ba85973d4186"
+  }
+}

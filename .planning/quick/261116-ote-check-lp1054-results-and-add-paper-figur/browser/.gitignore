@@ -1,0 +1,6 @@
+*
+!.gitignore
+!papers-pass/
+!public-pass/
+!papers-pass/verification.json
+!public-pass/verification.json

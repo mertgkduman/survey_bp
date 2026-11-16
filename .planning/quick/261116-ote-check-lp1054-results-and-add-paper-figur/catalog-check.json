@@ -1,0 +1,18 @@
+{
+  "before": {
+    "curves": 443,
+    "points": 3194,
+    "codes": 13,
+    "circuits": 0
+  },
+  "after": {
+    "curves": 443,
+    "points": 3195,
+    "codes": 13,
+    "circuits": 0
+  },
+  "preserved_raw_series": 1543,
+  "added_raw_series": 7,
+  "all_prior_point_multisets_preserved": true,
+  "catalog_rebuild_matches_committed_snapshot": true
+}

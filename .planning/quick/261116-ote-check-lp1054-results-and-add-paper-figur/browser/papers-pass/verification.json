@@ -1,0 +1,13 @@
+{
+  "checks": [
+    "Clickable Yao title opens seven separately named figures with paper reproductions on and additional curves off",
+    "Per-figure group toggles, individual mixed state and automatic axes agree without changing other figures",
+    "Figure-labelled settings and CSV contain only visible scoped evidence; both groups off safely disables exports",
+    "Roffe Fig. 3 includes four labelled toric codes; canonical regular BP is default while CS10/OSD0 and tuning stay additional",
+    "MacKay inferred settings and LP Example 4 remain explicitly additional; no invented exact-reproduction figure",
+    "Custom plots survive switching; new imports stay additional; empty refresh removes stale paper/figure/input selections",
+    "Paper options and separate figure cards fit mobile and desktop layouts"
+  ],
+  "errors": [],
+  "simulations": 0
+}
