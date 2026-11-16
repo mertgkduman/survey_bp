@@ -1,0 +1,211 @@
+{
+  "checked_at": "2026-11-16T23:18:57.662570+00:00",
+  "finished": 6,
+  "planned": 12,
+  "fresh_policies": 24,
+  "shots": 6525,
+  "failures": 480,
+  "training_measurements": 1322,
+  "verified_sha256": "f5136723cdb331c3f4e5238faebce6110f73dcf39cf888cb6cd378a3686b58c6",
+  "comparisons": [
+    {
+      "job": "source_numerics-p0600",
+      "p": 0.06,
+      "background": "source_numerics",
+      "gamma": {
+        "alpha": 0.625,
+        "beta": 0.0,
+        "damping": 0.0,
+        "first_gamma": 0.0,
+        "gamma_high": 0.375,
+        "gamma_low": 0.0,
+        "initial": 80,
+        "method": "relay",
+        "paper_scale": false,
+        "per_unit": 60,
+        "rounds": 1,
+        "solutions": 1,
+        "units": 1,
+        "width": 1
+      },
+      "selected_ler": 0.025220680958385876,
+      "selected_ci95": [
+        0.015471967435415058,
+        0.03721052824132324
+      ],
+      "baseline_ler": 0.043010752688172046,
+      "baseline_ci95": [
+        0.026466868223661018,
+        0.06320901283745224
+      ],
+      "baseline_to_gamma_ler_ratio": 1.7053763440860217,
+      "intervals_overlap": true
+    },
+    {
+      "job": "prior_tuned_numerics-p0600",
+      "p": 0.06,
+      "background": "prior_tuned_numerics",
+      "gamma": {
+        "alpha": 0.8,
+        "beta": 0.2,
+        "damping": 0.3,
+        "first_gamma": 0.0,
+        "gamma_high": 0.5,
+        "gamma_low": -0.375,
+        "initial": 80,
+        "method": "relay",
+        "paper_scale": false,
+        "per_unit": 60,
+        "rounds": 1,
+        "solutions": 1,
+        "units": 1,
+        "width": 1
+      },
+      "selected_ler": 0.01784121320249777,
+      "selected_ci95": [
+        0.01093107158272717,
+        0.026365529294602143
+      ],
+      "baseline_ler": 0.01921229586935639,
+      "baseline_ci95": [
+        0.011773882551682924,
+        0.028383174447541
+      ],
+      "baseline_to_gamma_ler_ratio": 1.0768491834774256,
+      "intervals_overlap": true
+    },
+    {
+      "job": "source_numerics-p0800",
+      "p": 0.08,
+      "background": "source_numerics",
+      "gamma": {
+        "alpha": 0.625,
+        "beta": 0.0,
+        "damping": 0.0,
+        "first_gamma": 0.125,
+        "gamma_high": 0.25,
+        "gamma_low": -0.125,
+        "initial": 80,
+        "method": "relay",
+        "paper_scale": false,
+        "per_unit": 60,
+        "rounds": 1,
+        "solutions": 1,
+        "units": 1,
+        "width": 1
+      },
+      "selected_ler": 0.19047619047619047,
+      "selected_ci95": [
+        0.12040398010661924,
+        0.27050185840821844
+      ],
+      "baseline_ler": 0.2247191011235955,
+      "baseline_ci95": [
+        0.1429948758235286,
+        0.316453469299049
+      ],
+      "baseline_to_gamma_ler_ratio": 1.1797752808988764,
+      "intervals_overlap": true
+    },
+    {
+      "job": "prior_tuned_numerics-p0800",
+      "p": 0.08,
+      "background": "prior_tuned_numerics",
+      "gamma": {
+        "alpha": 0.8,
+        "beta": 0.0,
+        "damping": 0.3,
+        "first_gamma": 0.0625,
+        "gamma_high": 0.125,
+        "gamma_low": -0.125,
+        "initial": 80,
+        "method": "relay",
+        "paper_scale": false,
+        "per_unit": 60,
+        "rounds": 1,
+        "solutions": 1,
+        "units": 1,
+        "width": 1
+      },
+      "selected_ler": 0.12195121951219512,
+      "selected_ci95": [
+        0.07610663087485975,
+        0.17603357435975964
+      ],
+      "baseline_ler": 0.11363636363636363,
+      "baseline_ci95": [
+        0.0708101622002994,
+        0.16434823209235103
+      ],
+      "baseline_to_gamma_ler_ratio": 0.9318181818181818,
+      "intervals_overlap": true
+    },
+    {
+      "job": "source_numerics-p1000",
+      "p": 0.1,
+      "background": "source_numerics",
+      "gamma": {
+        "alpha": 0.625,
+        "beta": 0.0,
+        "damping": 0.0,
+        "first_gamma": 0.125,
+        "gamma_high": 0.125,
+        "gamma_low": -0.125,
+        "initial": 80,
+        "method": "relay",
+        "paper_scale": false,
+        "per_unit": 60,
+        "rounds": 1,
+        "solutions": 1,
+        "units": 1,
+        "width": 1
+      },
+      "selected_ler": 0.8333333333333334,
+      "selected_ci95": [
+        0.6261582865113173,
+        0.9504923546942066
+      ],
+      "baseline_ler": 0.7692307692307693,
+      "baseline_ci95": [
+        0.5635249030586136,
+        0.9064355606682571
+      ],
+      "baseline_to_gamma_ler_ratio": 0.9230769230769231,
+      "intervals_overlap": true
+    },
+    {
+      "job": "prior_tuned_numerics-p1000",
+      "p": 0.1,
+      "background": "prior_tuned_numerics",
+      "gamma": {
+        "alpha": 0.8,
+        "beta": 0.0,
+        "damping": 0.3,
+        "first_gamma": 0.0,
+        "gamma_high": 0.375,
+        "gamma_low": 0.0,
+        "initial": 80,
+        "method": "relay",
+        "paper_scale": false,
+        "per_unit": 60,
+        "rounds": 1,
+        "solutions": 1,
+        "units": 1,
+        "width": 1
+      },
+      "selected_ler": 0.6666666666666666,
+      "selected_ci95": [
+        0.47187995521011944,
+        0.8206163507648881
+      ],
+      "baseline_ler": 0.6666666666666666,
+      "baseline_ci95": [
+        0.47187995521011944,
+        0.8206163507648881
+      ],
+      "baseline_to_gamma_ler_ratio": 1.0,
+      "intervals_overlap": true
+    }
+  ],
+  "scope": "Independent fresh confirmations only, no training pooled. All six pointwise interval pairs overlap."
+}

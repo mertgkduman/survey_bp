@@ -6,13 +6,13 @@
     "circuits": 0
   },
   "after": {
-    "curves": 443,
-    "points": 3195,
+    "curves": 448,
+    "points": 3207,
     "codes": 13,
     "circuits": 0
   },
   "preserved_raw_series": 1543,
-  "added_raw_series": 7,
+  "added_raw_series": 18,
   "all_prior_point_multisets_preserved": true,
-  "catalog_rebuild_matches_committed_snapshot": true
+  "catalog_refreshed_by_unchanged_frozen_collector": true
 }
