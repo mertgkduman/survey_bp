@@ -5,11 +5,11 @@ current_phase: 11
 current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
-stopped_at: LP1054 check publishes66 audited points;68 simulations complete; four p=.02 simulations and two audits continue
-last_updated: "2026-11-16T21:25:49.363032+00:00"
+stopped_at: LP1054 check publishes68 audited points; four p=.02 simulations continue with automatic audits/collector
+last_updated: "2026-11-16T21:37:14.628239+00:00"
 last_activity: 2026-11-16
-last_activity_desc: Quick261116-mkh checks66 LP1054 confirmations and decoder tradeoffs; joint CS10 leads middle-rate estimates, rare points remain pending.
-state_head: 2cad9b43
+last_activity_desc: Quick261116-mkh checks68 LP1054 confirmations; low-p tuned BP competitive with joint OSD0, joint CS10 leads middle-rate estimates; four rare points continue.
+state_head: a75222da
 progress:
   total_phases: 14
   completed_phases: 8
@@ -35,7 +35,7 @@ Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
 Last activity: 2026-11-16 — quick261116-mkh checks original lifted-product decoder results
-Last Activity Description: LP1054 campaign68/72 simulations complete;66 full audits published(3,045,149 fresh decoder shots/1,320 failures,1,788 separate training settings). Four p=.02 simulations(Q-BP+CS10,tunedQBP,beam32/128) continue; tunedBP/Relay128 p=.02 await ongoing full audits. Existing one-CPU allocations/stopping and collector61930188 retained; eight satisfied audit dependencies released with verified source0:0 and hashes. Independent1,854-summary/manifest/count/interval/work/selection/source reconciliation passes. At p=.06/.08, joint CS10 LER3.17e-4/6.68e-4 is5.38x/16.33x lower than tunedQBP; .04 intervals overlap. Current binary search does not match joint OSD at middle rates;128 permits4x directed-edge work. Scientific3-panel PNG/PDF inspected. Public443 curves/3193 points/13 codes/0 circuits; all1538 historical point multisets preserved.55 catalog tests and11 Chromium groups pass. Original paper has no1054 source LER grid/cap; borrowed32/.625, schedule difference and provenance-instrumented timing remain explicit. No new simulations, frozen/raw/kernel/v1/model/config/phase-gate/counter edits; campaign remains running.
+Last Activity Description: LP1054 campaign68/72 simulations complete;68 full audits published(6,054,571 fresh decoder shots/1,360 failures,1,892 separate training settings). Four p=.02 simulations(Q-BP+CS10,tunedQBP,beam32/128) continue; both late tunedBP/Relay128 p=.02 full audits completed and are included. Existing one-CPU allocations/stopping and collector61930188 retained; eight satisfied audit dependencies released with verified source0:0 and hashes. Independent1,960-summary/manifest/count/interval/work/selection/source reconciliation passes. At p=.06/.08, joint CS10 LER3.17e-4/6.68e-4 is5.38x/16.33x lower than tunedQBP; .04 intervals overlap. Current binary search does not match joint OSD at middle rates;128 permits4x directed-edge work. Scientific3-panel PNG/PDF inspected. Public443 curves/3194 points/13 codes/0 circuits; all1538 historical point multisets preserved.55 catalog tests and11 Chromium groups pass. Original paper has no1054 source LER grid/cap; borrowed32/.625, schedule difference and provenance-instrumented timing remain explicit. No new simulations, frozen/raw/kernel/v1/model/config/phase-gate/counter edits; campaign remains running. Late p=.02 tuned BP LER1.20e-5(113x below baseline) and Relay1281.49e-5 have intervals overlapping joint OSD0(1.85e-5); no rare-point superiority claim.
 
 Prior original lifted-product launch:
 Last Activity Description: User-selected original Panteleev–Kalachev2012.04068v2 Example4 reconstructed as LP1054/k140/ranks457+457, independently checked against polynomial coefficient expansion. No source LER/grid/cap exists for1054; controlled depolarizing .02/.04/.06/.08/.10/.12 and NMS32/.625 borrowed from cited1904.02703 are explicit adaptations with flooding/layered schedule difference. Twelve families/variants per rate, including ordinary/correlated BP+OSD0/CS10, BP/QBP numerical tuning and Relay/beam32/128. One CPU per point, disjoint coarse/finalist/fresh seeds,20 failures or100M fresh shots. Frozen array61930050, point audits61930127 and collector61930188 continue. Snapshot50/72 workers:273,537 shots/1,000 failures,1,140 separate training settings,12 displayed compatible curves/44 displayed points. Public440 curves/3178 points/13 codes/0 circuits; all1520 prior series point arrays unchanged.20 new/61 unique scientific tests,55 catalog tests and16 browser groups pass, including new LP input/stale exports and final13-code public flow; old NFS cleanup-only flake passes retry. Provenance-instrumented timing scope documented. Prior beam frontier now218/218/642 settings/271.66M shots in separate9dba3da. No canonical/prior frozen/raw/v1/model/config/phase-gate/counter changes; campaign remains running. Implementation53fabae.
@@ -334,7 +334,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 | # | Description | Date | Commit | Status | Directory |
 |---|-------------|------|--------|--------|-----------|
-| 261116-mkh | Check original lifted-product results and decoder comparisons | 2026-11-16 | 2cad9b43 |66 audited points published; four simulations/two audits continue | [261116-mkh](./quick/261116-mkh-check-original-lifted-product-campaign-r/) |
+| 261116-mkh | Check original lifted-product results and decoder comparisons | 2026-11-16 | a75222da |68 audited points published; four rare simulations continue | [261116-mkh](./quick/261116-mkh-check-original-lifted-product-campaign-r/) |
 | 261116-jzy | Launch original lifted-product full decoder stack | 2026-11-16 | 53fabae |72 single-CPU workers;50 audited points published; campaign running | [261116-jzy](./quick/261116-jzy-reproduce-lifted-product-paper-codes-wit/) |
 | 261116-0k6 | Check broader beam/RelayBP results and latency tradeoffs | 2026-11-16 | 77aba5a | Verified215/218 workers;639 fresh settings published | [261116-0k6](./quick/261116-0k6-check-tuned-beam-and-relaybp-frontier-re/) |
 | 261115-sxj | Tune beam search and RelayBP for LER versus OSD0 latency | 2026-11-15 | 1154bbf | Qualified;114-worker snapshot published; broader frontier running | [261115-sxj](./quick/261115-sxj-tune-canonical-beam-search-and-relaybp-a/) |
