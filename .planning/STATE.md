@@ -5,11 +5,11 @@ current_phase: 11
 current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
-stopped_at: Initial beam/RelayBP218 workers complete; audit61869372 running;114 workers/277 settings published; frontier61870314 running
-last_updated: "2026-11-16T03:12:18.709728+00:00"
-last_activity: 2026-11-15
-last_activity_desc: Quick261115-sxj publishes114 audited beam/RelayBP workers/277 settings and launches a broader fresh-seed latency frontier; full audits continue.
-state_head: 1154bbf
+stopped_at: Broader beam/RelayBP215/218 workers audited,639 settings published; three rare beam points continue; final collector61870315 pending
+last_updated: "2026-11-16T05:53:08.649303+00:00"
+last_activity: 2026-11-16
+last_activity_desc: Quick261116-0k6 audits639 broader search confirmations/27.24M shots; useful beam latency tradeoffs, remaining rare points explicit.
+state_head: 77aba5a
 progress:
   total_phases: 14
   completed_phases: 8
@@ -34,7 +34,10 @@ Total Phases: 14
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
-Last activity: 2026-11-15 — quick261115-sxj tunes beam search and RelayBP against OSD latency
+Last activity: 2026-11-16 — quick261116-0k6 checks broader beam/RelayBP results
+Last Activity Description: Original218-worker/full-audit campaign complete(616 settings/11,477,871 shots). Broader snapshot215/218 passes unchanged full-ledger/reference/endpoint/proposal/source audits via61875143(8 CPUs/16GiB,8m50s):639 fresh settings/27,243,865 shots/12,780 failures,2,063 separate training measurements. Independently reconcile1,255 old/new summaries/manifests/hashes/counts/stopping/CI/work/ratio/selection. At X-only p=.02,1x-role beam LER4.65e-5/2.70e-5/3.47e-6 on lengths162/242/338 uses.490/.366/.216 times same-CPU OSD0. Length162 intervals overlap;242/338 estimates remain3.0x/2.5x higher than OSD0. Beam242 improves14.8x versus first search; Relay remains less accurate at these examples. Actual1x budget fits93/106 beam,92/109 Relay;30 over-budget rows flagged. Three beam rare points(242/.01,450/.01,450/.02) remain active; no provisional rate/bound published. Full tables/role comparisons/PNG/PDF saved. Public427 curves/3132 points/12 codes/0 circuits; all800 historical raw series retain point subsets.53 regressions/12 Chromium groups pass, including empty/stale/custom/v1 flows. No simulations or frozen/raw/kernel/config/gate/counter changes; automatic final collector61870315 still awaits remaining workers.
+
+Prior beam/RelayBP launch: 2026-11-15 — quick261115-sxj tunes beam search and RelayBP against OSD latency
 Last Activity Description: Canonical-sweep beam/RelayBP traversal passes128 exact real-code scalar-oracle cases,80 unique regressions and12 final Chromium groups. First array61869371 completed218/2180:0; full audit61869372 runs. Completed-worker snapshot deeply audits114 workers/277 fresh settings/3,297,851 shots/5,540 failures plus23,839 training measurements. At length242/p=.02 beam LER4.01e-4 and Relay2.68e-4 use.145/.166 times same-CPU OSD0 time, improving earlier BP .161 but above OSD0 8.87e-6. Initial coarse zero-failure ties underused budgets; separately frozen training-only frontier (array61870314, audit61870315) retains budget-spanning/multiple-solution arms and uses new finalist/confirmation seeds1562/1563. Adaptive timing documented; no parent confirmation outcomes enter its selector. Source-dependent215 task releases verified sacct/completion hashes after Slurm cache expiry, without changing science or collector dependencies. Central normalized catalogs now registered; complete search state guards evidence identity. Public324 curves/2667 points/12 codes/0 circuits; all547 historical raw series unchanged.277 raw measurements remain in full report/CSV, singleton concrete policies excluded centrally. Full settings, pointwise intervals, all-path mean sweeps/edge updates and measured latency quantiles preserved. PNG/PDF inspected. Both studies/audits continue; no old frozen/raw/canonical/v1/config/model or Phase11 gate/counter changes.
 
 Prior completed runtime-budget activity: 2026-11-14 — quick261114-pna checks completed runtime-budget and related results
@@ -325,6 +328,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 | # | Description | Date | Commit | Status | Directory |
 |---|-------------|------|--------|--------|-----------|
+| 261116-0k6 | Check broader beam/RelayBP results and latency tradeoffs | 2026-11-16 | 77aba5a | Verified215/218 workers;639 fresh settings published | [261116-0k6](./quick/261116-0k6-check-tuned-beam-and-relaybp-frontier-re/) |
 | 261115-sxj | Tune beam search and RelayBP for LER versus OSD0 latency | 2026-11-15 | 1154bbf | Qualified;114-worker snapshot published; broader frontier running | [261115-sxj](./quick/261115-sxj-tune-canonical-beam-search-and-relaybp-a/) |
 | 261114-pna | Check completed runtime-budget results and archive full evidence | 2026-11-14 | 7fcae85 | Complete;1464 rows/218 workers, timing caveats explicit | [261114-pna](./quick/261114-pna-audit-completed-runtime-budget-joint-con/) |
 | 261114-lhw | Joint damping/scaling/offset and runtime-matched iteration histories | 2026-11-14 | 8e903bc | Implementation/launch complete;218-worker array61824235 running | [261114-lhw](./quick/261114-lhw-run-runtime-matched-iteration-sweeps-wit/) |
@@ -411,7 +415,7 @@ No requested decoding regime or named policy family is deferred beyond the first
 
 ## Session Continuity
 
-Latest campaign: quick261115-sxj. Initial218 workers complete; full source audit61869372 running.114-worker/277-setting snapshot published with full training/confirmation ledger and endpoint checks. Broader independent-seed frontier61870314 runs; collector61870315 requires its success and the complete source audit. Both source registries and exact search evidence identities are wired for future rebuilds. See FINDINGS.md, plots and both study READMEs; do not alter frozen plans or resubmit arrays. Parent confirmation outcomes are excluded from follow-up proposal selection. Phase gates/counters unchanged.
+Latest check: quick261116-0k6. Original search fully audited218/218. Broader search215/218 deeply audited;639 fresh configurations/27.24M shots published, with independent arithmetic/selection checks. Three beam points remain running and collector61870315 waits for them. See FINDINGS.md, comparisons.csv and scientific figure. Strict comparisons use actual mean-time eligibility; no equivalence/threshold claim follows from20-failure precision. Public427 curves/3132 points/12 codes/0 circuits; historical subsets and singleton eligibility preserved. Do not change frozen plans or resubmit simulations. Phase gates/counters unchanged.
 
 Prior comparison: quick 261114-pna, evidence `7fcae85`. Runtime-budget tuning is complete: 218/218 workers and collector 61824236 completed; all 1,464 fresh confirmation rows are independently reconciled. Extra iterations improve observed binary BP LER in only 1/107 extended-cap strata. Joint-control median LER and mean-iteration ratios remain 1.00; pointwise gains and uncertainty remain in the report. Actual selected timing is within 10% at 145/218 points; 36 over-budget points are flagged. See the quick task FINDINGS.md, per-cap figure, selected-point CSV and full study RESULTS.md. Public workbench now has 308 curves/2,627 points/12 codes/0 circuits. Full evidence and training CSV are losslessly archived with raw-byte hashes; unchanged local raw files remain available. MacKay T100 confirmation is complete 40/40. OSD audit 61820674 completed; 212 audited OSD points are published, two completed length338/p=.01 endpoints await final audit, and four length450 points continue. Complete collector 61820676 remains dependent on the original array. No simulations were rerun or submitted, and phase gates/counters remain unchanged.
 
