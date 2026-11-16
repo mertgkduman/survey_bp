@@ -1,0 +1,11 @@
+{
+  "status": "passed",
+  "checks": [
+    "LP1054 shows distinct binary and correlated OSD curves with exact budgets and precision",
+    "Visible table and CSV retain both decoder families and physical rates",
+    "Registered LP matrix preview loads; saved joint OSD cannot silently become plain BP",
+    "Repeated same-rate evidence hides LP1054 everywhere and clears stale code/decoder selections"
+  ],
+  "page_errors": [],
+  "fixture": "synthetic; not measured campaign evidence"
+}
