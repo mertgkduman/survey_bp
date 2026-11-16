@@ -5,11 +5,11 @@ current_phase: 11
 current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
-stopped_at: Runtime-budget study complete218/218;1464 confirmations audited/published; four length450 OSD points remain running
-last_updated: "2026-11-15T00:02:38.162455+00:00"
-last_activity: 2026-11-14
-last_activity_desc: Quick261114-pna validates1464 complete runtime measurements and mixed gains; actual timing145/218 within10%; lossless archives and full catalogs refreshed.
-state_head: 7fcae85
+stopped_at: Initial beam/RelayBP218 workers complete; audit61869372 running;114 workers/277 settings published; frontier61870314 running
+last_updated: "2026-11-16T03:12:18.709728+00:00"
+last_activity: 2026-11-15
+last_activity_desc: Quick261115-sxj publishes114 audited beam/RelayBP workers/277 settings and launches a broader fresh-seed latency frontier; full audits continue.
+state_head: 1154bbf
 progress:
   total_phases: 14
   completed_phases: 8
@@ -34,7 +34,10 @@ Total Phases: 14
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
-Last activity: 2026-11-14 — quick261114-pna checks completed runtime-budget and related results
+Last activity: 2026-11-15 — quick261115-sxj tunes beam search and RelayBP against OSD latency
+Last Activity Description: Canonical-sweep beam/RelayBP traversal passes128 exact real-code scalar-oracle cases,80 unique regressions and12 final Chromium groups. First array61869371 completed218/2180:0; full audit61869372 runs. Completed-worker snapshot deeply audits114 workers/277 fresh settings/3,297,851 shots/5,540 failures plus23,839 training measurements. At length242/p=.02 beam LER4.01e-4 and Relay2.68e-4 use.145/.166 times same-CPU OSD0 time, improving earlier BP .161 but above OSD0 8.87e-6. Initial coarse zero-failure ties underused budgets; separately frozen training-only frontier (array61870314, audit61870315) retains budget-spanning/multiple-solution arms and uses new finalist/confirmation seeds1562/1563. Adaptive timing documented; no parent confirmation outcomes enter its selector. Source-dependent215 task releases verified sacct/completion hashes after Slurm cache expiry, without changing science or collector dependencies. Central normalized catalogs now registered; complete search state guards evidence identity. Public324 curves/2667 points/12 codes/0 circuits; all547 historical raw series unchanged.277 raw measurements remain in full report/CSV, singleton concrete policies excluded centrally. Full settings, pointwise intervals, all-path mean sweeps/edge updates and measured latency quantiles preserved. PNG/PDF inspected. Both studies/audits continue; no old frozen/raw/canonical/v1/config/model or Phase11 gate/counter changes.
+
+Prior completed runtime-budget activity: 2026-11-14 — quick261114-pna checks completed runtime-budget and related results
 Last Activity Description: All218 runtime workers and collector61824236 complete0:0. Independently reconciled1464 fresh rows/249,888 shots/29,280 failures plus218 frozen selections;163,668 tuning rows remain separate. Only1/107 extended-cap BP strata improves LER; joint-control median LER and mean-iteration ratios remain1.00 across the grid. Offset zero selected217/218; alpha magnitude1 selected217/218. Actual selected timing145/218 within10%,36 over1.1 and37 below.9, so strict runtime claims use qualified subsets. At p_X=.02, same-channel BP remains orders of magnitude above OSD0. Full434MiB verification and70MiB tuning CSV retained locally and committed losslessly as gzip with byte hashes/roundtrip checks; no raw data or source edits. Refreshed public308 curves/2627 points/12 codes/0 circuits; old227 raw-series point subsets preserved.52 regressions and7 real-data browser groups pass. MacKay T100 confirmation now40/40(112,619,245 shots/791 failures); rare274 QBP point100M/11 failures ends at1.1e-7. OSD212 fully audited points retained; four length450 points run, two completed338/p=.01 points await final OSD audit. Checked findings/figure/selected-point CSV linked from study RESULTS.md. No new simulations, canonical/frozen/v1 changes or phase gate/counter changes.
 
 Prior runtime-budget launch activity: 2026-11-14 — quick261114-lhw prepares joint-control tuning and runtime-matched iteration studies
@@ -322,6 +325,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 | # | Description | Date | Commit | Status | Directory |
 |---|-------------|------|--------|--------|-----------|
+| 261115-sxj | Tune beam search and RelayBP for LER versus OSD0 latency | 2026-11-15 | 1154bbf | Qualified;114-worker snapshot published; broader frontier running | [261115-sxj](./quick/261115-sxj-tune-canonical-beam-search-and-relaybp-a/) |
 | 261114-pna | Check completed runtime-budget results and archive full evidence | 2026-11-14 | 7fcae85 | Complete;1464 rows/218 workers, timing caveats explicit | [261114-pna](./quick/261114-pna-audit-completed-runtime-budget-joint-con/) |
 | 261114-lhw | Joint damping/scaling/offset and runtime-matched iteration histories | 2026-11-14 | 8e903bc | Implementation/launch complete;218-worker array61824235 running | [261114-lhw](./quick/261114-lhw-run-runtime-matched-iteration-sweeps-wit/) |
 | 261114-i9b | Explain optimized OSD search and check212 terminal points/424 endpoints | 2026-11-14 | 2c8b6fe | Check complete; full interior audit61820674 continues | [261114-i9b](./quick/261114-i9b-audit-current-osd0-cs10-results-and-expl/) |
@@ -407,7 +411,9 @@ No requested decoding regime or named policy family is deferred beyond the first
 
 ## Session Continuity
 
-Latest comparison: quick 261114-pna, evidence `7fcae85`. Runtime-budget tuning is complete: 218/218 workers and collector 61824236 completed; all 1,464 fresh confirmation rows are independently reconciled. Extra iterations improve observed binary BP LER in only 1/107 extended-cap strata. Joint-control median LER and mean-iteration ratios remain 1.00; pointwise gains and uncertainty remain in the report. Actual selected timing is within 10% at 145/218 points; 36 over-budget points are flagged. See the quick task FINDINGS.md, per-cap figure, selected-point CSV and full study RESULTS.md. Public workbench now has 308 curves/2,627 points/12 codes/0 circuits. Full evidence and training CSV are losslessly archived with raw-byte hashes; unchanged local raw files remain available. MacKay T100 confirmation is complete 40/40. OSD audit 61820674 completed; 212 audited OSD points are published, two completed length338/p=.01 endpoints await final audit, and four length450 points continue. Complete collector 61820676 remains dependent on the original array. No simulations were rerun or submitted, and phase gates/counters remain unchanged.
+Latest campaign: quick261115-sxj. Initial218 workers complete; full source audit61869372 running.114-worker/277-setting snapshot published with full training/confirmation ledger and endpoint checks. Broader independent-seed frontier61870314 runs; collector61870315 requires its success and the complete source audit. Both source registries and exact search evidence identities are wired for future rebuilds. See FINDINGS.md, plots and both study READMEs; do not alter frozen plans or resubmit arrays. Parent confirmation outcomes are excluded from follow-up proposal selection. Phase gates/counters unchanged.
+
+Prior comparison: quick 261114-pna, evidence `7fcae85`. Runtime-budget tuning is complete: 218/218 workers and collector 61824236 completed; all 1,464 fresh confirmation rows are independently reconciled. Extra iterations improve observed binary BP LER in only 1/107 extended-cap strata. Joint-control median LER and mean-iteration ratios remain 1.00; pointwise gains and uncertainty remain in the report. Actual selected timing is within 10% at 145/218 points; 36 over-budget points are flagged. See the quick task FINDINGS.md, per-cap figure, selected-point CSV and full study RESULTS.md. Public workbench now has 308 curves/2,627 points/12 codes/0 circuits. Full evidence and training CSV are losslessly archived with raw-byte hashes; unchanged local raw files remain available. MacKay T100 confirmation is complete 40/40. OSD audit 61820674 completed; 212 audited OSD points are published, two completed length338/p=.01 endpoints await final audit, and four length450 points continue. Complete collector 61820676 remains dependent on the original array. No simulations were rerun or submitted, and phase gates/counters remain unchanged.
 
 Prior result: quick261113-v31, implementationc595969. Roffe damping is complete and published: all1526 tuning/436 independent confirmation points audited. Public104 curves/1073 points at that snapshot. See data/reproductions/roffe-2005-07016-damping/RESULTS.md and completion-status.json. Original failed publication history is retained; equal paper metadata now merges safely. The separate MacKay rare-event point subsequently completed, as recorded above.
 
