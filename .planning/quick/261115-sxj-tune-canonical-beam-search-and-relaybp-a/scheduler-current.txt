@@ -1,0 +1,12 @@
+61869372|N/A|RUNNING|dcc-core-ferc-u-ac39-4-6
+61870314|169|RUNNING|dcc-dhvimdcore-gpu-ferc-s-i11-20
+61870314|57|RUNNING|dcc-dhvimdcore-gpu-ferc-s-o15-5
+61870314|58|RUNNING|dcc-dhvimdcore-gpu-ferc-s-o15-5
+61870314|62|RUNNING|dcc-dhvimdcore-gpu-ferc-s-o15-5
+61870314|0|RUNNING|dcc-core-ferc-u-ac39-4-8
+61870314|1|RUNNING|dcc-core-ferc-u-ac39-4-7
+61870315|N/A|PENDING|(Dependency)
+61870314|112|RUNNING|dcc-schmidler-ferc-u-ab25-2-1
+61870314|114|RUNNING|dcc-schmidler-ferc-u-ab25-2-1
+61870314|116|RUNNING|dcc-schmidler-ferc-u-ab25-2-1
+61870314|118|RUNNING|dcc-schmidler-ferc-u-ab25-2-1

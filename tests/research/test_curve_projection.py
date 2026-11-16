@@ -217,10 +217,10 @@ def test_rebuilt_catalog_uses_same_active_view_as_browser_and_preserves_retained
     from bp_registry.research.catalog import build_catalog
     c = build_catalog(ROOT)
     view = active_view(c)
-    legacy = [s for s in view['curves'] if s['dataset_id'] not in {'yao-bpgd-completion', 'mackay-unicycle-bp', 'mackay-unicycle-paper-rates', 'mackay-damping-confirmation', 'roffe-2020-figure3-canonical-bp', 'mackay-inferred-t100-baseline', 'mackay-damping-t100-confirmation', 'mackay-qbp-isolation-t100', 'roffe-damping-confirmation', 'roffe-canonical-bp-osd', 'roffe-canonical-bp-osd-fast', 'roffe-joint-controls-runtime-budget'}]
+    legacy = [s for s in view['curves'] if s['dataset_id'] not in {'yao-bpgd-completion', 'mackay-unicycle-bp', 'mackay-unicycle-paper-rates', 'mackay-damping-confirmation', 'roffe-2020-figure3-canonical-bp', 'mackay-inferred-t100-baseline', 'mackay-damping-t100-confirmation', 'mackay-qbp-isolation-t100', 'roffe-damping-confirmation', 'roffe-canonical-bp-osd', 'roffe-canonical-bp-osd-fast', 'roffe-joint-controls-runtime-budget', 'roffe-tuned-beam-relay-latency', 'roffe-beam-relay-frontier-finalists'}]
     assert len(legacy) == 53
     assert sum(len(s['points']) for s in legacy) == 262
-    added = {s['code_id'] for s in view['curves'] if s['dataset_id'] in {'mackay-unicycle-bp', 'mackay-unicycle-paper-rates', 'mackay-damping-confirmation', 'roffe-2020-figure3-canonical-bp', 'mackay-inferred-t100-baseline', 'mackay-damping-t100-confirmation', 'mackay-qbp-isolation-t100', 'roffe-damping-confirmation', 'roffe-canonical-bp-osd', 'roffe-canonical-bp-osd-fast', 'roffe-joint-controls-runtime-budget'}}
+    added = {s['code_id'] for s in view['curves'] if s['dataset_id'] in {'mackay-unicycle-bp', 'mackay-unicycle-paper-rates', 'mackay-damping-confirmation', 'roffe-2020-figure3-canonical-bp', 'mackay-inferred-t100-baseline', 'mackay-damping-t100-confirmation', 'mackay-qbp-isolation-t100', 'roffe-damping-confirmation', 'roffe-canonical-bp-osd', 'roffe-canonical-bp-osd-fast', 'roffe-joint-controls-runtime-budget', 'roffe-tuned-beam-relay-latency', 'roffe-beam-relay-frontier-finalists'}}
     assert {code['code_id'] for code in view['codes']} == {'a5', 'b2', 'b1', 'c2', 'double-gross', 'bb72'} | added
     assert view['circuits'] == []
     from bp_registry.research.inputs import input_registry
@@ -299,6 +299,18 @@ def test_execution_backends_keep_timing_evidence_separate():
             'family': 'binary_css', 'execution_backend': name,
             'postprocessing': {'method': 'OSD_CS', 'order': 10}}}}
         for name in ('scalar', 'compiled')]))
+    assert len(curves) == 2 and all(len(c['points']) == 1 for c in curves)
+
+
+def test_search_controls_cannot_be_combined_to_make_a_curve_eligible():
+    # Deliberately identical display labels cannot erase the search state.
+    rows = [row(name, seed=1, evidence=name+'.json') for name in ('narrow', 'wide')]
+    rows[1]['points'][0]['x'] = .08
+    curves = project(catalog(rows, [
+        {'decoder_id': name, 'configuration': {'effective_configuration': {
+            'family': 'binary_css', 'execution_backend': 'canonical-css-search-traversal-v1',
+            'search': {'method': 'beam', 'width': width, 'solutions': 4}}}}
+        for name, width in [('narrow', 1), ('wide', 16)]]))
     assert len(curves) == 2 and all(len(c['points']) == 1 for c in curves)
 
 

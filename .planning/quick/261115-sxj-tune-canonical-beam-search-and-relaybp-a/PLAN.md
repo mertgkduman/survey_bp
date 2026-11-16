@@ -1,6 +1,6 @@
 ---
 id: 261115-sxj
-status: launched
+status: complete
 workflow: gsd-quick --validate (inline execution)
 ---
 

@@ -1,0 +1,18 @@
+{
+  "historical_series_unchanged": 547,
+  "new_raw_series": 253,
+  "new_raw_points": 277,
+  "counts_before": {
+    "curves": 308,
+    "points": 2627,
+    "codes": 12,
+    "circuits": 0
+  },
+  "counts_after": {
+    "curves": 324,
+    "points": 2667,
+    "codes": 12,
+    "circuits": 0
+  },
+  "source": "277 audited configurations from114 completed workers; singleton concrete policies remain in dedicated tables"
+}

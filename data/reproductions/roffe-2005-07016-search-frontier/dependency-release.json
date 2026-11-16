@@ -1,0 +1,1094 @@
+{
+  "argv": [
+    "scontrol",
+    "update",
+    "JobId=61870314_0,61870314_1,61870314_2,61870314_3,61870314_4,61870314_5,61870314_6,61870314_7,61870314_8,61870314_9,61870314_10,61870314_11,61870314_12,61870314_13,61870314_14,61870314_15,61870314_16,61870314_17,61870314_18,61870314_19,61870314_20,61870314_21,61870314_22,61870314_23,61870314_24,61870314_25,61870314_26,61870314_27,61870314_28,61870314_29,61870314_30,61870314_31,61870314_32,61870314_33,61870314_34,61870314_35,61870314_36,61870314_37,61870314_38,61870314_39,61870314_40,61870314_41,61870314_42,61870314_43,61870314_44,61870314_45,61870314_46,61870314_47,61870314_48,61870314_49,61870314_50,61870314_51,61870314_52,61870314_53,61870314_54,61870314_55,61870314_56,61870314_57,61870314_58,61870314_59,61870314_60,61870314_61,61870314_62,61870314_63,61870314_64,61870314_65,61870314_66,61870314_67,61870314_68,61870314_69,61870314_70,61870314_71,61870314_72,61870314_73,61870314_74,61870314_75,61870314_76,61870314_77,61870314_78,61870314_79,61870314_80,61870314_81,61870314_82,61870314_83,61870314_84,61870314_85,61870314_86,61870314_87,61870314_88,61870314_89,61870314_90,61870314_91,61870314_92,61870314_93,61870314_94,61870314_95,61870314_96,61870314_97,61870314_98,61870314_99,61870314_100,61870314_101,61870314_102,61870314_103,61870314_104,61870314_105,61870314_106,61870314_107,61870314_108,61870314_109,61870314_110,61870314_111,61870314_112,61870314_113,61870314_114,61870314_115,61870314_116,61870314_117,61870314_118,61870314_119,61870314_120,61870314_121,61870314_122,61870314_123,61870314_124,61870314_125,61870314_126,61870314_127,61870314_128,61870314_129,61870314_130,61870314_131,61870314_132,61870314_133,61870314_134,61870314_135,61870314_136,61870314_137,61870314_138,61870314_139,61870314_140,61870314_141,61870314_142,61870314_143,61870314_145,61870314_146,61870314_147,61870314_149,61870314_151,61870314_152,61870314_153,61870314_154,61870314_155,61870314_156,61870314_157,61870314_158,61870314_159,61870314_160,61870314_161,61870314_162,61870314_163,61870314_164,61870314_165,61870314_166,61870314_167,61870314_168,61870314_169,61870314_170,61870314_171,61870314_172,61870314_173,61870314_174,61870314_175,61870314_176,61870314_177,61870314_178,61870314_179,61870314_180,61870314_181,61870314_182,61870314_183,61870314_184,61870314_185,61870314_186,61870314_187,61870314_188,61870314_189,61870314_190,61870314_191,61870314_192,61870314_193,61870314_194,61870314_195,61870314_196,61870314_197,61870314_198,61870314_199,61870314_200,61870314_201,61870314_202,61870314_203,61870314_204,61870314_205,61870314_206,61870314_207,61870314_208,61870314_209,61870314_210,61870314_211,61870314_212,61870314_213,61870314_214,61870314_215,61870314_216,61870314_217",
+    "Dependency="
+  ],
+  "array": "61870314",
+  "parent_array": "61869371",
+  "reason": "Old individual tasks are absent from Slurm live cache; aftercorr remains unfulfilled despite successful sacct records and immutable complete receipts. Scientific settings and collector dependencies unchanged.",
+  "reference": "https://slurm.schedmd.com/scontrol.html#OPT_Dependency",
+  "returncode": 0,
+  "schema": "verified-parent-scheduler-dependency-release-v1",
+  "stderr": "",
+  "stdout": "",
+  "timestamp_utc": "2026-11-16T02:50:45.811659+00:00",
+  "verified_completed_parents": [
+    {
+      "index": 0,
+      "parent_job_id": "toric11-binary_ms-p01000-beam",
+      "selection_sha256": "e753400440e11df460c3fcd0d870348b5555202ae192e4e2d84d47d1d7bd0237"
+    },
+    {
+      "index": 1,
+      "parent_job_id": "toric11-binary_ms-p01000-relay",
+      "selection_sha256": "d46eec0089fb90bdea1e846299342fe149a1b4a4bebd2d6baab9b0bf03b97de9"
+    },
+    {
+      "index": 2,
+      "parent_job_id": "toric11-binary_ms-p02000-beam",
+      "selection_sha256": "24d19dff1cbdecf8a7bbc113ff1381b3bc5236effd252f588703c589cd1cd4e3"
+    },
+    {
+      "index": 3,
+      "parent_job_id": "toric11-binary_ms-p02000-relay",
+      "selection_sha256": "94a7b49751bde540f78028339a9c70e814769f604002a69c719df74caa209224"
+    },
+    {
+      "index": 4,
+      "parent_job_id": "toric11-binary_ms-p03000-beam",
+      "selection_sha256": "f23008783fbbdf1ca7648f60bcc2b2bef6b2cd70684f99f2e920f6b10d76e028"
+    },
+    {
+      "index": 5,
+      "parent_job_id": "toric11-binary_ms-p03000-relay",
+      "selection_sha256": "d34e7964c50912316e23552ab85af57bac13ee6adcb2fdda68f8a37411847e88"
+    },
+    {
+      "index": 6,
+      "parent_job_id": "toric11-binary_ms-p04000-beam",
+      "selection_sha256": "683ae32de41af71151513ccbd959152a827b9e7b3dd603e0cc0dc2f0b3dab139"
+    },
+    {
+      "index": 7,
+      "parent_job_id": "toric11-binary_ms-p04000-relay",
+      "selection_sha256": "600ccaeb1cab913c162898d6b62edc9634f225659b94e70690fed03875e827cb"
+    },
+    {
+      "index": 8,
+      "parent_job_id": "toric11-binary_ms-p05000-beam",
+      "selection_sha256": "ba63566bee4b9cd1f2e1a6d536e65a4b747f86321387582c1c45246bad1bedf7"
+    },
+    {
+      "index": 9,
+      "parent_job_id": "toric11-binary_ms-p05000-relay",
+      "selection_sha256": "0598a14e2dec696834f62a831cef03bea5133a405f830d87c1f401beb4eb8d66"
+    },
+    {
+      "index": 10,
+      "parent_job_id": "toric11-binary_ms-p06000-beam",
+      "selection_sha256": "c4c2c998f4cc8ba6ba814d9c52ec98d34ac07baa006c90b1c97d7e65a0af5201"
+    },
+    {
+      "index": 11,
+      "parent_job_id": "toric11-binary_ms-p06000-relay",
+      "selection_sha256": "e310c460780ffdef5c6915872710315abac599346c9fbc48668a479f54a92d46"
+    },
+    {
+      "index": 12,
+      "parent_job_id": "toric11-binary_ms-p07000-beam",
+      "selection_sha256": "74b8c3abf9ecf2f1ae231dc3cfcdf05a552ed3b89a41b299581e05f6b1a90d85"
+    },
+    {
+      "index": 13,
+      "parent_job_id": "toric11-binary_ms-p07000-relay",
+      "selection_sha256": "ec43f71ad2cff1de94613ecd69e6a04b0490f14e875440bfcf8798763d314699"
+    },
+    {
+      "index": 14,
+      "parent_job_id": "toric11-binary_ms-p08000-beam",
+      "selection_sha256": "8f4f0a408959c10e6ea9fd8af4f346e6e12f57e7446ee58e05e84ef25d4fb019"
+    },
+    {
+      "index": 15,
+      "parent_job_id": "toric11-binary_ms-p08000-relay",
+      "selection_sha256": "9dd0dff00cfb123743f2009a9a1b0142f97e6940778e1cbc863c48a67a528779"
+    },
+    {
+      "index": 16,
+      "parent_job_id": "toric11-binary_ms-p09000-beam",
+      "selection_sha256": "53ecc3899ce760d689756c932a006b56cda3b66df04db6037d1d8beedcdc8c52"
+    },
+    {
+      "index": 17,
+      "parent_job_id": "toric11-binary_ms-p09000-relay",
+      "selection_sha256": "586217463e7bb8e7e9aa0961c36082b9ed2cfb85cc8ae24c4e84fe87c75ad7c2"
+    },
+    {
+      "index": 18,
+      "parent_job_id": "toric11-binary_ms-p09100-beam",
+      "selection_sha256": "e40cdba7724921f852e35f6bdf1b63c81e9c1de946dfdbcae26c976e3a9a24eb"
+    },
+    {
+      "index": 19,
+      "parent_job_id": "toric11-binary_ms-p09100-relay",
+      "selection_sha256": "5454d8858eb660e0f49566a37b5d3594d547e208786bdc9f1ca244db025f884b"
+    },
+    {
+      "index": 20,
+      "parent_job_id": "toric11-binary_ms-p09200-beam",
+      "selection_sha256": "869a31be1ea8376d4501d1c7e1320850f39a4a5e0830cd29890266c075a9d9ee"
+    },
+    {
+      "index": 21,
+      "parent_job_id": "toric11-binary_ms-p09200-relay",
+      "selection_sha256": "a522e0db8c537a26a2e9c1ded80775b4823d11c914904f1e812fccfee6aeea67"
+    },
+    {
+      "index": 22,
+      "parent_job_id": "toric11-binary_ms-p09300-beam",
+      "selection_sha256": "4556c465b2a60b2cf040908c88347b2f840d9e2ec1d7c0a7a6340afacbd2ec5f"
+    },
+    {
+      "index": 23,
+      "parent_job_id": "toric11-binary_ms-p09300-relay",
+      "selection_sha256": "ab384be9ba30d5f8fa4e22ed10c0924357268eb48a6b163d3369acd6dde3d176"
+    },
+    {
+      "index": 24,
+      "parent_job_id": "toric11-binary_ms-p09400-beam",
+      "selection_sha256": "a63dcf946d26cbd3803d616ad45005b18dd421d3ce89615e2917032a8bdc542b"
+    },
+    {
+      "index": 25,
+      "parent_job_id": "toric11-binary_ms-p09400-relay",
+      "selection_sha256": "d083e6790b4e78b09997647c13639c25d8102e687856fe72944cbb13607ad6d0"
+    },
+    {
+      "index": 26,
+      "parent_job_id": "toric11-binary_ms-p09500-beam",
+      "selection_sha256": "961840afd00558c88b8d80466132be1f9456e4e9862a3c7225c63dd5491b1ad4"
+    },
+    {
+      "index": 27,
+      "parent_job_id": "toric11-binary_ms-p09500-relay",
+      "selection_sha256": "ef574de36bc335fd34db434eeb94d34d4853cb256b8cf3b5eba5934d035969c3"
+    },
+    {
+      "index": 28,
+      "parent_job_id": "toric11-binary_ms-p09600-beam",
+      "selection_sha256": "a48f969c3762f7f2d4835f32d18c80d755d9be35877b9a9e583e823dffec3201"
+    },
+    {
+      "index": 29,
+      "parent_job_id": "toric11-binary_ms-p09600-relay",
+      "selection_sha256": "9a137ab087271c214dc84bdc15edb030acb0e730f2ce7d888626047bf87b1d31"
+    },
+    {
+      "index": 30,
+      "parent_job_id": "toric11-binary_ms-p09700-beam",
+      "selection_sha256": "8123e9365ae073666cbbd72b590b63771305cefa07f37faa62dc35ff825889c9"
+    },
+    {
+      "index": 31,
+      "parent_job_id": "toric11-binary_ms-p09700-relay",
+      "selection_sha256": "73a099e63f02bad56905cde3cc394d1a08488ef34843bb21dd88d497dc9f57de"
+    },
+    {
+      "index": 32,
+      "parent_job_id": "toric11-binary_ms-p09800-beam",
+      "selection_sha256": "3f180d79fed28d4335347be722cc68f78f91833e3c71641249461c154c105fc8"
+    },
+    {
+      "index": 33,
+      "parent_job_id": "toric11-binary_ms-p09800-relay",
+      "selection_sha256": "d8537d2b5e9169619ea22ce800420fea2824ada3caef3c8f095d5fc289b92a2d"
+    },
+    {
+      "index": 34,
+      "parent_job_id": "toric11-binary_ms-p09900-beam",
+      "selection_sha256": "d11910fddb480dc9b8004271e27577e93fc92d05e12ccb75f8e64faf96368efb"
+    },
+    {
+      "index": 35,
+      "parent_job_id": "toric11-binary_ms-p09900-relay",
+      "selection_sha256": "48f4c9a2159471e755d0c565229417f377e22eccbb1ec60b51f3d9fd336d422a"
+    },
+    {
+      "index": 36,
+      "parent_job_id": "toric11-binary_ms-p10000-beam",
+      "selection_sha256": "40b0af55cb30264621dbb972e3eead621f328ac32be544fbbb86b1130e849a55"
+    },
+    {
+      "index": 37,
+      "parent_job_id": "toric11-binary_ms-p10000-relay",
+      "selection_sha256": "0bab960616e137869b2b9a74215b7f013dd41e86feffa14fe51e9d9e32993e5a"
+    },
+    {
+      "index": 38,
+      "parent_job_id": "toric11-binary_ms-p10100-beam",
+      "selection_sha256": "145d8e6fe768a283a242c9dc78eaae280457b63f78dbf0f99eb29bf9e9dcc0ab"
+    },
+    {
+      "index": 39,
+      "parent_job_id": "toric11-binary_ms-p10100-relay",
+      "selection_sha256": "8abd4c4ac8873ff5645e3cddbf9dfec160fcd37e4fc918cdd86709f52fabbdc1"
+    },
+    {
+      "index": 40,
+      "parent_job_id": "toric11-binary_ms-p10200-beam",
+      "selection_sha256": "9484195c00b404499e99d63c3227a90e8da7997c60a2fd01adc43f46f43f8081"
+    },
+    {
+      "index": 41,
+      "parent_job_id": "toric11-binary_ms-p10200-relay",
+      "selection_sha256": "f894a45c8f54ec23e34edef7adfe94026310c455f6651126a67a950a9252f1ee"
+    },
+    {
+      "index": 42,
+      "parent_job_id": "toric11-binary_ms-p10300-beam",
+      "selection_sha256": "73f68f49b6e02bdb437eb03d8e7952684cfb2073a50faa7cc9a9a554f78c481f"
+    },
+    {
+      "index": 43,
+      "parent_job_id": "toric11-binary_ms-p10300-relay",
+      "selection_sha256": "4f7f2c78f04821835bd0b734ab9a9b87ed0522a32a8f1d67cf2fa292665c9c99"
+    },
+    {
+      "index": 44,
+      "parent_job_id": "toric11-binary_ms-p10500-beam",
+      "selection_sha256": "c96740ff133ce10f21e71656ec8d7f6f8dedd2b9052bcf318754c07f1ccb9fa6"
+    },
+    {
+      "index": 45,
+      "parent_job_id": "toric11-binary_ms-p10500-relay",
+      "selection_sha256": "bfa5187a98ac0e91270850282f3e17434c713de43861287ab49deb8a1bad3899"
+    },
+    {
+      "index": 46,
+      "parent_job_id": "toric11-binary_ms-p10600-beam",
+      "selection_sha256": "77883ae524dabd2fb773477dec4b07b4b18da067926a936171946832c1ac8539"
+    },
+    {
+      "index": 47,
+      "parent_job_id": "toric11-binary_ms-p10600-relay",
+      "selection_sha256": "9a777621025e950ca5ed120989a56836446a27efda21b63dd0efec15b0b69189"
+    },
+    {
+      "index": 48,
+      "parent_job_id": "toric11-binary_ms-p10700-beam",
+      "selection_sha256": "d1c619a4dfbec7179459a1760cb80cc1467d369b033e80972770009b3b7e16bd"
+    },
+    {
+      "index": 49,
+      "parent_job_id": "toric11-binary_ms-p10700-relay",
+      "selection_sha256": "73ecaf69fa3177b75f4f86b6e5ab23be6766e847d0e32411717daf2efea6d0d6"
+    },
+    {
+      "index": 50,
+      "parent_job_id": "toric11-binary_ms-p10800-beam",
+      "selection_sha256": "c7e71c483a502e8a5de291bbe9c286f5523f2663549ea569e9af2ef47acc86c9"
+    },
+    {
+      "index": 51,
+      "parent_job_id": "toric11-binary_ms-p10800-relay",
+      "selection_sha256": "463cc64013f01c034df61a259c346fd53d74483c64c2344f1dce03487eab23d6"
+    },
+    {
+      "index": 52,
+      "parent_job_id": "toric11-binary_ms-p10900-beam",
+      "selection_sha256": "2be11e30a6105360d2651638c7f6aef4a24f4c94898a292bb0b35b2ddbb8ac85"
+    },
+    {
+      "index": 53,
+      "parent_job_id": "toric11-binary_ms-p10900-relay",
+      "selection_sha256": "1e027ee175bf1b80ac378cf3cc2bf8a0021cc3784c51f263edb43ad3135a317d"
+    },
+    {
+      "index": 54,
+      "parent_job_id": "toric11-binary_ms-p11000-beam",
+      "selection_sha256": "4aa7ac35c4c021910ea819894bda9cdc7cf62074e0c63ebf7d985ebbf6f089d6"
+    },
+    {
+      "index": 55,
+      "parent_job_id": "toric11-binary_ms-p11000-relay",
+      "selection_sha256": "e631de0d2d79e1e37c688f492d0ea562bac3c09d7f4af70ef061e1516733f37c"
+    },
+    {
+      "index": 56,
+      "parent_job_id": "toric13-binary_ms-p01000-beam",
+      "selection_sha256": "ee30c07b094731db66bc874fda5cbb41cbfd8710e24d32a5a373cddaa319e287"
+    },
+    {
+      "index": 57,
+      "parent_job_id": "toric13-binary_ms-p01000-relay",
+      "selection_sha256": "027b87c87f56708d84a70b98a00786d6d73ef882f28f8f237b654a88de2311d7"
+    },
+    {
+      "index": 58,
+      "parent_job_id": "toric13-binary_ms-p02000-beam",
+      "selection_sha256": "f113edc99cc7365c37a0ce321bd5535982e863b840f4b70ed9cb0318bf90b8c2"
+    },
+    {
+      "index": 59,
+      "parent_job_id": "toric13-binary_ms-p02000-relay",
+      "selection_sha256": "bd39d596618663f898a0d7dcddd5b9708f1016fd9698550428b9c2e7011bbc0f"
+    },
+    {
+      "index": 60,
+      "parent_job_id": "toric13-binary_ms-p03000-beam",
+      "selection_sha256": "956520b9cb4d00eb9d9cfc784bd292d5aecec8ff017f781e52a64d306640ff86"
+    },
+    {
+      "index": 61,
+      "parent_job_id": "toric13-binary_ms-p03000-relay",
+      "selection_sha256": "422ca6255cc898df25904956c22ca7ca21b6351eed00b4dd9c1097c3e0eb96a8"
+    },
+    {
+      "index": 62,
+      "parent_job_id": "toric13-binary_ms-p04000-beam",
+      "selection_sha256": "b01acef56749fd001c46ca26828abd12bf5f0aec6aa4c1209d51387494b59dd2"
+    },
+    {
+      "index": 63,
+      "parent_job_id": "toric13-binary_ms-p04000-relay",
+      "selection_sha256": "8b1f2fe451734d3e9952e32d2067747d248003b4fce088adbfd07516f0a0580d"
+    },
+    {
+      "index": 64,
+      "parent_job_id": "toric13-binary_ms-p05000-beam",
+      "selection_sha256": "aca3b0f8fa7fa792d7e31d2a69f5d537d4ea4787800ea3abb09a79770a8af894"
+    },
+    {
+      "index": 65,
+      "parent_job_id": "toric13-binary_ms-p05000-relay",
+      "selection_sha256": "9e881735d16d44639624a8d9f4a15c7dc9298c83e2336e0b9e0ad87239bf4423"
+    },
+    {
+      "index": 66,
+      "parent_job_id": "toric13-binary_ms-p06000-beam",
+      "selection_sha256": "47787c8d49c8430a59dc0a40c97e0f8d6b6183d89468d7ace608feea2f7b3db7"
+    },
+    {
+      "index": 67,
+      "parent_job_id": "toric13-binary_ms-p06000-relay",
+      "selection_sha256": "77e10c038cac939ba3a5688e2e68f06bccec7aa89ab94106d79ab39eb302eedf"
+    },
+    {
+      "index": 68,
+      "parent_job_id": "toric13-binary_ms-p07000-beam",
+      "selection_sha256": "e5fbbf6f40c04a2f961c948dc3ae2795abc715d4f5cca69d55a86d06e623a2ab"
+    },
+    {
+      "index": 69,
+      "parent_job_id": "toric13-binary_ms-p07000-relay",
+      "selection_sha256": "c314a3edce53bbf0717f1b9673b61135b2dde177c0066e182c5d6e8fdb7f1631"
+    },
+    {
+      "index": 70,
+      "parent_job_id": "toric13-binary_ms-p08000-beam",
+      "selection_sha256": "c56a7d312bb27af5945fd79afb221eefdc8ca5507a40bbcfdb85ba2bfbedc1e4"
+    },
+    {
+      "index": 71,
+      "parent_job_id": "toric13-binary_ms-p08000-relay",
+      "selection_sha256": "1a051a6715c5a5302c7574975ec976277a4f4b52d9ffd4cd0a52448e4b8215b4"
+    },
+    {
+      "index": 72,
+      "parent_job_id": "toric13-binary_ms-p09000-beam",
+      "selection_sha256": "30448c66b24c3e4d94eabd4dc499d09a5ca8faf660c0a22d063a00e554c386ca"
+    },
+    {
+      "index": 73,
+      "parent_job_id": "toric13-binary_ms-p09000-relay",
+      "selection_sha256": "cbc24e109880879aa499c02f1e0f0794b22fb571d89b134ffc22212789b26fb9"
+    },
+    {
+      "index": 74,
+      "parent_job_id": "toric13-binary_ms-p09100-beam",
+      "selection_sha256": "f4b9cc75420b1e538efda842df4e293c0d6a2d17e99277d33d845df096d3e4ad"
+    },
+    {
+      "index": 75,
+      "parent_job_id": "toric13-binary_ms-p09100-relay",
+      "selection_sha256": "8151197015177f12debf38966706181502d0d2326b5d68034034a0cf51a2bdea"
+    },
+    {
+      "index": 76,
+      "parent_job_id": "toric13-binary_ms-p09200-beam",
+      "selection_sha256": "2eb23238c13bd5cb6d67fd4b27e515fabd3705c5ea1f34e803c0715ec51c246e"
+    },
+    {
+      "index": 77,
+      "parent_job_id": "toric13-binary_ms-p09200-relay",
+      "selection_sha256": "413ff5e4260d35cd76114c845a19c90114557c3bb978e43cb5c87f6b73646df1"
+    },
+    {
+      "index": 78,
+      "parent_job_id": "toric13-binary_ms-p09300-beam",
+      "selection_sha256": "740c69ce9649c42ea6dee6e5e88d48eca43b889b6aeaa8849eeb746881dec17a"
+    },
+    {
+      "index": 79,
+      "parent_job_id": "toric13-binary_ms-p09300-relay",
+      "selection_sha256": "ef45e515fc8ab9f763f5f581b9acb685bf3c0a95bf7e1fbfc46e0f29a8c86b46"
+    },
+    {
+      "index": 80,
+      "parent_job_id": "toric13-binary_ms-p09400-beam",
+      "selection_sha256": "00078ecf9ed7eead2a84fd1c45374a229e2a785149747d2e8492d9d8aaec2b54"
+    },
+    {
+      "index": 81,
+      "parent_job_id": "toric13-binary_ms-p09400-relay",
+      "selection_sha256": "27788880850b176401670d7b542dc971a89bcc79225b1402ae92593db16d9286"
+    },
+    {
+      "index": 82,
+      "parent_job_id": "toric13-binary_ms-p09500-beam",
+      "selection_sha256": "e64d31bc9f45ecad91cde802b86b6b7479905e8979c80dd1682d6e87671cabf9"
+    },
+    {
+      "index": 83,
+      "parent_job_id": "toric13-binary_ms-p09500-relay",
+      "selection_sha256": "483445f5eba7ce0a6bf13aea584476956935526946a3ad89673d52b9e8238a85"
+    },
+    {
+      "index": 84,
+      "parent_job_id": "toric13-binary_ms-p09600-beam",
+      "selection_sha256": "978745a7f1c97585fb5dd890654ff9480384e9a2e43ba3a77b6d98ee0cd2429f"
+    },
+    {
+      "index": 85,
+      "parent_job_id": "toric13-binary_ms-p09600-relay",
+      "selection_sha256": "28208e0609bcb5cfc99a44c615da527c771001c313e8da4c3e1673ba1c532b54"
+    },
+    {
+      "index": 86,
+      "parent_job_id": "toric13-binary_ms-p09800-beam",
+      "selection_sha256": "9ec75a928866167fe816fc70f36ffc71f7540ddeb526ef8b84b30692f66f45d7"
+    },
+    {
+      "index": 87,
+      "parent_job_id": "toric13-binary_ms-p09800-relay",
+      "selection_sha256": "433fbe72eeffe1c0b158fceb19fd1583144c3c6efa15ea280557a2b6113b0d51"
+    },
+    {
+      "index": 88,
+      "parent_job_id": "toric13-binary_ms-p09900-beam",
+      "selection_sha256": "5cf377199270d1a9994cbde74859551992d3a01ff13a4e0608d65d733a1f4ce0"
+    },
+    {
+      "index": 89,
+      "parent_job_id": "toric13-binary_ms-p09900-relay",
+      "selection_sha256": "285311505c092ca5d9d8abe41e3e3250910bf58ac72f2f0ccc1fe4f356708fbd"
+    },
+    {
+      "index": 90,
+      "parent_job_id": "toric13-binary_ms-p10000-beam",
+      "selection_sha256": "7dcd151c8e1f2808729c737a0a2e6deb751d7f88621feee949a9e516d6630414"
+    },
+    {
+      "index": 91,
+      "parent_job_id": "toric13-binary_ms-p10000-relay",
+      "selection_sha256": "375d944465392837aa5527bd5ddfcd66ddbee4021f80cf4fdb56cbb5bf69b493"
+    },
+    {
+      "index": 92,
+      "parent_job_id": "toric13-binary_ms-p10100-beam",
+      "selection_sha256": "fddf296f3bfc93dcc33659c73bdc52d712819f7ca8b8303e143cc7cc059b3bb1"
+    },
+    {
+      "index": 93,
+      "parent_job_id": "toric13-binary_ms-p10100-relay",
+      "selection_sha256": "4535483edc601d64aa45bc1b2af5467233d2df12cec39b993a7416345082372a"
+    },
+    {
+      "index": 94,
+      "parent_job_id": "toric13-binary_ms-p10200-beam",
+      "selection_sha256": "79351cc5b1d44dca8845293d9f53c24ae1440c670d87066ea7ab5a81f2242618"
+    },
+    {
+      "index": 95,
+      "parent_job_id": "toric13-binary_ms-p10200-relay",
+      "selection_sha256": "4a5d952eb34b05aa375471746342b3a103aab9f426ac2f09247559cb81e8b1f4"
+    },
+    {
+      "index": 96,
+      "parent_job_id": "toric13-binary_ms-p10300-beam",
+      "selection_sha256": "39da2416dc49458ae8068eac471b79e5e5c3e100f3ffa5f7e6b7aadf4056c610"
+    },
+    {
+      "index": 97,
+      "parent_job_id": "toric13-binary_ms-p10300-relay",
+      "selection_sha256": "7d1a4c3b6cef22bd638a9ed317d325194167bd10922244c25d8fe93b86aee88a"
+    },
+    {
+      "index": 98,
+      "parent_job_id": "toric13-binary_ms-p10400-beam",
+      "selection_sha256": "50d652bd9a7ed09f6540434f867f09978634201688e37fe57c87b0a43f5ef421"
+    },
+    {
+      "index": 99,
+      "parent_job_id": "toric13-binary_ms-p10400-relay",
+      "selection_sha256": "c47aae172693c81f6d76875c3e2d425c996646802b822af2ce0e8fa23f5c0cfd"
+    },
+    {
+      "index": 100,
+      "parent_job_id": "toric13-binary_ms-p10500-beam",
+      "selection_sha256": "5cb28e333a84e9f04523c30b6f60b13d8fb0cc7ae869f3f219752196d7d64c56"
+    },
+    {
+      "index": 101,
+      "parent_job_id": "toric13-binary_ms-p10500-relay",
+      "selection_sha256": "676157cb56c026452d4dd5f71fcf62070202a1bf440a65e96c6f6ddd6406f885"
+    },
+    {
+      "index": 102,
+      "parent_job_id": "toric13-binary_ms-p10600-beam",
+      "selection_sha256": "2992b01edd179859f437954281e294c86196a083e04edbfab861deecc458ed94"
+    },
+    {
+      "index": 103,
+      "parent_job_id": "toric13-binary_ms-p10600-relay",
+      "selection_sha256": "186c2d17d835af24723740124f2678d3c066cf43e7614fe71ce9650053b5eecf"
+    },
+    {
+      "index": 104,
+      "parent_job_id": "toric13-binary_ms-p10700-beam",
+      "selection_sha256": "ec444383aed127491a37cd845256ae9a78e7d655ad8442c09e5bd3e6f91c25f2"
+    },
+    {
+      "index": 105,
+      "parent_job_id": "toric13-binary_ms-p10700-relay",
+      "selection_sha256": "4676946c55647b87ec65f2ecfb3d69ab6d6931b60c3e0b826072049f536509d4"
+    },
+    {
+      "index": 106,
+      "parent_job_id": "toric13-binary_ms-p10800-beam",
+      "selection_sha256": "d395acc1a650bef0f3224d7a4c8ffad00c98a36249ceee3ac21aa72d18014132"
+    },
+    {
+      "index": 107,
+      "parent_job_id": "toric13-binary_ms-p10800-relay",
+      "selection_sha256": "c1d4f85e2016e4eb1bee4918bec7121d387add9f92b8bcad043878e9807f918c"
+    },
+    {
+      "index": 108,
+      "parent_job_id": "toric13-binary_ms-p10900-beam",
+      "selection_sha256": "4f2733a11391abc54b0e966cb65ea8d85e5d3e684bd77ac671c402d3ff027a05"
+    },
+    {
+      "index": 109,
+      "parent_job_id": "toric13-binary_ms-p10900-relay",
+      "selection_sha256": "8d794fda63c17ddf5bff3a5a8c7b816189b0d7eb14345c815c2f319570aee123"
+    },
+    {
+      "index": 110,
+      "parent_job_id": "toric13-binary_ms-p11000-beam",
+      "selection_sha256": "66eb3435c23c23fd15fcb7181088fafa320484413399a28d16fdf871a8908f92"
+    },
+    {
+      "index": 111,
+      "parent_job_id": "toric13-binary_ms-p11000-relay",
+      "selection_sha256": "8ada16a6295820aa0b11671578aa2b096deab6e97f5e08b4a8da763f5c7dad29"
+    },
+    {
+      "index": 112,
+      "parent_job_id": "toric15-binary_ms-p01000-beam",
+      "selection_sha256": "82bd9f5a8be972f357555cf84ffdeaf95e4bc719599acae8cadf5912a8b9e836"
+    },
+    {
+      "index": 113,
+      "parent_job_id": "toric15-binary_ms-p01000-relay",
+      "selection_sha256": "fa2807001619bf5429049c718358275673cd36796aa5d69c43e4f0c3ea48f7b9"
+    },
+    {
+      "index": 114,
+      "parent_job_id": "toric15-binary_ms-p02000-beam",
+      "selection_sha256": "cfeb28256f13b4213d908e24b5acda125bc8ce5fc150f207d6f066604b99a94e"
+    },
+    {
+      "index": 115,
+      "parent_job_id": "toric15-binary_ms-p02000-relay",
+      "selection_sha256": "a8559b703e24bacc34dc636c9b8f2ac3ab0a247d98bdd6bf4d8ca042c3f92d2d"
+    },
+    {
+      "index": 116,
+      "parent_job_id": "toric15-binary_ms-p03000-beam",
+      "selection_sha256": "feaa96b848732e339d251f2b8b1f228f28f46461bad5da4c9c2bac1086106dcb"
+    },
+    {
+      "index": 117,
+      "parent_job_id": "toric15-binary_ms-p03000-relay",
+      "selection_sha256": "a0bda364ca8110583f9c71344f161e24a6e12493d5b6b927952dbb3477208d7b"
+    },
+    {
+      "index": 118,
+      "parent_job_id": "toric15-binary_ms-p04000-beam",
+      "selection_sha256": "157d650b26f222bc35a95b5024be02e824f87b66de7dadddcada1b3e4e15c342"
+    },
+    {
+      "index": 119,
+      "parent_job_id": "toric15-binary_ms-p04000-relay",
+      "selection_sha256": "0c433ce69edeadd0c80b39f47a27c7e89deddafd6a71e5162a509afb9424ec38"
+    },
+    {
+      "index": 120,
+      "parent_job_id": "toric15-binary_ms-p05000-beam",
+      "selection_sha256": "0a3b19a91275572d2e36ac1096f5744c899cd93cc38bd88e8fedac976b8ea104"
+    },
+    {
+      "index": 121,
+      "parent_job_id": "toric15-binary_ms-p05000-relay",
+      "selection_sha256": "dcec97dd83b080413c728a0e89c1ae6cc0a1fe6b53d9e68a56b7284759490ee9"
+    },
+    {
+      "index": 122,
+      "parent_job_id": "toric15-binary_ms-p06000-beam",
+      "selection_sha256": "91d363e40deeb9ff0f1194da12122f9da433efe641113f87260199000f231d0b"
+    },
+    {
+      "index": 123,
+      "parent_job_id": "toric15-binary_ms-p06000-relay",
+      "selection_sha256": "cffd0a53737dc6863d1b00c95ea8508b5dc51f104659380adf7450acbf1c8651"
+    },
+    {
+      "index": 124,
+      "parent_job_id": "toric15-binary_ms-p07000-beam",
+      "selection_sha256": "d5f2d8f75c845f1155348a2c826447a4d6032eab03c0c2398c929e44f2d4f605"
+    },
+    {
+      "index": 125,
+      "parent_job_id": "toric15-binary_ms-p07000-relay",
+      "selection_sha256": "a6f62387d631e0cdea422ab93ff19a27fef59c0df7a8560e87e309892bbbfa0d"
+    },
+    {
+      "index": 126,
+      "parent_job_id": "toric15-binary_ms-p08000-beam",
+      "selection_sha256": "396fcb154e03b22c1d3258a5660802d856e103926fe579f248977fd7fa3d1eea"
+    },
+    {
+      "index": 127,
+      "parent_job_id": "toric15-binary_ms-p08000-relay",
+      "selection_sha256": "105a45927e5bc3205c6d7d5111a4e1f8a8b0a5a6d065d55a141f7cb5545800dd"
+    },
+    {
+      "index": 128,
+      "parent_job_id": "toric15-binary_ms-p09000-beam",
+      "selection_sha256": "f73d75c5d03dae3d6c5f26cf9eebb9b92a5b26f0bf57d5499fc86e94fd9b0d05"
+    },
+    {
+      "index": 129,
+      "parent_job_id": "toric15-binary_ms-p09000-relay",
+      "selection_sha256": "8f5a8dd68f57ccc50787ee357283a58dcd320d6d9011ae8d69ae5bc197ba17f3"
+    },
+    {
+      "index": 130,
+      "parent_job_id": "toric15-binary_ms-p09100-beam",
+      "selection_sha256": "4678553d47a5fe922b5638cec982b10cc6dcb9734ff5754e7cc90bfab3c1acc6"
+    },
+    {
+      "index": 131,
+      "parent_job_id": "toric15-binary_ms-p09100-relay",
+      "selection_sha256": "00accb266df11ba89b0f227f1dd8b72d02efbf52525cbe2891508d89bffe0df2"
+    },
+    {
+      "index": 132,
+      "parent_job_id": "toric15-binary_ms-p09200-beam",
+      "selection_sha256": "62e38f236f4382e765161db5e3002c8f917cf701c9f8d7fe081e22fee4b0e4fa"
+    },
+    {
+      "index": 133,
+      "parent_job_id": "toric15-binary_ms-p09200-relay",
+      "selection_sha256": "4551975453f9b42dc2dd09a9ca98cd32c8e50c7f9d7e1b93b7e71f9cfeed8758"
+    },
+    {
+      "index": 134,
+      "parent_job_id": "toric15-binary_ms-p09300-beam",
+      "selection_sha256": "9bb06fc542827b8688ed35038637a83421140626770a6f50aefb79de31ba0893"
+    },
+    {
+      "index": 135,
+      "parent_job_id": "toric15-binary_ms-p09300-relay",
+      "selection_sha256": "f934eac59304c3c45f7d852900a1c2c3006d4d79cdde556abd218773233414ad"
+    },
+    {
+      "index": 136,
+      "parent_job_id": "toric15-binary_ms-p09400-beam",
+      "selection_sha256": "3958255dbcfd04e8a885f4de55abd1221747073534f673a2e4bba5d809e5bddf"
+    },
+    {
+      "index": 137,
+      "parent_job_id": "toric15-binary_ms-p09400-relay",
+      "selection_sha256": "e3e275605939d32216caf474dff8a4b22bf0317a88121fcfaec7ddb380de1561"
+    },
+    {
+      "index": 138,
+      "parent_job_id": "toric15-binary_ms-p09600-beam",
+      "selection_sha256": "3de32c1d1f4608e56e8dc310f89068485bdc4c376ac882d8734a698f3e8c5686"
+    },
+    {
+      "index": 139,
+      "parent_job_id": "toric15-binary_ms-p09600-relay",
+      "selection_sha256": "9661cef6900c9b60b57e890aafc9d3010ef2189f86ecd67d9f72bcc50030f30f"
+    },
+    {
+      "index": 140,
+      "parent_job_id": "toric15-binary_ms-p09700-beam",
+      "selection_sha256": "5855f2a728f439c1f644e590a27d51289ed1a31938745b354ef7abbe64b9dbae"
+    },
+    {
+      "index": 141,
+      "parent_job_id": "toric15-binary_ms-p09700-relay",
+      "selection_sha256": "da9b8ac34d39220ff2d403228823742c152a43449b73fdb6cdd16e58a95a2f0e"
+    },
+    {
+      "index": 142,
+      "parent_job_id": "toric15-binary_ms-p09800-beam",
+      "selection_sha256": "225293a814f3688c52ac214ac3d96782afda75f3e007d0ff3295e3fb78a14e9b"
+    },
+    {
+      "index": 143,
+      "parent_job_id": "toric15-binary_ms-p09800-relay",
+      "selection_sha256": "bef898a53859a9f3114cf47c04360a37ffdce5282fa561680d6ff3438d814c1d"
+    },
+    {
+      "index": 145,
+      "parent_job_id": "toric15-binary_ms-p09900-relay",
+      "selection_sha256": "2dab11c2e9557b2fefe38f2c8e41ae1de8123548f6b8cc0bb829a8c47d3a36ac"
+    },
+    {
+      "index": 146,
+      "parent_job_id": "toric15-binary_ms-p10000-beam",
+      "selection_sha256": "bf839a85ec98c2c343ad53ef6dddf475fc0ab6ea6348ef6737d35d72e17ebd3b"
+    },
+    {
+      "index": 147,
+      "parent_job_id": "toric15-binary_ms-p10000-relay",
+      "selection_sha256": "50a0ae93bb10ad25d4fd1a9bc98c8460f1f9dc1dd879d184ed382cdf6b9a800e"
+    },
+    {
+      "index": 149,
+      "parent_job_id": "toric15-binary_ms-p10100-relay",
+      "selection_sha256": "e7a73a034e7803db19483bbd51e93940756f6f555381fdbd5b903b2c47cd9b7d"
+    },
+    {
+      "index": 151,
+      "parent_job_id": "toric15-binary_ms-p10200-relay",
+      "selection_sha256": "97ba3499afa943e824a084908eb77a2e91c31c42af58e776312403c839ffa9e3"
+    },
+    {
+      "index": 152,
+      "parent_job_id": "toric15-binary_ms-p10300-beam",
+      "selection_sha256": "d933a0a9591707ffd7bc433140e2fefb79a4bf98044f7cb3a3836a8f50ba8480"
+    },
+    {
+      "index": 153,
+      "parent_job_id": "toric15-binary_ms-p10300-relay",
+      "selection_sha256": "1e3dcbcec4176dc33e0e17d719cfdce10a585e66b0b23a357dd6267ab015491d"
+    },
+    {
+      "index": 154,
+      "parent_job_id": "toric15-binary_ms-p10400-beam",
+      "selection_sha256": "407b887761cae7f79f9f06bace9c0fb5395409abcbce92268172793d2a8eb854"
+    },
+    {
+      "index": 155,
+      "parent_job_id": "toric15-binary_ms-p10400-relay",
+      "selection_sha256": "61ec734b93b5a52000cdbd5d617ccb72de74734a2b61bb7af1d5b8b7c7495a55"
+    },
+    {
+      "index": 156,
+      "parent_job_id": "toric15-binary_ms-p10500-beam",
+      "selection_sha256": "684b0587178043dc2c71d938130f98b821f674a787d04863c76885af63fe3664"
+    },
+    {
+      "index": 157,
+      "parent_job_id": "toric15-binary_ms-p10500-relay",
+      "selection_sha256": "74479b3b745574b5782a40c1abfb060980e8505bd5decc22a905fb7ef55a22ea"
+    },
+    {
+      "index": 158,
+      "parent_job_id": "toric15-binary_ms-p10600-beam",
+      "selection_sha256": "c8e3ec1b13155f61ecdf470fc3feae34848c77a83a97f7fffedd0d4f33255a5b"
+    },
+    {
+      "index": 159,
+      "parent_job_id": "toric15-binary_ms-p10600-relay",
+      "selection_sha256": "ede339bea31140b79c5b41d91a44bab6a9e41a4bf435c424a928c7c41c5e2c3b"
+    },
+    {
+      "index": 160,
+      "parent_job_id": "toric15-binary_ms-p10700-beam",
+      "selection_sha256": "c41f9a1ee5392b881df4c385efe8ec815affb2a7820e6af10cf1aa3b5c913661"
+    },
+    {
+      "index": 161,
+      "parent_job_id": "toric15-binary_ms-p10700-relay",
+      "selection_sha256": "854df4e26f273076b8bb06bdec39874a0506e6b5c5c68cc9bd393d3eea9d3137"
+    },
+    {
+      "index": 162,
+      "parent_job_id": "toric15-binary_ms-p10800-beam",
+      "selection_sha256": "259cc39b56b01cf3f4461ecc02fc6255faa1218a049cef9d93ce97f22f699623"
+    },
+    {
+      "index": 163,
+      "parent_job_id": "toric15-binary_ms-p10800-relay",
+      "selection_sha256": "be36169e943a1fe9644cb7c979535718ad1f6709e553e5579e1d4cbc00563098"
+    },
+    {
+      "index": 164,
+      "parent_job_id": "toric15-binary_ms-p10900-beam",
+      "selection_sha256": "935bb7d49ad37f265b8a9936edd80fbcef523a42ff20f99bc4d186207f3012bd"
+    },
+    {
+      "index": 165,
+      "parent_job_id": "toric15-binary_ms-p10900-relay",
+      "selection_sha256": "561ce6a5361c57a9a78f8cc1847c3ce1d3586617c642d4d5044d3c9bc38b8885"
+    },
+    {
+      "index": 166,
+      "parent_job_id": "toric15-binary_ms-p11000-beam",
+      "selection_sha256": "3269e6902570a9ae302a9379f3b11396eaee7b5c5b310b50df890f98ac8e73bd"
+    },
+    {
+      "index": 167,
+      "parent_job_id": "toric15-binary_ms-p11000-relay",
+      "selection_sha256": "55834f09c1b1fa305cb13318a327b6ec9732a7a389cf9a1f4e3640ac32bf6c41"
+    },
+    {
+      "index": 168,
+      "parent_job_id": "toric9-binary_ms-p01000-beam",
+      "selection_sha256": "bcf001b57be18732471f9214f3a97f025e214c20c1bb2f3acc9df3b1d8178ee9"
+    },
+    {
+      "index": 169,
+      "parent_job_id": "toric9-binary_ms-p01000-relay",
+      "selection_sha256": "7e785e062d482d803ea5a2d3dda301eaebc23ff943ca662f195f5ea0ea376204"
+    },
+    {
+      "index": 170,
+      "parent_job_id": "toric9-binary_ms-p02000-beam",
+      "selection_sha256": "33e8757d73c10c3d13d67ce97bfd4de63032d8ace4c4626e912fc413ae26e03a"
+    },
+    {
+      "index": 171,
+      "parent_job_id": "toric9-binary_ms-p02000-relay",
+      "selection_sha256": "6c15552802b0301f6cab35fa4aec36c9e2c721cffa1cc44fe8ec4242ed81fc6c"
+    },
+    {
+      "index": 172,
+      "parent_job_id": "toric9-binary_ms-p03000-beam",
+      "selection_sha256": "ddc305dad002a0ea9f97e5b9de77c02b287b85d960919cacabb2239cc4316022"
+    },
+    {
+      "index": 173,
+      "parent_job_id": "toric9-binary_ms-p03000-relay",
+      "selection_sha256": "88dcd7b8bd02229bbab0f47f7a5ecd7e007936ec9e72bbd2e461eb99acdcb1f9"
+    },
+    {
+      "index": 174,
+      "parent_job_id": "toric9-binary_ms-p04000-beam",
+      "selection_sha256": "8f71e44466b61eceaeef1f54d896c06a59fec61edb55df29ef945a67a122eb1f"
+    },
+    {
+      "index": 175,
+      "parent_job_id": "toric9-binary_ms-p04000-relay",
+      "selection_sha256": "9393db6f9d117a287f99e44b71881b0e87503e5eeceb68201d225b5980020df8"
+    },
+    {
+      "index": 176,
+      "parent_job_id": "toric9-binary_ms-p05000-beam",
+      "selection_sha256": "dc1eba7472cfc42edc2262cf0fbc23c7bcd1f44ae2bab6e12a25137a6a90fc90"
+    },
+    {
+      "index": 177,
+      "parent_job_id": "toric9-binary_ms-p05000-relay",
+      "selection_sha256": "371694da0283cd20a88e0f801d28f2cd116a19967882f07147fbdd64f6feedca"
+    },
+    {
+      "index": 178,
+      "parent_job_id": "toric9-binary_ms-p06000-beam",
+      "selection_sha256": "8e00a6f92d9ec21e207fead6f6885fc13dbc090e186c282a1dbffca2de114bf5"
+    },
+    {
+      "index": 179,
+      "parent_job_id": "toric9-binary_ms-p06000-relay",
+      "selection_sha256": "6839c85818d3bc5131bf08d9b2d5b1aaeacc388ad9d33a510b3e809b4da8bb25"
+    },
+    {
+      "index": 180,
+      "parent_job_id": "toric9-binary_ms-p07000-beam",
+      "selection_sha256": "cf450a5d58c2296c3d01b76bcd476cd59ff2519c75adfcd078bac045cb50a432"
+    },
+    {
+      "index": 181,
+      "parent_job_id": "toric9-binary_ms-p07000-relay",
+      "selection_sha256": "ccb3c6d705953e205d47de84eb369b0bd2bdd3968290af17aa48f5d07dd6cd3c"
+    },
+    {
+      "index": 182,
+      "parent_job_id": "toric9-binary_ms-p08000-beam",
+      "selection_sha256": "d2bb785c01ce1ece28df9bd2b1347d0bdd29a89d229f5c8af8acefe51cf421cb"
+    },
+    {
+      "index": 183,
+      "parent_job_id": "toric9-binary_ms-p08000-relay",
+      "selection_sha256": "b63488f72f77076d5eb5f24215938bef604e21475af50e907bd62613877f276b"
+    },
+    {
+      "index": 184,
+      "parent_job_id": "toric9-binary_ms-p09000-beam",
+      "selection_sha256": "a0718567463976cb0785ae2770665c1eee292d0ad2629171b38adc3f185a1d56"
+    },
+    {
+      "index": 185,
+      "parent_job_id": "toric9-binary_ms-p09000-relay",
+      "selection_sha256": "4f3423cf67570a10de844384eb5001dd42022c5c36139372dc324a70a75c26fa"
+    },
+    {
+      "index": 186,
+      "parent_job_id": "toric9-binary_ms-p09100-beam",
+      "selection_sha256": "0c6c1c61c55d4bd1cc06c6ac35c41a5109b60b6f3cf5891c09398a1ef50bfe70"
+    },
+    {
+      "index": 187,
+      "parent_job_id": "toric9-binary_ms-p09100-relay",
+      "selection_sha256": "79051ce63589a042abeea3a4df5c482da9902d2b6261d1f51b54dada6f28e01a"
+    },
+    {
+      "index": 188,
+      "parent_job_id": "toric9-binary_ms-p09300-beam",
+      "selection_sha256": "64e1c810e95b441b34a2433ef81a3715f3755627295888adb8594eb181d5a5e3"
+    },
+    {
+      "index": 189,
+      "parent_job_id": "toric9-binary_ms-p09300-relay",
+      "selection_sha256": "1967dfae75376c52ac709ad6a8a84ecabe6f7df3f7ef24c3a00d793f44e9431b"
+    },
+    {
+      "index": 190,
+      "parent_job_id": "toric9-binary_ms-p09400-beam",
+      "selection_sha256": "90293a559fb0656776df54c2c144e0fc809658030d0f586156acc98e38711775"
+    },
+    {
+      "index": 191,
+      "parent_job_id": "toric9-binary_ms-p09400-relay",
+      "selection_sha256": "ed662ccb1cf27a289ddbca346cdf6d176500044c0a7d4c932093258ebce0f80b"
+    },
+    {
+      "index": 192,
+      "parent_job_id": "toric9-binary_ms-p09500-beam",
+      "selection_sha256": "94291d39f7c007a4b5b5eff1fb452bc98eb504dd112182437d3c574e9edc3d48"
+    },
+    {
+      "index": 193,
+      "parent_job_id": "toric9-binary_ms-p09500-relay",
+      "selection_sha256": "fcf22f0a00c653113162a640444a480bac14c786d207a437ae329eff8c61eac5"
+    },
+    {
+      "index": 194,
+      "parent_job_id": "toric9-binary_ms-p09900-beam",
+      "selection_sha256": "64c9ccd07db4f3f393b1a4e34167d94e32184e461772a05301bc2f78f76a6e98"
+    },
+    {
+      "index": 195,
+      "parent_job_id": "toric9-binary_ms-p09900-relay",
+      "selection_sha256": "96075a98c72d054f3ff60063c305b1d3ab605d5171c818e9b7fb8e889082216f"
+    },
+    {
+      "index": 196,
+      "parent_job_id": "toric9-binary_ms-p10000-beam",
+      "selection_sha256": "ada7807972a832db5ab8d1ec8f6618273ae5858208bab0c81432f1c74fcf3978"
+    },
+    {
+      "index": 197,
+      "parent_job_id": "toric9-binary_ms-p10000-relay",
+      "selection_sha256": "964fd0ec4b2eaec4861469e1b95dfd76080b9fbde5969e6ce0deb5d19088cbde"
+    },
+    {
+      "index": 198,
+      "parent_job_id": "toric9-binary_ms-p10100-beam",
+      "selection_sha256": "3f1f08bdba3556a4d4be35b433bb45d0ad193d92ddf1b257a17540221d8baf65"
+    },
+    {
+      "index": 199,
+      "parent_job_id": "toric9-binary_ms-p10100-relay",
+      "selection_sha256": "2580b519d6629aa8155fe350eb5808928600f1c60c497c2d9eb5fb777cecf9b2"
+    },
+    {
+      "index": 200,
+      "parent_job_id": "toric9-binary_ms-p10200-beam",
+      "selection_sha256": "790810f7946cd5371260ce219b6d9e901dfa42749391dbc366397806b7633a29"
+    },
+    {
+      "index": 201,
+      "parent_job_id": "toric9-binary_ms-p10200-relay",
+      "selection_sha256": "e209f638380a734b9e749eca7371b6fc36a7a4c8fad4da7da3d2337000454fb0"
+    },
+    {
+      "index": 202,
+      "parent_job_id": "toric9-binary_ms-p10300-beam",
+      "selection_sha256": "e630d8b7d01b4866606a142ccb492723bac6ad053baca7b5e05b97936beeb2e1"
+    },
+    {
+      "index": 203,
+      "parent_job_id": "toric9-binary_ms-p10300-relay",
+      "selection_sha256": "9b6eefefa2b35d54d33e8696d552029a1e63b21f842d97cce8fed464658849b8"
+    },
+    {
+      "index": 204,
+      "parent_job_id": "toric9-binary_ms-p10400-beam",
+      "selection_sha256": "c8b005e1a1125c4f9a198ea194f5aa628357c3c9b36d1514dd997e0511c40f8d"
+    },
+    {
+      "index": 205,
+      "parent_job_id": "toric9-binary_ms-p10400-relay",
+      "selection_sha256": "02370e5a15327353a861823ebd1e62e42abb66886dcdb2df9a5309bcf0a7b003"
+    },
+    {
+      "index": 206,
+      "parent_job_id": "toric9-binary_ms-p10500-beam",
+      "selection_sha256": "ef965aeb71ad52d40f8da6bddfce2f9366907efa5495a6c2e8aa985eab248ea7"
+    },
+    {
+      "index": 207,
+      "parent_job_id": "toric9-binary_ms-p10500-relay",
+      "selection_sha256": "d9842aa6a2d4eb604025ca5d62d1137665821a4ed09b0187fed75c5b937d73c6"
+    },
+    {
+      "index": 208,
+      "parent_job_id": "toric9-binary_ms-p10600-beam",
+      "selection_sha256": "44c584a29fbbf9507226621d55e723e2b51e23b3aa224b3eeb152f84fca99ddb"
+    },
+    {
+      "index": 209,
+      "parent_job_id": "toric9-binary_ms-p10600-relay",
+      "selection_sha256": "e96ccfe3bf4ff0dd39c428866c7aac81935e54f538a96bb9d18aa8abf03eb10f"
+    },
+    {
+      "index": 210,
+      "parent_job_id": "toric9-binary_ms-p10700-beam",
+      "selection_sha256": "338226cf5525b060c84ad30a7141fe20d8afda5ff6f94e347495df6f7c605554"
+    },
+    {
+      "index": 211,
+      "parent_job_id": "toric9-binary_ms-p10700-relay",
+      "selection_sha256": "ec93b1e84532e4853762fe0f821136c69ed230d9b7d5d96b43eb372d8949da29"
+    },
+    {
+      "index": 212,
+      "parent_job_id": "toric9-binary_ms-p10800-beam",
+      "selection_sha256": "5f828daadc5aafab7e1f188305b00188202006b33ca8c7cc472dbda63fed5311"
+    },
+    {
+      "index": 213,
+      "parent_job_id": "toric9-binary_ms-p10800-relay",
+      "selection_sha256": "26b0ca1308e4d6bb2a328d414370e2cde57af1d1628aa27269f00bf10e2fb48c"
+    },
+    {
+      "index": 214,
+      "parent_job_id": "toric9-binary_ms-p10900-beam",
+      "selection_sha256": "2ada6cd68da4fa24206892538654e27e3bc2fd68d48dbc307cc97eb7cea9cddb"
+    },
+    {
+      "index": 215,
+      "parent_job_id": "toric9-binary_ms-p10900-relay",
+      "selection_sha256": "dafaf3b74bb6ae3e70bf802bb654b87505257adb1f8c361940950bcbe6e013f1"
+    },
+    {
+      "index": 216,
+      "parent_job_id": "toric9-binary_ms-p11000-beam",
+      "selection_sha256": "c24ee95bff1b8f70e2f6f43891902f1167060e207a9ebb6d178e6035f96e31e1"
+    },
+    {
+      "index": 217,
+      "parent_job_id": "toric9-binary_ms-p11000-relay",
+      "selection_sha256": "3f0d1b25917a2991428adc4e7e261315e05c3aa099d5c43bfd702fa1903b39e9"
+    }
+  ]
+}

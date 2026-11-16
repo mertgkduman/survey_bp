@@ -1,0 +1,12 @@
+{
+  "array": "61870314",
+  "parent_array": "61869371",
+  "reason": "Old individual tasks are absent from Slurm live cache; aftercorr remains unfulfilled despite successful sacct records and immutable complete receipts. Scientific settings and collector dependencies unchanged.",
+  "reference": "https://slurm.schedmd.com/scontrol.html#OPT_Dependency",
+  "returncode": 0,
+  "schema": "verified-parent-scheduler-dependency-release-v1",
+  "stderr": "",
+  "stdout": "No eligible pending tasks",
+  "timestamp_utc": "2026-11-16T03:04:47.118204+00:00",
+  "verified_completed_parents": []
+}

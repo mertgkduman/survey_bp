@@ -10,15 +10,145 @@
     "errors": [],
     "simulations": 0
   },
+  "catalog": {
+    "counts_after": {
+      "circuits": 0,
+      "codes": 12,
+      "curves": 324,
+      "points": 2667
+    },
+    "counts_before": {
+      "circuits": 0,
+      "codes": 12,
+      "curves": 308,
+      "points": 2627
+    },
+    "historical_series_unchanged": 547,
+    "new_raw_points": 277,
+    "new_raw_series": 253,
+    "source": "277 audited configurations from114 completed workers; singleton concrete policies remain in dedicated tables"
+  },
   "exact_real_code_comparisons": 128,
+  "figure": "PNG/PDF visually inspected; proper log powers/minor grids, no clipped labels, explicit pending values",
   "final_source_regression_retry": 20,
+  "frontier": {
+    "array": "61870314",
+    "collector": "61870315",
+    "implementation_commit": "7610e01",
+    "resource_dependency_release": "215 only after successful source sacct and matching immutable completion receipt; no pending task dependencies remained at recheck",
+    "scientific_status": "running; final publication requires complete source audit",
+    "separate_seeds": [
+      2026111562,
+      2026111563
+    ]
+  },
   "frozen_jobs": 218,
+  "full_initial_array": "218/218 COMPLETED0:0; independent collector61869372 running",
   "latency_budget_ratios": [
     0.5,
     1,
     2,
     4
   ],
+  "launch": {
+    "array": "61869371",
+    "collector": "61869372",
+    "collector_dependency": "afterok:61869371",
+    "cpus_per_worker": 1,
+    "initial_running_workers": 218,
+    "observed_later_states": {
+      "completed": 37,
+      "running": 181
+    },
+    "scheduler_smoke": "passed"
+  },
+  "partial_audit": {
+    "audited_workers": 114,
+    "budget_counts": {
+      "0.5": {
+        "actual_under110_percent": 91,
+        "selected_points": 114
+      },
+      "1.0": {
+        "actual_under110_percent": 98,
+        "selected_points": 114
+      },
+      "2.0": {
+        "actual_under110_percent": 106,
+        "selected_points": 114
+      },
+      "4.0": {
+        "actual_under110_percent": 114,
+        "selected_points": 114
+      }
+    },
+    "confirmation_measurements": 277,
+    "failures": 5540,
+    "length242_examples": [
+      {
+        "budgets": [
+          0.5,
+          1.0,
+          2.0,
+          4.0
+        ],
+        "ci95_high": 6.844403319079101e-05,
+        "ci95_low": 2.8181284864168516e-05,
+        "failures": 20,
+        "ler": 4.6135995072675725e-05,
+        "method": "beam",
+        "osd0_ler": 4e-08,
+        "p": 0.01,
+        "runtime_ratio": 0.3504117566069236,
+        "shots": 433501,
+        "source_directory": "data/reproductions/roffe-2005-07016-search/results/toric11-binary_ms-p01000-beam/confirmation/toric11-binary_ms-p01000-beam-confirmation-1690300b00b141ead125",
+        "summary_sha256": "15ab782af4f131fa65e1cf7f5ea4de76d78960e16fa8ca74063f9a9446ef8c95"
+      },
+      {
+        "budgets": [
+          0.5,
+          1.0,
+          2.0,
+          4.0
+        ],
+        "ci95_high": 0.0005950673587198256,
+        "ci95_low": 0.0002450478527025516,
+        "failures": 20,
+        "ler": 0.0004011472812243015,
+        "method": "beam",
+        "osd0_ler": 8.867559452552349e-06,
+        "p": 0.02,
+        "runtime_ratio": 0.14479709062037474,
+        "shots": 49857,
+        "source_directory": "data/reproductions/roffe-2005-07016-search/results/toric11-binary_ms-p02000-beam/confirmation/toric11-binary_ms-p02000-beam-confirmation-91f56ae892dfc724e507",
+        "summary_sha256": "b6b2d4b823611ef916cd34dc02b3a5db5a71877ff3cb9db04756cecc6fbaa8ec"
+      },
+      {
+        "budgets": [
+          0.5,
+          1.0,
+          2.0,
+          4.0
+        ],
+        "ci95_high": 0.0003978161530088859,
+        "ci95_low": 0.00016381168171784443,
+        "failures": 20,
+        "ler": 0.0002681684097613301,
+        "method": "relay",
+        "osd0_ler": 8.867559452552349e-06,
+        "p": 0.02,
+        "runtime_ratio": 0.1656053922111916,
+        "shots": 74580,
+        "source_directory": "data/reproductions/roffe-2005-07016-search/results/toric11-binary_ms-p02000-relay/confirmation/toric11-binary_ms-p02000-relay-confirmation-30037ff8845d3977830c",
+        "summary_sha256": "b241ea637d8db0f0e4d369bf71d0eb2dfec2d9c195dd189eafdf12ae77820563"
+      }
+    ],
+    "planned_workers": 218,
+    "scope": "same-channel X-only; pointwise20-failure estimates, no pooled control curves or global ranking; stronger follow-up has independent seeds",
+    "shots": 3297851,
+    "status": "partial_completed_worker_audit",
+    "training_measurements": 23839
+  },
   "path_cases": {
     "beam_extra": 360,
     "capped": 69,
@@ -28,8 +158,48 @@
   },
   "plan_sha256": "bd0b6527cbfe152957867896ce48855344b9ea7637317de52b1a07ab473a8ce0",
   "production_simulations_at_prelaunch": 0,
-  "regression_cases": 72,
-  "scope": "prelaunch implementation and prospective protocol qualification; production scientific results are not complete",
+  "public_browser": {
+    "checks": [
+      "324 curves / 2667 rows; all public input and saved-decoder lists use the active view; GB46 and all three singleton circuits absent",
+      "Every remaining code: picker, legend, plotted collection, table, settings receipt and CSV agree",
+      "Empty active view clears plot/decoder/input state and stale matrices; reset, custom matrix and custom Stim still validate",
+      "Missing default A5/B2 inputs fall back to a displayed input in both DOM and experiment/plot state",
+      "Import refresh hides singleton, admits multi-rate circuit and updates availability; hiding the selected circuit clears its Stim bytes and download validation",
+      "Saved imports reapply eligibility after reload; internal three-qubit fixture remains hidden even with two rates",
+      "Empty mobile layout fits; archived v1 still loads its retained catalog"
+    ],
+    "errors": [],
+    "simulations": 0
+  },
+  "regression_breakdown": {
+    "catalog_projection_display": 53,
+    "controller_and_pipeline": 20,
+    "frontier_orchestration": 7
+  },
+  "regression_cases": 80,
+  "scheduler_current": {
+    "61869372": {
+      "RUNNING": 1
+    },
+    "61870314": {
+      "RUNNING": 10
+    },
+    "61870315": {
+      "PENDING": 1
+    }
+  },
+  "scope": "qualified implementation plus launch and completed-worker partial publication; no claim that the stronger campaign or full scientific audits are finished",
+  "search_browser": {
+    "checks": [
+      "Both search methods expose exact numerical, topology, solution and memory controls",
+      "Table/CSV retain both search methods, measured runtime ratios and all-path work",
+      "Downloaded settings preserve full search configuration and traversal version",
+      "Saved search decoder cannot silently turn into ordinary BP in experiment builder",
+      "Singleton/empty handling clears stale code and search-decoder selections"
+    ],
+    "errors": [],
+    "simulations": 0
+  },
   "separate_seeds": [
     2026111551,
     2026111552,
@@ -40,5 +210,5 @@
     ".git/roffe-search-regressions.log",
     ".git/roffe-search-final-tests.log"
   ],
-  "timestamp_utc": "2026-11-16T02:17:42.419138+00:00"
+  "timestamp_utc": "2026-11-16T03:07:14.215145+00:00"
 }

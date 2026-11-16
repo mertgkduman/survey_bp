@@ -1,0 +1,47 @@
+{
+  "array": {
+    "argv": [
+      "sbatch",
+      "--parsable",
+      "--partition=common,scavenger",
+      "--account=pfisterlab",
+      "--nodes=1",
+      "--ntasks=1",
+      "--cpus-per-task=1",
+      "--mem=2G",
+      "--time=4-00:00:00",
+      "--requeue",
+      "--chdir=/hpc/group/pfisterlab/mg551/storage/survey_bp",
+      "--export=ALL,PYTHONPATH=/hpc/group/pfisterlab/mg551/storage/survey_bp/src,OMP_NUM_THREADS=1,OPENBLAS_NUM_THREADS=1,MKL_NUM_THREADS=1",
+      "--job-name=roffe-search-frontier",
+      "--array=0-217%218",
+      "--dependency=aftercorr:61869371",
+      "--output=/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/roffe-2005-07016-search-frontier/results/slurm-%A_%a.log",
+      "--wrap=export NUMBA_CACHE_DIR=\"/tmp/roffe-frontier-${SLURM_JOB_ID}\"; mkdir -p \"$NUMBA_CACHE_DIR\"; exec /hpc/group/pfisterlab/mg551/storage/survey_bp/.venv/bin/python /hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/roffe-2005-07016-search-frontier/run.py --index \"$SLURM_ARRAY_TASK_ID\""
+    ],
+    "id": "61870314",
+    "plan_sha256": "8bbc025040915c299af18d09edd90bf443cc0ba2df8b33f2a0e7db5a254aa3a1"
+  },
+  "collect": {
+    "argv": [
+      "sbatch",
+      "--parsable",
+      "--partition=common,scavenger",
+      "--account=pfisterlab",
+      "--nodes=1",
+      "--ntasks=1",
+      "--cpus-per-task=1",
+      "--mem=16G",
+      "--time=4-00:00:00",
+      "--requeue",
+      "--chdir=/hpc/group/pfisterlab/mg551/storage/survey_bp",
+      "--export=ALL,PYTHONPATH=/hpc/group/pfisterlab/mg551/storage/survey_bp/src,OMP_NUM_THREADS=1,OPENBLAS_NUM_THREADS=1,MKL_NUM_THREADS=1",
+      "--job-name=roffe-frontier-audit",
+      "--dependency=afterok:61870314:61869372",
+      "--output=/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/roffe-2005-07016-search-frontier/results/collect-%j.log",
+      "--wrap=export NUMBA_CACHE_DIR=\"/tmp/roffe-frontier-${SLURM_JOB_ID}\"; mkdir -p \"$NUMBA_CACHE_DIR\"; /hpc/group/pfisterlab/mg551/storage/survey_bp/.venv/bin/python /hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/roffe-2005-07016-search-frontier/run.py --collect --complete"
+    ],
+    "id": "61870315",
+    "plan_sha256": "8bbc025040915c299af18d09edd90bf443cc0ba2df8b33f2a0e7db5a254aa3a1"
+  }
+}
