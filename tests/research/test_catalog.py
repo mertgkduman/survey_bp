@@ -29,13 +29,18 @@ def test_catalog_uses_retained_summary_evidence_without_raw_ledger_promotion(tmp
     raw = next(asset for asset in datasets["yao-vanilla-a5-b2"]["assets"] if asset["kind"] == "jsonl_zstd")
     assert raw["availability"] == "tracked"
     assert raw["url"] == raw["path"]
-    assert all({"x", "y", "n", "failures", "ci_low", "ci_high", "status", "mean_work", "work_unit", "mean_seconds", "type_i", "type_ii", "source_value"} <= set(point)
+    # Normalized local comparisons without a paper ordinate omit source_value;
+    # the schema makes it optional. Source transcriptions are checked above.
+    assert all({"x", "y", "n", "failures", "ci_low", "ci_high", "status", "mean_work", "work_unit", "mean_seconds", "type_i", "type_ii"} <= set(point)
                for dataset in catalog["datasets"] for point in dataset["points"])
     public_inputs = {code["code_id"] for code in catalog["codes"]} | {circuit["circuit_id"] for circuit in catalog["circuits"]}
     assert {series["code_id"] for series in catalog["result_series"]} <= public_inputs
     assert {series["decoder_id"] for series in catalog["result_series"]} <= {decoder["decoder_id"] for decoder in catalog["decoders"]}
     assert len(catalog["decoders"]) == len({decoder["decoder_id"] for decoder in catalog["decoders"]})
-    assert {dataset["dataset_id"] for dataset in catalog["datasets"]} <= {experiment.get("dataset_id") for experiment in catalog["experiments"]}
+    assert {dataset["dataset_id"] for dataset in catalog["datasets"]} <= {
+        dataset for experiment in catalog["experiments"]
+        for dataset in experiment.get("dataset_ids", [experiment.get("dataset_id")])
+    }
     assert {"a5", "b2", "b1", "c2", "double-gross", "bb72", "gb46"} <= {code["code_id"] for code in catalog["codes"]}
     assert "three-qubit" not in {code["code_id"] for code in catalog["codes"]}
     gross = next(code for code in catalog["codes"] if code["code_id"] == "double-gross")

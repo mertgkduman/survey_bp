@@ -36,6 +36,30 @@ def validate_catalog(catalog: dict[str, Any]) -> dict[str, Any]:
         for paper in dataset.get("paper_ids", [dataset.get("paper_id")]):
             if paper not in indexes["papers"]:
                 raise ValueError(f"dataset {dataset['dataset_id']} has an unresolved paper {paper}")
+    figure_ids = set()
+    for figure in catalog.get("paper_figures", []):
+        fid = figure.get("figure_id")
+        if not isinstance(fid, str) or not fid or fid in figure_ids:
+            raise ValueError("paper figures need unique figure_id values")
+        figure_ids.add(fid)
+        if figure.get("paper_id") not in indexes["papers"]:
+            raise ValueError("paper figure has an unresolved paper")
+        for field in ("label", "note", "source_path"):
+            if not isinstance(figure.get(field), str) or not figure[field]:
+                raise ValueError(f"paper figure needs {field}")
+        codes = figure.get("code_ids")
+        if not isinstance(codes, list) or not codes or any(c not in indexes["codes"] for c in codes):
+            raise ValueError("paper figure has unresolved codes")
+        rules = figure.get("reproduction_rules")
+        if not isinstance(rules, list):
+            raise ValueError("paper figure needs explicit reproduction rules")
+        for rule in rules:
+            dataset = indexes["datasets"].get(rule.get("dataset_id"))
+            if dataset is None or figure["paper_id"] not in dataset.get("paper_ids", [dataset.get("paper_id")]):
+                raise ValueError("paper reproduction rule has an unresolved or unrelated dataset")
+            arms = rule.get("source_decoder_ids")
+            if not isinstance(arms, list) or not arms or any(not isinstance(a, str) or not a for a in arms):
+                raise ValueError("paper reproduction rules need explicit decoder arms")
     for experiment in catalog["experiments"]:
         for paper in experiment.get("paper_ids", []):
             if paper not in indexes["papers"]:
@@ -149,5 +173,39 @@ def extend_catalog(catalog: dict[str, Any], registry: dict[str, Any], repository
                             raise ValueError(f"conflicting paper metadata: {item.get('paper_id')}")
                         continue
                 result.setdefault(kind, []).append(item)
+        result["extension_sources"].append({"path": relative, "sha256": sha256(path.read_bytes()).hexdigest()})
+    # Some normalized comparison publishers retain exact decoder/evidence
+    # records but omit experiment context. Keep those datasets reachable from
+    # receipts/details without inventing an executable reproduction recipe.
+    covered = {dataset for experiment in result.get("experiments", [])
+               for dataset in experiment.get("dataset_ids", [experiment.get("dataset_id")])}
+    for dataset in result.get("datasets", []):
+        identifier = dataset["dataset_id"]
+        if identifier in covered:
+            continue
+        members = [s for s in result.get("result_series", []) if s["dataset_id"] == identifier]
+        result.setdefault("experiments", []).append({
+            "experiment_id": "catalog-context:" + identifier,
+            "dataset_id": identifier, "dataset_ids": [identifier],
+            "paper_ids": dataset.get("paper_ids", [dataset.get("paper_id")]),
+            "code_ids": sorted({s["code_id"] for s in members}),
+            "decoder_ids": sorted({s["decoder_id"] for s in members}),
+            "description": dataset.get("caveat", "Retained comparison evidence."),
+            "evidence_status": dataset.get("evidence_status"),
+            "reproduction_recipe": {
+                "kind": "retained_source_only", "commands": [],
+                "original_instruction_path": dataset.get("source_path"),
+                "budget_note": "No executable recipe is registered for this comparison context; inspect its retained source evidence.",
+            },
+        })
+        covered.add(identifier)
+    if relative := registry.get("paper_figures_path"):
+        path = (root / relative).resolve()
+        if not path.is_relative_to(root) or not path.is_file():
+            raise ValueError("paper figure registry is unavailable within repository")
+        figures = json.loads(path.read_text())
+        if figures.get("schema") != "research-paper-figures-v1" or not isinstance(figures.get("figures"), list):
+            raise ValueError("unsupported paper figure registry")
+        result["paper_figures"] = figures["figures"]
         result["extension_sources"].append({"path": relative, "sha256": sha256(path.read_bytes()).hexdigest()})
     return validate_catalog(result)

@@ -2,7 +2,7 @@
 
 The v2 workbench in [`web/research/`](../web/research/index.html) views measured
 results, compares code/circuit and decoder selections, and exports new experiments.
-Paper and dataset browsing remains in the [v1 archive](../web/research/v1/index.html). It runs as static HTML/CSS/JavaScript. Catalog inspection, plots, CSV
+Paper figure views are available in v2; the earlier dataset browser remains in the [v1 archive](../web/research/v1/index.html). It runs as static HTML/CSS/JavaScript. Catalog inspection, plots, CSV
 downloads, and ZIP preparation happen in the browser. New simulations execute
 locally after download.
 
@@ -32,6 +32,32 @@ Custom parity-check matrices and custom Stim inputs remain available, even
 when the active result view is empty. Refreshes reconcile removed selections
 and clear stale registered-input bytes. New-experiment BP/Q-BP baseline presets
 remain available; they do not claim measured performance.
+
+Click a paper title above the results to open its separately named figures
+(for example, Yao Figs. 2–8 or Roffe Fig. 3). **Custom plots** restores your
+independent plot selections. Each figure has **Paper reproductions** and
+**Additional curves** checkboxes below its curve list. Reproduction curves
+start on and additional comparisons start off. Each checkbox switches its
+whole group; a partly selected group shows a mixed state. Individual curve
+controls still work, and ranges, tables and exports follow visible curves.
+
+Figure membership and reproduction settings are declared in
+`research/catalog/paper-figures.json`, indexed by `sources.json`. Rules name
+retained dataset and decoder-arm identities, with source-figure scope where
+needed; titles alone never establish a reproduction. The same eligibility
+projection runs separately on each scoped group, so an unrelated imported
+point cannot make a reproduction qualify. New imported comparisons remain
+additional unless explicitly reviewed into the registry. Settings downloads
+include the paper, figure, caveat and scoped original evidence.
+
+“Paper reproductions” identifies runs of the plotted decoder configurations,
+with canonical numerical adaptations still stated in each figure note. It does
+not imply bitwise author identity. MacKay's unstated iteration cap and different
+source metric prevent an exact configuration claim; its local curves remain
+additional. The original lifted-product paper supplies Example 4 but no LER
+figure, so that view is labelled as a controlled comparison rather than given
+an invented figure number. Groups with no qualified reproduction are disabled;
+the additional curves can still be selected.
 
 Importance estimates keep their declared
 estimator and raw proposal-count semantics. Work/runtime units are not silently

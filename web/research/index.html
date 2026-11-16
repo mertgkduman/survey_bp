@@ -5,7 +5,7 @@
 <meta name="description" content="View BP-based QLDPC experiment results, reproduce them locally, and build new comparisons.">
 <title>BP-based QLDPC decoding workbench · v2</title>
 <link rel="stylesheet" href="vendor/katex/katex.min.css"><link rel="stylesheet" href="style.css">
-<script defer src="vendor/katex/katex.min.js"></script><script defer src="zip.js"></script><script defer src="contract-ui.js"></script><script defer src="result-import.js"></script><script defer src="decoder-display.js"></script><script defer src="curve-projection.js"></script><script defer src="plot-data.js"></script><script defer src="app.js"></script>
+<script defer src="vendor/katex/katex.min.js"></script><script defer src="zip.js"></script><script defer src="contract-ui.js"></script><script defer src="result-import.js"></script><script defer src="decoder-display.js"></script><script defer src="curve-projection.js"></script><script defer src="paper-figures.js"></script><script defer src="plot-data.js"></script><script defer src="app.js"></script>
 </head>
 <body>
 <a class="skip" href="#main-content">Skip to content</a>
@@ -61,6 +61,8 @@ cd /path/to/survey_bp
 </section>
 <section id="results" class="page" aria-labelledby="results-heading" hidden>
 <div class="section-head"><div><h2 id="results-heading">Available experiment results</h2><p>Results measured with this package. Each saved decoder keeps its exact run settings.</p></div><button id="add-plot" type="button">+ Add plot</button></div>
+<nav id="paper-options" class="paper-options" aria-label="Choose a paper or custom plots"></nav>
+<div id="paper-heading" class="paper-heading" aria-live="polite"></div>
 <div class="results-layout"><div id="plot-grid" class="plot-grid"></div><aside id="availability" class="availability" aria-label="Available policies and codes"></aside></div>
 </section>
 <section id="builder" class="page" aria-labelledby="builder-heading" hidden>

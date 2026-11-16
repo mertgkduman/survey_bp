@@ -17,7 +17,10 @@
     "public_retired_dataset_ids": {
       "type": "array",
       "uniqueItems": true,
-      "items": {"type": "string", "minLength": 1}
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
     },
     "schema_version": {
       "const": 1
@@ -135,6 +138,84 @@
           "label",
           "kind"
         ]
+      }
+    },
+    "paper_figures": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "figure_id",
+          "paper_id",
+          "label",
+          "code_ids",
+          "note",
+          "source_path",
+          "reproduction_rules"
+        ],
+        "properties": {
+          "figure_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "paper_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1
+          },
+          "note": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "code_ids": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string"
+            }
+          },
+          "source_figure": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "reproduction_rules": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "dataset_id",
+                "source_decoder_ids"
+              ],
+              "properties": {
+                "dataset_id": {
+                  "type": "string"
+                },
+                "source_decoder_ids": {
+                  "type": "array",
+                  "minItems": 1,
+                  "uniqueItems": true,
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "source_figure": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
       }
     }
   },

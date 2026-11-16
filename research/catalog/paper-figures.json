@@ -1,0 +1,298 @@
+{
+  "schema": "research-paper-figures-v1",
+  "figures": [
+    {
+      "figure_id": "yao-fig-2",
+      "paper_id": "yao-2312-10950-v2",
+      "label": "Fig. 2 · B1",
+      "code_ids": [
+        "b1"
+      ],
+      "note": "Canonical reproductions of the plotted BP/BPGD configurations; published sample counts and some numerical safeguards are unavailable. Additional curves include tuning and channel adaptations. BP-OSD and BP-SI source curves are outside this reproduced set.",
+      "source_path": "data/reproductions/yao-2312-10950-non-osd/source_points.json",
+      "reproduction_rules": [
+        {
+          "dataset_id": "yao-non-osd-results",
+          "source_decoder_ids": [
+            "bp",
+            "bpgd_random_t100",
+            "bpgd_t100"
+          ],
+          "source_figure": "2"
+        },
+        {
+          "dataset_id": "yao-bpgd-completion",
+          "source_decoder_ids": [
+            "bpgd_t100_r882"
+          ]
+        }
+      ],
+      "source_figure": "2"
+    },
+    {
+      "figure_id": "yao-fig-3",
+      "paper_id": "yao-2312-10950-v2",
+      "label": "Fig. 3 · B1",
+      "code_ids": [
+        "b1"
+      ],
+      "note": "Canonical reproductions of the plotted BP/BPGD configurations; published sample counts and some numerical safeguards are unavailable. Additional curves include tuning and channel adaptations. BP-OSD and BP-SI source curves are outside this reproduced set. The paper reports conflicting ordinates for the nominally identical T=10 curves in Figs. 3 and 4; their source scopes stay separate.",
+      "source_path": "data/reproductions/yao-2312-10950-non-osd/source_points.json",
+      "reproduction_rules": [
+        {
+          "dataset_id": "yao-non-osd-results",
+          "source_decoder_ids": [
+            "bp",
+            "bpgd_t1",
+            "bpgd_t10",
+            "bpgd_t100",
+            "bpgd_t70"
+          ],
+          "source_figure": "3"
+        },
+        {
+          "dataset_id": "yao-bpgd-completion",
+          "source_decoder_ids": [
+            "bpgd_t1_r882",
+            "bpgd_t10_r882",
+            "bpgd_t70_r882",
+            "bpgd_t100_r882"
+          ]
+        }
+      ],
+      "source_figure": "3"
+    },
+    {
+      "figure_id": "yao-fig-4",
+      "paper_id": "yao-2312-10950-v2",
+      "label": "Fig. 4 · B1",
+      "code_ids": [
+        "b1"
+      ],
+      "note": "Canonical reproductions of the plotted BP/BPGD configurations; published sample counts and some numerical safeguards are unavailable. Additional curves include tuning and channel adaptations. BP-OSD and BP-SI source curves are outside this reproduced set. The paper reports conflicting ordinates for the nominally identical T=10 curves in Figs. 3 and 4; their source scopes stay separate.",
+      "source_path": "data/reproductions/yao-2312-10950-non-osd/source_points.json",
+      "reproduction_rules": [
+        {
+          "dataset_id": "yao-non-osd-results",
+          "source_decoder_ids": [
+            "bp",
+            "bpgd_t10"
+          ],
+          "source_figure": "4"
+        },
+        {
+          "dataset_id": "yao-bpgd-completion",
+          "source_decoder_ids": [
+            "bpgd_t10_r882"
+          ]
+        }
+      ],
+      "source_figure": "4"
+    },
+    {
+      "figure_id": "yao-fig-5",
+      "paper_id": "yao-2312-10950-v2",
+      "label": "Fig. 5 · C2",
+      "code_ids": [
+        "c2"
+      ],
+      "note": "Canonical reproductions of the plotted BP/BPGD configurations; published sample counts and some numerical safeguards are unavailable. Additional curves include tuning and channel adaptations. BP-OSD and BP-SI source curves are outside this reproduced set.",
+      "source_path": "data/reproductions/yao-2312-10950-non-osd/source_points.json",
+      "reproduction_rules": [
+        {
+          "dataset_id": "yao-non-osd-results",
+          "source_decoder_ids": [
+            "bp",
+            "bpgd_t10"
+          ],
+          "source_figure": "5"
+        },
+        {
+          "dataset_id": "yao-bpgd-completion",
+          "source_decoder_ids": [
+            "bpgd_t10_r1922"
+          ]
+        }
+      ],
+      "source_figure": "5"
+    },
+    {
+      "figure_id": "yao-fig-6",
+      "paper_id": "yao-2312-10950-v2",
+      "label": "Fig. 6 · B1",
+      "code_ids": [
+        "b1"
+      ],
+      "note": "Canonical reproductions of the plotted BP/BPGD configurations; published sample counts and some numerical safeguards are unavailable. Additional curves include tuning and channel adaptations. BP-OSD and BP-SI source curves are outside this reproduced set.",
+      "source_path": "data/reproductions/yao-2312-10950-non-osd/source_points.json",
+      "reproduction_rules": [
+        {
+          "dataset_id": "yao-non-osd-results",
+          "source_decoder_ids": [
+            "bp",
+            "bpgd_t100_r10",
+            "bpgd_t100_r2",
+            "bpgd_t100_r5",
+            "bpgd_t100_r50",
+            "bpgd_t100_r882"
+          ],
+          "source_figure": "6"
+        },
+        {
+          "dataset_id": "yao-bpgd-completion",
+          "source_decoder_ids": [
+            "bpgd_t100_r2",
+            "bpgd_t100_r5",
+            "bpgd_t100_r10",
+            "bpgd_t100_r50",
+            "bpgd_t100_r882"
+          ]
+        }
+      ],
+      "source_figure": "6"
+    },
+    {
+      "figure_id": "yao-fig-7",
+      "paper_id": "yao-2312-10950-v2",
+      "label": "Fig. 7 · A5",
+      "code_ids": [
+        "a5"
+      ],
+      "note": "Canonical reproductions of the plotted BP/BPGD configurations; published sample counts and some numerical safeguards are unavailable. Additional curves include tuning and channel adaptations. BP-OSD and BP-SI source curves are outside this reproduced set.",
+      "source_path": "data/reproductions/yao-2312-10950-non-osd/source_points.json",
+      "reproduction_rules": [
+        {
+          "dataset_id": "yao-non-osd-results",
+          "source_decoder_ids": [
+            "bpgd_t10",
+            "qbp"
+          ],
+          "source_figure": "7"
+        }
+      ],
+      "source_figure": "7"
+    },
+    {
+      "figure_id": "yao-fig-8",
+      "paper_id": "yao-2312-10950-v2",
+      "label": "Fig. 8 · B2",
+      "code_ids": [
+        "b2"
+      ],
+      "note": "Canonical reproductions of the plotted BP/BPGD configurations; published sample counts and some numerical safeguards are unavailable. Additional curves include tuning and channel adaptations. BP-OSD and BP-SI source curves are outside this reproduced set.",
+      "source_path": "data/reproductions/yao-2312-10950-non-osd/source_points.json",
+      "reproduction_rules": [
+        {
+          "dataset_id": "yao-non-osd-results",
+          "source_decoder_ids": [
+            "bpgd_t10",
+            "qbp"
+          ],
+          "source_figure": "8"
+        }
+      ],
+      "source_figure": "8"
+    },
+    {
+      "figure_id": "roffe-fig-3",
+      "paper_id": "roffe-2005-07016-v2",
+      "label": "Fig. 3 · Toric codes",
+      "code_ids": [
+        "toric9",
+        "toric11",
+        "toric13",
+        "toric15"
+      ],
+      "note": "The default curves reproduce regular BP with the paper’s codes, rate grids, min-sum schedule and T=n. Canonical floating-point and row-order conventions are documented adaptations. CS-10 and OSD-0 differ from the paper’s CS-60 and belong to Additional curves, alongside Q-BP and tuning.",
+      "source_path": "data/reproductions/roffe-2005-07016-bp/source.json",
+      "reproduction_rules": [
+        {
+          "dataset_id": "roffe-2020-figure3-canonical-bp",
+          "source_decoder_ids": [
+            "binary_ms"
+          ]
+        },
+        {
+          "dataset_id": "roffe-damping-confirmation",
+          "source_decoder_ids": [
+            "binary_ms_baseline"
+          ]
+        }
+      ],
+      "source_figure": "3"
+    },
+    {
+      "figure_id": "mackay-fig-15",
+      "paper_id": "mackay-0304161-v3",
+      "label": "Fig. 15 · Construction U",
+      "code_ids": [
+        "unicycle274",
+        "unicycle74"
+      ],
+      "note": "No exact paper configuration is established: the iteration cap is unstated and T=100 is inferred. The source reports classical block errors; these curves report quantum block failures. All local runs are Additional curves. Length 74 has no source ordinate at the retained five rates.",
+      "source_path": "data/reproductions/mackay-0304161-unicycle/source.json",
+      "reproduction_rules": [],
+      "source_figure": "15"
+    },
+    {
+      "figure_id": "lp1054-example-4",
+      "paper_id": "panteleev-2012-04068-v2",
+      "label": "Example 4 · LP [[1054,140]]",
+      "code_ids": [
+        "lp1054"
+      ],
+      "note": "The original paper provides this construction but no LER figure, rate grid or numeric iteration cap. These are controlled comparisons, all under Additional curves; no source-curve reproduction is claimed.",
+      "source_path": "data/reproductions/panteleev-2012-04068-lifted-product/source.json",
+      "reproduction_rules": [],
+      "source_figure": null
+    },
+    {
+      "figure_id": "bb72-comparison",
+      "paper_id": "bravyi-2308-07915",
+      "label": "BB72 · Controlled CSS comparison",
+      "code_ids": [
+        "bb72"
+      ],
+      "note": "Controlled code-capacity adaptation. This view does not reproduce the paper’s original circuit or decoder experiment; all curves are Additional curves.",
+      "source_path": "data/studies/bb72-css-bp-v1.json",
+      "reproduction_rules": [],
+      "source_figure": null
+    },
+    {
+      "figure_id": "relay-css-comparison",
+      "paper_id": "relaybp-2506-01779-v2",
+      "label": "RelayBP · Controlled CSS comparison",
+      "code_ids": [
+        "bb72"
+      ],
+      "note": "Controlled code-capacity adaptation. This view does not reproduce the paper’s original circuit or decoder experiment; all curves are Additional curves.",
+      "source_path": "research/catalog/sources.json",
+      "reproduction_rules": [],
+      "source_figure": null
+    },
+    {
+      "figure_id": "beam-css-comparison",
+      "paper_id": "beamsearch-2512-07057-v2",
+      "label": "BeamSearch · Controlled CSS comparison",
+      "code_ids": [
+        "bb72"
+      ],
+      "note": "Controlled code-capacity adaptation. This view does not reproduce the paper’s original circuit or decoder experiment; all curves are Additional curves.",
+      "source_path": "research/catalog/sources.json",
+      "reproduction_rules": [],
+      "source_figure": null
+    },
+    {
+      "figure_id": "bpsf-css-comparison",
+      "paper_id": "bpsf-2507-00254-v1",
+      "label": "BP-SF · Controlled CSS comparison",
+      "code_ids": [
+        "bb72"
+      ],
+      "note": "Controlled code-capacity adaptation. This view does not reproduce the paper’s original circuit or decoder experiment; all curves are Additional curves.",
+      "source_path": "research/catalog/sources.json",
+      "reproduction_rules": [],
+      "source_figure": null
+    }
+  ]
+}

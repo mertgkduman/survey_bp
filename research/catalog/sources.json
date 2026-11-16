@@ -129,5 +129,6 @@
   ],
   "public_retired_dataset_ids": [
     "mackay-unicycle-bp"
-  ]
+  ],
+  "paper_figures_path": "research/catalog/paper-figures.json"
 }

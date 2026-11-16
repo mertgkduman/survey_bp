@@ -2,7 +2,7 @@
 (()=>{
 'use strict';
 const $=id=>document.getElementById(id), copy=x=>JSON.parse(JSON.stringify(x));
-const S={catalog:null,contract:null,template:null,policy:null,cards:[],custom:null,blocked:'',spec:null,imports:[],display:new Map()};
+const S={catalog:null,contract:null,template:null,policy:null,cards:[],custom:null,blocked:'',spec:null,imports:[],display:new Map(),paper:"",customCards:null,figureViews:null};
 const colors=['#087d78','#b47412','#5066aa','#ac4447','#608333','#8058a2'];
 const known=x=>typeof x==='number'&&Number.isFinite(x);
 const fmt=x=>known(x)?(x===0?'0':Math.abs(x)<.001?x.toExponential(3):Number(x.toPrecision(5)).toString()):'Unavailable';
@@ -21,7 +21,7 @@ function activeView(){return S.active||(S.active=ResearchCurves.active(S.catalog
 function series(){return activeView().curves;}
 const curveIdentity=s=>s.curve_id||s.series_id;
 const curveForDecoder=id=>series().find(s=>evidenceMembers(s).some(m=>m.decoder_id===id));
-function selected(card){return series().filter(s=>(s.code_id===card.input||s.circuit_id===card.input)&&(card.chosen?card.chosen.has(curveIdentity(s)):!card.decoder||curveIdentity(s)===card.decoder));}
+function selected(card){return available(card).filter(s=>(card.chosen?card.chosen.has(curveIdentity(s)):!card.decoder||curveIdentity(s)===card.decoder));}
 function points(card){return selected(card).filter(s=>!card.hidden.has(s.series_id)).flatMap(s=>s.points.map(p=>({s,p})));}
 function bound(p){return ResearchPlot.upperBound(p);}
 const metricFields={rate:'y',iterations:'mean_iterations',edge_updates:'mean_directed_edge_updates',work:'mean_work',time:'mean_seconds'};
@@ -30,18 +30,70 @@ const namedWorkUnits=new Set(['iterations','BP4 iterations','BP4 sweeps','circui
 const otherWork=p=>known(p.mean_work)&&!namedWorkUnits.has(p.work_unit);
 function value(card,p){return p[metricFields[card.metric]];}
 function plotValue(card,p){return card.metric==='rate'&&bound(p)&&p.y===0?p.ci_high:value(card,p);}
-function addPlot(){const card={id:S.cards.length?Math.max(...S.cards.map(c=>c.id))+1:1,input:S.cards.length?'b2':'a5',decoder:'',hidden:new Set(),metric:'rate'};const initial=series().find(s=>s.code_id===card.input&&s.source_decoder_id==='bp4_v2'&&s.dataset_id==='yao-vanilla-a5-b2');card.decoder=initial?curveIdentity(initial):curveIdentity(series().find(s=>s.code_id===card.input)||{})||'';S.cards.push(card);renderCards();}
+function addPlot(){if(S.paper)openPaper('');const card={id:S.cards.length?Math.max(...S.cards.map(c=>c.id))+1:1,input:S.cards.length?'b2':'a5',decoder:'',hidden:new Set(),metric:'rate'};const initial=series().find(s=>s.code_id===card.input&&s.source_decoder_id==='bp4_v2'&&s.dataset_id==='yao-vanilla-a5-b2');card.decoder=initial?curveIdentity(initial):curveIdentity(series().find(s=>s.code_id===card.input)||{})||'';S.cards.push(card);renderCards();}
 function inputChoices(){const view=activeView();return [...new Map([...view.codes.map(x=>[x.code_id,x.label]),...view.circuits.map(x=>[x.circuit_id,`${x.label} · circuit`])]).entries()];}
+function figureViews(){return S.figureViews||(S.figureViews=ResearchFigures.views(S.catalog,S.display));}
+function figureFor(card){return card.figureId?figureViews().find(f=>f.figure_id===card.figureId):null;}
+function cardInputs(card){
+ const figure=figureFor(card);
+ if(!card.figureId)return inputChoices();
+ const ids=new Set((figure?.curves||[]).map(s=>s.code_id));
+ return [['__figure__','All figure codes'],...inputChoices().filter(([id])=>ids.has(id))];
+}
+function paperCard(figure,id){return {id,figureId:figure.figure_id,input:'__figure__',decoder:'',metric:'rate',
+ hidden:new Set(figure.curves.filter(s=>s.paper_group==='additional').map(s=>s.series_id)),
+ known:new Set(figure.curves.map(s=>s.series_id))};}
+function reconcilePapers(){
+ if(!S.paper)return;
+ const figures=figureViews().filter(f=>f.paper_id===S.paper);
+ if(!figures.length){S.paper='';S.cards=S.customCards||[];return;}
+ S.cards=figures.map((figure,index)=>{
+  const card=S.cards.find(c=>c.figureId===figure.figure_id)||paperCard(figure,index+1);
+  for(const curve of figure.curves)if(!card.known.has(curve.series_id)&&curve.paper_group==='additional')card.hidden.add(curve.series_id);
+  card.known=new Set(figure.curves.map(s=>s.series_id));return card;
+ });
+}
+function openPaper(id){
+ if(id===S.paper)return;
+ if(!S.paper)S.customCards=S.cards;
+ S.paper=id;
+ S.cards=id?figureViews().filter(f=>f.paper_id===id).map((f,i)=>paperCard(f,i+1)):S.customCards||[];
+ renderCards();
+}
+function renderPapers(){
+ const target=$('paper-options');target.replaceChildren();
+ const ids=new Set(figureViews().map(f=>f.paper_id));
+ for(const [id,title]of [['','Custom plots'],...S.catalog.papers.filter(p=>ids.has(p.paper_id)).map(p=>[p.paper_id,p.title])]){
+  const button=el('button',{type:'button',class:'secondary','data-paper':id,'aria-pressed':String(S.paper===id)},title);
+  button.onclick=()=>openPaper(id);target.append(button);
+ }
+ const heading=$('paper-heading');heading.replaceChildren();
+ if(S.paper){const paper=record('papers',S.paper);heading.append(el('h3',{},paper.title),el('p',{class:'small muted'},'Paper reproduction curves are selected by default. Use each plot’s group controls to show our additional comparisons. Source settings and known adaptations are described below.'));
+  if(paper.source_url)heading.append(el('a',{href:paper.source_url,target:'_blank',rel:'noopener'},'Open paper ↗'));
+ }
+}
+function curveGroups(card){
+ const wrap=el('div',{class:'curve-groups','aria-label':'Curve groups'});
+ for(const [id,name]of [['paper','Paper reproductions'],['additional','Additional curves']]){
+  const group=available(card).filter(s=>s.paper_group===id),shown=new Set(visible(card).map(s=>s.series_id));
+  const n=group.filter(s=>shown.has(s.series_id)).length;
+  const label=el('label'),cb=el('input',{type:'checkbox','data-group':id,'aria-label':name});
+  cb.checked=!!group.length&&n===group.length;cb.indeterminate=n>0&&n<group.length;cb.disabled=!group.length;
+  cb.onchange=()=>{const show=cb.checked;card.decoder='';card.chosen=null;for(const s of group){if(show)card.hidden.delete(s.series_id);else card.hidden.add(s.series_id);}renderCards();document.querySelector(`[data-plot="${card.id}"] [data-group="${id}"]`)?.focus({preventScroll:true});};
+  label.append(cb,document.createTextNode(`${name} (${group.length})`));wrap.append(label);
+ }
+ return wrap;
+}
 function reconcileCard(card){
- const inputs=inputChoices();
- if(!inputs.some(([id])=>id===card.input)){card.input=inputs[0]?.[0]||'';card.decoder='';card.chosen=null;card.hidden.clear();}
+ const inputs=cardInputs(card);
+ if(!inputs.some(([id])=>id===card.input)){card.input=inputs[0]?.[0]||'';card.decoder='';card.chosen=null;card.hidden.clear();if(card.figureId)for(const s of available(card))if(s.paper_group==='additional')card.hidden.add(s.series_id);}
  const ids=new Set(available(card).map(curveIdentity));
  card.hidden=new Set([...card.hidden].filter(id=>ids.has(id)));
  if(card.chosen){card.chosen=new Set([...card.chosen].filter(id=>ids.has(id)));if(!card.chosen.size){card.chosen=null;card.decoder='';}}
  if(card.decoder&&card.decoder!=='__selected__'&&!ids.has(card.decoder))card.decoder='';
 }
 function visible(card){return selected(card).filter(s=>!card.hidden.has(s.series_id));}
-function available(card){return series().filter(s=>s.code_id===card.input||s.circuit_id===card.input);}
+function available(card){const collection=card.figureId?(figureFor(card)?.curves||[]):series();return collection.filter(s=>card.figureId&&card.input==='__figure__'||s.code_id===card.input||s.circuit_id===card.input);}
 function colorFor(card,s){return colors[Math.max(0,available(card).findIndex(x=>x.series_id===s.series_id))%colors.length];}
 function toggleCurve(card,s){if(card.hidden.has(s.series_id))card.hidden.delete(s.series_id);else card.hidden.add(s.series_id);renderCards();const next=[...document.querySelectorAll(`[data-plot="${card.id}"] .curve-list input`)].find(n=>n.dataset.curve===s.series_id);next?.focus({preventScroll:true});}
 function previewCurve(card,s,on){const box=document.querySelector(`[data-plot="${card.id}"]`);if(!box)return;const group=[...box.querySelectorAll('.curve-group')].find(g=>g.dataset.curve===s.series_id);if(group){group.classList.toggle('preview',on);group.setAttribute('opacity',on?'0.25':card.hidden.has(s.series_id)?'0':'1');}}
@@ -56,18 +108,20 @@ function curvePicker(card){
 }
 function parameterKey(card){const details=el('details',{class:'parameter-key'});details.append(el('summary',{},'Parameter key'));const definitions=new Map();for(const s of selected(card)){const info=S.display.get(s.source_series_id||s.series_id)||s;for(const p of info?.parameters||[])if(DecoderDisplay.symbols[p.symbol])definitions.set(p.symbol,DecoderDisplay.symbols[p.symbol]);if(info?.parameters.some(p=>p.value==='n'))definitions.set('n',DecoderDisplay.symbols.n);}const dl=el('dl');for(const [symbol,meaning]of definitions){dl.append(el('dt',{},symbol),el('dd',{},meaning));}details.append(el('p',{class:'small muted'},'SP = sum-product; MS = min-sum; OMS = offset min-sum. Every displayed parameter is followed by its value. Parameters come from the saved specification; coefficient rounding and exact numerical conventions are retained in run settings.'),dl);return details;}
 function renderCards(){
- const grid=$('plot-grid');grid.classList.toggle('compare',S.cards.length>1);grid.replaceChildren();
+ reconcilePapers();renderPapers();
+ const grid=$('plot-grid');grid.classList.toggle('compare',S.cards.length>1&&!S.paper);grid.replaceChildren();
  for(const card of S.cards){
   reconcileCard(card);
-  const box=el('article',{class:'plot-card','data-plot':card.id}),heading=el('div',{class:'card-heading'});heading.append(el('h3',{},`Plot ${card.id}`));
-  if(S.cards.length>1){const remove=el('button',{type:'button',class:'secondary','aria-label':`Remove plot ${card.id}`},'Remove');remove.onclick=()=>{S.cards=S.cards.filter(c=>c!==card);renderCards();};heading.append(remove);}box.append(heading);
+  const figure=figureFor(card),box=el('article',{class:'plot-card','data-plot':card.id,...(figure?{'data-figure':figure.figure_id}:{})}),heading=el('div',{class:'card-heading'});heading.append(el('h3',{},figure?.label||`Plot ${card.id}`));
+  if(S.cards.length>1&&!figure){const remove=el('button',{type:'button',class:'secondary','aria-label':`Remove plot ${card.id}`},'Remove');remove.onclick=()=>{S.cards=S.cards.filter(c=>c!==card);renderCards();};heading.append(remove);}box.append(heading);if(figure)box.append(el('p',{class:'small muted figure-note'},figure.note));
   const filters=el('div',{class:'selectors'});
-  for(const [key,label]of [['input','Code/circuit'],['decoder','Decoder']]){const wrap=el('label',{},label),select=el('select',{'data-select':key,'aria-label':`${label} for plot ${card.id}`});const choices=key==='input'?inputChoices():[['','Compare available decoders'],...(card.chosen?[['__selected__','Selected curves']]:[]),...available(card).map(s=>[curveIdentity(s),s.label])];options(select,choices,card[key]);if(key==='decoder')for(const option of select.options){const item=available(card).find(s=>curveIdentity(s)===option.value);if(item)option.dataset.decoder=item.decoder_id;}select.title=choices.find(x=>x[0]===card[key])?.[1]||'';select.onchange=()=>{card[key]=select.value;card.hidden.clear();if(key==='input'){card.chosen=null;card.decoder=available(card)[0]?curveIdentity(available(card)[0]):'';}else if(select.value!=='__selected__')card.chosen=null;renderCards();};wrap.append(select);filters.append(wrap);}box.append(filters);
+  for(const [key,label]of [['input','Code/circuit'],['decoder','Decoder']]){const wrap=el('label',{},label),select=el('select',{'data-select':key,'aria-label':`${label} for plot ${card.id}`});const choices=key==='input'?cardInputs(card):[['','Compare available decoders'],...(card.chosen?[['__selected__','Selected curves']]:[]),...available(card).map(s=>[curveIdentity(s),s.label])];options(select,choices,card[key]);if(key==='decoder')for(const option of select.options){const item=available(card).find(s=>curveIdentity(s)===option.value);if(item)option.dataset.decoder=item.decoder_id;}select.title=choices.find(x=>x[0]===card[key])?.[1]||'';select.onchange=()=>{card[key]=select.value;card.hidden.clear();if(card.figureId)for(const s of available(card))if(s.paper_group==='additional')card.hidden.add(s.series_id);if(key==='input'){card.chosen=null;card.decoder=card.figureId?'':available(card)[0]?curveIdentity(available(card)[0]):'';}else if(select.value!=='__selected__'){card.chosen=null;if(select.value)card.hidden.delete(select.value);}renderCards();};wrap.append(select);filters.append(wrap);}box.append(filters);
   const choices=selected(card);
   if(!available(card).length){box.append(el('p',{class:'empty'},'No curves with measurements at two or more error rates are available. Build a custom experiment or import measured results.'));grid.append(box);continue;}
   box.append(curvePicker(card));
   const curves=el('fieldset',{class:'curves'});curves.append(el('legend',{},'Show curves'));const list=el('div',{class:'curve-list'});
-  for(const s of choices){const color=colorFor(card,s),label=el('label',{style:`color:${color}`,title:s.label}),cb=el('input',{type:'checkbox','aria-label':s.label,'data-curve':s.series_id});cb.checked=!card.hidden.has(s.series_id);cb.onchange=()=>toggleCurve(card,s);const swatch=el('span',{class:'curve-swatch','aria-hidden':'true',style:`background:${color}`});label.append(cb,swatch,document.createTextNode(s.label));label.onmouseenter=()=>previewCurve(card,s,true);label.onmouseleave=()=>previewCurve(card,s,false);label.onfocusin=()=>previewCurve(card,s,true);label.onfocusout=()=>previewCurve(card,s,false);list.append(label);}curves.append(list);box.append(curves,parameterKey(card));
+  for(const s of choices){const color=colorFor(card,s),label=el('label',{style:`color:${color}`,title:s.label}),cb=el('input',{type:'checkbox','aria-label':s.label,'data-curve':s.series_id});cb.checked=!card.hidden.has(s.series_id);cb.onchange=()=>toggleCurve(card,s);const swatch=el('span',{class:'curve-swatch','aria-hidden':'true',style:`background:${color}`});label.append(cb,swatch,document.createTextNode(s.label));label.onmouseenter=()=>previewCurve(card,s,true);label.onmouseleave=()=>previewCurve(card,s,false);label.onfocusin=()=>previewCurve(card,s,true);label.onfocusout=()=>previewCurve(card,s,false);list.append(label);}curves.append(list);if(figure)curves.append(curveGroups(card));box.append(curves,parameterKey(card));
+  if(figure&&!available(card).some(s=>s.paper_group==='paper'))box.append(el('p',{class:'small muted'},'No qualified paper reproduction curves are available in this view. Select Additional curves to show the retained adaptations.'));
   const metricLabel=el('label',{class:'metric'},'Metric'),metric=el('select',{'aria-label':`Metric for plot ${card.id}`});
   const visiblePoints=points(card),basis=visiblePoints.length?visiblePoints:choices.flatMap(s=>s.points.map(p=>({s,p})));
   const units=[...new Set(basis.filter(({p})=>otherWork(p)).map(({p})=>p.work_unit))];
@@ -81,7 +135,7 @@ function renderCards(){
   metricLabel.append(metric);box.append(metricLabel);
   drawPlot(card,box);drawTable(card,box);
   const actions=el('div',{class:'actions'}),csv=el('button',{type:'button',class:'secondary'},'Export visible table');csv.disabled=!visiblePoints.length;csv.onclick=()=>exportTable(card);actions.append(csv);
-  const receipt=el('button',{type:'button',class:'secondary'},'Download run settings');receipt.disabled=!visible(card).length;receipt.onclick=()=>{const shown=visible(card);save(`plot-${card.id}-settings.json`,JSON.stringify({schema:'research-plot-receipt-v2',axis:{mode:ResearchPlot.axis(shown,card.axis||'auto'),depolarizing_to_bit_flip_factor:2/3},series:shown,decoders:[...new Set(shown.flatMap(s=>evidenceMembers(s).map(m=>m.decoder_id)))].map(id=>record('decoders',id)),experiments:S.catalog.experiments.filter(e=>e.dataset_ids?.some(id=>shown.some(s=>evidenceMembers(s).some(m=>m.dataset_id===id))))},null,2)+'\n');};actions.append(receipt);
+  const receipt=el('button',{type:'button',class:'secondary'},'Download run settings');receipt.disabled=!visible(card).length;receipt.onclick=()=>{const shown=visible(card);save(`plot-${card.id}-settings.json`,JSON.stringify({schema:'research-plot-receipt-v2',...(figure?{paper_id:figure.paper_id,figure_id:figure.figure_id,figure_label:figure.label,reproduction_note:figure.note}:{}),axis:{mode:ResearchPlot.axis(shown,card.axis||'auto'),depolarizing_to_bit_flip_factor:2/3},series:shown,decoders:[...new Set(shown.flatMap(s=>evidenceMembers(s).map(m=>m.decoder_id)))].map(id=>record('decoders',id)),experiments:S.catalog.experiments.filter(e=>e.dataset_ids?.some(id=>shown.some(s=>evidenceMembers(s).some(m=>m.dataset_id===id))))},null,2)+'\n');};actions.append(receipt);
   if(visible(card).length===1){const reproduce=el('button',{type:'button',class:'secondary'},'Reproduce / extend');reproduce.onclick=()=>{const d=record('decoders',visible(card)[0].decoder_id),cfg=d.configuration||{};if(cfg.effective_policy?.schema==='vanilla-bp-decoder-v1'||cfg.experiment)useSaved(d,card.input);else{const detail=box.querySelector('.run-details');detail.open=true;detail.scrollIntoView({block:'start'});}};actions.append(reproduce);}box.append(actions);runDetails(card,box);grid.append(box);
  }
 }
@@ -354,7 +408,7 @@ async function downloadOriginal(experiment){const files={...S.template.registere
 function mergeExtension(extension){for(const kind of['papers','codes','circuits','channels','decoders','experiments','datasets','result_series']){S.catalog[kind]||=[];const idField=kind==='result_series'?'series_id':kind==='policies'?'policy_id':kind.slice(0,-1)+'_id';for(const item of extension[kind]||[]){const identifier=item[idField];if(typeof identifier!=='string'||!identifier)throw Error(`Uploaded ${kind} record has no stable identifier.`);const prior=S.catalog[kind].find(x=>x[idField]===identifier);if(prior){if(['codes','circuits'].includes(kind)&&prior.input_sha256&&prior.input_sha256===item.input_sha256)continue;if(JSON.stringify(prior)!==JSON.stringify(item))throw Error(`Conflicting imported identity: ${identifier}`);}else S.catalog[kind].push(item);}}}
 async function uploadResults(files){const target=$('upload-feedback');try{target.className='muted';target.textContent='Verifying generated result files…';const {entry,summary}=await ResearchImport.read(files,S.contract);const identifier=summary.experiment_id;if(S.imports.some(x=>x.id===identifier))throw Error('This result is already saved in this browser.');const next=[...S.imports,{id:identifier,extension:entry}],previous=S.catalog;S.catalog=copy(S.catalog);try{mergeExtension(entry);localStorage.setItem('bp-research-v2-results',JSON.stringify(next));}catch(e){S.catalog=previous;throw e;}S.imports=next;fillSavedChoices();renderCards();availability();target.className='success';target.textContent='Verified and added to this browser’s results database. Use import-results to add it to the shared repository catalog.';}catch(e){target.className='error';target.textContent=e.name==='QuotaExceededError'?'Browser storage is full. Use CLI import-results.':e.message;}}
 function fillSavedChoices(){
- S.display=DecoderDisplay.labels(S.catalog);S.active=null;const view=activeView(),current=valueOf('build-preset'),oldCode=valueOf('build-code'),oldCircuit=valueOf('build-circuit');
+ S.display=DecoderDisplay.labels(S.catalog);S.active=null;S.figureViews=null;const view=activeView(),current=valueOf('build-preset'),oldCode=valueOf('build-code'),oldCircuit=valueOf('build-circuit');
  options($('build-preset'),[['','Custom configuration'],['__baseline-binary','BP, SP, d = 0, T = 100, float64 v2'],['__baseline-quaternary','Q-BP, SP, d = 0, T = 100, float64 v2'],...S.catalog.decoders.filter(d=>view.decoderIds.has(d.decoder_id)).map(d=>{const s=series().find(s=>evidenceMembers(s).some(m=>m.decoder_id===d.decoder_id)),code=record('codes',s.code_id)||record('circuits',s.code_id);return[d.decoder_id,`${s.label}, code = ${code?.label||s.code_id}`];})],current);
  options($('build-code'),[...view.codes.filter(c=>S.contract.registered_code_ids.includes(c.code_id)).map(c=>[c.code_id,c.label]),['custom','Custom parity check matrix']],oldCode||'a5');
  options($('build-circuit'),[['','Custom Stim circuit'],...view.circuits.map(c=>[c.circuit_id,c.label])],oldCircuit);
