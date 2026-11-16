@@ -1,6 +1,6 @@
 # Lifted-product [[1054,140]] full decoder stack
 
-68/72 arm/rate workers independently audited. Fresh confirmation only below.
+70/72 arm/rate workers independently audited. Fresh confirmation only below.
 
 Original LP paper provides no LER plot/rate grid/numeric iteration cap for1054. Controlled prospective depolarizing grid0.02,0.04,0.06,0.08,0.10,0.12. Budget32 and scale0.625 borrowed from cited BP-OSD paper, whose schedule is layered; this study uses canonical flooding. No original LP paper curve ordinates exist to compare. Original LP Example4, depolarizing code capacity. Q-BP, tuning, Relay and beam are canonical adaptations. Search128 is explicitly4x the documented BP cap. No native runtime or statistical paper agreement is claimed before confirmation.
 
@@ -8,10 +8,12 @@ Noise: independent I/X/Y/Z, probabilities1-p,p/3,p/3,p/3. Both X/Z residuals cou
 
 | Arm | p | Shots | Block LER | 95% CI | Word error rate | Mean sweeps | Mean edge updates | Mean µs |
 | --- | ---: | ---: | ---: | --- | ---: | ---: | ---: | ---: |
+| beam32 | 0.02 | 2720397 | 7.35187e-06 | [4.49072e-06, 1.09068e-05] | 5.25135e-08 | 4.146 | 30847.4 | 755.68 |
 | bp | 0.02 | 14765 | 0.00135455 | [0.000827587, 0.00200895] | 9.6819e-06 | 4.239 | 31541.8 | 294.74 |
 | cs10 | 0.02 | 360278 | 5.55127e-05 | [3.39089e-05, 8.23544e-05] | 3.9653e-07 | 4.241 | 31550.2 | 325.24 |
 | osd0 | 0.02 | 225526 | 8.86816e-05 | [5.41698e-05, 0.00013156] | 6.33468e-07 | 4.243 | 31566.9 | 327.25 |
 | qbp | 0.02 | 143078 | 0.000139784 | [8.53857e-05, 0.000207369] | 9.98526e-07 | 2.246 | 33425.0 | 1258.39 |
+| qbp_cs10 | 0.02 | 2461775 | 8.12422e-06 | [4.96249e-06, 1.20526e-05] | 5.80304e-08 | 2.245 | 33398.7 | 1426.05 |
 | qbp_osd0 | 0.02 | 1083988 | 1.84504e-05 | [1.127e-05, 2.73718e-05] | 1.3179e-07 | 2.244 | 33391.4 | 1415.03 |
 | relay128 | 0.02 | 1339641 | 1.49294e-05 | [9.11927e-06, 2.21483e-05] | 1.06639e-07 | 4.127 | 30702.0 | 769.66 |
 | relay32 | 0.02 | 147567 | 0.000135532 | [8.27882e-05, 0.000201061] | 9.68148e-07 | 4.134 | 30760.1 | 753.02 |
