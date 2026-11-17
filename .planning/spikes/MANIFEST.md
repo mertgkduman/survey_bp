@@ -74,6 +74,18 @@ Qualify an observable, efficient OSD-0/combination-sweep processor grounded in p
 - Freeze and run both OSD-0 and CS-10 with original undamped BP so the processor is the changed setting, using20 logical failures or1e8 shots and one CPU per point. Preserve custom inputs, old measured/source data and frozen canonical files.
 - The requested sequence (quality/efficiency, then simulation) supplies alignment for both spikes; execute inline without an additional approval gate. Use CLI/machine-readable experiments because this is algorithm qualification and benchmarking, then the existing workbench for results.
 
+### priortilt-figure1
+
+Reproduce Fig. 1 of PriorTilt (arXiv:2611.13373v1) using the source circuit artifacts and exact published rate/configuration grid, adding the prior-tilt policy to canonical BP and comparing it with source-configured Relay-BP and beam search.
+
+**Requirements:**
+
+- Review the milestone goals and preserve the canonical policy architecture, independent observable evaluation, source/canonical fidelity labels and per-shot evidence.
+- First target is Fig. 1 only: BB144, BB70 and GB102 standard XZ circuit memory; preserve the sum of X/Z memory LERs per syndrome cycle.
+- Use the source's exact circuit bytes, numerical contracts, rate grids, phase schedules and decoder budgets; no inherited 88,200 or two-leg LP budget.
+- Run one processor per point, preserve raw results/manifests and prior campaign configurations, and retain all-path work and observable-failure semantics.
+- Qualify PriorTilt using an independent mathematical oracle and source cross-checks before production, without replacing the canonical BP engine with a native wrapper.
+
 ## Spikes
 
 | # | Idea | Name | Type | Validates | Verdict | Tags |
@@ -135,6 +147,10 @@ Qualify an observable, efficient OSD-0/combination-sweep processor grounded in p
 | 055 | cited-bp-baselines | Primary BP baseline evidence | standard | Given citation-prioritized papers, verify explicit standalone BP comparisons and separate code benchmarks and hybrids. | VALIDATED | literature, baseline, min-sum, sum-product |
 | 056 | efficient-canonical-bp-osd | Observable efficient OSD-0/CS-10 | comparison | Given pinned public OSD and exact small-code oracles, validate full candidate/scoring/work correspondence and efficient source-derived execution. | VALIDATED | osd, correctness, performance, provenance |
 | 057 | efficient-canonical-bp-osd | Canonical BP/OSD handoff and Roffe campaign | standard | Given qualified OSD, preserve canonical terminal BP messages and run paper-budget OSD-0/CS-10 with auditable ledgers and comparison publication. | VALIDATED | osd, canonical, campaign, roffe |
+
+| 058 | priortilt-figure1 | Source artifacts and Fig1 contract | standard | Given published data/circuits, extract exact rates, models, metric and decoder configurations and verify immutable artifact identities. | VALIDATED | circuit, source, provenance |
+| 059 | priortilt-figure1 | Canonical PriorTilt policy qualification | comparison | Given independent scalar mathematics and pinned source, preserve messages across six-sweep rounds and qualify offsets, phase boundaries, randomness and work. | VALIDATED | canonical, priortilt, mathematics |
+| 060 | priortilt-figure1 | Fig1 one-CPU campaign | standard | Given qualified source-configured decoders and circuits, freeze and dispatch independent point workers with traceable ledgers and source comparisons. | PARTIAL | circuit, campaign, figure1 |
 
 Ordered closure of D03 → D04 → D01 → D02 → D05: [correction report](CANONICAL-KERNEL-COMPLETENESS-FIXES.md), [combined verification](042-batch-evidence-fix/verification.json), and [execution contracts](../../docs/canonical-kernel-contracts.md). Historical 034–037 verdicts remain as originally observed.
 

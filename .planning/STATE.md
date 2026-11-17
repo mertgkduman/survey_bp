@@ -5,11 +5,11 @@ current_phase: 11
 current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
-stopped_at: Paper figure views verified; gamma 6/12 and original LP 70/72 audited; remaining jobs continue
-last_updated: "2026-11-16T23:21:11.069354+00:00"
+stopped_at: PriorTilt Fig1 canonical policy qualified;39 single-CPU points launched in61946754; source agreement awaits production
+last_updated: "2026-11-17T00:27:51.550183+00:00"
 last_activity: 2026-11-16
-last_activity_desc: Quick 261116-ote adds paper figure views with reproduction/additional group toggles and checks audited LP snapshots.
-state_head: 873c3724
+last_activity_desc: Spikes058-060 qualify PriorTilt and source-specific canonical circuit controllers, freeze exact Fig1 artifacts/settings and launch39 one-CPU points.
+state_head: 759c09f6
 progress:
   total_phases: 14
   completed_phases: 8
@@ -34,6 +34,10 @@ Total Phases: 14
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
+Last activity: 2026-11-16 — spikes058–060 launch exact PriorTilt Fig1 circuit reproduction
+Last Activity Description: Reviewed project goals and2611.13373v1; pinned exact26 X/Z memory circuits,78 source basis rows,39 source figure points and full-precision three-phase schedules. New transient-prior and source-specific Beam/Relay controllers use unchanged canonical float64 min-sum sweep; independent math, native144 controller cases,144 ordinary-BP numeric probes and624 full-budget pilot events pass, alongside348 regressions. Canonical/native reduction-order drift remains explicit (strict-state failure preserved); no source LER agreement claimed. Frozen39-point array61946754 has one CPU/3GiB per point, X/Z sequentially, independent policy RNG and shared sealed Stim samples,20 observable errors or100M shots per basis. All39 observed RUNNING; fresh-process original-DEM full audits use same CPU allocation; dependent collector61946755 queued. Initial source-only report0/39 local points inspected; no provisional bounds published. Work retains all-path sweeps/directed updates, typed random/bias operands and instrumented latency separately. Existing raw data, prior frozen kernels/campaigns, public catalog/v1, model config and phase gates/counters unchanged. Spikes058/059 VALIDATED within stated scope;060 PARTIAL while production continues.
+
+Prior paper-figure and result activity:
 Last activity: 2026-11-16 — quick 261116-ote checks results and adds paper figure views
 Last Activity Description: Clickable paper titles open named figures with default-on paper reproductions and default-off additional comparisons, group/mixed-state controls, scoped exports and unchanged central multi-rate eligibility. Source-backed metadata preserves Yao figure conflicts, Roffe CS60 versus local CS10/OSD0, MacKay inferred budget/metric limits and LP Example 4 without a fabricated LER figure. New imports and stale selections reconcile; 88 relevant tests and 14 Chromium groups pass after scoped fixes. Gamma 6/12 strata audited (24 fresh policies, 6525 shots/480 failures, 1322 training settings); p=.06 source/tuned gamma LER .02522/.01784 versus BP140 .04301/.01921, overlapping intervals. At p=.06 both select gamma0=0. Additional p=.08/.10 results are mixed, with overlapping intervals in all six comparisons. Original LP 70/72 audited (11,236,743 shots/1400 failures); new p=.02 Beam32 and QBP+CS10 LERs 7.35e-6/8.12e-6 overlap. Outstanding workers/audits continue unchanged. Public counts 448/3207/13/0 with five multi-rate gamma-study curves, all 1543 prior raw point multisets preserved. No frozen/raw/kernel/v1/model/phase-gate/counter changes.
 

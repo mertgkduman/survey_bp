@@ -1,0 +1,8 @@
+{
+  "comparison": "float64 native terminal beliefs after up to 36 sweeps",
+  "initial_absolute_tolerance": 2e-09,
+  "initial_relative_tolerance": 2e-10,
+  "observed_max_absolute_difference": 6.36053912e-08,
+  "status": "strict-state tolerance failed; recurrence/branch behavior under investigation; no production launch",
+  "known_difference": "canonical total-minus extrinsics versus source prefix/suffix reductions; native and NumPy prior-log evaluation may also differ in final bits"
+}

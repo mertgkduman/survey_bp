@@ -1,0 +1,270 @@
+{
+  "source_commit": "8eefd37d694b5942fe60ec6d5c82ce97f3d2a450",
+  "circuits": [
+    {
+      "file": "BB[[144,12,12]],memory_X,error_rate=0.001,syndrome_rounds=12.stim",
+      "circuit_sha256": "6628d4483489cd8ea792da846274e8e245c7168c3560bf4c5e1cd2b3fb736dc3",
+      "dem_execution_sha256": "94371aea9a9dba71787de227a631b6ab85c91e57fd5cba79a31550029cd8bb06",
+      "checks": 936,
+      "variables": 8784,
+      "edges": 30672,
+      "minimum_check_degree": 16,
+      "detector_merge_collisions": 0
+    },
+    {
+      "file": "BB[[144,12,12]],memory_Z,error_rate=0.001,syndrome_rounds=12.stim",
+      "circuit_sha256": "106f45471003ecdf6d843ea3b9da45d2f0a766716569a9fababaacbcdeb356db",
+      "dem_execution_sha256": "4170e97137ffd0173e1786c29c066c783877d62dc574df24285f48a999b50f59",
+      "checks": 936,
+      "variables": 8784,
+      "edges": 30672,
+      "minimum_check_degree": 16,
+      "detector_merge_collisions": 0
+    },
+    {
+      "file": "BB[[144,12,12]],memory_X,error_rate=0.002,syndrome_rounds=12.stim",
+      "circuit_sha256": "c4cf3bf092a6877a4db8c0d481bf719d5ca3ec63d534aba013a12d14deee7cd2",
+      "dem_execution_sha256": "40145606d34fd7ec20413af790158de8653cb506cb4a23069fd75ab172dbb0fc",
+      "checks": 936,
+      "variables": 8784,
+      "edges": 30672,
+      "minimum_check_degree": 16,
+      "detector_merge_collisions": 0
+    },
+    {
+      "file": "BB[[144,12,12]],memory_Z,error_rate=0.002,syndrome_rounds=12.stim",
+      "circuit_sha256": "6de26930cd8575daae63bfe244e7ce96a927152de2ef128295f0fc54717cc179",
+      "dem_execution_sha256": "cd21c3b537d9b83834cb2b027c21892692f5b864359f3479ff64b444b73da23b",
+      "checks": 936,
+      "variables": 8784,
+      "edges": 30672,
+      "minimum_check_degree": 16,
+      "detector_merge_collisions": 0
+    },
+    {
+      "file": "BB[[144,12,12]],memory_X,error_rate=0.003,syndrome_rounds=12.stim",
+      "circuit_sha256": "c22326f0170a657474525acec4eb97b6585bfa9ab512bd543ce6b0f18e7e2ddd",
+      "dem_execution_sha256": "d45d1ddceaf39e289a3223846f782cf32f3528358d49d6a2aa868aaf2f144bad",
+      "checks": 936,
+      "variables": 8784,
+      "edges": 30672,
+      "minimum_check_degree": 16,
+      "detector_merge_collisions": 0
+    },
+    {
+      "file": "BB[[144,12,12]],memory_Z,error_rate=0.003,syndrome_rounds=12.stim",
+      "circuit_sha256": "690b3b4450ea9cc20bd17d69a5b27379817c705eff7c04860eb0e072010e5e8f",
+      "dem_execution_sha256": "8c0a36a8df0e993492561467bb1230abfe11a6c9b5f58dd77980eb867a7b8f57",
+      "checks": 936,
+      "variables": 8784,
+      "edges": 30672,
+      "minimum_check_degree": 16,
+      "detector_merge_collisions": 0
+    },
+    {
+      "file": "BB[[144,12,12]],memory_X,error_rate=0.004,syndrome_rounds=12.stim",
+      "circuit_sha256": "6b92b0a70d9e8e4e6049d02bc854c7f64b3b503262c730f5313ea4e1ddb6921b",
+      "dem_execution_sha256": "6b65b8a1295b0d9ddbdac22b5a14d34c79e980b8bbbd7ea3bc73166c98489a70",
+      "checks": 936,
+      "variables": 8784,
+      "edges": 30672,
+      "minimum_check_degree": 16,
+      "detector_merge_collisions": 0
+    },
+    {
+      "file": "BB[[144,12,12]],memory_Z,error_rate=0.004,syndrome_rounds=12.stim",
+      "circuit_sha256": "44b7238c21acafea1473d254685a6fd9e1689e79c37c41732fa890f282fcf25a",
+      "dem_execution_sha256": "c8eb7d670eabfb69b45bfd05e81ff5e230d217535f2d3cd047ed372e2590d4c6",
+      "checks": 936,
+      "variables": 8784,
+      "edges": 30672,
+      "minimum_check_degree": 16,
+      "detector_merge_collisions": 0
+    },
+    {
+      "file": "BB[[144,12,12]],memory_X,error_rate=0.005,syndrome_rounds=12.stim",
+      "circuit_sha256": "13999915168d2aabf9f11d68ce5a52badacb5bb5104fc0464db479c2f3f6a1c0",
+      "dem_execution_sha256": "0e923007cd1056b88340c39145e46a7aaa40f27a5eb744709eff933a551b3a68",
+      "checks": 936,
+      "variables": 8784,
+      "edges": 30672,
+      "minimum_check_degree": 16,
+      "detector_merge_collisions": 0
+    },
+    {
+      "file": "BB[[144,12,12]],memory_Z,error_rate=0.005,syndrome_rounds=12.stim",
+      "circuit_sha256": "75232092c811cbcdd553d257eecb093fbbd8d40f544ac4d09d4161134b5db4a2",
+      "dem_execution_sha256": "a463e2ad17ce2dcbce574090958961991c4a3dc33384c0a73ff75cc648d6127b",
+      "checks": 936,
+      "variables": 8784,
+      "edges": 30672,
+      "minimum_check_degree": 16,
+      "detector_merge_collisions": 0
+    },
+    {
+      "file": "BB[[70,6,9]],memory_X,error_rate=0.0005,syndrome_rounds=9.stim",
+      "circuit_sha256": "865d8a469ccbeaa00a1203b5006f029a9ff0c61facd86379b023d29eb038e6e1",
+      "dem_execution_sha256": "f03b636c39c55465902785d78caf0a20bbf4812adb690bb9f37a68b67323c829",
+      "checks": 350,
+      "variables": 3850,
+      "edges": 15680,
+      "minimum_check_degree": 28,
+      "detector_merge_collisions": 0
+    },
+    {
+      "file": "BB[[70,6,9]],memory_Z,error_rate=0.0005,syndrome_rounds=9.stim",
+      "circuit_sha256": "cbb00aedcf40900edbbdcd0244f557960ff907426b51ba5e43e86b7b2ad8af1b",
+      "dem_execution_sha256": "c5f3fb4134eef0d9413f95ffc88a230749466e208742ee905159f75f7ac4f7dd",
+      "checks": 350,
+      "variables": 3850,
+      "edges": 15680,
+      "minimum_check_degree": 28,
+      "detector_merge_collisions": 0
+    },
+    {
+      "file": "BB[[70,6,9]],memory_X,error_rate=0.0008,syndrome_rounds=9.stim",
+      "circuit_sha256": "35d34ee8514ce186128d81c581603a73e1b5cd808d0ed8d743e547dd8676c72a",
+      "dem_execution_sha256": "430989dbbc83dae7b8553c5d6c0631c9348e15a9dc03b76f2f03f73cdbac0fc9",
+      "checks": 350,
+      "variables": 3850,
+      "edges": 15680,
+      "minimum_check_degree": 28,
+      "detector_merge_collisions": 0
+    },
+    {
+      "file": "BB[[70,6,9]],memory_Z,error_rate=0.0008,syndrome_rounds=9.stim",
+      "circuit_sha256": "b142b166894a72bb4eba879d94756f8132211fbf55b43cc6aabd04d0136956af",
+      "dem_execution_sha256": "e54319e921e2080c6c07b1ff14c323d37305984daa5f4fa9320960f58e87366b",
+      "checks": 350,
+      "variables": 3850,
+      "edges": 15680,
+      "minimum_check_degree": 28,
+      "detector_merge_collisions": 0
+    },
+    {
+      "file": "BB[[70,6,9]],memory_X,error_rate=0.001,syndrome_rounds=9.stim",
+      "circuit_sha256": "7aea1c7bbfc0c486741c16430b16be0a7b764f049e1f15ddd9288854d5b1a410",
+      "dem_execution_sha256": "c142a85a4696a1e09bef9e39fe265c8d725813ced4b8e3ddbaa6c0ca09e472d2",
+      "checks": 350,
+      "variables": 3850,
+      "edges": 15680,
+      "minimum_check_degree": 28,
+      "detector_merge_collisions": 0
+    },
+    {
+      "file": "BB[[70,6,9]],memory_Z,error_rate=0.001,syndrome_rounds=9.stim",
+      "circuit_sha256": "50ba7ce52235c967408e8bbad77872e680c6966e858b675bc44ee1f9dbfd09fb",
+      "dem_execution_sha256": "7de1b7e8719ccdb646fe23ca6b8f2ca846ba8c6da24016a221884c5f6601f784",
+      "checks": 350,
+      "variables": 3850,
+      "edges": 15680,
+      "minimum_check_degree": 28,
+      "detector_merge_collisions": 0
+    },
+    {
+      "file": "BB[[70,6,9]],memory_X,error_rate=0.002,syndrome_rounds=9.stim",
+      "circuit_sha256": "91477d89e97165eb414852315a52e521623680f60ee1e7e48adb33d9c15848c2",
+      "dem_execution_sha256": "be22ce11f934d9fa347a71135696f1852416e72d4b817f007a581e912e1dab79",
+      "checks": 350,
+      "variables": 3850,
+      "edges": 15680,
+      "minimum_check_degree": 28,
+      "detector_merge_collisions": 0
+    },
+    {
+      "file": "BB[[70,6,9]],memory_Z,error_rate=0.002,syndrome_rounds=9.stim",
+      "circuit_sha256": "49c0ffa4af47fa728701e542e866a8f766c44834ac101126defe86ed0f58ae03",
+      "dem_execution_sha256": "beb751f9378aa0ece342003e65c56bc93b2bc9f60679511686cdaf2b38206471",
+      "checks": 350,
+      "variables": 3850,
+      "edges": 15680,
+      "minimum_check_degree": 28,
+      "detector_merge_collisions": 0
+    },
+    {
+      "file": "GB[[102,22,9]],memory_X,error_rate=0.0005,syndrome_rounds=9.stim",
+      "circuit_sha256": "63eedcb05cca47498a72330903e7eaad1f20e5e7c1271606fb3128e54de67ab7",
+      "dem_execution_sha256": "0f7d4790bb3c11f68bbb2e4de1082a2268a0624ecb45e5dc2ac1abb6baf2ed4b",
+      "checks": 510,
+      "variables": 6528,
+      "edges": 32538,
+      "minimum_check_degree": 39,
+      "detector_merge_collisions": 0
+    },
+    {
+      "file": "GB[[102,22,9]],memory_Z,error_rate=0.0005,syndrome_rounds=9.stim",
+      "circuit_sha256": "20100c19311b35f520415f4da36d0f67e14ee0d9b3615519ec38740b0f16dc03",
+      "dem_execution_sha256": "1160c7dbb4af2a95f72726873343ea475f038fb9ae8e774371094d7d5ba4f9ba",
+      "checks": 510,
+      "variables": 6528,
+      "edges": 32538,
+      "minimum_check_degree": 39,
+      "detector_merge_collisions": 0
+    },
+    {
+      "file": "GB[[102,22,9]],memory_X,error_rate=0.0008,syndrome_rounds=9.stim",
+      "circuit_sha256": "4641648c9a500507f190b5a82f0c29db505eeec998fcaef05154c37000741686",
+      "dem_execution_sha256": "d551c7a4aba05ae5f2e7c6ff402e9245d35b733ad0df93bfeea4a9efc67e840a",
+      "checks": 510,
+      "variables": 6528,
+      "edges": 32538,
+      "minimum_check_degree": 39,
+      "detector_merge_collisions": 0
+    },
+    {
+      "file": "GB[[102,22,9]],memory_Z,error_rate=0.0008,syndrome_rounds=9.stim",
+      "circuit_sha256": "704b9696888ff833a56198dd972654e28f15256f94d048f4dad096bc4d329b79",
+      "dem_execution_sha256": "a0c91d6d97bac4f331f6fc75db01d6750682f9af46c0877944eaa6fce953afa3",
+      "checks": 510,
+      "variables": 6528,
+      "edges": 32538,
+      "minimum_check_degree": 39,
+      "detector_merge_collisions": 0
+    },
+    {
+      "file": "GB[[102,22,9]],memory_X,error_rate=0.001,syndrome_rounds=9.stim",
+      "circuit_sha256": "87be92b61f1f6fc989739a6a885a4d61643c5c100e07f7fe162fcb131653a4bf",
+      "dem_execution_sha256": "c187b9bff34b586f9489f63555fc0a7f0ed4ac65b2626a43c56d73701111be65",
+      "checks": 510,
+      "variables": 6528,
+      "edges": 32538,
+      "minimum_check_degree": 39,
+      "detector_merge_collisions": 0
+    },
+    {
+      "file": "GB[[102,22,9]],memory_Z,error_rate=0.001,syndrome_rounds=9.stim",
+      "circuit_sha256": "37b77027dbcdbe66df2e616d4d44c16a7cfad81fff5c13988185df4b76b5b645",
+      "dem_execution_sha256": "052b1cf57bd3ac2fda2b572d9ad7f0fe7b200a22db44289d5cdf27c12d136cb2",
+      "checks": 510,
+      "variables": 6528,
+      "edges": 32538,
+      "minimum_check_degree": 39,
+      "detector_merge_collisions": 0
+    },
+    {
+      "file": "GB[[102,22,9]],memory_X,error_rate=0.002,syndrome_rounds=9.stim",
+      "circuit_sha256": "82d26daee2057c026eddac0e49308c77b11b75fc0d9399554dd0fcdd287a58a9",
+      "dem_execution_sha256": "3a378a2df8a832b564d43fba75028b6a688097a9ae20f5d3b07be14f851ad47c",
+      "checks": 510,
+      "variables": 6528,
+      "edges": 32538,
+      "minimum_check_degree": 39,
+      "detector_merge_collisions": 0
+    },
+    {
+      "file": "GB[[102,22,9]],memory_Z,error_rate=0.002,syndrome_rounds=9.stim",
+      "circuit_sha256": "beb3523a3338a2425f8a5c9c58c03abbf44f63c4dade8a5058a240d4b5d5a953",
+      "dem_execution_sha256": "7fdd436416c07940ca05fe0a9542aa27b3686f13af98e74ca36d53129030f267",
+      "checks": 510,
+      "variables": 6528,
+      "edges": 32538,
+      "minimum_check_degree": 39,
+      "detector_merge_collisions": 0
+    }
+  ],
+  "source_basis_rows": 78,
+  "source_figure_points": 39,
+  "schedule_precision": "full released values; paper table is rounded",
+  "metric": "(errors_X/shots_X + errors_Z/shots_Z)/cycles",
+  "canonical_numeric_difference": "existing total-minus-excluded-message float64 order; paper ties at zero; no historical kernel edited"
+}

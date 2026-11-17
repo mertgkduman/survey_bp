@@ -1,0 +1,27 @@
+{
+  "schema": "priortilt-launch-verification-v1",
+  "regressions": {
+    "passed": 348,
+    "log": ".planning/spikes/059-priortilt-canonical/regression-tests.txt"
+  },
+  "qualified_events": 624,
+  "native_prior_cases": 72,
+  "native_baseline_cases": 72,
+  "ordinary_bp_numeric_cases": 144,
+  "plan_sha256": "3e466081790d913ae2fb0a477f654bd0218504a79e7d969b989b62043b7e829c",
+  "frozen_files": 63,
+  "points": 39,
+  "processors_per_point": 1,
+  "basis_execution": "X/Z sequential/interleaved on one worker CPU",
+  "source_figure_points": 39,
+  "source_memory_circuits": 26,
+  "source_basis_rows": 78,
+  "production_initially_published": 0,
+  "stop_per_basis": {
+    "observable_errors": 20,
+    "decoded_shots": 100000000
+  },
+  "empty_report": "source-only figure inspected; no local estimates or bounds fabricated",
+  "regression_discovery": "Initial paired-worker resume tests found JSON tuple/list manifest mismatch (2 failed,40 passed); policy is now normalized before receipt comparison and resume/crash/audit tests pass.",
+  "unchanged": "Existing canonical kernels, historical campaign plans/data, public catalog and archived v1; phase gates/counters and model configuration unchanged."
+}
