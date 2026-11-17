@@ -1,0 +1,43 @@
+{
+  "checks": [
+    {
+      "computed": {
+        "biased_node_updates": 0,
+        "decode_ns": 10456589812084,
+        "directed_edge_updates": 712537973356,
+        "errors": 5,
+        "iterations": 10949331,
+        "nonconvergence": 0,
+        "random_draws": 0,
+        "shots": 1163264
+      },
+      "inherited_markers_unchanged": 1642,
+      "point": "gb102-p001000-beam",
+      "retained": {
+        "biased_node_updates": 0,
+        "decode_ns": 9550218612391,
+        "directed_edge_updates": 646681568396,
+        "errors": 5,
+        "iterations": 9937338,
+        "nonconvergence": 0,
+        "random_draws": 0,
+        "shots": 1056051
+      },
+      "speculative": {
+        "biased_node_updates": 0,
+        "decode_ns": 906371199693,
+        "directed_edge_updates": 65856404960,
+        "errors": 0,
+        "iterations": 1011993,
+        "nonconvergence": 0,
+        "random_draws": 0,
+        "shots": 107213
+      },
+      "stages": 142,
+      "work_sha256": "f0d861fb3cc21d5c21bcef8b00f88a5ee51120364560549d0ab16feb0b28485c"
+    }
+  ],
+  "parent_plan_sha256": "3e466081790d913ae2fb0a477f654bd0218504a79e7d969b989b62043b7e829c",
+  "resource_amendment_sha256": "da570e399be73f21d768d015c124b02fb5ee82796bda498effa284e8ddeb6a22",
+  "scope": "worker final full candidate/work/replay audits retained; rehash sealed stages, inherited markers and recompute cohort/work separation; no simulations rerun"
+}

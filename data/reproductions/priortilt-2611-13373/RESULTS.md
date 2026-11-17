@@ -1,6 +1,6 @@
 # PriorTilt Fig. 1 — canonical reproduction campaign
 
-23/39 complete plotted points passed the fresh-process full-ledger audit. The completed snapshot originated from one-CPU workers. Remaining points now continue with ten CPUs per point under the resource amendment.
+24/39 complete plotted points passed the fresh-process full-ledger audit. The original workers used one CPU; remaining points continue under the ten-CPU resource amendment, sharing one process pool across the X/Z memory runs.
 
 Source: [Ye and Delfosse, arXiv:2611.13373v1](https://arxiv.org/html/2611.13373v1), Fig. 1; exact released circuits, rates and full-precision three-phase schedules. This is a canonical float64 adaptation; native prefix/suffix arithmetic and RNG are separate references.
 
@@ -30,6 +30,7 @@ The CSV retains both denominators, errors, nonconvergence, mean all-path BP swee
 | BB70 | 0.002 | priortilt | 20/398510 | 20/366703 | 1.164e-05 [6.597e-06, 1.823e-05] | 1.509e-05 | 0.771 | True |
 | BB70 | 0.002 | relay | 20/170875 | 20/248101 | 2.196e-05 [1.245e-05, 3.441e-05] | 2.428e-05 | 0.904 | True |
 | BB70 | 0.002 | beam | 20/117935 | 20/156889 | 3.301e-05 [1.871e-05, 5.171e-05] | 2.849e-05 | 1.16 | True |
+| GB102 | 0.001 | beam | 20/7643051 | 20/6864264 | 6.145e-07 [3.484e-07, 9.627e-07] | 5.8e-07 | 1.06 | True |
 | GB102 | 0.002 | priortilt | 20/199810 | 20/279612 | 1.907e-05 [1.081e-05, 2.987e-05] | 2.099e-05 | 0.909 | True |
 | GB102 | 0.002 | relay | 20/156698 | 20/162358 | 2.787e-05 [1.58e-05, 4.366e-05] | 2.455e-05 | 1.14 | True |
 | GB102 | 0.002 | beam | 20/156698 | 20/162358 | 2.787e-05 [1.58e-05, 4.366e-05] | 2.86e-05 | 0.974 | True |
@@ -38,4 +39,4 @@ The CSV retains both denominators, errors, nonconvergence, mean all-path BP swee
 
 The event ledgers remain under ignored `results/`; audit receipts and their hashes bind the published rows. `run.py --index N --audit` independently reevaluates all original DEM detector and logical equations, reconciles work/lineage and replays chunk endpoints before issuing a receipt. Publication rehashes bound chunks and shared samples.
 
-Execution update (2026-11-17): all16 remaining points were migrated to ten CPUs each. Original committed samples and stopping remain intact. See [resource amendment](PARALLEL.md). Future refreshes use `parallel_report.py`; concurrent timing cohorts and speculative compute are recorded separately.
+Resource history: `resource-amendment.json` binds the unchanged scientific plan to `parallel.py` and ten CPUs per remaining point. Original prefixes are preserved. Sealed batches may compute ahead; only the exact ordered stopping prefix enters this table. Extra work is retained separately in each point's `parallel-work.json`, with all sealed speculative candidates independently audited. Original single-CPU and concurrent ten-CPU timing cohorts should be analyzed separately; pooled mean decoder time is not a standalone single-CPU benchmark. Interrupted work before a sealed stage has no measured counter.
