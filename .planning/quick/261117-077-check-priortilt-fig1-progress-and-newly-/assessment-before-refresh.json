@@ -1,0 +1,179 @@
+{
+  "snapshot_points": 15,
+  "complete_pair_shots": 2838888,
+  "complete_pair_errors": 600,
+  "checks": [
+    {
+      "point": "bb144-p003000-priortilt",
+      "local": 5.5735983685614126e-05,
+      "paper": 5.740602031388392e-05,
+      "local_ci95": [
+        3.159969551980347e-05,
+        8.730906181581503e-05
+      ],
+      "local_over_paper": 0.9709083364577723,
+      "paper_inside": true
+    },
+    {
+      "point": "bb144-p003000-relay",
+      "local": 0.00011865201719522032,
+      "paper": 0.00010848123593886951,
+      "local_ci95": [
+        6.727491995954818e-05,
+        0.00018584770123832438
+      ],
+      "local_over_paper": 1.0937561336605914,
+      "paper_inside": true
+    },
+    {
+      "point": "bb144-p003000-beam",
+      "local": 0.00013115978733085432,
+      "paper": 0.00011014153457726738,
+      "local_ci95": [
+        7.436802508196719e-05,
+        0.00020543417083951007
+      ],
+      "local_over_paper": 1.1908294889321889,
+      "paper_inside": true
+    },
+    {
+      "point": "bb144-p004000-priortilt",
+      "local": 0.0006415944122111914,
+      "paper": 0.0006761113644340866,
+      "local_ci95": [
+        0.0003640003270857751,
+        0.0010041251161343801
+      ],
+      "local_over_paper": 0.9489478301377373,
+      "paper_inside": true
+    },
+    {
+      "point": "bb144-p004000-relay",
+      "local": 0.001135205450832965,
+      "paper": 0.0011181121796664932,
+      "local_ci95": [
+        0.0006444103881943023,
+        0.0017752883955670755
+      ],
+      "local_over_paper": 1.0152876173583676,
+      "paper_inside": true
+    },
+    {
+      "point": "bb144-p004000-beam",
+      "local": 0.0012686540546097752,
+      "paper": 0.0013240820474950843,
+      "local_ci95": [
+        0.0007202833006612306,
+        0.0019835379856972435
+      ],
+      "local_over_paper": 0.9581385511644324,
+      "paper_inside": true
+    },
+    {
+      "point": "bb144-p005000-priortilt",
+      "local": 0.005508743317930598,
+      "paper": 0.00439469945387781,
+      "local_ci95": [
+        0.003143112967795064,
+        0.008555739405202501
+      ],
+      "local_over_paper": 1.2534971676094424,
+      "paper_inside": true
+    },
+    {
+      "point": "bb144-p005000-relay",
+      "local": 0.009531887394482814,
+      "paper": 0.007860099786113831,
+      "local_ci95": [
+        0.00546507791924981,
+        0.014707772543219422
+      ],
+      "local_over_paper": 1.2126929242453732,
+      "paper_inside": true
+    },
+    {
+      "point": "bb144-p005000-beam",
+      "local": 0.010883347421808959,
+      "paper": 0.011173111565604544,
+      "local_ci95": [
+        0.006249849135369598,
+        0.016757290736880804
+      ],
+      "local_over_paper": 0.9740659401730491,
+      "paper_inside": true
+    },
+    {
+      "point": "bb70-p002000-priortilt",
+      "local": 1.163633294417265e-05,
+      "paper": 1.5085533154519537e-05,
+      "local_ci95": [
+        6.596872729460543e-06,
+        1.822946218000058e-05
+      ],
+      "local_over_paper": 0.7713570892710858,
+      "paper_inside": true
+    },
+    {
+      "point": "bb70-p002000-relay",
+      "local": 2.196188383677033e-05,
+      "paper": 2.428477297730926e-05,
+      "local_ci95": [
+        1.2450755185220372e-05,
+        3.440501311596837e-05
+      ],
+      "local_over_paper": 0.9043479161732603,
+      "paper_inside": true
+    },
+    {
+      "point": "bb70-p002000-beam",
+      "local": 3.3007067123998774e-05,
+      "paper": 2.8486966820419017e-05,
+      "local_ci95": [
+        1.8712729681938322e-05,
+        5.170749989087027e-05
+      ],
+      "local_over_paper": 1.1586725723406894,
+      "paper_inside": true
+    },
+    {
+      "point": "gb102-p002000-priortilt",
+      "local": 1.906919763377626e-05,
+      "paper": 2.098878265545429e-05,
+      "local_ci95": [
+        1.0810788204474577e-05,
+        2.987350137203079e-05
+      ],
+      "local_over_paper": 0.908542336485666,
+      "paper_inside": true
+    },
+    {
+      "point": "gb102-p002000-relay",
+      "local": 2.7868735010660542e-05,
+      "paper": 2.455242688017085e-05,
+      "local_ci95": [
+        1.5799571007606672e-05,
+        4.365829629288809e-05
+      ],
+      "local_over_paper": 1.1350704818987984,
+      "paper_inside": true
+    },
+    {
+      "point": "gb102-p002000-beam",
+      "local": 2.7868735010660542e-05,
+      "paper": 2.8600900806211423e-05,
+      "local_ci95": [
+        1.5799571007606672e-05,
+        4.365829629288809e-05
+      ],
+      "local_over_paper": 0.974400603655397,
+      "paper_inside": true
+    }
+  ],
+  "preserved_previous_points": 15,
+  "frozen_file_count": 63,
+  "scope": "retained worker full-ledger audits plus publisher rehash of bound ledgers/samples; independent aggregate source/count/stopping/CI/work and prior-point reconciliation; no simulation reruns",
+  "frozen_plan_sha256": "3e466081790d913ae2fb0a477f654bd0218504a79e7d969b989b62043b7e829c",
+  "csv_sha256": "89190ad67c8f79bb7c07014c02fd25c212670a36b8cdd27272989428bb10768c",
+  "progress_committed_shots": 170952221,
+  "progress_committed_errors": 906
+}

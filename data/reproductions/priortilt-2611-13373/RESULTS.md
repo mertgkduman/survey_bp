@@ -1,6 +1,6 @@
 # PriorTilt Fig. 1 — canonical reproduction campaign
 
-15/39 complete plotted points passed the fresh-process full-ledger audit. Each point uses one CPU for X/Z memories sequentially.
+19/39 complete plotted points passed the fresh-process full-ledger audit. Each point uses one CPU for X/Z memories sequentially.
 
 Source: [Ye and Delfosse, arXiv:2611.13373v1](https://arxiv.org/html/2611.13373v1), Fig. 1; exact released circuits, rates and full-precision three-phase schedules. This is a canonical float64 adaptation; native prefix/suffix arithmetic and RNG are separate references.
 
@@ -10,6 +10,8 @@ The CSV retains both denominators, errors, nonconvergence, mean all-path BP swee
 
 | Code | p | Decoder | X errors / shots | Z errors / shots | Local LER/cycle (95%) | Paper LER/cycle | Local/paper | Paper inside local interval |
 |---|---:|---|---:|---:|---:|---:|---:|---|
+| BB144 | 0.002 | relay | 20/719387 | 20/477417 | 5.808e-06 [3.293e-06, 9.099e-06] | 5.495e-06 | 1.06 | True |
+| BB144 | 0.002 | beam | 20/690348 | 20/888778 | 4.289e-06 [2.432e-06, 6.72e-06] | 5.441e-06 | 0.788 | True |
 | BB144 | 0.003 | priortilt | 20/47671 | 20/80228 | 5.574e-05 [3.16e-05, 8.731e-05] | 5.741e-05 | 0.971 | True |
 | BB144 | 0.003 | relay | 20/24559 | 20/32816 | 0.0001187 [6.727e-05, 0.0001858] | 0.0001085 | 1.09 | True |
 | BB144 | 0.003 | beam | 20/21287 | 20/31527 | 0.0001312 [7.437e-05, 0.0002054] | 0.0001101 | 1.19 | True |
@@ -19,6 +21,8 @@ The CSV retains both denominators, errors, nonconvergence, mean all-path BP swee
 | BB144 | 0.005 | priortilt | 20/650 | 20/566 | 0.005509 [0.003143, 0.008556] | 0.004395 | 1.25 | True |
 | BB144 | 0.005 | relay | 20/315 | 20/393 | 0.009532 [0.005465, 0.01471] | 0.00786 | 1.21 | True |
 | BB144 | 0.005 | beam | 20/280 | 20/338 | 0.01088 [0.00625, 0.01676] | 0.01117 | 0.974 | True |
+| BB70 | 0.001 | relay | 20/4405117 | 20/4672283 | 9.801e-07 [5.556e-07, 1.535e-06] | 1.113e-06 | 0.881 | True |
+| BB70 | 0.001 | beam | 20/6624128 | 20/2982691 | 1.081e-06 [6.126e-07, 1.693e-06] | 9.81e-07 | 1.1 | True |
 | BB70 | 0.002 | priortilt | 20/398510 | 20/366703 | 1.164e-05 [6.597e-06, 1.823e-05] | 1.509e-05 | 0.771 | True |
 | BB70 | 0.002 | relay | 20/170875 | 20/248101 | 2.196e-05 [1.245e-05, 3.441e-05] | 2.428e-05 | 0.904 | True |
 | BB70 | 0.002 | beam | 20/117935 | 20/156889 | 3.301e-05 [1.871e-05, 5.171e-05] | 2.849e-05 | 1.16 | True |
