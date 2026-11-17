@@ -5,11 +5,11 @@ current_phase: 11
 current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
-stopped_at: PriorTilt Fig1 canonical policy qualified;39 single-CPU points launched in61946754; source agreement awaits production
-last_updated: "2026-11-17T00:27:51.550183+00:00"
+stopped_at: PriorTilt7/39 audited and pointwise consistent;32 one-CPU points continue; OSD-CS timing scope reconfirmed
+last_updated: "2026-11-17T00:48:49.069239+00:00"
 last_activity: 2026-11-16
-last_activity_desc: Spikes058-060 qualify PriorTilt and source-specific canonical circuit controllers, freeze exact Fig1 artifacts/settings and launch39 one-CPU points.
-state_head: 759c09f6
+last_activity_desc: Quick261116-rf9 publishes seven audited PriorTilt pairs and reconfirms the same-CS10 native speedup evidence.
+state_head: 0e8ec024
 progress:
   total_phases: 14
   completed_phases: 8
@@ -34,6 +34,10 @@ Total Phases: 14
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
+Last activity: 2026-11-16 — quick261116-rf9 checks PriorTilt Fig1 and OSD-CS speedup
+Last Activity Description: Published7/39 full-audited PriorTilt memory pairs (345,963 decoded basis shots/280 observable errors); all seven paper ordinates fall inside local pointwise95% intervals, ratios.958–1.253. At BB144/p=.005 PriorTilt/Relay/Beam estimates .005509/.009532/.010883 preserve the source ordering with overlapping intervals.32 single-CPU workers61946754 continue; collector61946755 pending. Frozen63-file identity and source/count/CI/work/receipt hashes independently reconcile;13 affected regressions pass and figure inspected. Warm standalone uniform-channel CS10 benchmark implementation hash still matches;2.32–3.53x versus pinned native -O3 -march=native comes from reused affine flip responses, packed XOR and popcount, excluding BP/JIT and broader speed claims. No simulation or native benchmark reruns; no old raw/frozen/source/kernel/public/v1/model/gate/counter changes. Spike060 remains PARTIAL pending full campaign.
+
+Prior PriorTilt launch:
 Last activity: 2026-11-16 — spikes058–060 launch exact PriorTilt Fig1 circuit reproduction
 Last Activity Description: Reviewed project goals and2611.13373v1; pinned exact26 X/Z memory circuits,78 source basis rows,39 source figure points and full-precision three-phase schedules. New transient-prior and source-specific Beam/Relay controllers use unchanged canonical float64 min-sum sweep; independent math, native144 controller cases,144 ordinary-BP numeric probes and624 full-budget pilot events pass, alongside348 regressions. Canonical/native reduction-order drift remains explicit (strict-state failure preserved); no source LER agreement claimed. Frozen39-point array61946754 has one CPU/3GiB per point, X/Z sequentially, independent policy RNG and shared sealed Stim samples,20 observable errors or100M shots per basis. All39 observed RUNNING; fresh-process original-DEM full audits use same CPU allocation; dependent collector61946755 queued. Initial source-only report0/39 local points inspected; no provisional bounds published. Work retains all-path sweeps/directed updates, typed random/bias operands and instrumented latency separately. Existing raw data, prior frozen kernels/campaigns, public catalog/v1, model config and phase gates/counters unchanged. Spikes058/059 VALIDATED within stated scope;060 PARTIAL while production continues.
 
@@ -345,6 +349,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 | # | Description | Date | Commit | Status | Directory |
 |---|-------------|------|--------|--------|-----------|
+| 261116-rf9 | Check PriorTilt Fig1 and explain matched OSD-CS speedup | 2026-11-16 | 0e8ec024 | Verified7/39 audited pairs;32 one-CPU workers continue | [261116-rf9](./quick/261116-rf9-check-priortilt-fig1-results-and-explain/) |
 | 261116-ote | Check LP results and add paper figure views with grouped curve controls | 2026-11-16 | 781055fb | Verified; gamma 6/12 and original LP 70/72 audited, campaigns running | [261116-ote](./quick/261116-ote-check-lp1054-results-and-add-paper-figur/) |
 | 261116-nf0 | Tune RelayBP uniform80/disordered60 gamma with matched controls | 2026-11-16 | 177417b7 | 12 single-CPU workers tuning; fresh results pending | [261116-nf0](./quick/261116-nf0-tune-relaybp-uniform-gamma80-and-disorde/) |
 | 261116-mkh | Check original lifted-product results and decoder comparisons | 2026-11-16 | a75222da |68 audited points published; four rare simulations continue | [261116-mkh](./quick/261116-mkh-check-original-lifted-product-campaign-r/) |

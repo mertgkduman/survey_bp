@@ -38,3 +38,7 @@ Existing raw results, historical manifests and kernels, old jobs, public catalog
 Evidence: [launch verification](verification.json), [dispatch commands/IDs](../../../data/reproductions/priortilt-2611-13373/dispatch.json), [campaign guide](../../../data/reproductions/priortilt-2611-13373/README.md), and [audited result report](../../../data/reproductions/priortilt-2611-13373/RESULTS.md).
 
 Verdict: PARTIAL — implementation, freeze, qualification and one-CPU dispatch are complete; statistical reproduction remains running, with no source agreement claim yet.
+
+## First production check — quick261116-rf9
+
+Seven complete pairs passed worker full-ledger audits and are now published (345,963 decoded basis shots/280 observable errors). Source join, both denominators, capped stopping, figure metric, component intervals and work/latency independently reconcile. All seven source ordinates lie within local pointwise95% intervals; this does not establish simultaneous full-figure agreement. Thirty-two workers continue on one CPU each; collector61946755 remains dependency-queued. Full source/frozen identities remain unchanged. The updated three-panel figure was inspected and13 affected regressions pass. See the [check summary](../../quick/261116-rf9-check-priortilt-fig1-results-and-explain/SUMMARY.md) and its assessment.
