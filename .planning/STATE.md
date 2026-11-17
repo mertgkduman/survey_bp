@@ -5,11 +5,11 @@ current_phase: 11
 current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
-stopped_at: PriorTilt Fig1 has 19/39 audited campaign points; PriorTilt stays5/13;20 single-CPU workers continue
-last_updated: "2026-11-17T05:12:16.691242+00:00"
+stopped_at: PriorTilt Fig1 has23/39 audited points, including7/13 PriorTilt;16 single-CPU workers continue
+last_updated: "2026-11-17T15:52:20.554136+00:00"
 last_activity: 2026-11-17
-last_activity_desc: Quick 261117-077 verifies19 completed points and progress toward the remaining PriorTilt stops.
-state_head: be547ae3
+last_activity_desc: Quick261117-exr verifies23 audited points including new PriorTilt BB144/.002 and BB70/.001 results.
+state_head: 70d91402
 progress:
   total_phases: 14
   completed_phases: 8
@@ -34,6 +34,10 @@ Total Phases: 14
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
+Last activity: 2026-11-17 — quick 261117-exr checks new PriorTilt results
+Last Activity Description: Published23/39 full-audited points (97,616,345 decoded memory-basis shots/920 observable errors):7 PriorTilt and8 each Relay/Beam. New PriorTilt BB144/p=.002 is2.723e-6 versus source2.467e-6 LER/cycle; BB70/p=.001 is3.958e-7 versus4.678e-7. Both and all23 source ordinates lie within local pointwise95% intervals, ratios0.771–1.253. PriorTilt has the lowest estimate at all seven complete three-method strata. Independent source/count/CI/work/receipt checks pass; all19 previous rows and63 frozen identities unchanged; final figure inspected. Sixteen one-CPU workers61946754 continue without reported failures; collector61946755 pending. Unfinished counts remain progress only. Production code unchanged, regressions not repeated for a data-only update. Sixteen pre-existing dirty files from other collectors/public catalog remained outside staging. No simulation/source/kernel/v1/model/phase-gate/counter changes; spike060 stays PARTIAL.
+
+Previous PriorTilt check:
 Last activity: 2026-11-17 — quick 261117-077 checks PriorTilt Fig1 progress
 Last Activity Description: Published19/39 full-audited points (24,299,037 decoded basis shots/760 observable errors):5 PriorTilt,7 Relay and7 Beam. All19 paper ordinates are within local pointwise95% intervals; all15 previous point records and63 frozen identities remain unchanged. Four new comparison points are Relay/Beam at BB144/.002 and BB70/.001; no new PriorTilt point has finished. Saved PriorTilt progress is BB144/.002 at778240/770048 X/Z shots and10/13 errors; BB70/.001 at5029888/5021696 shots and10/12 errors, retaining20-error/100M per-basis stops without provisional rates.20 one-CPU workers61946754 continue without reported failures; collector61946755 pending. Independent source/count/CI/work/receipt reconciliation passes; plot inspected. No production code or simulation changes, regressions not repeated for data-only update; source/raw/kernel/public/v1/model/phase gates/counters preserved. Spike060 remains PARTIAL.
 
@@ -357,6 +361,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 | # | Description | Date | Commit | Status | Directory |
 |---|-------------|------|--------|--------|-----------|
+| 261117-exr | Check new PriorTilt results and paper agreement | 2026-11-17 | 70d91402 | Verified23/39; PriorTilt7/13;16 one-CPU workers continue | [261117-exr](./quick/261117-exr-check-new-priortilt-fig1-results-and-sou/) |
 | 261117-077 | Check PriorTilt progress and newly completed comparison points | 2026-11-17 | be547ae3 | Verified19/39; PriorTilt5/13;20 one-CPU workers continue | [261117-077](./quick/261117-077-check-priortilt-fig1-progress-and-newly-/) |
 | 261116-ta4 | Check PriorTilt Fig1 completed points and paper agreement | 2026-11-16 | 97d6423d | Verified 15/39 audited pairs; 24 one-CPU workers continue | [261116-ta4](./quick/261116-ta4-check-priortilt-completed-fig1-points-an/) |
 | 261116-rf9 | Check PriorTilt Fig1 and explain matched OSD-CS speedup | 2026-11-16 | 0e8ec024 | Verified7/39 audited pairs;32 one-CPU workers continue | [261116-rf9](./quick/261116-rf9-check-priortilt-fig1-results-and-explain/) |
