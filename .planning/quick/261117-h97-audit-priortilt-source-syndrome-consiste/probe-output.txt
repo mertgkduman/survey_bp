@@ -1,0 +1,88 @@
+{
+  "author_commit": "8eefd37d694b5942fe60ec6d5c82ce97f3d2a450",
+  "current_github_blobs_matching_pinned_source": {
+    "priortilt/__init__.py": "2a0c45b758e9a2e17237d51b319767c96d9ba01b",
+    "priortilt/sinter_priortilt.py": "e536d89f3b95e7a430fc65797784bdb93b31eec3",
+    "decoder/src/lib.rs": "040da491b6c56f1a75018efaac228f6c2a3aeb36",
+    "simulation_functions.py": "1864a65e30571e713e97a3f5898a931ff286723a"
+  },
+  "native_binary_sha256": "aaaa953479f95ececb78b9b17ad26ac183050100c1c3a1995912122e822d3898",
+  "dem": "error(0.1000000000000000056) D0 L0\nerror(0.1000000000000000056) D1\nerror(0.1000000000000000056) D2\nerror(0.1000000000000000056) D0 D1 D2",
+  "H": [
+    [
+      1,
+      0,
+      0,
+      1
+    ],
+    [
+      0,
+      1,
+      0,
+      1
+    ],
+    [
+      0,
+      0,
+      1,
+      1
+    ]
+  ],
+  "A": [
+    [
+      1,
+      0,
+      0,
+      0
+    ]
+  ],
+  "true_error": [
+    1,
+    1,
+    0,
+    0
+  ],
+  "syndrome": [
+    1,
+    1,
+    0
+  ],
+  "estimated_error": [
+    1,
+    1,
+    1,
+    1
+  ],
+  "estimated_syndrome": [
+    0,
+    0,
+    0
+  ],
+  "true_observables": [
+    1
+  ],
+  "predicted_observables": [
+    1
+  ],
+  "sinter_adapter_predictions": [
+    1
+  ],
+  "converged": false,
+  "H_consistent": false,
+  "observable_correct": true,
+  "observable_only_success": true,
+  "joint_definition_success": false,
+  "iterations": 2,
+  "scope": "two-sweep zero-offset toy proof through unmodified author code; not the paper configuration or a performance measurement",
+  "canonical_examples": [
+    {
+      "canonical_point": "bb144-p002000-priortilt",
+      "basis": "z",
+      "shots": 1192846,
+      "observable_errors": 20,
+      "nonconverged_observable_correct": 1,
+      "joint_criterion_failures": 21,
+      "scope": "canonical adaptation data; not an estimate of the authors historical convergence statistics"
+    }
+  ]
+}

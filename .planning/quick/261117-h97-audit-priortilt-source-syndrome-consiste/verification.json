@@ -1,0 +1,14 @@
+{
+  "source_current_main_checked": true,
+  "current_blobs_match_pinned_author_commit": "8eefd37d694b5942fe60ec6d5c82ce97f3d2a450",
+  "native_binary_matches_frozen_reference": true,
+  "reachable_syndrome": true,
+  "author_core_and_single_and_packed_adapter_probe_passed": true,
+  "inconsistent_syndrome_and_correct_observable_demonstrated": true,
+  "Sinter_installed_version": "1.15.0",
+  "Sinter_installed_file_git_blob": "1e54f87ef4be0a919915f0aa036e7598b56c0daf",
+  "Sinter_current_main_file_git_blob": "e45aef72bc7d09f99a087cbe45fb03e8b598b15e",
+  "Sinter_predicate_verified_in_both": "any(sampled_observables XOR predicted_observables)",
+  "canonical_counterexample_count": 1,
+  "scope": "source semantics and short-budget native proof; no author historical failure frequency inferred; no campaign changes"
+}
