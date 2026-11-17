@@ -7,7 +7,7 @@
     ".planning/spikes/061-results-discovery-forecast/forecast.json": "a8249daf7263e2151a86ad38551668189d68982ed5caf3bb113c66661081b3c3",
     ".planning/spikes/061-results-discovery-forecast/probe.py": "970ba96198a5338735969614c68af1bd4a9634c89f5e3f20c879a72b9ff328fd",
     ".planning/spikes/061-results-discovery-forecast/source-context.json": "c26b7c3c63515f9b10134d660813f4835dcb016563a3d089ac6987422d0a5db0",
-    ".planning/spikes/061-results-discovery-forecast/verification.json": "6b1d9f4b147b494aec74650e70aef863e57c184b265a01bee09135a087ecfe2b",
+    ".planning/spikes/061-results-discovery-forecast/verification.json": "835c26f3bfe7b6b0bdb88fcfea05d27696f790f5bf9022620e0de4c5efc75017",
     ".planning/spikes/062-paper-comparison-forecast/lp-default-empty.png": "c3b67a17515ff59188ebe7ac477e84e9a623d922e4bb2d5a7a3ab8d37d1606ef",
     ".planning/spikes/062-paper-comparison-forecast/yao-current.png": "9b1f1ae41bb98652777c578aa17cece7030ee4e1ca399dd25969bc07a41a2c25",
     ".planning/spikes/063-workbench-controls-forecast/builder-current.png": "1818e7272b8244827866ff3af63265fcf8a3dd7a1142e7ca4342e9ccdc1aca0f"

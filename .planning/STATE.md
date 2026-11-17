@@ -5,11 +5,11 @@ current_phase: 11
 current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
-stopped_at: PriorTilt28/39 audited;11 ten-CPU jobs continue; OSD latency regressions explained
-last_updated: "2026-11-17T20:17:26.920Z"
+stopped_at: Workbench feedback forecast delivered; no implementation authorized; research campaigns unchanged
+last_updated: "2026-11-17T21:39:20.444Z"
 last_activity: 2026-11-17
-last_activity_desc: "Published28/39 full-audited Fig1 points (346,440,636 basis shots/1120 errors):PriorTilt9/13,Relay10/13,Beam9/13. New PriorTilt BB70/.0008 is1.694e-7 versus source1.566e-7 andGB102/.001 is3.847e-7 versus3.637e-7; all28 source ordinates remain within pointwise95% intervals and all24 earlier CSV rows unchanged. Five parallel points reconcile13,488 stages/16,951 inherited markers;110,493,696 computed shots=109,962,648 retained+531,048 speculative. Eleven ten-CPU jobs remain active; BB70 PriorTilt/.0005 hit100M/basis with8/18 errors but awaits full audit and is excluded. Parent/resource pins and63 frozen files unchanged. OSD small-case regressions mean latency slowdowns (n162CS10 .172→.378ms; n450 .498→.734ms), with exact uniform candidates/winners preserved and richer-evidence overhead explicit. Figure inspected, no code or simulation changes/test reruns;16 other collector files unstaged. Spike060 remainsPARTIAL and Phase11 gates unchanged. Report evidence355b9e97."
-state_head: 355b9e9746d7484900d9da883843a86ecc8de215
+last_activity_desc: Completed requested feedback forecast only across discovery, paper comparisons/work and controls/builder. No mock-up or production/catalog changes. Read earlier user-directed v2 revisions and latest781055fb paper update; actual browser observations use identical captured catalog for current and pre-paper-update UI. Snapshot453 active curves/3229 points/13 codes/0 circuits,7 paper options and565 builder presets. PriorTilt and OSDv2 benchmark absent; adaptation-only MacKay/LP views default empty; paper chart begins1260px below initial1050px viewport; min-sum changes float64→int8 and shortcut false→true; savedOSD general-builder route blocked, paper choice lost on reload. Forecast priorities/confidence and existing-feature guardrails recorded. Final browser run no errors; initial historical-route harness closure error retained/corrected. Source/catalog hashes unchanged; user preferences remain unvalidated, so all3 spike verdictsPARTIAL. Parent scientific phases, jobs, models and16 pre-existing collector changes untouched. Evidence920ef6db.
+state_head: 920ef6db22d13732ac866dbf887ab48c24fa2225
 progress:
   total_phases: 15
   completed_phases: 9
@@ -34,8 +34,8 @@ Total Phases: 15
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
-Last activity: 2026-11-17 — quick261117-kva checks PriorTilt progress and explains OSD costs
-Last Activity Description: Published28/39 full-audited Fig1 points (346,440,636 basis shots/1120 errors):PriorTilt9/13,Relay10/13,Beam9/13. New PriorTilt BB70/.0008 is1.694e-7 versus source1.566e-7 andGB102/.001 is3.847e-7 versus3.637e-7; all28 source ordinates remain within pointwise95% intervals and all24 earlier CSV rows unchanged. Five parallel points reconcile13,488 stages/16,951 inherited markers;110,493,696 computed shots=109,962,648 retained+531,048 speculative. Eleven ten-CPU jobs remain active; BB70 PriorTilt/.0005 hit100M/basis with8/18 errors but awaits full audit and is excluded. Parent/resource pins and63 frozen files unchanged. OSD small-case regressions mean latency slowdowns (n162CS10 .172→.378ms; n450 .498→.734ms), with exact uniform candidates/winners preserved and richer-evidence overhead explicit. Figure inspected, no code or simulation changes/test reruns;16 other collector files unstaged. Spike060 remainsPARTIAL and Phase11 gates unchanged. Report evidence355b9e97.
+Last activity: 2026-11-17 — spikes061–063 forecast workbench feedback from history and live UI
+Last Activity Description: Completed requested feedback forecast only across discovery, paper comparisons/work and controls/builder. No mock-up or production/catalog changes. Read earlier user-directed v2 revisions and latest781055fb paper update; actual browser observations use identical captured catalog for current and pre-paper-update UI. Snapshot453 active curves/3229 points/13 codes/0 circuits,7 paper options and565 builder presets. PriorTilt and OSDv2 benchmark absent; adaptation-only MacKay/LP views default empty; paper chart begins1260px below initial1050px viewport; min-sum changes float64→int8 and shortcut false→true; savedOSD general-builder route blocked, paper choice lost on reload. Forecast priorities/confidence and existing-feature guardrails recorded. Final browser run no errors; initial historical-route harness closure error retained/corrected. Source/catalog hashes unchanged; user preferences remain unvalidated, so all3 spike verdictsPARTIAL. Parent scientific phases, jobs, models and16 pre-existing collector changes untouched. Evidence920ef6db.
 
 Previous source-scoring audit:
 Last activity: 2026-11-17 — quick261117-h97 audits author syndrome versus observable success
@@ -501,7 +501,7 @@ Latest kernel work: completed F01 → F02 corrections and qualification in quick
 **Resume file:** None
 
 Last session: 2026-11-10T22:51:46+00:00
-Stopped at: PriorTilt28/39 audited;11 ten-CPU jobs continue; OSD latency regressions explained
+Stopped at: Workbench feedback forecast delivered; no implementation authorized; research campaigns unchanged
 Next step: Requested builder request action and display/catalog cleanup are complete; resume the existing Phase 11 scientific work when directed. Preserve identity versions and qualification labels. Phase 11 scientific gaps and Phase 5 human review remain open; Phase 7 stays paused.
 
 Design continuation: `.planning/phases/05-guided-and-perturbative-bp-interventions/05-DESIGN-TASKS.md`.

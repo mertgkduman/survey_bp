@@ -1,11 +1,11 @@
 {
   "production_files_unchanged": {
-    "web/research/index.html": false,
-    "web/research/app.js": false,
-    "web/research/style.css": false,
-    "web/research/curve-projection.js": false,
-    "web/research/paper-figures.js": false,
-    "web/research/catalog.json": false
+    "web/research/index.html": true,
+    "web/research/app.js": true,
+    "web/research/style.css": true,
+    "web/research/curve-projection.js": true,
+    "web/research/paper-figures.js": true,
+    "web/research/catalog.json": true
   },
   "browser_page_errors": [],
   "current_catalog_sha256": "7568edbfa073d44d2faf1e44099a15d9570459af94b67151b0f5a0c046c92ef4",
