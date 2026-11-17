@@ -1,0 +1,16 @@
+data/reproductions/lp1054-relay-gamma80-60/RESULTS.md
+data/reproductions/lp1054-relay-gamma80-60/catalog.json
+data/reproductions/lp1054-relay-gamma80-60/results-table.csv
+data/reproductions/lp1054-relay-gamma80-60/tuning-results.csv.gz
+data/reproductions/lp1054-relay-gamma80-60/verified.json.gz
+data/reproductions/panteleev-2012-04068-lifted-product/RESULTS.md
+data/reproductions/panteleev-2012-04068-lifted-product/catalog.json
+data/reproductions/panteleev-2012-04068-lifted-product/results-table.csv
+data/reproductions/panteleev-2012-04068-lifted-product/tuning-results.csv.gz
+data/reproductions/panteleev-2012-04068-lifted-product/verified.json.gz
+data/reproductions/roffe-2005-07016-osd-fast/RESULTS.md
+data/reproductions/roffe-2005-07016-osd-fast/assessment.json
+data/reproductions/roffe-2005-07016-osd-fast/catalog.json
+data/reproductions/roffe-2005-07016-osd-fast/results-table.csv
+data/reproductions/roffe-2005-07016-osd-fast/verified.json
+web/research/catalog.json
