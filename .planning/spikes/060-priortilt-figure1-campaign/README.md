@@ -64,3 +64,20 @@ The user requested10 processors per remaining point. All16 remaining points now 
 ## First completed parallel point — quick261117-guy
 
 The resource-aware snapshot is24/39 audited points (112,123,660 decoded basis shots/960 errors), with PriorTilt still7/13 complete. New GB102 Beam/p=.001 is6.145e-7 LER/cycle versus source5.8e-7, inside the local95% interval. All24 source ordinates remain within corresponding intervals; all23 earlier point records are unchanged. Independent stage accounting verifies142 sealed stages and1,642 inherited marker hashes:1,163,264 computed shots split into1,056,051 retained and107,213 speculative, with matching additive work totals and exact inherited+retained canonical counts. Worker full audits cover all candidates/stages and endpoint replay; extra speculative outcomes do not enter LER. Fifteen ten-CPU workers continue; next PriorTilt GB102/.001 had15/16 X/Z errors in the saved progress snapshot. Parent/resource sources and phase gates remain unchanged. See the [check summary](../../quick/261117-guy-check-priortilt-ten-cpu-progress-and-new/SUMMARY.md).
+
+## Further parallel completions — quick261117-kva
+
+The refreshed full-audited snapshot is28/39 points (346,440,636 decoded basis
+shots/1120 observable errors):PriorTilt9/13,Relay10/13,Beam9/13. New PriorTilt
+BB70/.0008 andGB102/.001 give1.694e-7 and3.847e-7 LER/cycle versus source
+1.566e-7 and3.637e-7. All28 paper ordinates remain inside local pointwise95%
+intervals, and all24 earlier complete CSV rows are unchanged. PriorTilt has the
+lowest estimate in all nine completed three-method strata, without a blanket
+statistical-superiority claim. Independent source/count/CI/work and resource
+checks pass:13,488 sealed stages and16,951 inherited markers across five parallel
+points;110,493,696 computed shots=109,962,648 retained+531,048 speculative. Figure
+inspected. Eleven ten-CPU point jobs remain active, including final audit of
+BB70 PriorTilt/.0005 after100M shots/basis with8/18 errors; that unaudited point
+is excluded. Parent/resource identities and63 frozen files unchanged. No new
+simulations or production changes; campaign remains PARTIAL. See the
+[check summary](../../quick/261117-kva-check-current-priortilt-fig1-results-and/SUMMARY.md).

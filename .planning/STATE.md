@@ -5,11 +5,11 @@ current_phase: 11
 current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
-stopped_at: Scoped Phase 11.1 complete; Phase 11 scientific gates and ten-CPU PriorTilt campaign continue unchanged
-last_updated: "2026-11-17T19:41:55.051Z"
+stopped_at: PriorTilt28/39 audited;11 ten-CPU jobs continue; OSD latency regressions explained
+last_updated: "2026-11-17T20:17:26.920Z"
 last_activity: 2026-11-17
-last_activity_desc: Completed user-scoped Phase 11.1 (3/3 plans, verification passed) at9cf8239c. Qualified weighted sparse OSD v2 preserves stable order, first minima and uniform digests; source/ML weighted oracles and full native candidate checks pass. 540 standalone and280 whole canonical BP-OSD timing rows on one CPU, OSD0/CS1/CS10/CS60, five matrices and two channels. LP1054 uniform CS10 2.485→2.143ms, whole failure-conditioned BP-OSD4.466→4.108ms; small-input regressions and cache/order limits explicit. Fresh replay verifies240 OSD and2660 pipeline ledgers.122 regressions pass/5 skips plus5 receipt checks. Frozen v1/canonical sweeps/campaigns and16 existing collector outputs untouched. Parent Phase11 source gates and PriorTilt ten-CPU campaign remain unchanged; scoped autonomous task complete.
-state_head: 9cf8239c18fccb064e0752662c0796a9b35ef342
+last_activity_desc: "Published28/39 full-audited Fig1 points (346,440,636 basis shots/1120 errors):PriorTilt9/13,Relay10/13,Beam9/13. New PriorTilt BB70/.0008 is1.694e-7 versus source1.566e-7 andGB102/.001 is3.847e-7 versus3.637e-7; all28 source ordinates remain within pointwise95% intervals and all24 earlier CSV rows unchanged. Five parallel points reconcile13,488 stages/16,951 inherited markers;110,493,696 computed shots=109,962,648 retained+531,048 speculative. Eleven ten-CPU jobs remain active; BB70 PriorTilt/.0005 hit100M/basis with8/18 errors but awaits full audit and is excluded. Parent/resource pins and63 frozen files unchanged. OSD small-case regressions mean latency slowdowns (n162CS10 .172→.378ms; n450 .498→.734ms), with exact uniform candidates/winners preserved and richer-evidence overhead explicit. Figure inspected, no code or simulation changes/test reruns;16 other collector files unstaged. Spike060 remainsPARTIAL and Phase11 gates unchanged. Report evidence355b9e97."
+state_head: 355b9e9746d7484900d9da883843a86ecc8de215
 progress:
   total_phases: 15
   completed_phases: 9
@@ -34,8 +34,8 @@ Total Phases: 15
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
-Last activity: 2026-11-17 — Phase 11.1 weighted streaming OSD qualification complete
-Last Activity Description: Completed user-scoped Phase 11.1 (3/3 plans, verification passed) at9cf8239c. Qualified weighted sparse OSD v2 preserves stable order, first minima and uniform digests; source/ML weighted oracles and full native candidate checks pass. 540 standalone and280 whole canonical BP-OSD timing rows on one CPU, OSD0/CS1/CS10/CS60, five matrices and two channels. LP1054 uniform CS10 2.485→2.143ms, whole failure-conditioned BP-OSD4.466→4.108ms; small-input regressions and cache/order limits explicit. Fresh replay verifies240 OSD and2660 pipeline ledgers.122 regressions pass/5 skips plus5 receipt checks. Frozen v1/canonical sweeps/campaigns and16 existing collector outputs untouched. Parent Phase11 source gates and PriorTilt ten-CPU campaign remain unchanged; scoped autonomous task complete.
+Last activity: 2026-11-17 — quick261117-kva checks PriorTilt progress and explains OSD costs
+Last Activity Description: Published28/39 full-audited Fig1 points (346,440,636 basis shots/1120 errors):PriorTilt9/13,Relay10/13,Beam9/13. New PriorTilt BB70/.0008 is1.694e-7 versus source1.566e-7 andGB102/.001 is3.847e-7 versus3.637e-7; all28 source ordinates remain within pointwise95% intervals and all24 earlier CSV rows unchanged. Five parallel points reconcile13,488 stages/16,951 inherited markers;110,493,696 computed shots=109,962,648 retained+531,048 speculative. Eleven ten-CPU jobs remain active; BB70 PriorTilt/.0005 hit100M/basis with8/18 errors but awaits full audit and is excluded. Parent/resource pins and63 frozen files unchanged. OSD small-case regressions mean latency slowdowns (n162CS10 .172→.378ms; n450 .498→.734ms), with exact uniform candidates/winners preserved and richer-evidence overhead explicit. Figure inspected, no code or simulation changes/test reruns;16 other collector files unstaged. Spike060 remainsPARTIAL and Phase11 gates unchanged. Report evidence355b9e97.
 
 Previous source-scoring audit:
 Last activity: 2026-11-17 — quick261117-h97 audits author syndrome versus observable success
@@ -465,6 +465,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 | 261105-q2s | Improve v2 parameter labels and interactive curve selection; hide retired clipping | 2026-11-05 | See quick summary | Verified (111 tests + browser) | [261105-q2s-improve-v2-decoder-labels-and-legends-se](./quick/261105-q2s-improve-v2-decoder-labels-and-legends-se/) |
 
 | 261106-nd0 | Refine workbench curves, composable policies, circuit sweeps and per-point budgets | 2026-11-06 | dc39055 | Verified (144 tests + 22 browser checks) | [261106-nd0-refine-workbench-result-semantics-and-co](./quick/261106-nd0-refine-workbench-result-semantics-and-co/) |
+| 261117-kva | Verify 28 PriorTilt Fig1 points and explain small-matrix OSD runtime regressions | 2026-11-17 | 355b9e97 | — | [261117-kva-check-current-priortilt-fig1-results-and](./quick/261117-kva-check-current-priortilt-fig1-results-and/) |
 
 ### Roadmap Evolution
 
@@ -500,7 +501,7 @@ Latest kernel work: completed F01 → F02 corrections and qualification in quick
 **Resume file:** None
 
 Last session: 2026-11-10T22:51:46+00:00
-Stopped at: Scoped Phase 11.1 complete; Phase 11 scientific gates and ten-CPU PriorTilt campaign continue unchanged
+Stopped at: PriorTilt28/39 audited;11 ten-CPU jobs continue; OSD latency regressions explained
 Next step: Requested builder request action and display/catalog cleanup are complete; resume the existing Phase 11 scientific work when directed. Preserve identity versions and qualification labels. Phase 11 scientific gaps and Phase 5 human review remain open; Phase 7 stays paused.
 
 Design continuation: `.planning/phases/05-guided-and-perturbative-bp-interventions/05-DESIGN-TASKS.md`.
