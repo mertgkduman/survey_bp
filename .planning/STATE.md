@@ -5,11 +5,11 @@ current_phase: 11
 current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
-stopped_at: PriorTilt source audit confirms internal syndrome stopping but observable-only Sinter score; ten-CPU campaign continues unchanged
-last_updated: "2026-11-17T17:37:32.164303+00:00"
+stopped_at: PriorTilt/Relay Rust sources compared: no direct crate reuse; historical derivation unproven; ten-CPU campaign continues
+last_updated: "2026-11-17T17:54:55.624881+00:00"
 last_activity: 2026-11-17
-last_activity_desc: Quick261117-h97 verifies author source success semantics with a native-and-Sinter counterexample; campaign unchanged.
-state_head: b5012500
+last_activity_desc: Quick261117-htb compares PriorTilt and Relay Rust manifests, kernels and retained history with bounded provenance conclusions.
+state_head: fdc677b3
 progress:
   total_phases: 14
   completed_phases: 8
@@ -34,6 +34,10 @@ Total Phases: 14
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
+Last activity: 2026-11-17 — quick261117-htb compares Rust implementation provenance
+Last Activity Description: PriorTilt priortilt_rs has no Relay package in direct dependencies or full lockfile. Its flat-Vec/raw-pointer macro core and prefix/suffix check minima differ from Relay's generic SparseBipartiteGraph/ndarray and two-minimum check update; current Relay main cdfdc996ce55582c4c431f8d8392bcce57175e36 adds four-lane optimization beyond pinned v0.2.2. PriorTilt window-statistic prior offsets and Relay gamma-memory/legs are distinct policies over min-sum math. Initial public PriorTilt Rust already has the flat implementation and an unspecified C++ comment; retained history does not prove independent authorship or exclude adaptation. README resimulation wording/licenses/common PyO3 or observable interfaces are not provenance proof. Static manifest/structure/history assertions pass; primary-source links and version bounds recorded. No runtime, benchmark, campaign, frozen/source/kernel/model/public/v1/gate/counter changes; other collector outputs unstaged. Ten-CPU continuations remain unchanged.
+
+Previous source-scoring audit:
 Last activity: 2026-11-17 — quick261117-h97 audits author syndrome versus observable success
 Last Activity Description: Current public Rust/Python/adapter/simulation-helper blobs match pinned8eefd37d694b5942fe60ec6d5c82ce97f3d2a450. PriorTilt checks H ehat=s after each sweep for early stopping; on exhaustion returns last vector with convergefalse. Python always projects A ehat, and Sinter receives only predicted observable bits without convergence gating/discard, so released workflow scores observable mismatch alone. Actual unmodified author native+single+packed adapter proof passes on reachable two-sweep toy: s110, H ehat000, A ehat=A e=1, convergencefalse. Literal joint failure adds nonconverged/observable-correct events. Existing canonical BB144/.002 Z-memory has one such shot (20 observable errors versus21 joint failures on1,192,846 recorded shots); this is our data, not historical author statistics. Published author CSVs lack joint flags. Native binary matches frozen qualification; all assertions pass. Our reproduction already uses released observable-only scoring with joint counters retained. No campaign, metric, stop, frozen/source/kernel/model/public/v1/phase-gate/counter changes or simulation reruns; other collector outputs remain unstaged. Ten-CPU continuations remain active; use parallel_report.py for future refreshes.
 
@@ -373,6 +377,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 | # | Description | Date | Commit | Status | Directory |
 |---|-------------|------|--------|--------|-----------|
+| 261117-htb | Compare PriorTilt and Relay Rust provenance | 2026-11-17 | fdc677b3 | Verified no direct Relay dependency; historical derivation remains unproven | [261117-htb](./quick/261117-htb-compare-priortilt-and-relaybp-rust-imple/) |
 | 261117-h97 | Audit PriorTilt syndrome and observable scoring | 2026-11-17 | b5012500 | Verified public source and native/Sinter counterexample; campaign unchanged | [261117-h97](./quick/261117-h97-audit-priortilt-source-syndrome-consiste/) |
 | 261117-guy | Check ten-CPU progress and first parallel result | 2026-11-17 | 967f3b99 | Verified24/39; PriorTilt7/13;15 ten-CPU jobs continue | [261117-guy](./quick/261117-guy-check-priortilt-ten-cpu-progress-and-new/) |
 | 261117-fdl | Resume remaining Fig1 points on ten CPUs each | 2026-11-17 | c653c495 | Qualified;16 running ten-CPU continuations;23 completed points preserved | [261117-fdl](./quick/261117-fdl-resume-remaining-priortilt-fig1-points-w/) |

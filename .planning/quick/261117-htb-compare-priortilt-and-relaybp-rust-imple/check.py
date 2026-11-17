@@ -30,4 +30,3 @@ result={'prior_commit':subprocess.check_output(['git','-C',str(P),'rev-parse','H
         'scope':'static public-source inspection, not a forensic authorship proof or runtime comparison; current Relay has newer four-lane min-two optimization than pinned reference'}
 (Path(__file__).parent/'evidence.json').write_text(json.dumps(result,indent=2)+'\n')
 print('Verified no Relay package dependency and different structures; historical derivation remains unproven')
-
