@@ -206,6 +206,8 @@ def _block(start, stop, base, directions, a, b, pivots, free, depth,
                 if second >= 0:
                     candidate[w] ^= directions[second, w]
                     counters[10] += 1
+        elif index == 0:
+            candidate[:] = base
         else:
             for j in (first, second):
                 if j >= 0:
@@ -240,6 +242,37 @@ def _block(start, stop, base, directions, a, b, pivots, free, depth,
                 if candidate[col//64] & (np.uint64(1) << np.uint64(col % 64)):
                     scores[index-start] += 1.0 if uniform else bit_weights[col]
                     counters[13] += 1
+    return values, scores
+
+
+@njit(cache=True)
+def _byte_block(start, stop, base, directions, q, depth, uniform, bit_weights, counters):
+    """Candidate-storage ablation: one byte/bit XOR, same affine sequence."""
+    values = np.empty((stop-start, len(base)), dtype=np.uint8)
+    scores = np.zeros(stop-start, dtype=np.float64)
+    for index in range(start, stop):
+        first, second = -1, -1
+        if 0 < index <= q:
+            first = index-1
+        elif index > q:
+            offset, first = index-q-1, 0
+            while offset >= depth-first-1:
+                offset -= depth-first-1
+                first += 1
+            second = first+1+offset
+        for col in range(len(base)):
+            bit = base[col]
+            if first >= 0:
+                bit ^= directions[first, col]
+                counters[0] += 1
+            if second >= 0:
+                bit ^= directions[second, col]
+                counters[0] += 1
+            values[index-start, col] = bit
+            counters[1] += 1
+            if bit:
+                scores[index-start] += 1.0 if uniform else bit_weights[col]
+                counters[2] += 1
     return values, scores
 
 
@@ -344,7 +377,7 @@ class Osd:
     def __init__(self, check_matrix, *, method, order, channel_probabilities,
                  score=SCORE_SOURCE, matrix_storage='auto', cache=None,
                  affine_reuse=True, response_method='set_bits', packed_scoring=True,
-                 block_size=128):
+                 block_size=128, candidate_representation='packed'):
         started = perf_counter_ns()
         if method not in ('OSD_0', 'OSD_CS') or type(order) is not int or order < 0:
             raise ValueError('explicit OSD_0/OSD_CS method and integer order required')
@@ -356,6 +389,10 @@ class Osd:
             raise ValueError('positive integer block_size required')
         if type(affine_reuse) is not bool or type(packed_scoring) is not bool:
             raise ValueError('ablation switches must be bool')
+        if candidate_representation not in ('packed', 'bytes'):
+            raise ValueError('unknown candidate representation')
+        if candidate_representation == 'bytes' and (not affine_reuse or packed_scoring):
+            raise ValueError('byte ablation requires affine reuse and bitwise scoring')
         if cache is not None and not isinstance(cache, AffineBasisCache):
             raise ValueError('cache must be an AffineBasisCache')
         if score not in (SCORE_SOURCE, SCORE_ML):
@@ -411,6 +448,7 @@ class Osd:
         self.method, self.order, self.cache = method, order, cache
         self.affine_reuse, self.response_method = affine_reuse, response_method
         self.packed_scoring, self.block_size = packed_scoring, block_size
+        self.candidate_representation = candidate_representation
         self.constructor_ns = perf_counter_ns()-started
 
     @property
@@ -438,7 +476,7 @@ class Osd:
         timing['cache_lookup'] = perf_counter_ns()-tick
         tick = perf_counter_ns()
         packed_h = self.packed_matrix
-        if packed_h is None and (cached is None or evidence_mode == 'full'):
+        if packed_h is None and cached is None:
             packed_h = _pack_csr(self.row_ptr, self.columns, self.n)
         timing['pack_matrix'] = perf_counter_ns()-tick
         tick = perf_counter_ns()
@@ -461,6 +499,10 @@ class Osd:
         timing['responses_and_cache_store'] = perf_counter_ns()-tick
         tick = perf_counter_ns()
         base = _base(a, b, pivots, not affine, counters)
+        byte_counters = np.zeros(3, dtype=np.int64)
+        if self.candidate_representation == 'bytes':
+            byte_base = np.unpackbits(np.ascontiguousarray(base, dtype='<u8').view(np.uint8), bitorder='little')[:self.n]
+            byte_directions = np.unpackbits(np.ascontiguousarray(directions, dtype='<u8').view(np.uint8).reshape(len(directions), self.width*8), axis=1, bitorder='little')[:, :self.n]
         timing['base_solution'] = perf_counter_ns()-tick
         count = 1+(len(free)+self.order*(self.order-1)//2 if cs else 0)
         weights = np.empty(count, dtype=np.int64 if self.uniform else np.float64)
@@ -471,8 +513,18 @@ class Osd:
         for start in range(0, count, self.block_size):
             stop = min(count, start+self.block_size)
             tick = perf_counter_ns()
-            block, scores = _block(start, stop, base, directions, a, b, pivots, free, self.order,
-                                   affine or not cs, self.uniform, self.bit_weights, self.n, self.packed_scoring, counters)
+            extra_bytes = 0
+            if self.candidate_representation == 'bytes':
+                byte_block, scores = _byte_block(start, stop, byte_base, byte_directions,
+                                                len(free), self.order, self.uniform, self.bit_weights, byte_counters)
+                packed_bytes = np.packbits(byte_block, axis=1, bitorder='little')
+                padded = np.zeros((stop-start, self.width*8), dtype=np.uint8)
+                padded[:, :packed_bytes.shape[1]] = packed_bytes
+                block = padded.view('<u8')
+                extra_bytes = byte_block.nbytes+packed_bytes.nbytes
+            else:
+                block, scores = _block(start, stop, base, directions, a, b, pivots, free, self.order,
+                                       affine or not cs, self.uniform, self.bit_weights, self.n, self.packed_scoring, counters)
             weights[start:stop] = scores
             local = int(np.argmin(scores))
             if best < 0 or scores[local] < weights[best]:
@@ -480,11 +532,11 @@ class Osd:
                 selected[:] = block[local]
             if materialized is not None:
                 materialized[start:stop] = block
-            block_peak = max(block_peak, block.nbytes+scores.nbytes)
+            block_peak = max(block_peak, block.nbytes+scores.nbytes+extra_bytes)
             timing['enumerate_score'] += perf_counter_ns()-tick
             tick = perf_counter_ns()
             if evidence_mode == 'full':
-                if not _check_candidates(packed_h, self.row_ptr, self.columns, block, s,
+                if not _check_candidates(packed_h if packed_h is not None else a, self.row_ptr, self.columns, block, s,
                                          self.matrix_storage == 'sparse', counters):
                     raise RuntimeError('OSD candidate fails original syndrome validation')
                 checks += len(block)
@@ -519,6 +571,8 @@ class Osd:
                     cache_lookup=int(key is not None), cache_hit=int(cached is not None), cache_stored=int(cache_stored),
                     retained_matrix_bytes=self.retained_matrix_bytes,
                     cache_retained_bytes=0 if self.cache is None else self.cache.info()['bytes'])
+        work.update(candidate_xor_bytes=int(byte_counters[0]), byte_score_bit_tests=int(byte_counters[1]),
+                    byte_score_additions=int(byte_counters[2]))
         semantic = dict(version=VERSION, evidence_version=EVIDENCE_VERSION,
                         method=self.method, order=self.order, n=self.n, m=self.m,
                         matrix_sha256=self.matrix_sha256, channel_sha256=self.channel_sha256,
@@ -534,7 +588,7 @@ class Osd:
                       materialized=materialize_candidates, work=work,
                       execution=dict(matrix_storage=self.matrix_storage, affine_reuse=self.affine_reuse,
                                      response_method=self.response_method, packed_scoring=self.packed_scoring,
-                                     block_size=self.block_size))
+                                     block_size=self.block_size, candidate_representation=self.candidate_representation))
         ledger['ledger_sha256'] = _json_digest(ledger)
         result = OsdResult(immutable_snapshot(output), None if materialized is None else immutable_snapshot(materialized),
                            immutable_snapshot(weights), immutable_snapshot(ordering), immutable_snapshot(pivots),

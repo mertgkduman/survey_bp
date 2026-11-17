@@ -12,6 +12,7 @@ from bp_registry.postprocessing.osd import UniformOsd
 from bp_registry.postprocessing.osd_v2 import (
     Osd, AffineBasisCache, SCORE_SOURCE, SCORE_ML, VERSION, WORK_VERSION,
 )
+from bp_registry.postprocessing.bp_osd_v2 import CanonicalBpOsd
 
 
 def independent_candidates(h, s, llr, depth, *, full_basis=False):
@@ -281,3 +282,64 @@ def test_invalid_controls_and_sparse_data_rejected():
     decoder = Osd(h, method='OSD_CS', order=1, channel_probabilities=.1)
     with pytest.raises(ValueError, match='non-pivot'):
         decoder.decode(np.zeros(2, dtype=np.uint8), np.zeros(2))
+
+
+def test_typed_work_counts_streaming_bound_and_packing_ablation():
+    h = np.array([[1, 1, 1]], dtype=np.uint8); s = np.ones(1, dtype=np.uint8)
+    kwargs = dict(method='OSD_CS', order=2, channel_probabilities=.1, block_size=1)
+    packed = Osd(h, **kwargs).decode(s, [0., 0., 0.], evidence_mode='full')
+    w = packed.work
+    assert (w['candidate_evaluations'], w['candidate_xor_words'], w['score_popcount_words']) == (4, 4, 4)
+    assert (w['response_scan_words'], w['response_coefficients'], w['validation_words']) == (1, 2, 4)
+    assert w['candidate_hash_bytes'] == w['weight_hash_bytes'] == 32
+    assert w['candidate_materialized_bytes'] == 0 and w['candidate_block_peak_bytes'] == 16
+    byte = Osd(h, **kwargs, candidate_representation='bytes', packed_scoring=False).decode(s, [0., 0., 0.])
+    assert byte.work['candidate_xor_bytes'] == 12 and byte.work['byte_score_bit_tests'] == 12
+    assert byte.candidate_set_sha256 == packed.candidate_set_sha256
+    assert not any(value < 0 for value in packed.timings_ns.values())
+    assert sum(v for k, v in packed.timings_ns.items() if k != 'total') <= packed.timings_ns['total']
+
+
+def independent_bp(h, syndrome, probabilities, cap, alpha):
+    rows, cols = np.nonzero(h)
+    initial = np.array([math.log((1-p)/p) for p in probabilities])
+    prior = np.array([math.log1p(-p)-math.log(p) for p in probabilities])
+    old = initial[cols].copy()
+    for iteration in range(1, cap+1):
+        c2v = np.zeros(len(old)); coefficient = 1-2**(-iteration) if alpha == 'roffe' else alpha
+        for edge, (row, col) in enumerate(zip(rows, cols, strict=True)):
+            others = [old[j] for j, r in enumerate(rows) if r == row and j != edge]
+            magnitude = min(map(abs, others)) if others else 23.7189981105
+            sign = -1 if (int(syndrome[row])+sum(v < 0 for v in others)) % 2 else 1
+            c2v[edge] = sign*coefficient*magnitude
+        beliefs = prior.copy()
+        for col, message in zip(cols, c2v, strict=True):
+            beliefs[col] += message
+        candidate = np.asarray(beliefs < 0, dtype=np.uint8)
+        if np.array_equal(h @ candidate % 2, syndrome):
+            return candidate, beliefs, True, iteration
+        old = np.array([beliefs[col]-c2v[j] for j, col in enumerate(cols)])
+    return candidate, beliefs, False, iteration
+
+
+@pytest.mark.parametrize('alpha', ['roffe', .625])
+def test_pipeline_uses_canonical_sweep_and_preserves_both_activation_paths(alpha):
+    rng = np.random.default_rng(881)
+    h = np.array([[1, 1, 0, 1, 0], [0, 1, 1, 0, 1], [1, 0, 1, 1, 1]], dtype=np.uint8)
+    paths = set()
+    for probabilities in (np.full(5, .1), np.array([.05, .2, .15, .1, .3])):
+        processor = Osd(h, method='OSD_CS', order=1, channel_probabilities=probabilities)
+        pipeline = CanonicalBpOsd(processor, max_iterations=2, alpha=alpha)
+        for _ in range(32):
+            syndrome = h @ rng.integers(0, 2, 5, dtype=np.uint8) % 2
+            expected = independent_bp(h, syndrome, probabilities, 2, alpha)
+            result = pipeline.decode(syndrome, evidence_mode='full', materialize_candidates=True)
+            assert np.array_equal(result.bp_candidate, expected[0])
+            assert np.array_equal(result.posterior_llr, expected[1])
+            assert result.converged == expected[2] and result.iterations == expected[3]
+            assert result.ledger['bp_directed_edge_updates'] == 2*int(h.sum())*result.iterations
+            assert np.array_equal(h @ result.candidate % 2, syndrome)
+            paths.add(result.osd is not None)
+            if result.osd is not None:
+                processor.replay(syndrome, result.posterior_llr, result.osd.ledger)
+    assert paths == {True, False}
