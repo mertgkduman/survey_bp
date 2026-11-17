@@ -1,0 +1,7 @@
+{
+  "command": "PYTHONPATH=src .venv/bin/python -m pytest -q tests/test_osd_v2.py tests/test_osd_v2_benchmark.py tests/test_uniform_osd.py tests/test_roffe_compiled_osd.py tests/test_roffe_canonical_osd.py tests/test_roffe_osd_comparison.py tests/canonical/test_postprocessing_osd.py tests/canonical/test_postprocessing_handoff.py -x",
+  "passed": 122,
+  "skipped": 5,
+  "exit_code": 0,
+  "followup": "Extended report/replay receipt integrity assertions checked by focused benchmark tests; no production changes."
+}

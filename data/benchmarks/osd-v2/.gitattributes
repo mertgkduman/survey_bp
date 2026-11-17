@@ -1,0 +1,2 @@
+# Preserve sealed csv.writer CRLF bytes and treat CR as part of the line ending.
+*.csv -text whitespace=cr-at-eol

@@ -88,12 +88,12 @@ def _factor(matrix, syndrome, ordering, n, cs, affine, track_transform, counters
             if a[row, word] & mask:
                 for w in range(width):
                     a[row, w] ^= a[rank, w]
-                    counters[1] += 1
+                counters[1] += width
                 b[row] ^= b[rank]
                 counters[2] += 1
                 for w in range(transform.shape[1]):
                     transform[row, w] ^= transform[rank, w]
-                    counters[4] += 1
+                counters[4] += transform.shape[1]
         rank += 1
     if cs and affine:
         for i in range(rank-1, -1, -1):
@@ -104,12 +104,12 @@ def _factor(matrix, syndrome, ordering, n, cs, affine, track_transform, counters
                 if a[row, word] & mask:
                     for w in range(width):
                         a[row, w] ^= a[i, w]
-                        counters[1] += 1
+                    counters[1] += width
                     b[row] ^= b[i]
                     counters[2] += 1
                     for w in range(transform.shape[1]):
                         transform[row, w] ^= transform[i, w]
-                        counters[4] += 1
+                    counters[4] += transform.shape[1]
     free = np.empty(n-rank, dtype=np.int64)
     j = 0
     for col in ordering:
@@ -173,7 +173,7 @@ def _base(a, b, pivots, triangular, counters):
         if triangular:
             for w in range(a.shape[1]):
                 value ^= _popcount(a[row, w] & result[w]) & 1
-                counters[6] += 1
+            counters[6] += a.shape[1]
         if value:
             col = pivots[row]
             result[col//64] |= np.uint64(1) << np.uint64(col % 64)
@@ -202,10 +202,9 @@ def _block(start, stop, base, directions, a, b, pivots, free, depth,
                 candidate[w] = base[w]
                 if first >= 0:
                     candidate[w] ^= directions[first, w]
-                    counters[10] += 1
                 if second >= 0:
                     candidate[w] ^= directions[second, w]
-                    counters[10] += 1
+            counters[10] += width*(int(first >= 0)+int(second >= 0))
         elif index == 0:
             candidate[:] = base
         else:
@@ -217,14 +216,14 @@ def _block(start, stop, base, directions, a, b, pivots, free, depth,
                 value = int(b[row])
                 for w in range(width):
                     value ^= _popcount(a[row, w] & candidate[w]) & 1
-                    counters[6] += 1
+                counters[6] += width
                 if value:
                     col = pivots[row]
                     candidate[col//64] |= np.uint64(1) << np.uint64(col % 64)
         if packed_scoring and uniform:
             for w in range(width):
                 scores[index-start] += _popcount(candidate[w])
-                counters[11] += 1
+            counters[11] += width
         elif packed_scoring:
             # Visit set bits in original-column order: exactly the reference's
             # accumulation order, including negative weights in ML mode.
@@ -285,11 +284,11 @@ def _check_candidates(packed_h, row_ptr, columns, values, syndrome, use_sparse, 
                 for edge in range(row_ptr[row], row_ptr[row+1]):
                     col = columns[edge]
                     parity ^= int((values[i, col//64] >> np.uint64(col % 64)) & np.uint64(1))
-                    counters[15] += 1
+                counters[15] += row_ptr[row+1]-row_ptr[row]
             else:
                 for w in range(packed_h.shape[1]):
                     parity ^= _popcount(packed_h[row, w] & values[i, w]) & 1
-                    counters[14] += 1
+                counters[14] += packed_h.shape[1]
             if parity != syndrome[row]:
                 return False
     return True
@@ -377,7 +376,7 @@ class Osd:
     def __init__(self, check_matrix, *, method, order, channel_probabilities,
                  score=SCORE_SOURCE, matrix_storage='auto', cache=None,
                  affine_reuse=True, response_method='set_bits', packed_scoring=True,
-                 block_size=128, candidate_representation='packed'):
+                 block_size=512, candidate_representation='packed'):
         started = perf_counter_ns()
         if method not in ('OSD_0', 'OSD_CS') or type(order) is not int or order < 0:
             raise ValueError('explicit OSD_0/OSD_CS method and integer order required')
@@ -441,6 +440,8 @@ class Osd:
         # recomputation in the decode hot path. Source evaluates log(1/p).
         import math
         weights = np.array([math.log(1/float(p)) if score == SCORE_SOURCE else math.log1p(-float(p))-math.log(float(p)) for p in probabilities])
+        if not np.all(np.isfinite(weights)):
+            raise ValueError('channel score overflows float64 under the selected convention')
         self.bit_weights = immutable_snapshot(weights)
         self.uniform = bool(np.all(probabilities == probabilities[0]) and weights[0] > 0)
         self.score = score
@@ -460,6 +461,8 @@ class Osd:
         if evidence_mode not in ('fast', 'full') or type(materialize_candidates) is not bool:
             raise ValueError('explicit fast/full evidence mode and boolean materialization required')
         s = _binary(syndrome, ndim=1, name='syndrome')
+        if np.iscomplexobj(posterior_llr):
+            raise ValueError('posterior must be real signed LLRs')
         llr = np.asarray(posterior_llr, dtype=np.float64)
         if s.shape != (self.m,) or llr.shape != (self.n,) or not np.all(np.isfinite(llr)):
             raise ValueError('syndrome/finite signed posterior shape mismatch')

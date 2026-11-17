@@ -1,0 +1,196 @@
+{
+  "claim": "real canonical syndrome nonconvergence, fixed finite qualification samples; no LER inference",
+  "groups": [
+    {
+      "alpha": "roffe",
+      "cap": 100,
+      "channel": "uniform",
+      "code": "toric9",
+      "id": "toric9_uniform",
+      "mixed_converged": 2,
+      "nnz": 324,
+      "samples": 3,
+      "search_attempts": 16,
+      "shape": [
+        81,
+        162
+      ],
+      "source": {
+        "path": "data/reproductions/roffe-2005-07016-bp/codes/toric9.npz",
+        "sha256": "c39af0c389fa25cc4b462e7534f2aa6bc1c01cb82cc4b2569aa96248d7dd0800"
+      }
+    },
+    {
+      "alpha": "roffe",
+      "cap": 100,
+      "channel": "nonuniform",
+      "code": "toric9",
+      "id": "toric9_nonuniform",
+      "mixed_converged": 13,
+      "nnz": 324,
+      "samples": 3,
+      "search_attempts": 16,
+      "shape": [
+        81,
+        162
+      ],
+      "source": {
+        "path": "data/reproductions/roffe-2005-07016-bp/codes/toric9.npz",
+        "sha256": "c39af0c389fa25cc4b462e7534f2aa6bc1c01cb82cc4b2569aa96248d7dd0800"
+      }
+    },
+    {
+      "alpha": "roffe",
+      "cap": 100,
+      "channel": "uniform",
+      "code": "toric15",
+      "id": "toric15_uniform",
+      "mixed_converged": 0,
+      "nnz": 900,
+      "samples": 3,
+      "search_attempts": 16,
+      "shape": [
+        225,
+        450
+      ],
+      "source": {
+        "path": "data/reproductions/roffe-2005-07016-bp/codes/toric15.npz",
+        "sha256": "0ea160892a22bfb817bfcd58295e43a236fc33e8c9d0f0a0f3690e60d47f6824"
+      }
+    },
+    {
+      "alpha": "roffe",
+      "cap": 100,
+      "channel": "nonuniform",
+      "code": "toric15",
+      "id": "toric15_nonuniform",
+      "mixed_converged": 10,
+      "nnz": 900,
+      "samples": 3,
+      "search_attempts": 16,
+      "shape": [
+        225,
+        450
+      ],
+      "source": {
+        "path": "data/reproductions/roffe-2005-07016-bp/codes/toric15.npz",
+        "sha256": "0ea160892a22bfb817bfcd58295e43a236fc33e8c9d0f0a0f3690e60d47f6824"
+      }
+    },
+    {
+      "alpha": "roffe",
+      "cap": 100,
+      "channel": "uniform",
+      "code": "b1_882",
+      "id": "b1_882_uniform",
+      "mixed_converged": 3,
+      "nnz": 2646,
+      "samples": 3,
+      "search_attempts": 16,
+      "shape": [
+        441,
+        882
+      ],
+      "source": {
+        "path": "data/artifacts/b1-panteleev-kalachev-v3.npz",
+        "sha256": "3b3fb669daf18cb294049c2c20a457a2da997ad1a7da9f0667171d3b48eb38a6"
+      }
+    },
+    {
+      "alpha": "roffe",
+      "cap": 100,
+      "channel": "nonuniform",
+      "code": "b1_882",
+      "id": "b1_882_nonuniform",
+      "mixed_converged": 6,
+      "nnz": 2646,
+      "samples": 3,
+      "search_attempts": 16,
+      "shape": [
+        441,
+        882
+      ],
+      "source": {
+        "path": "data/artifacts/b1-panteleev-kalachev-v3.npz",
+        "sha256": "3b3fb669daf18cb294049c2c20a457a2da997ad1a7da9f0667171d3b48eb38a6"
+      }
+    },
+    {
+      "alpha": 0.625,
+      "cap": 32,
+      "channel": "uniform",
+      "code": "lp1054",
+      "id": "lp1054_uniform",
+      "mixed_converged": 0,
+      "nnz": 3720,
+      "samples": 3,
+      "search_attempts": 16,
+      "shape": [
+        465,
+        1054
+      ],
+      "source": {
+        "path": "data/reproductions/panteleev-2012-04068-lifted-product/code.npz",
+        "sha256": "8d4dfbd27d0e39d4ccacc1a6bdbc1b69f400c0f843eaa0661d7d765ff61cecee"
+      }
+    },
+    {
+      "alpha": 0.625,
+      "cap": 32,
+      "channel": "nonuniform",
+      "code": "lp1054",
+      "id": "lp1054_nonuniform",
+      "mixed_converged": 3,
+      "nnz": 3720,
+      "samples": 3,
+      "search_attempts": 16,
+      "shape": [
+        465,
+        1054
+      ],
+      "source": {
+        "path": "data/reproductions/panteleev-2012-04068-lifted-product/code.npz",
+        "sha256": "8d4dfbd27d0e39d4ccacc1a6bdbc1b69f400c0f843eaa0661d7d765ff61cecee"
+      }
+    },
+    {
+      "alpha": "roffe",
+      "cap": 100,
+      "channel": "uniform",
+      "code": "toric31",
+      "id": "toric31_uniform",
+      "mixed_converged": 0,
+      "nnz": 3844,
+      "samples": 3,
+      "search_attempts": 16,
+      "shape": [
+        961,
+        1922
+      ],
+      "source": {
+        "generator": "periodic-square-lattice-L31-v1"
+      }
+    },
+    {
+      "alpha": "roffe",
+      "cap": 100,
+      "channel": "nonuniform",
+      "code": "toric31",
+      "id": "toric31_nonuniform",
+      "mixed_converged": 0,
+      "nnz": 3844,
+      "samples": 3,
+      "search_attempts": 16,
+      "shape": [
+        961,
+        1922
+      ],
+      "source": {
+        "generator": "periodic-square-lattice-L31-v1"
+      }
+    }
+  ],
+  "npz_sha256": "606a88f62c237319db17d50c1a7b2798bbe34a363953ed11f0ca240a02ac3147",
+  "schema": "osd-v2-bp-failure-fixtures-v1",
+  "seed": 2026111705
+}

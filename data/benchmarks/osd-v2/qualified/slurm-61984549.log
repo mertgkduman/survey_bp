@@ -1,0 +1,83 @@
+qualified native/weighted/all ablations toric9_uniform
+qualified native/weighted/all ablations toric9_nonuniform
+qualified native/weighted/all ablations toric15_uniform
+qualified native/weighted/all ablations toric15_nonuniform
+qualified native/weighted/all ablations b1_882_uniform
+qualified native/weighted/all ablations b1_882_nonuniform
+qualified native/weighted/all ablations lp1054_uniform
+qualified native/weighted/all ablations lp1054_nonuniform
+qualified native/weighted/all ablations toric31_uniform
+qualified native/weighted/all ablations toric31_nonuniform
+benchmarked toric9_uniform OSD0
+benchmarked toric9_uniform OSD1
+benchmarked toric9_uniform OSD10
+benchmarked toric9_uniform OSD60
+benchmarked toric9_nonuniform OSD0
+benchmarked toric9_nonuniform OSD1
+benchmarked toric9_nonuniform OSD10
+benchmarked toric9_nonuniform OSD60
+benchmarked toric15_uniform OSD0
+benchmarked toric15_uniform OSD1
+benchmarked toric15_uniform OSD10
+benchmarked toric15_uniform OSD60
+benchmarked toric15_nonuniform OSD0
+benchmarked toric15_nonuniform OSD1
+benchmarked toric15_nonuniform OSD10
+benchmarked toric15_nonuniform OSD60
+benchmarked b1_882_uniform OSD0
+benchmarked b1_882_uniform OSD1
+benchmarked b1_882_uniform OSD10
+benchmarked b1_882_uniform OSD60
+benchmarked b1_882_nonuniform OSD0
+benchmarked b1_882_nonuniform OSD1
+benchmarked b1_882_nonuniform OSD10
+benchmarked b1_882_nonuniform OSD60
+benchmarked lp1054_uniform OSD0
+benchmarked lp1054_uniform OSD1
+benchmarked lp1054_uniform OSD10
+benchmarked lp1054_uniform OSD60
+benchmarked lp1054_nonuniform OSD0
+benchmarked lp1054_nonuniform OSD1
+benchmarked lp1054_nonuniform OSD10
+benchmarked lp1054_nonuniform OSD60
+benchmarked toric31_uniform OSD0
+benchmarked toric31_uniform OSD1
+benchmarked toric31_uniform OSD10
+benchmarked toric31_uniform OSD60
+benchmarked toric31_nonuniform OSD0
+benchmarked toric31_nonuniform OSD1
+benchmarked toric31_nonuniform OSD10
+benchmarked toric31_nonuniform OSD60
+memory toric9_uniform 0 v2_fast
+memory toric9_uniform 0 v2_materialized
+memory toric9_uniform 0 v2_bytes
+memory toric9_uniform 0 v2_full
+memory toric9_uniform 1 v2_fast
+memory toric9_uniform 1 v2_materialized
+memory toric9_uniform 1 v2_bytes
+memory toric9_uniform 1 v2_full
+memory toric9_uniform 10 v2_fast
+memory toric9_uniform 10 v2_materialized
+memory toric9_uniform 10 v2_bytes
+memory toric9_uniform 10 v2_full
+memory toric9_uniform 60 v2_fast
+memory toric9_uniform 60 v2_materialized
+memory toric9_uniform 60 v2_bytes
+memory toric9_uniform 60 v2_full
+memory toric31_nonuniform 0 v2_fast
+memory toric31_nonuniform 0 v2_materialized
+memory toric31_nonuniform 0 v2_bytes
+memory toric31_nonuniform 0 v2_full
+memory toric31_nonuniform 1 v2_fast
+memory toric31_nonuniform 1 v2_materialized
+memory toric31_nonuniform 1 v2_bytes
+memory toric31_nonuniform 1 v2_full
+memory toric31_nonuniform 10 v2_fast
+memory toric31_nonuniform 10 v2_materialized
+memory toric31_nonuniform 10 v2_bytes
+memory toric31_nonuniform 10 v2_full
+memory toric31_nonuniform 60 v2_fast
+memory toric31_nonuniform 60 v2_materialized
+memory toric31_nonuniform 60 v2_bytes
+memory toric31_nonuniform 60 v2_full
+BENCHMARK COMPLETE 540 standalone rows 280 pipeline rows

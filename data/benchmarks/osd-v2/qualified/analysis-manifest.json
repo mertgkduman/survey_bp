@@ -1,0 +1,11 @@
+{
+  "benchmark_manifest_sha256": "a61f23f2ec6182a2648fa45607b6e296478ef2572112f8fa69401d8bc0b10208",
+  "files": {
+    "QUALIFICATION.md": "193e9fb17222899439a7ff0440bd5eedafc39224ac2e4cd96002666466ecd4ad",
+    "ablations.csv": "5012369d185481e241b04090c0e18cb9e69bd0c09418e2d8abb271a973cba2fd",
+    "memory.csv": "fbb9d812c611d3e542ae3bbcc941e8af0b5b7121a40806134b26b6e209f10d58",
+    "storage.csv": "d41f2fabf1a8536f148312505ed186fb0faae96891c93034fdb665183d106667"
+  },
+  "schema": "osd-v2-derived-report-v1",
+  "script_sha256": "880b8ad6453d27ec5f9d1a5227e4f24a755102526e72b216965a26e13c3fd97e"
+}

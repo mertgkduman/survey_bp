@@ -1,0 +1,19 @@
+{
+  "affinity": [
+    32
+  ],
+  "analysis_manifest_sha256": "f9d5ec030fbc2ef30ee489595d7f91d20109af17db26340e19c1b953cb8cea82",
+  "benchmark_manifest_sha256": "a61f23f2ec6182a2648fa45607b6e296478ef2572112f8fa69401d8bc0b10208",
+  "counts": {
+    "full_osd_equivalence_ledgers_replayed": 240,
+    "published_pipeline_event_ledgers_verified": 2660,
+    "sealed_actual_bp_failure_terminal_states": 30,
+    "unique_whole_pipeline_shots_recomputed": 640
+  },
+  "elapsed_seconds": 8.24859881401062,
+  "schema": "osd-v2-fresh-replay-v1",
+  "slurm_cpus_per_task": "1",
+  "slurm_job_id": "61986557",
+  "status": "passed",
+  "verifier_sha256": "030c6a64e833d3518913d8756424348c284296b08713267c84e3d83c184999f7"
+}

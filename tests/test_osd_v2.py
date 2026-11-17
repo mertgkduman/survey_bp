@@ -263,7 +263,7 @@ def test_replay_rejects_tampering_and_changed_inputs():
         decoder.replay(s, -llr, result.ledger)
 
 
-@pytest.mark.parametrize('p', [True, 0, 1, np.nan, [.1], [.1, np.inf], ['x', 'y'], [.1+.1j, .2]])
+@pytest.mark.parametrize('p', [True, 0, 1, np.nan, np.nextafter(0., 1.), [.1], [.1, np.inf], ['x', 'y'], [.1+.1j, .2]])
 def test_invalid_probabilities_rejected(p):
     with pytest.raises(ValueError):
         Osd(np.eye(2, dtype=np.uint8), method='OSD_0', order=0, channel_probabilities=p)

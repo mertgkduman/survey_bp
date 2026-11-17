@@ -65,6 +65,8 @@ class CanonicalBpOsd:
         p = processor.probabilities
         self.initial = immutable_snapshot(np.array([math.log((1-float(v))/float(v)) for v in p]))
         self.prior = immutable_snapshot(np.array([math.log1p(-float(v))-math.log(float(v)) for v in p]))
+        if not np.all(np.isfinite(self.initial)) or not np.all(np.isfinite(self.prior)):
+            raise ValueError('initial canonical BP messages must be finite float64')
 
     def bp(self, syndrome):
         p = self.processor

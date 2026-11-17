@@ -1,0 +1,14 @@
+[
+  {
+    "job": "61981163",
+    "accounting": "JobID|State|ExitCode|AllocCPUS|Elapsed|MaxRSS|NodeList\n61981163|COMPLETED|0:0|1|00:06:20||dcc-dhvimdcore-gpu-ferc-s-p15-4\n61981163.batch|COMPLETED|0:0|1|00:06:20|266332K|dcc-dhvimdcore-gpu-ferc-s-p15-4\n61981163.extern|COMPLETED|0:0|1|00:06:20||dcc-dhvimdcore-gpu-ferc-s-p15-4\n"
+  },
+  {
+    "job": "61984549",
+    "accounting": "JobID|State|ExitCode|AllocCPUS|Elapsed|MaxRSS|NodeList\n61984549|COMPLETED|0:0|1|00:07:12||dcc-dhvimdcore-gpu-ferc-s-p15-4\n61984549.batch|COMPLETED|0:0|1|00:07:12|324704K|dcc-dhvimdcore-gpu-ferc-s-p15-4\n61984549.extern|COMPLETED|0:0|1|00:07:12||dcc-dhvimdcore-gpu-ferc-s-p15-4\n"
+  },
+  {
+    "job": "61986557",
+    "accounting": "JobID|State|ExitCode|AllocCPUS|Elapsed|MaxRSS|NodeList\n61986557|COMPLETED|0:0|1|00:00:18||dcc-dhvimdcore-gpu-ferc-s-p15-24\n61986557.batch|COMPLETED|0:0|1|00:00:18|13516K|dcc-dhvimdcore-gpu-ferc-s-p15-24\n61986557.extern|COMPLETED|0:0|1|00:00:18||dcc-dhvimdcore-gpu-ferc-s-p15-24\n"
+  }
+]

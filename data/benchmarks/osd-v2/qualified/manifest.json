@@ -1,0 +1,14 @@
+{
+  "files": {
+    "RESULTS.md": "6dfa35ad3ec610752a6712d48e6c941d2a88eb9eb5bd687413844d3796a0f6f8",
+    "benchmark.json": "b5f2aa3cbb8391d4b2917fc1e1ff5dd356be1be13b032b5ad7c56fd3aead7ed2",
+    "equivalence-ledgers.jsonl": "7cbe8a3ee45fdd1ad2be3006f2c497d8632404d82badab7619a4bc8d6518521f",
+    "fixtures.json": "af713b9d27af36693866e2981fe2919924d21ef7fb1f3fe8e6e20a06c3e43af6",
+    "fixtures.npz": "606a88f62c237319db17d50c1a7b2798bbe34a363953ed11f0ca240a02ac3147",
+    "pipeline-ledgers.jsonl": "bff9ba18f58626f8ec3fc4b76d11cd86cf69d8a28982d383317ebd734c1799e5",
+    "pipeline.csv": "9811a5eeb18be4270efd1acde2b2c8315851ba3b344cd964340f29b69291f6a7",
+    "reference_weighted.cpp": "d60a45c173309caed35161598e08aada66c9035ad4c3f8a5919007bcbddd9f4c",
+    "timings.csv": "922331c15109e13c0c9a6eebb82bec92b3191f1b648d2c0eff46396c6f7504a0"
+  },
+  "schema": "osd-v2-benchmark-seal-v1"
+}

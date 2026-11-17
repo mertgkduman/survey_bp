@@ -1,0 +1,14 @@
+{
+  "files": {
+    "RESULTS.md": "bcf49e9a975f6d8aebc8aeff52e2c9158bbee03f23b3c32743ddd387bf5acb2c",
+    "benchmark.json": "8e3bc40295c66f44077e263f994468cb73aed3c94af62b358fccf7f81112e7b6",
+    "equivalence-ledgers.jsonl": "0eb0b757952f622e6959ac549920cd6b4235e53fde9df16d7ce98c294bb7ce81",
+    "fixtures.json": "af713b9d27af36693866e2981fe2919924d21ef7fb1f3fe8e6e20a06c3e43af6",
+    "fixtures.npz": "606a88f62c237319db17d50c1a7b2798bbe34a363953ed11f0ca240a02ac3147",
+    "pipeline-ledgers.jsonl": "df406c7a1386457520ef6028a5f37f0fcea54ee9a824bc76ae8a011d5e58fb58",
+    "pipeline.csv": "cfa27e72cff1390224000ec186b9350f139020c7e5b09c8194721c80d922e582",
+    "reference_weighted.cpp": "d60a45c173309caed35161598e08aada66c9035ad4c3f8a5919007bcbddd9f4c",
+    "timings.csv": "1adebebdc1c883a3df0d4d2c42e4ed512c8c67b7acfef67607bb4f4f8c485093"
+  },
+  "schema": "osd-v2-benchmark-seal-v1"
+}
