@@ -5,11 +5,11 @@ current_phase: 11
 current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
-stopped_at: PriorTilt7/13 complete;24/39 audited campaign points;15 ten-CPU continuations in61971019; use parallel_report.py
-last_updated: "2026-11-17T17:17:14.592351+00:00"
+stopped_at: PriorTilt source audit confirms internal syndrome stopping but observable-only Sinter score; ten-CPU campaign continues unchanged
+last_updated: "2026-11-17T17:37:32.164303+00:00"
 last_activity: 2026-11-17
-last_activity_desc: Quick261117-guy checks24 audited points, first parallel completion, and retained/speculative work accounting.
-state_head: 967f3b99
+last_activity_desc: Quick261117-h97 verifies author source success semantics with a native-and-Sinter counterexample; campaign unchanged.
+state_head: b5012500
 progress:
   total_phases: 14
   completed_phases: 8
@@ -34,6 +34,10 @@ Total Phases: 14
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
+Last activity: 2026-11-17 — quick261117-h97 audits author syndrome versus observable success
+Last Activity Description: Current public Rust/Python/adapter/simulation-helper blobs match pinned8eefd37d694b5942fe60ec6d5c82ce97f3d2a450. PriorTilt checks H ehat=s after each sweep for early stopping; on exhaustion returns last vector with convergefalse. Python always projects A ehat, and Sinter receives only predicted observable bits without convergence gating/discard, so released workflow scores observable mismatch alone. Actual unmodified author native+single+packed adapter proof passes on reachable two-sweep toy: s110, H ehat000, A ehat=A e=1, convergencefalse. Literal joint failure adds nonconverged/observable-correct events. Existing canonical BB144/.002 Z-memory has one such shot (20 observable errors versus21 joint failures on1,192,846 recorded shots); this is our data, not historical author statistics. Published author CSVs lack joint flags. Native binary matches frozen qualification; all assertions pass. Our reproduction already uses released observable-only scoring with joint counters retained. No campaign, metric, stop, frozen/source/kernel/model/public/v1/phase-gate/counter changes or simulation reruns; other collector outputs remain unstaged. Ten-CPU continuations remain active; use parallel_report.py for future refreshes.
+
+Previous result check:
 Last activity: 2026-11-17 — quick261117-guy checks ten-CPU PriorTilt progress
 Last Activity Description: Resource-aware report now24/39 full-audited points (112,123,660 decoded basis shots/960 errors):PriorTilt7/13,Relay8/13,Beam9/13. New GB102 Beam/p=.001 is6.145e-7 LER/cycle versus source5.8e-7, within local95% interval; all24 source ordinates remain inside pointwise intervals and all23 earlier rows unchanged. No new PriorTilt point complete; saved GB102 PriorTilt/.001 progress is15/16 X/Z errors at9,486,336 shots each; BB70/.0008 is11 X errors and Z stopped20.15 ten-CPU workers61971019 continue without reported errors; collector61971020 pending. First completed parallel point's142 sealed stages and1,642 inherited markers rehashed; computed1,163,264 shots=1,056,051 retained+107,213 speculative, additive work/cohort totals reconcile and extra outcomes excluded from LER. Parent/resource identities valid, source/count/CI/work checks pass, final figure inspected. Production code unchanged; no repeated software tests or simulations; other collectors' dirty outputs remain unstaged. Frozen/kernel/source/v1/model/public/phase gates/counters preserved; spike060 remains PARTIAL. Use parallel_report.py for future refreshes.
 
@@ -369,6 +373,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 | # | Description | Date | Commit | Status | Directory |
 |---|-------------|------|--------|--------|-----------|
+| 261117-h97 | Audit PriorTilt syndrome and observable scoring | 2026-11-17 | b5012500 | Verified public source and native/Sinter counterexample; campaign unchanged | [261117-h97](./quick/261117-h97-audit-priortilt-source-syndrome-consiste/) |
 | 261117-guy | Check ten-CPU progress and first parallel result | 2026-11-17 | 967f3b99 | Verified24/39; PriorTilt7/13;15 ten-CPU jobs continue | [261117-guy](./quick/261117-guy-check-priortilt-ten-cpu-progress-and-new/) |
 | 261117-fdl | Resume remaining Fig1 points on ten CPUs each | 2026-11-17 | c653c495 | Qualified;16 running ten-CPU continuations;23 completed points preserved | [261117-fdl](./quick/261117-fdl-resume-remaining-priortilt-fig1-points-w/) |
 | 261117-exr | Check new PriorTilt results and paper agreement | 2026-11-17 | 70d91402 | Verified23/39; PriorTilt7/13;16 one-CPU workers continue | [261117-exr](./quick/261117-exr-check-new-priortilt-fig1-results-and-sou/) |
