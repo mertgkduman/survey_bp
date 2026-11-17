@@ -5,11 +5,11 @@ current_phase: 11
 current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
-stopped_at: PriorTilt7/39 audited and pointwise consistent;32 one-CPU points continue; OSD-CS timing scope reconfirmed
-last_updated: "2026-11-17T00:48:49.069239+00:00"
+stopped_at: PriorTilt Fig1 has 14/39 audited points (4/13 PriorTilt); 25 single-CPU workers continue
+last_updated: "2026-11-17T02:09:38.985637+00:00"
 last_activity: 2026-11-16
-last_activity_desc: Quick261116-rf9 publishes seven audited PriorTilt pairs and reconfirms the same-CS10 native speedup evidence.
-state_head: 0e8ec024
+last_activity_desc: Quick 261116-ta4 verifies 14 audited PriorTilt campaign pairs and their pointwise paper agreement.
+state_head: 97d6423d
 progress:
   total_phases: 14
   completed_phases: 8
@@ -34,6 +34,10 @@ Total Phases: 14
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
+Last activity: 2026-11-16 — quick 261116-ta4 checks PriorTilt Fig1 progress
+Last Activity Description: Published 14/39 full-audited pairs (2,710,989 decoded basis shots/560 observable errors), including 4/13 PriorTilt and 5/13 each Relay/Beam points. All 14 source ordinates lie inside their local pointwise 95% intervals, ratios 0.771–1.253. PriorTilt has the lowest estimate at all four complete three-method strata; BB70/p=.002 is about 1.89x below Relay and 2.84x below Beam at paper settings. Lower-rate points remain unfinished; 25 one-CPU workers in61946754 continue and collector61946755 is pending. Independent source/count/CI/work and prior-point reconciliation passes; all 63 frozen files and seven previous point records are unchanged. Source/current uncertainty is explicit and figure inspected. No software changed or simulations rerun; raw/source/kernel/public/v1/model/phase-gate/counter evidence is preserved. Spike060 remains PARTIAL while production continues.
+
+Prior PriorTilt snapshot and OSD explanation:
 Last activity: 2026-11-16 — quick261116-rf9 checks PriorTilt Fig1 and OSD-CS speedup
 Last Activity Description: Published7/39 full-audited PriorTilt memory pairs (345,963 decoded basis shots/280 observable errors); all seven paper ordinates fall inside local pointwise95% intervals, ratios.958–1.253. At BB144/p=.005 PriorTilt/Relay/Beam estimates .005509/.009532/.010883 preserve the source ordering with overlapping intervals.32 single-CPU workers61946754 continue; collector61946755 pending. Frozen63-file identity and source/count/CI/work/receipt hashes independently reconcile;13 affected regressions pass and figure inspected. Warm standalone uniform-channel CS10 benchmark implementation hash still matches;2.32–3.53x versus pinned native -O3 -march=native comes from reused affine flip responses, packed XOR and popcount, excluding BP/JIT and broader speed claims. No simulation or native benchmark reruns; no old raw/frozen/source/kernel/public/v1/model/gate/counter changes. Spike060 remains PARTIAL pending full campaign.
 
@@ -349,6 +353,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 | # | Description | Date | Commit | Status | Directory |
 |---|-------------|------|--------|--------|-----------|
+| 261116-ta4 | Check PriorTilt Fig1 completed points and paper agreement | 2026-11-16 | 97d6423d | Verified 14/39 audited pairs; 25 one-CPU workers continue | [261116-ta4](./quick/261116-ta4-check-priortilt-completed-fig1-points-an/) |
 | 261116-rf9 | Check PriorTilt Fig1 and explain matched OSD-CS speedup | 2026-11-16 | 0e8ec024 | Verified7/39 audited pairs;32 one-CPU workers continue | [261116-rf9](./quick/261116-rf9-check-priortilt-fig1-results-and-explain/) |
 | 261116-ote | Check LP results and add paper figure views with grouped curve controls | 2026-11-16 | 781055fb | Verified; gamma 6/12 and original LP 70/72 audited, campaigns running | [261116-ote](./quick/261116-ote-check-lp1054-results-and-add-paper-figur/) |
 | 261116-nf0 | Tune RelayBP uniform80/disordered60 gamma with matched controls | 2026-11-16 | 177417b7 | 12 single-CPU workers tuning; fresh results pending | [261116-nf0](./quick/261116-nf0-tune-relaybp-uniform-gamma80-and-disorde/) |
