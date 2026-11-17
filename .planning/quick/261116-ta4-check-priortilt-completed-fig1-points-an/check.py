@@ -51,5 +51,6 @@ result={'snapshot_points':len(checks),'complete_pair_shots':shots,'complete_pair
         'frozen_plan_sha256':run.sha(STUDY/'plan.json'),'csv_sha256':run.sha(STUDY/'comparison.csv'),
         'progress_committed_shots':sum(s['shots'] for p in progress for s in p['bases'].values()),
         'progress_committed_errors':sum(s['errors'] for p in progress for s in p['bases'].values())}
-(Path(__file__).parent/'assessment.json').write_text(json.dumps(result,indent=2)+'\n')
+output=Path(sys.argv[1]) if len(sys.argv)>1 else Path(__file__).parent/'assessment.json'
+output.write_text(json.dumps(result,indent=2)+'\n')
 print(f"Checked {len(checks)}/39 audited pairs, {shots:,} shots/{errors} errors; {sum(c['paper_inside'] for c in checks)} paper values inside pointwise intervals; {len(previous)} previous points unchanged")

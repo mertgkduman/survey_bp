@@ -5,10 +5,10 @@ current_phase: 11
 current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
-stopped_at: PriorTilt Fig1 has 14/39 audited points (4/13 PriorTilt); 25 single-CPU workers continue
-last_updated: "2026-11-17T02:09:38.985637+00:00"
+stopped_at: PriorTilt Fig1 has 15/39 audited points (5/13 PriorTilt); 24 single-CPU workers continue
+last_updated: "2026-11-17T02:12:37.868796+00:00"
 last_activity: 2026-11-16
-last_activity_desc: Quick 261116-ta4 verifies 14 audited PriorTilt campaign pairs and their pointwise paper agreement.
+last_activity_desc: Quick 261116-ta4 verifies 15 audited PriorTilt campaign pairs, including a late p=.003 point, and their pointwise paper agreement.
 state_head: 97d6423d
 progress:
   total_phases: 14
@@ -35,7 +35,7 @@ Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
 Last activity: 2026-11-16 — quick 261116-ta4 checks PriorTilt Fig1 progress
-Last Activity Description: Published 14/39 full-audited pairs (2,710,989 decoded basis shots/560 observable errors), including 4/13 PriorTilt and 5/13 each Relay/Beam points. All 14 source ordinates lie inside their local pointwise 95% intervals, ratios 0.771–1.253. PriorTilt has the lowest estimate at all four complete three-method strata; BB70/p=.002 is about 1.89x below Relay and 2.84x below Beam at paper settings. Lower-rate points remain unfinished; 25 one-CPU workers in61946754 continue and collector61946755 is pending. Independent source/count/CI/work and prior-point reconciliation passes; all 63 frozen files and seven previous point records are unchanged. Source/current uncertainty is explicit and figure inspected. No software changed or simulations rerun; raw/source/kernel/public/v1/model/phase-gate/counter evidence is preserved. Spike060 remains PARTIAL while production continues.
+Last Activity Description: Published 15/39 full-audited pairs (2,838,888 decoded basis shots/600 observable errors), including 5/13 PriorTilt points and all three methods at five complete strata. All 15 source ordinates lie inside local pointwise 95% intervals, ratios 0.771–1.253. Late BB144 PriorTilt/p=.003 gives5.574e-5 versus source5.741e-5. PriorTilt has the lowest estimate at all five strata; BB70/p=.002 is about1.89x below Relay and2.84x below Beam at paper settings.24 single-CPU workers61946754 continue; collector61946755 pending. Independent source/count/CI/work reconciliation passes and all14 earlier point records/frozen63-file identities are unchanged. Both14-point and final15-point assessments are preserved; final figure inspected. No simulations, canonical/frozen/source/public/v1/model/phase gates/counters changed. Spike060 remains PARTIAL.
 
 Prior PriorTilt snapshot and OSD explanation:
 Last activity: 2026-11-16 — quick261116-rf9 checks PriorTilt Fig1 and OSD-CS speedup
@@ -353,7 +353,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 | # | Description | Date | Commit | Status | Directory |
 |---|-------------|------|--------|--------|-----------|
-| 261116-ta4 | Check PriorTilt Fig1 completed points and paper agreement | 2026-11-16 | 97d6423d | Verified 14/39 audited pairs; 25 one-CPU workers continue | [261116-ta4](./quick/261116-ta4-check-priortilt-completed-fig1-points-an/) |
+| 261116-ta4 | Check PriorTilt Fig1 completed points and paper agreement | 2026-11-16 | 97d6423d | Verified 15/39 audited pairs; 24 one-CPU workers continue | [261116-ta4](./quick/261116-ta4-check-priortilt-completed-fig1-points-an/) |
 | 261116-rf9 | Check PriorTilt Fig1 and explain matched OSD-CS speedup | 2026-11-16 | 0e8ec024 | Verified7/39 audited pairs;32 one-CPU workers continue | [261116-rf9](./quick/261116-rf9-check-priortilt-fig1-results-and-explain/) |
 | 261116-ote | Check LP results and add paper figure views with grouped curve controls | 2026-11-16 | 781055fb | Verified; gamma 6/12 and original LP 70/72 audited, campaigns running | [261116-ote](./quick/261116-ote-check-lp1054-results-and-add-paper-figur/) |
 | 261116-nf0 | Tune RelayBP uniform80/disordered60 gamma with matched controls | 2026-11-16 | 177417b7 | 12 single-CPU workers tuning; fresh results pending | [261116-nf0](./quick/261116-nf0-tune-relaybp-uniform-gamma80-and-disorde/) |

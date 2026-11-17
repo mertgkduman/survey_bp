@@ -1,6 +1,6 @@
 # PriorTilt Fig. 1 — canonical reproduction campaign
 
-14/39 complete plotted points passed the fresh-process full-ledger audit. Each point uses one CPU for X/Z memories sequentially.
+15/39 complete plotted points passed the fresh-process full-ledger audit. Each point uses one CPU for X/Z memories sequentially.
 
 Source: [Ye and Delfosse, arXiv:2611.13373v1](https://arxiv.org/html/2611.13373v1), Fig. 1; exact released circuits, rates and full-precision three-phase schedules. This is a canonical float64 adaptation; native prefix/suffix arithmetic and RNG are separate references.
 
@@ -10,6 +10,7 @@ The CSV retains both denominators, errors, nonconvergence, mean all-path BP swee
 
 | Code | p | Decoder | X errors / shots | Z errors / shots | Local LER/cycle (95%) | Paper LER/cycle | Local/paper | Paper inside local interval |
 |---|---:|---|---:|---:|---:|---:|---:|---|
+| BB144 | 0.003 | priortilt | 20/47671 | 20/80228 | 5.574e-05 [3.16e-05, 8.731e-05] | 5.741e-05 | 0.971 | True |
 | BB144 | 0.003 | relay | 20/24559 | 20/32816 | 0.0001187 [6.727e-05, 0.0001858] | 0.0001085 | 1.09 | True |
 | BB144 | 0.003 | beam | 20/21287 | 20/31527 | 0.0001312 [7.437e-05, 0.0002054] | 0.0001101 | 1.19 | True |
 | BB144 | 0.004 | priortilt | 20/4737 | 20/5752 | 0.0006416 [0.000364, 0.001004] | 0.0006761 | 0.949 | True |
