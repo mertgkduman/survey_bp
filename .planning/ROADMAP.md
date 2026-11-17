@@ -765,6 +765,20 @@ Plans:
 
 **Open-plan status:** 11-18 awaits the aSCED Figure 2 source review; 11-19 is the Q-BPGD Figure 7 review deferred by user direction. Both review plans may retain a blocked target if primary evidence remains unresolved. Plans 11-17 and 11-21 depend on those reviews and the completed 11-20 review. Plan 11-22 depends on measured resource qualification, 11-23 and 11-24 depend on its authorization outcome, and 11-25 depends on the resulting evidence. The completed 11-16 receipt contract and 11-20 mechanism-only review do not close QEV-01/QEV-02, authorize dispatch, or establish a statistical curve result.
 
+### Phase 11.1: Qualified weighted streaming OSD-CS (INSERTED)
+
+**Goal:** Qualify nonuniform, sparse, streaming canonical OSD-CS while preserving candidate enumeration, stable LLR ties and first-minimum selection, with independent equivalence and matched performance evidence.
+**Requirements:** OSDV2-01 weighted priors; OSDV2-02 sparse/storage/cache; OSDV2-03 streaming evidence/replay; OSDV2-04 work/timing/memory/ablations/end-to-end qualification.
+**Depends on:** Qualified canonical BP and spike056 OSD foundation (independent of open Phase 11 source gates).
+**Plans:** 3 plans
+**Execution scope:** User-requested `$gsd-autonomous` task only, equivalent to `--only 11.1`; unrelated milestones/gates remain open.
+
+Plans:
+
+- [ ] 11.1-01-PLAN.md — Weighted sparse OSD and independent correctness.
+- [ ] 11.1-02-PLAN.md — Bounded affine reuse and streaming evidence.
+- [ ] 11.1-03-PLAN.md — Matched performance and publication.
+
 ### Phase 12: Circuit Models and Canonical Integration
 
 **Goal:** A researcher can run eligible native and canonical decoders on noisy extraction circuits and evaluate detector and logical-observable behavior correctly.
