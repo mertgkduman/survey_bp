@@ -1,0 +1,63 @@
+{
+  "prior_commit": "8eefd37d694b5942fe60ec6d5c82ce97f3d2a450",
+  "relay_pinned_commit": "14cb31a18f9b9d7d099791b793e35b8a2951f8f3",
+  "relay_current_head_checked": "cdfdc996ce55582c4c431f8d8392bcce57175e36",
+  "relay_current_min_sum_git_blob": "4a0228574b34c4fb84c6969b8c8f2e77ca2c8e97",
+  "prior_direct_dependencies": {
+    "pyo3": {
+      "version": "0.28",
+      "features": [
+        "extension-module",
+        "abi3-py310"
+      ]
+    },
+    "numpy": "0.28",
+    "rand": "0.8.5"
+  },
+  "relay_package_dependency_present": false,
+  "prior_all_transitive_package_names": [
+    "autocfg",
+    "cfg-if",
+    "getrandom",
+    "heck",
+    "libc",
+    "matrixmultiply",
+    "ndarray",
+    "num-complex",
+    "num-integer",
+    "num-traits",
+    "numpy",
+    "once_cell",
+    "portable-atomic",
+    "portable-atomic-util",
+    "ppv-lite86",
+    "priortilt_rs",
+    "proc-macro2",
+    "pyo3",
+    "pyo3-build-config",
+    "pyo3-ffi",
+    "pyo3-macros",
+    "pyo3-macros-backend",
+    "quote",
+    "rand",
+    "rand_chacha",
+    "rand_core",
+    "rawpointer",
+    "rustc-hash",
+    "syn",
+    "target-lexicon",
+    "unicode-ident",
+    "wasi",
+    "zerocopy",
+    "zerocopy-derive"
+  ],
+  "prior_rust_retained_history": [
+    "4614d7a fixed sinter resume bugs and align the terminology with the paper",
+    "f7e209b Initial commit"
+  ],
+  "initial_source_layout_already_flat": true,
+  "initial_comment_refers_to_unspecified_cpp": true,
+  "observed": "separate compiled core with different graph representation and check-update implementation; both min-sum BP",
+  "not_established": "whether authors consulted/copied/ported/rewrote Relay or any other earlier source; public history starts with a complete implementation",
+  "scope": "static public-source inspection, not a forensic authorship proof or runtime comparison; current Relay has newer four-lane min-two optimization than pinned reference"
+}
