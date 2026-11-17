@@ -1,0 +1,1445 @@
+{
+  "gb102-p000800-priortilt": {
+    "bases": {
+      "x": {
+        "biased_node_updates": 12273165,
+        "decode_ns": 88417560975733,
+        "directed_edge_updates": 9290953231560,
+        "errors": 9,
+        "iterations": 142770810,
+        "joint_counts": [
+          17375223,
+          9,
+          0,
+          0
+        ],
+        "nonconvergence": 0,
+        "random_draws": 2200624,
+        "shots": 17375232
+      },
+      "z": {
+        "biased_node_updates": 12051014,
+        "decode_ns": 88219462387891,
+        "directed_edge_updates": 9288093076284,
+        "errors": 9,
+        "iterations": 142726859,
+        "joint_counts": [
+          17367031,
+          9,
+          0,
+          0
+        ],
+        "nonconvergence": 0,
+        "random_draws": 2161779,
+        "shots": 17367040
+      }
+    },
+    "job": "gb102-p000800-priortilt"
+  },
+  "gb102-p000800-relay": {
+    "bases": {
+      "x": {
+        "biased_node_updates": 727084377429,
+        "decode_ns": 89007539893168,
+        "directed_edge_updates": 7736181843060,
+        "errors": 12,
+        "iterations": 118879185,
+        "joint_counts": [
+          16523252,
+          12,
+          0,
+          0
+        ],
+        "nonconvergence": 0,
+        "random_draws": 24277632,
+        "shots": 16523264
+      },
+      "z": {
+        "biased_node_updates": 727990168404,
+        "decode_ns": 89027124859901,
+        "directed_edge_updates": 7744970096556,
+        "errors": 10,
+        "iterations": 119014231,
+        "joint_counts": [
+          16515062,
+          9,
+          0,
+          1
+        ],
+        "nonconvergence": 1,
+        "random_draws": 24604032,
+        "shots": 16515072
+      }
+    },
+    "job": "gb102-p000800-relay"
+  },
+  "bb70-p001000-beam": {
+    "bases": {
+      "x": {
+        "biased_node_updates": 0,
+        "decode_ns": 9120236055825,
+        "directed_edge_updates": 1274025883132,
+        "errors": 20,
+        "iterations": 40626710,
+        "joint_counts": [
+          6624108,
+          17,
+          0,
+          3
+        ],
+        "nonconvergence": 3,
+        "random_draws": 0,
+        "shots": 6624128
+      },
+      "z": {
+        "biased_node_updates": 0,
+        "decode_ns": 4273894832049,
+        "directed_edge_updates": 604895325726,
+        "errors": 20,
+        "iterations": 19289201,
+        "joint_counts": [
+          2982671,
+          18,
+          0,
+          2
+        ],
+        "nonconvergence": 2,
+        "random_draws": 0,
+        "shots": 2982691
+      }
+    },
+    "job": "bb70-p001000-beam"
+  },
+  "gb102-p000500-beam": {
+    "bases": {
+      "x": {
+        "biased_node_updates": 0,
+        "decode_ns": 85366792735877,
+        "directed_edge_updates": 8128844038360,
+        "errors": 2,
+        "iterations": 124913112,
+        "joint_counts": [
+          20299774,
+          2,
+          0,
+          0
+        ],
+        "nonconvergence": 0,
+        "random_draws": 0,
+        "shots": 20299776
+      },
+      "z": {
+        "biased_node_updates": 0,
+        "decode_ns": 85286450050616,
+        "directed_edge_updates": 8124414447728,
+        "errors": 1,
+        "iterations": 124845043,
+        "joint_counts": [
+          20299775,
+          1,
+          0,
+          0
+        ],
+        "nonconvergence": 0,
+        "random_draws": 0,
+        "shots": 20299776
+      }
+    },
+    "job": "gb102-p000500-beam"
+  },
+  "gb102-p001000-priortilt": {
+    "bases": {
+      "x": {
+        "biased_node_updates": 13712869,
+        "decode_ns": 47431107885544,
+        "directed_edge_updates": 6433605138972,
+        "errors": 20,
+        "iterations": 98862947,
+        "joint_counts": [
+          10442962,
+          18,
+          0,
+          2
+        ],
+        "nonconvergence": 2,
+        "random_draws": 2599586,
+        "shots": 10442982
+      },
+      "z": {
+        "biased_node_updates": 16847294,
+        "decode_ns": 65157031091961,
+        "directed_edge_updates": 7966100231760,
+        "errors": 20,
+        "iterations": 122412260,
+        "joint_counts": [
+          12928562,
+          19,
+          0,
+          1
+        ],
+        "nonconvergence": 1,
+        "random_draws": 3205558,
+        "shots": 12928582
+      }
+    },
+    "job": "gb102-p001000-priortilt"
+  },
+  "bb70-p000500-beam": {
+    "bases": {
+      "x": {
+        "biased_node_updates": 0,
+        "decode_ns": 43390442261898,
+        "directed_edge_updates": 6298509978210,
+        "errors": 10,
+        "iterations": 200846023,
+        "joint_counts": [
+          54321142,
+          9,
+          0,
+          1
+        ],
+        "nonconvergence": 1,
+        "random_draws": 0,
+        "shots": 54321152
+      },
+      "z": {
+        "biased_node_updates": 0,
+        "decode_ns": 39720437759675,
+        "directed_edge_updates": 5247289167702,
+        "errors": 20,
+        "iterations": 167324915,
+        "joint_counts": [
+          41011020,
+          17,
+          0,
+          3
+        ],
+        "nonconvergence": 3,
+        "random_draws": 0,
+        "shots": 41011040
+      }
+    },
+    "job": "bb70-p000500-beam"
+  },
+  "bb70-p000800-beam": {
+    "bases": {
+      "x": {
+        "biased_node_updates": 0,
+        "decode_ns": 21677879821650,
+        "directed_edge_updates": 2624290077306,
+        "errors": 20,
+        "iterations": 83683676,
+        "joint_counts": [
+          16307645,
+          19,
+          0,
+          1
+        ],
+        "nonconvergence": 1,
+        "random_draws": 0,
+        "shots": 16307665
+      },
+      "z": {
+        "biased_node_updates": 0,
+        "decode_ns": 13923865478825,
+        "directed_edge_updates": 1673932712868,
+        "errors": 20,
+        "iterations": 53378636,
+        "joint_counts": [
+          9612274,
+          16,
+          0,
+          4
+        ],
+        "nonconvergence": 4,
+        "random_draws": 0,
+        "shots": 9612294
+      }
+    },
+    "job": "bb70-p000800-beam"
+  },
+  "gb102-p000500-relay": {
+    "bases": {
+      "x": {
+        "biased_node_updates": 645696602480,
+        "decode_ns": 87041644301668,
+        "directed_edge_updates": 7644428782848,
+        "errors": 2,
+        "iterations": 117469248,
+        "joint_counts": [
+          21831678,
+          2,
+          0,
+          0
+        ],
+        "nonconvergence": 0,
+        "random_draws": 6208128,
+        "shots": 21831680
+      },
+      "z": {
+        "biased_node_updates": 646628650509,
+        "decode_ns": 86992027638887,
+        "directed_edge_updates": 7642139279016,
+        "errors": 1,
+        "iterations": 117434066,
+        "joint_counts": [
+          21823487,
+          1,
+          0,
+          0
+        ],
+        "nonconvergence": 0,
+        "random_draws": 7298304,
+        "shots": 21823488
+      }
+    },
+    "job": "gb102-p000500-relay"
+  },
+  "bb144-p001000-priortilt": {
+    "bases": {
+      "x": {
+        "biased_node_updates": 63653061,
+        "decode_ns": 86616078102189,
+        "directed_edge_updates": 12430149381216,
+        "errors": 3,
+        "iterations": 202630239,
+        "joint_counts": [
+          21372925,
+          2,
+          0,
+          1
+        ],
+        "nonconvergence": 1,
+        "random_draws": 16709618,
+        "shots": 21372928
+      },
+      "z": {
+        "biased_node_updates": 74301163,
+        "decode_ns": 95675611068773,
+        "directed_edge_updates": 13996105212672,
+        "errors": 2,
+        "iterations": 228157688,
+        "joint_counts": [
+          21356542,
+          2,
+          0,
+          0
+        ],
+        "nonconvergence": 0,
+        "random_draws": 19585520,
+        "shots": 21356544
+      }
+    },
+    "job": "bb144-p001000-priortilt"
+  },
+  "bb70-p002000-priortilt": {
+    "bases": {
+      "x": {
+        "biased_node_updates": 28119025,
+        "decode_ns": 1591181891188,
+        "directed_edge_updates": 231038245760,
+        "errors": 20,
+        "iterations": 7367291,
+        "joint_counts": [
+          398490,
+          17,
+          0,
+          3
+        ],
+        "nonconvergence": 3,
+        "random_draws": 5758931,
+        "shots": 398510
+      },
+      "z": {
+        "biased_node_updates": 25801614,
+        "decode_ns": 1467035847045,
+        "directed_edge_updates": 214444572160,
+        "errors": 20,
+        "iterations": 6838156,
+        "joint_counts": [
+          366683,
+          15,
+          0,
+          5
+        ],
+        "nonconvergence": 5,
+        "random_draws": 5291347,
+        "shots": 366703
+      }
+    },
+    "job": "bb70-p002000-priortilt"
+  },
+  "bb70-p000500-relay": {
+    "bases": {
+      "x": {
+        "biased_node_updates": 470032767475,
+        "decode_ns": 47369091276606,
+        "directed_edge_updates": 5798918280960,
+        "errors": 20,
+        "iterations": 184914486,
+        "joint_counts": [
+          62610950,
+          2,
+          0,
+          18
+        ],
+        "nonconvergence": 18,
+        "random_draws": 85824200,
+        "shots": 62610970
+      },
+      "z": {
+        "biased_node_updates": 560349892643,
+        "decode_ns": 52191801277077,
+        "directed_edge_updates": 6424594467200,
+        "errors": 20,
+        "iterations": 204865895,
+        "joint_counts": [
+          59078766,
+          3,
+          0,
+          17
+        ],
+        "nonconvergence": 17,
+        "random_draws": 162851150,
+        "shots": 59078786
+      }
+    },
+    "job": "bb70-p000500-relay"
+  },
+  "gb102-p002000-priortilt": {
+    "bases": {
+      "x": {
+        "biased_node_updates": 16161670,
+        "decode_ns": 1908039373816,
+        "directed_edge_updates": 270737830308,
+        "errors": 20,
+        "iterations": 4160333,
+        "joint_counts": [
+          199790,
+          20,
+          0,
+          0
+        ],
+        "nonconvergence": 0,
+        "random_draws": 3235818,
+        "shots": 199810
+      },
+      "z": {
+        "biased_node_updates": 22977455,
+        "decode_ns": 2645680711990,
+        "directed_edge_updates": 378148436424,
+        "errors": 20,
+        "iterations": 5810874,
+        "joint_counts": [
+          279592,
+          19,
+          0,
+          1
+        ],
+        "nonconvergence": 1,
+        "random_draws": 4586115,
+        "shots": 279612
+      }
+    },
+    "job": "gb102-p002000-priortilt"
+  },
+  "gb102-p002000-relay": {
+    "bases": {
+      "x": {
+        "biased_node_updates": 14827166648,
+        "decode_ns": 1201134235787,
+        "directed_edge_updates": 155560663896,
+        "errors": 20,
+        "iterations": 2390446,
+        "joint_counts": [
+          156678,
+          19,
+          0,
+          1
+        ],
+        "nonconvergence": 1,
+        "random_draws": 30746880,
+        "shots": 156698
+      },
+      "z": {
+        "biased_node_updates": 15053267669,
+        "decode_ns": 1220984080083,
+        "directed_edge_updates": 158177630160,
+        "errors": 20,
+        "iterations": 2430660,
+        "joint_counts": [
+          162338,
+          19,
+          0,
+          1
+        ],
+        "nonconvergence": 1,
+        "random_draws": 26516736,
+        "shots": 162358
+      }
+    },
+    "job": "gb102-p002000-relay"
+  },
+  "bb144-p002000-priortilt": {
+    "bases": {
+      "x": {
+        "biased_node_updates": 94434055,
+        "decode_ns": 12896568985933,
+        "directed_edge_updates": 1764095601888,
+        "errors": 20,
+        "iterations": 28757427,
+        "joint_counts": [
+          1256783,
+          19,
+          0,
+          1
+        ],
+        "nonconvergence": 1,
+        "random_draws": 27714609,
+        "shots": 1256803
+      },
+      "z": {
+        "biased_node_updates": 94596142,
+        "decode_ns": 12605212592252,
+        "directed_edge_updates": 1754584521408,
+        "errors": 20,
+        "iterations": 28602382,
+        "joint_counts": [
+          1192825,
+          16,
+          1,
+          4
+        ],
+        "nonconvergence": 5,
+        "random_draws": 27981461,
+        "shots": 1192846
+      }
+    },
+    "job": "bb144-p002000-priortilt"
+  },
+  "bb70-p001000-priortilt": {
+    "bases": {
+      "x": {
+        "biased_node_updates": 37248654,
+        "decode_ns": 20949339805785,
+        "directed_edge_updates": 2727307228800,
+        "errors": 20,
+        "iterations": 86967705,
+        "joint_counts": [
+          13566649,
+          14,
+          0,
+          6
+        ],
+        "nonconvergence": 6,
+        "random_draws": 7292484,
+        "shots": 13566669
+      },
+      "z": {
+        "biased_node_updates": 27329637,
+        "decode_ns": 15644292690406,
+        "directed_edge_updates": 2026309810560,
+        "errors": 20,
+        "iterations": 64614471,
+        "joint_counts": [
+          9577033,
+          14,
+          0,
+          6
+        ],
+        "nonconvergence": 6,
+        "random_draws": 5365957,
+        "shots": 9577053
+      }
+    },
+    "job": "bb70-p001000-priortilt"
+  },
+  "bb70-p002000-beam": {
+    "bases": {
+      "x": {
+        "biased_node_updates": 0,
+        "decode_ns": 379044237389,
+        "directed_edge_updates": 53865105512,
+        "errors": 20,
+        "iterations": 1718047,
+        "joint_counts": [
+          117915,
+          16,
+          0,
+          4
+        ],
+        "nonconvergence": 4,
+        "random_draws": 0,
+        "shots": 117935
+      },
+      "z": {
+        "biased_node_updates": 0,
+        "decode_ns": 497463212447,
+        "directed_edge_updates": 71251492552,
+        "errors": 20,
+        "iterations": 2272528,
+        "joint_counts": [
+          156869,
+          18,
+          0,
+          2
+        ],
+        "nonconvergence": 2,
+        "random_draws": 0,
+        "shots": 156889
+      }
+    },
+    "job": "bb70-p002000-beam"
+  },
+  "bb144-p003000-relay": {
+    "bases": {
+      "x": {
+        "biased_node_updates": 6313859256,
+        "decode_ns": 367883622992,
+        "directed_edge_updates": 45637359552,
+        "errors": 20,
+        "iterations": 743958,
+        "joint_counts": [
+          24539,
+          18,
+          0,
+          2
+        ],
+        "nonconvergence": 2,
+        "random_draws": 44517312,
+        "shots": 24559
+      },
+      "z": {
+        "biased_node_updates": 8534029016,
+        "decode_ns": 491076645351,
+        "directed_edge_updates": 61661087136,
+        "errors": 20,
+        "iterations": 1005169,
+        "joint_counts": [
+          32796,
+          17,
+          0,
+          3
+        ],
+        "nonconvergence": 3,
+        "random_draws": 59581872,
+        "shots": 32816
+      }
+    },
+    "job": "bb144-p003000-relay"
+  },
+  "bb144-p002000-relay": {
+    "bases": {
+      "x": {
+        "biased_node_updates": 72785602784,
+        "decode_ns": 4697492947549,
+        "directed_edge_updates": 553158600768,
+        "errors": 20,
+        "iterations": 9017322,
+        "joint_counts": [
+          719367,
+          17,
+          0,
+          3
+        ],
+        "nonconvergence": 3,
+        "random_draws": 125215920,
+        "shots": 719387
+      },
+      "z": {
+        "biased_node_updates": 50190451923,
+        "decode_ns": 3161088523993,
+        "directed_edge_updates": 380273971104,
+        "errors": 20,
+        "iterations": 6199041,
+        "joint_counts": [
+          477397,
+          14,
+          0,
+          6
+        ],
+        "nonconvergence": 6,
+        "random_draws": 85503456,
+        "shots": 477417
+      }
+    },
+    "job": "bb144-p002000-relay"
+  },
+  "bb70-p000500-priortilt": {
+    "bases": {
+      "x": {
+        "biased_node_updates": 16414068,
+        "decode_ns": 79240817434324,
+        "directed_edge_updates": 11679776572800,
+        "errors": 8,
+        "iterations": 372441855,
+        "joint_counts": [
+          99999992,
+          4,
+          0,
+          4
+        ],
+        "nonconvergence": 4,
+        "random_draws": 3205856,
+        "shots": 100000000
+      },
+      "z": {
+        "biased_node_updates": 17882500,
+        "decode_ns": 86505337043110,
+        "directed_edge_updates": 12867441018880,
+        "errors": 18,
+        "iterations": 410313808,
+        "joint_counts": [
+          99999982,
+          7,
+          0,
+          11
+        ],
+        "nonconvergence": 11,
+        "random_draws": 3490376,
+        "shots": 100000000
+      }
+    },
+    "job": "bb70-p000500-priortilt"
+  },
+  "gb102-p002000-beam": {
+    "bases": {
+      "x": {
+        "biased_node_updates": 0,
+        "decode_ns": 1134278674235,
+        "directed_edge_updates": 162912519916,
+        "errors": 20,
+        "iterations": 2503482,
+        "joint_counts": [
+          156678,
+          20,
+          0,
+          0
+        ],
+        "nonconvergence": 0,
+        "random_draws": 0,
+        "shots": 156698
+      },
+      "z": {
+        "biased_node_updates": 0,
+        "decode_ns": 1184934440362,
+        "directed_edge_updates": 170946570220,
+        "errors": 20,
+        "iterations": 2626974,
+        "joint_counts": [
+          162338,
+          20,
+          0,
+          0
+        ],
+        "nonconvergence": 0,
+        "random_draws": 0,
+        "shots": 162358
+      }
+    },
+    "job": "gb102-p002000-beam"
+  },
+  "bb70-p001000-relay": {
+    "bases": {
+      "x": {
+        "biased_node_updates": 64036934525,
+        "decode_ns": 6089728825761,
+        "directed_edge_updates": 661037157760,
+        "errors": 20,
+        "iterations": 21078991,
+        "joint_counts": [
+          4405096,
+          8,
+          1,
+          12
+        ],
+        "nonconvergence": 13,
+        "random_draws": 65353750,
+        "shots": 4405117
+      },
+      "z": {
+        "biased_node_updates": 83726518010,
+        "decode_ns": 7440185758705,
+        "directed_edge_updates": 829736051200,
+        "errors": 20,
+        "iterations": 26458420,
+        "joint_counts": [
+          4672263,
+          6,
+          0,
+          14
+        ],
+        "nonconvergence": 14,
+        "random_draws": 102236750,
+        "shots": 4672283
+      }
+    },
+    "job": "bb70-p001000-relay"
+  },
+  "bb70-p002000-relay": {
+    "bases": {
+      "x": {
+        "biased_node_updates": 7275042880,
+        "decode_ns": 510478369747,
+        "directed_edge_updates": 64735820800,
+        "errors": 20,
+        "iterations": 2064280,
+        "joint_counts": [
+          170855,
+          7,
+          0,
+          13
+        ],
+        "nonconvergence": 13,
+        "random_draws": 44810150,
+        "shots": 170875
+      },
+      "z": {
+        "biased_node_updates": 11149314692,
+        "decode_ns": 772961656573,
+        "directed_edge_updates": 98761420800,
+        "errors": 20,
+        "iterations": 3149280,
+        "joint_counts": [
+          248081,
+          9,
+          0,
+          11
+        ],
+        "nonconvergence": 11,
+        "random_draws": 66943800,
+        "shots": 248101
+      }
+    },
+    "job": "bb70-p002000-relay"
+  },
+  "bb144-p001000-beam": {
+    "bases": {
+      "x": {
+        "biased_node_updates": 0,
+        "decode_ns": 85126236088042,
+        "directed_edge_updates": 11632847472772,
+        "errors": 7,
+        "iterations": 189633715,
+        "joint_counts": [
+          20512761,
+          4,
+          0,
+          3
+        ],
+        "nonconvergence": 3,
+        "random_draws": 0,
+        "shots": 20512768
+      },
+      "z": {
+        "biased_node_updates": 0,
+        "decode_ns": 93434026780968,
+        "directed_edge_updates": 13080645231932,
+        "errors": 3,
+        "iterations": 213235047,
+        "joint_counts": [
+          20496380,
+          3,
+          1,
+          0
+        ],
+        "nonconvergence": 1,
+        "random_draws": 0,
+        "shots": 20496384
+      }
+    },
+    "job": "bb144-p001000-beam"
+  },
+  "bb144-p004000-priortilt": {
+    "bases": {
+      "x": {
+        "biased_node_updates": 45837561,
+        "decode_ns": 905418753021,
+        "directed_edge_updates": 104532016320,
+        "errors": 20,
+        "iterations": 1704030,
+        "joint_counts": [
+          4717,
+          17,
+          0,
+          3
+        ],
+        "nonconvergence": 3,
+        "random_draws": 12989306,
+        "shots": 4737
+      },
+      "z": {
+        "biased_node_updates": 55887859,
+        "decode_ns": 1063979637353,
+        "directed_edge_updates": 125309842560,
+        "errors": 20,
+        "iterations": 2042740,
+        "joint_counts": [
+          5732,
+          16,
+          0,
+          4
+        ],
+        "nonconvergence": 4,
+        "random_draws": 15460307,
+        "shots": 5752
+      }
+    },
+    "job": "bb144-p004000-priortilt"
+  },
+  "bb70-p000800-relay": {
+    "bases": {
+      "x": {
+        "biased_node_updates": 154452708881,
+        "decode_ns": 15458041096903,
+        "directed_edge_updates": 1675573173120,
+        "errors": 20,
+        "iterations": 53430267,
+        "joint_counts": [
+          13234116,
+          2,
+          0,
+          18
+        ],
+        "nonconvergence": 18,
+        "random_draws": 88361350,
+        "shots": 13234136
+      },
+      "z": {
+        "biased_node_updates": 125290485367,
+        "decode_ns": 11546943743060,
+        "directed_edge_updates": 1291196287360,
+        "errors": 20,
+        "iterations": 41173351,
+        "joint_counts": [
+          8569822,
+          2,
+          0,
+          18
+        ],
+        "nonconvergence": 18,
+        "random_draws": 102313750,
+        "shots": 8569842
+      }
+    },
+    "job": "bb70-p000800-relay"
+  },
+  "bb144-p001000-relay": {
+    "bases": {
+      "x": {
+        "biased_node_updates": 865097144803,
+        "decode_ns": 86309242464257,
+        "directed_edge_updates": 7171622080416,
+        "errors": 11,
+        "iterations": 116908289,
+        "joint_counts": [
+          18276341,
+          7,
+          0,
+          4
+        ],
+        "nonconvergence": 4,
+        "random_draws": 114227136,
+        "shots": 18276352
+      },
+      "z": {
+        "biased_node_updates": 946781735877,
+        "decode_ns": 91326275709763,
+        "directed_edge_updates": 7740470942784,
+        "errors": 10,
+        "iterations": 126181386,
+        "joint_counts": [
+          18251765,
+          6,
+          1,
+          4
+        ],
+        "nonconvergence": 5,
+        "random_draws": 119295504,
+        "shots": 18251776
+      }
+    },
+    "job": "bb144-p001000-relay"
+  },
+  "gb102-p000500-priortilt": {
+    "bases": {
+      "x": {
+        "biased_node_updates": 5917535,
+        "decode_ns": 88142759331910,
+        "directed_edge_updates": 14664144560076,
+        "errors": 3,
+        "iterations": 225338751,
+        "joint_counts": [
+          36577277,
+          3,
+          0,
+          0
+        ],
+        "nonconvergence": 0,
+        "random_draws": 1050106,
+        "shots": 36577280
+      },
+      "z": {
+        "biased_node_updates": 5842806,
+        "decode_ns": 88139845748449,
+        "directed_edge_updates": 14657154096156,
+        "errors": 2,
+        "iterations": 225231331,
+        "joint_counts": [
+          36569086,
+          2,
+          0,
+          0
+        ],
+        "nonconvergence": 0,
+        "random_draws": 1038032,
+        "shots": 36569088
+      }
+    },
+    "job": "gb102-p000500-priortilt"
+  },
+  "gb102-p001000-relay": {
+    "bases": {
+      "x": {
+        "biased_node_updates": 404099341356,
+        "decode_ns": 34188075696916,
+        "directed_edge_updates": 4531543507260,
+        "errors": 20,
+        "iterations": 69634635,
+        "joint_counts": [
+          8178758,
+          18,
+          0,
+          2
+        ],
+        "nonconvergence": 2,
+        "random_draws": 30420480,
+        "shots": 8178778
+      },
+      "z": {
+        "biased_node_updates": 647198937930,
+        "decode_ns": 75692800088071,
+        "directed_edge_updates": 7257801138852,
+        "errors": 20,
+        "iterations": 111528077,
+        "joint_counts": [
+          13101453,
+          18,
+          0,
+          2
+        ],
+        "nonconvergence": 2,
+        "random_draws": 53177088,
+        "shots": 13101473
+      }
+    },
+    "job": "gb102-p001000-relay"
+  },
+  "bb144-p003000-beam": {
+    "bases": {
+      "x": {
+        "biased_node_updates": 0,
+        "decode_ns": 616093736241,
+        "directed_edge_updates": 79024386536,
+        "errors": 20,
+        "iterations": 1288521,
+        "joint_counts": [
+          21267,
+          13,
+          0,
+          7
+        ],
+        "nonconvergence": 7,
+        "random_draws": 0,
+        "shots": 21287
+      },
+      "z": {
+        "biased_node_updates": 0,
+        "decode_ns": 880331469130,
+        "directed_edge_updates": 115223445620,
+        "errors": 20,
+        "iterations": 1878731,
+        "joint_counts": [
+          31506,
+          10,
+          1,
+          10
+        ],
+        "nonconvergence": 11,
+        "random_draws": 0,
+        "shots": 31527
+      }
+    },
+    "job": "bb144-p003000-beam"
+  },
+  "bb70-p000800-priortilt": {
+    "bases": {
+      "x": {
+        "biased_node_updates": 63392802,
+        "decode_ns": 52236561904524,
+        "directed_edge_updates": 8337155787520,
+        "errors": 20,
+        "iterations": 265853182,
+        "joint_counts": [
+          50216078,
+          15,
+          0,
+          5
+        ],
+        "nonconvergence": 5,
+        "random_draws": 11921384,
+        "shots": 50216098
+      },
+      "z": {
+        "biased_node_updates": 23873770,
+        "decode_ns": 23988126741055,
+        "directed_edge_updates": 3180873713920,
+        "errors": 20,
+        "iterations": 101430922,
+        "joint_counts": [
+          17759287,
+          9,
+          0,
+          11
+        ],
+        "nonconvergence": 11,
+        "random_draws": 4563267,
+        "shots": 17759307
+      }
+    },
+    "job": "bb70-p000800-priortilt"
+  },
+  "bb144-p003000-priortilt": {
+    "bases": {
+      "x": {
+        "biased_node_updates": 71408412,
+        "decode_ns": 2159843454992,
+        "directed_edge_updates": 262824012576,
+        "errors": 20,
+        "iterations": 4284429,
+        "joint_counts": [
+          47651,
+          16,
+          0,
+          4
+        ],
+        "nonconvergence": 4,
+        "random_draws": 19294912,
+        "shots": 47671
+      },
+      "z": {
+        "biased_node_updates": 124341052,
+        "decode_ns": 3805275152380,
+        "directed_edge_updates": 458950656960,
+        "errors": 20,
+        "iterations": 7481590,
+        "joint_counts": [
+          80208,
+          18,
+          0,
+          2
+        ],
+        "nonconvergence": 2,
+        "random_draws": 33828453,
+        "shots": 80228
+      }
+    },
+    "job": "bb144-p003000-priortilt"
+  },
+  "bb144-p005000-relay": {
+    "bases": {
+      "x": {
+        "biased_node_updates": 2473303727,
+        "decode_ns": 136251899709,
+        "directed_edge_updates": 17292689568,
+        "errors": 20,
+        "iterations": 281897,
+        "joint_counts": [
+          295,
+          13,
+          0,
+          7
+        ],
+        "nonconvergence": 7,
+        "random_draws": 39405024,
+        "shots": 315
+      },
+      "z": {
+        "biased_node_updates": 2927238535,
+        "decode_ns": 159465101970,
+        "directed_edge_updates": 20467793664,
+        "errors": 20,
+        "iterations": 333656,
+        "joint_counts": [
+          373,
+          11,
+          0,
+          9
+        ],
+        "nonconvergence": 9,
+        "random_draws": 46643040,
+        "shots": 393
+      }
+    },
+    "job": "bb144-p005000-relay"
+  },
+  "bb144-p004000-relay": {
+    "bases": {
+      "x": {
+        "biased_node_updates": 4362840799,
+        "decode_ns": 245597284938,
+        "directed_edge_updates": 30668319360,
+        "errors": 20,
+        "iterations": 499940,
+        "joint_counts": [
+          3135,
+          15,
+          0,
+          5
+        ],
+        "nonconvergence": 5,
+        "random_draws": 60574464,
+        "shots": 3155
+      },
+      "z": {
+        "biased_node_updates": 3498837148,
+        "decode_ns": 195154790156,
+        "directed_edge_updates": 24608513664,
+        "errors": 20,
+        "iterations": 401156,
+        "joint_counts": [
+          2726,
+          17,
+          0,
+          3
+        ],
+        "nonconvergence": 3,
+        "random_draws": 47495088,
+        "shots": 2746
+      }
+    },
+    "job": "bb144-p004000-relay"
+  },
+  "gb102-p000800-beam": {
+    "bases": {
+      "x": {
+        "biased_node_updates": 0,
+        "decode_ns": 86860502986833,
+        "directed_edge_updates": 8859554773816,
+        "errors": 14,
+        "iterations": 136141741,
+        "joint_counts": [
+          16646130,
+          14,
+          0,
+          0
+        ],
+        "nonconvergence": 0,
+        "random_draws": 0,
+        "shots": 16646144
+      },
+      "z": {
+        "biased_node_updates": 0,
+        "decode_ns": 86774258111180,
+        "directed_edge_updates": 8855641914344,
+        "errors": 12,
+        "iterations": 136081606,
+        "joint_counts": [
+          16637940,
+          12,
+          0,
+          0
+        ],
+        "nonconvergence": 0,
+        "random_draws": 0,
+        "shots": 16637952
+      }
+    },
+    "job": "gb102-p000800-beam"
+  },
+  "gb102-p001000-beam": {
+    "bases": {
+      "x": {
+        "biased_node_updates": 0,
+        "decode_ns": 35012584896646,
+        "directed_edge_updates": 4676739054268,
+        "errors": 20,
+        "iterations": 71865877,
+        "joint_counts": [
+          7643031,
+          20,
+          0,
+          0
+        ],
+        "nonconvergence": 0,
+        "random_draws": 0,
+        "shots": 7643051
+      },
+      "z": {
+        "biased_node_updates": 0,
+        "decode_ns": 27817258819581,
+        "directed_edge_updates": 4200129483996,
+        "errors": 20,
+        "iterations": 64541980,
+        "joint_counts": [
+          6864244,
+          20,
+          0,
+          0
+        ],
+        "nonconvergence": 0,
+        "random_draws": 0,
+        "shots": 6864264
+      }
+    },
+    "job": "gb102-p001000-beam"
+  },
+  "bb144-p002000-beam": {
+    "bases": {
+      "x": {
+        "biased_node_updates": 0,
+        "decode_ns": 6646979576564,
+        "directed_edge_updates": 869681415148,
+        "errors": 20,
+        "iterations": 14177677,
+        "joint_counts": [
+          690328,
+          11,
+          0,
+          9
+        ],
+        "nonconvergence": 9,
+        "random_draws": 0,
+        "shots": 690348
+      },
+      "z": {
+        "biased_node_updates": 0,
+        "decode_ns": 8537197924557,
+        "directed_edge_updates": 1161145154922,
+        "errors": 20,
+        "iterations": 18929062,
+        "joint_counts": [
+          888758,
+          18,
+          0,
+          2
+        ],
+        "nonconvergence": 2,
+        "random_draws": 0,
+        "shots": 888778
+      }
+    },
+    "job": "bb144-p002000-beam"
+  },
+  "bb144-p005000-beam": {
+    "bases": {
+      "x": {
+        "biased_node_updates": 0,
+        "decode_ns": 206803689617,
+        "directed_edge_updates": 27342270342,
+        "errors": 20,
+        "iterations": 446014,
+        "joint_counts": [
+          260,
+          2,
+          0,
+          18
+        ],
+        "nonconvergence": 18,
+        "random_draws": 0,
+        "shots": 280
+      },
+      "z": {
+        "biased_node_updates": 0,
+        "decode_ns": 200566170358,
+        "directed_edge_updates": 26696673922,
+        "errors": 20,
+        "iterations": 435476,
+        "joint_counts": [
+          318,
+          2,
+          0,
+          18
+        ],
+        "nonconvergence": 18,
+        "random_draws": 0,
+        "shots": 338
+      }
+    },
+    "job": "bb144-p005000-beam"
+  },
+  "bb144-p005000-priortilt": {
+    "bases": {
+      "x": {
+        "biased_node_updates": 23590322,
+        "decode_ns": 394777557514,
+        "directed_edge_updates": 43740971136,
+        "errors": 20,
+        "iterations": 713044,
+        "joint_counts": [
+          630,
+          13,
+          0,
+          7
+        ],
+        "nonconvergence": 7,
+        "random_draws": 7063644,
+        "shots": 650
+      },
+      "z": {
+        "biased_node_updates": 18252783,
+        "decode_ns": 283421614002,
+        "directed_edge_updates": 32680095840,
+        "errors": 20,
+        "iterations": 532735,
+        "joint_counts": [
+          546,
+          14,
+          0,
+          6
+        ],
+        "nonconvergence": 6,
+        "random_draws": 5260448,
+        "shots": 566
+      }
+    },
+    "job": "bb144-p005000-priortilt"
+  },
+  "bb144-p004000-beam": {
+    "bases": {
+      "x": {
+        "biased_node_updates": 0,
+        "decode_ns": 392946255617,
+        "directed_edge_updates": 51368258906,
+        "errors": 20,
+        "iterations": 837787,
+        "joint_counts": [
+          2937,
+          5,
+          0,
+          15
+        ],
+        "nonconvergence": 15,
+        "random_draws": 0,
+        "shots": 2957
+      },
+      "z": {
+        "biased_node_updates": 0,
+        "decode_ns": 355381447928,
+        "directed_edge_updates": 47982801350,
+        "errors": 20,
+        "iterations": 782598,
+        "joint_counts": [
+          2344,
+          5,
+          0,
+          15
+        ],
+        "nonconvergence": 15,
+        "random_draws": 0,
+        "shots": 2364
+      }
+    },
+    "job": "bb144-p004000-beam"
+  }
+}

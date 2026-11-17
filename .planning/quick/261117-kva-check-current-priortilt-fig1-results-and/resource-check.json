@@ -1,0 +1,187 @@
+{
+  "checks": [
+    {
+      "computed": {
+        "biased_node_updates": 570448092749,
+        "decode_ns": 48059162616562,
+        "directed_edge_updates": 6774225288320,
+        "errors": 17,
+        "iterations": 216014837,
+        "nonconvergence": 15,
+        "random_draws": 131951050,
+        "shots": 67592192
+      },
+      "inherited_markers_unchanged": 6617,
+      "point": "bb70-p000500-relay",
+      "retained": {
+        "biased_node_updates": 569523347398,
+        "decode_ns": 47998502203116,
+        "directed_edge_updates": 6763264905600,
+        "errors": 17,
+        "iterations": 215665335,
+        "nonconvergence": 15,
+        "random_draws": 131535250,
+        "shots": 67483292
+      },
+      "speculative": {
+        "biased_node_updates": 924745351,
+        "decode_ns": 60660413446,
+        "directed_edge_updates": 10960382720,
+        "errors": 0,
+        "iterations": 349502,
+        "nonconvergence": 0,
+        "random_draws": 415800,
+        "shots": 108900
+      },
+      "stages": 8251,
+      "work_sha256": "e12c6c258aae2184aa6b7f4613d9d13407f31c4b75a25db2a8e60018c8248d42"
+    },
+    {
+      "computed": {
+        "biased_node_updates": 34282062,
+        "decode_ns": 22483036380755,
+        "directed_edge_updates": 4488975989120,
+        "errors": 13,
+        "iterations": 143143367,
+        "nonconvergence": 2,
+        "random_draws": 6429773,
+        "shots": 27033600
+      },
+      "inherited_markers_unchanged": 5007,
+      "point": "bb70-p000800-priortilt",
+      "retained": {
+        "biased_node_updates": 34170562,
+        "decode_ns": 22433576414233,
+        "directed_edge_updates": 4476527166720,
+        "errors": 13,
+        "iterations": 142746402,
+        "nonconvergence": 2,
+        "random_draws": 6409174,
+        "shots": 26959010
+      },
+      "speculative": {
+        "biased_node_updates": 111500,
+        "decode_ns": 49459966522,
+        "directed_edge_updates": 12448822400,
+        "errors": 0,
+        "iterations": 396965,
+        "nonconvergence": 0,
+        "random_draws": 20599,
+        "shots": 74590
+      },
+      "stages": 3300,
+      "work_sha256": "5e878c9fca3fc574287b79c18524b6a585e8c9fe16cbcec34ec72a8641249b66"
+    },
+    {
+      "computed": {
+        "biased_node_updates": 0,
+        "decode_ns": 10456589812084,
+        "directed_edge_updates": 712537973356,
+        "errors": 5,
+        "iterations": 10949331,
+        "nonconvergence": 0,
+        "random_draws": 0,
+        "shots": 1163264
+      },
+      "inherited_markers_unchanged": 1642,
+      "point": "gb102-p001000-beam",
+      "retained": {
+        "biased_node_updates": 0,
+        "decode_ns": 9550218612391,
+        "directed_edge_updates": 646681568396,
+        "errors": 5,
+        "iterations": 9937338,
+        "nonconvergence": 0,
+        "random_draws": 0,
+        "shots": 1056051
+      },
+      "speculative": {
+        "biased_node_updates": 0,
+        "decode_ns": 906371199693,
+        "directed_edge_updates": 65856404960,
+        "errors": 0,
+        "iterations": 1011993,
+        "nonconvergence": 0,
+        "random_draws": 0,
+        "shots": 107213
+      },
+      "stages": 142,
+      "work_sha256": "f0d861fb3cc21d5c21bcef8b00f88a5ee51120364560549d0ab16feb0b28485c"
+    },
+    {
+      "computed": {
+        "biased_node_updates": 10566049,
+        "decode_ns": 58924588690945,
+        "directed_edge_updates": 4967175136308,
+        "errors": 14,
+        "iterations": 76328833,
+        "nonconvergence": 2,
+        "random_draws": 2008578,
+        "shots": 8060928
+      },
+      "inherited_markers_unchanged": 1884,
+      "point": "gb102-p001000-priortilt",
+      "retained": {
+        "biased_node_updates": 10393081,
+        "decode_ns": 58082086055514,
+        "directed_edge_updates": 4891289427024,
+        "errors": 14,
+        "iterations": 75162724,
+        "nonconvergence": 2,
+        "random_draws": 1976269,
+        "shots": 7937836
+      },
+      "speculative": {
+        "biased_node_updates": 172968,
+        "decode_ns": 842502635431,
+        "directed_edge_updates": 75885709284,
+        "errors": 0,
+        "iterations": 1166109,
+        "nonconvergence": 0,
+        "random_draws": 32309,
+        "shots": 123092
+      },
+      "stages": 984,
+      "work_sha256": "9f1546a2e2b236dff81c74351082414622ca167b7748c5a1de7bf3184ef22ac9"
+    },
+    {
+      "computed": {
+        "biased_node_updates": 328237865593,
+        "decode_ns": 56584335627819,
+        "directed_edge_updates": 3680860404012,
+        "errors": 13,
+        "iterations": 56562487,
+        "nonconvergence": 2,
+        "random_draws": 27659136,
+        "shots": 6643712
+      },
+      "inherited_markers_unchanged": 1801,
+      "point": "gb102-p001000-relay",
+      "retained": {
+        "biased_node_updates": 322439723455,
+        "decode_ns": 55640944746241,
+        "directed_edge_updates": 3615846291288,
+        "errors": 13,
+        "iterations": 55563438,
+        "nonconvergence": 2,
+        "random_draws": 27156480,
+        "shots": 6526459
+      },
+      "speculative": {
+        "biased_node_updates": 5798142138,
+        "decode_ns": 943390881578,
+        "directed_edge_updates": 65014112724,
+        "errors": 0,
+        "iterations": 999049,
+        "nonconvergence": 0,
+        "random_draws": 502656,
+        "shots": 117253
+      },
+      "stages": 811,
+      "work_sha256": "4efb9e5b6b5db87b373cb102932c6d2ecbb4d0c1ef7187267670be3c099ec9d5"
+    }
+  ],
+  "parent_plan_sha256": "3e466081790d913ae2fb0a477f654bd0218504a79e7d969b989b62043b7e829c",
+  "resource_amendment_sha256": "da570e399be73f21d768d015c124b02fb5ee82796bda498effa284e8ddeb6a22",
+  "scope": "worker final full candidate/work/replay audits retained; rehash sealed stages, inherited markers and recompute cohort/work separation; no simulations rerun"
+}

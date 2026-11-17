@@ -1,0 +1,12 @@
+{
+  "old_complete_csv_rows_preserved": 24,
+  "audited_parallel_accounting_rows": 5,
+  "methods": {
+    "priortilt": 9,
+    "relay": 10,
+    "beam": 9
+  },
+  "completed_awaiting_audit": [
+    "bb70-p000500-priortilt"
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "scope": "independent receipt/count/source/CI check while full publisher/resource rehash continues",
+  "checks": [
+    {
+      "point": "bb70-p000500-relay",
+      "code": "BB70",
+      "p": 0.0005,
+      "method": "relay",
+      "ler": 7.310709245362259e-08,
+      "ci95": [
+        4.144547699721237e-08,
+        1.1453100626742952e-07
+      ],
+      "paper": 8.986883756324493e-08,
+      "paper_inside": true,
+      "audit_sha256": "76ab3e6483bb62dbb568c00e87bbce46fa04e0e9c56e41b2adee2fe765c6ca89"
+    },
+    {
+      "point": "bb70-p000800-priortilt",
+      "code": "BB70",
+      "p": 0.0008,
+      "method": "priortilt",
+      "ler": 1.693831916853704e-07,
+      "ci95": [
+        9.602581302253921e-08,
+        2.653589917963245e-07
+      ],
+      "paper": 1.5657799418802937e-07,
+      "paper_inside": true,
+      "audit_sha256": "7aa87a6a2c9c00c63945370f2a8edb2742a6c106be80c5ace6f34766005a1c91"
+    },
+    {
+      "point": "gb102-p001000-priortilt",
+      "code": "GB102",
+      "p": 0.001,
+      "method": "priortilt",
+      "ler": 3.8468020460754335e-07,
+      "ci95": [
+        2.1808087802283554e-07,
+        6.026473392252441e-07
+      ],
+      "paper": 3.6369821759844206e-07,
+      "paper_inside": true,
+      "audit_sha256": "5fa63b8f3158c94ac26cebd4d8befba28b96ff59da73105f957664060fa39dcf"
+    },
+    {
+      "point": "gb102-p001000-relay",
+      "code": "GB102",
+      "p": 0.001,
+      "method": "relay",
+      "ler": 4.4132211017154674e-07,
+      "ci95": [
+        2.501920255353281e-07,
+        6.913835668937791e-07
+      ],
+      "paper": 4.86348004894521e-07,
+      "paper_inside": true,
+      "audit_sha256": "a970de98ca66ab48b95846d6ac9b4de06adcf77001d74ec96504f7d08b836551"
+    }
+  ]
+}

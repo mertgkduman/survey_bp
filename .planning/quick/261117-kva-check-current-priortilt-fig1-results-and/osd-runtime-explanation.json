@@ -1,0 +1,87 @@
+{
+  "benchmark_sha256": "b5f2aa3cbb8391d4b2917fc1e1ff5dd356be1be13b032b5ad7c56fd3aead7ed2",
+  "cases": [
+    {
+      "group": "toric9_uniform",
+      "n": 162,
+      "depth": 0,
+      "old_ns": 99529.33333333333,
+      "new_ns": 302911.3333333333,
+      "new_over_old_medians": 3.0434377804868245,
+      "provenance_ns_last_fixture_median": 164375
+    },
+    {
+      "group": "toric9_uniform",
+      "n": 162,
+      "depth": 10,
+      "old_ns": 171557.66666666666,
+      "new_ns": 378423.6666666667,
+      "new_over_old_medians": 2.2058102911946036,
+      "provenance_ns_last_fixture_median": 185971
+    },
+    {
+      "group": "toric9_uniform",
+      "n": 162,
+      "depth": 60,
+      "old_ns": 428851.3333333333,
+      "new_ns": 808861.0,
+      "new_over_old_medians": 1.8861104936131714,
+      "provenance_ns_last_fixture_median": 430864
+    },
+    {
+      "group": "toric15_uniform",
+      "n": 450,
+      "depth": 0,
+      "old_ns": 163173.33333333334,
+      "new_ns": 401206.0,
+      "new_over_old_medians": 2.458771858146756,
+      "provenance_ns_last_fixture_median": 191903
+    },
+    {
+      "group": "toric15_uniform",
+      "n": 450,
+      "depth": 10,
+      "old_ns": 498104.3333333333,
+      "new_ns": 734111.3333333334,
+      "new_over_old_medians": 1.4738103730610657,
+      "provenance_ns_last_fixture_median": 278541
+    },
+    {
+      "group": "toric15_uniform",
+      "n": 450,
+      "depth": 60,
+      "old_ns": 1063853.0,
+      "new_ns": 1399088.3333333333,
+      "new_over_old_medians": 1.3151143375384882,
+      "provenance_ns_last_fixture_median": 742502
+    },
+    {
+      "group": "lp1054_uniform",
+      "n": 1054,
+      "depth": 0,
+      "old_ns": 554668.6666666666,
+      "new_ns": 956724.0,
+      "new_over_old_medians": 1.7248567613337933,
+      "provenance_ns_last_fixture_median": 256105
+    },
+    {
+      "group": "lp1054_uniform",
+      "n": 1054,
+      "depth": 10,
+      "old_ns": 2484596.6666666665,
+      "new_ns": 2143018.3333333335,
+      "new_over_old_medians": 0.8625216165199182,
+      "provenance_ns_last_fixture_median": 607803
+    },
+    {
+      "group": "lp1054_uniform",
+      "n": 1054,
+      "depth": 60,
+      "old_ns": 3521469.0,
+      "new_ns": 3211778.3333333335,
+      "new_over_old_medians": 0.9120563984329646,
+      "provenance_ns_last_fixture_median": 1482728
+    }
+  ],
+  "scope": "Uniform before/after exact candidate/winner/digest equivalence; speed regression, not LER change. Distinct rich-evidence contracts. Timings from sealed single-CPU matched benchmark."
+}
