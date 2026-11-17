@@ -5,11 +5,11 @@ current_phase: 11
 current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
-stopped_at: PriorTilt Fig1 has23/39 audited points, including7/13 PriorTilt;16 single-CPU workers continue
-last_updated: "2026-11-17T15:52:20.554136+00:00"
+stopped_at: Remaining16 PriorTilt Fig1 points resumed on10 CPUs each in61971019; collector61971020; use parallel_report.py
+last_updated: "2026-11-17T16:26:57.727163+00:00"
 last_activity: 2026-11-17
-last_activity_desc: Quick261117-exr verifies23 audited points including new PriorTilt BB144/.002 and BB70/.001 results.
-state_head: 70d91402
+last_activity_desc: Quick261117-fdl implements and deploys user-requested ten-CPU continuation for each remaining Fig1 point.
+state_head: c653c495
 progress:
   total_phases: 14
   completed_phases: 8
@@ -34,6 +34,10 @@ Total Phases: 14
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
+Last activity: 2026-11-17 — quick261117-fdl moves remaining Fig1 points to ten CPUs each
+Last Activity Description: User explicitly superseded one-CPU allocation. Array61971019 resumes all16 unfinished points on10 CPUs/24GiB each (160 point CPUs); all16 observed RUNNING with AllocCPUS10 and real resumed points sealing batches from ten distinct worker PIDs. New collector61971020 pending; only after replacement submission,16 old active tasks61946754 and collector61946755 intentionally cancelled. Original23 completed audits/CSV preserved and all63 frozen parent files unchanged. New separately pinned resource amendment (da570e399be73f21d768d015c124b02fb5ee82796bda498effa284e8ddeb6a22) adds ordered concurrent sealed batches, exact global-shot stopping prefixes, separate speculative-work archive, inherited marker-hash snapshots and ten-process fresh full audits. Qualification61970828 completes0:0 on10 CPUs:480 full-budget pilot events across PriorTilt/Relay/Beam match frozen sequential candidates/predictions/stats/traces bitwise; inherited prefixes/audits/resume pass.51 targeted regressions pass. Concurrent timing cohorts are explicit; saved input bytes authoritative under existing Stim producer protocol. Use parallel_report.py for future report refreshes. No canonical/scientific plan/source/v1/model/public/phase-gate/counter changes; other collectors' pre-existing outputs remain unstaged. Campaign remains running; spike060 PARTIAL.
+
+Previous PriorTilt result check:
 Last activity: 2026-11-17 — quick 261117-exr checks new PriorTilt results
 Last Activity Description: Published23/39 full-audited points (97,616,345 decoded memory-basis shots/920 observable errors):7 PriorTilt and8 each Relay/Beam. New PriorTilt BB144/p=.002 is2.723e-6 versus source2.467e-6 LER/cycle; BB70/p=.001 is3.958e-7 versus4.678e-7. Both and all23 source ordinates lie within local pointwise95% intervals, ratios0.771–1.253. PriorTilt has the lowest estimate at all seven complete three-method strata. Independent source/count/CI/work/receipt checks pass; all19 previous rows and63 frozen identities unchanged; final figure inspected. Sixteen one-CPU workers61946754 continue without reported failures; collector61946755 pending. Unfinished counts remain progress only. Production code unchanged, regressions not repeated for a data-only update. Sixteen pre-existing dirty files from other collectors/public catalog remained outside staging. No simulation/source/kernel/v1/model/phase-gate/counter changes; spike060 stays PARTIAL.
 
@@ -361,6 +365,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 | # | Description | Date | Commit | Status | Directory |
 |---|-------------|------|--------|--------|-----------|
+| 261117-fdl | Resume remaining Fig1 points on ten CPUs each | 2026-11-17 | c653c495 | Qualified;16 running ten-CPU continuations;23 completed points preserved | [261117-fdl](./quick/261117-fdl-resume-remaining-priortilt-fig1-points-w/) |
 | 261117-exr | Check new PriorTilt results and paper agreement | 2026-11-17 | 70d91402 | Verified23/39; PriorTilt7/13;16 one-CPU workers continue | [261117-exr](./quick/261117-exr-check-new-priortilt-fig1-results-and-sou/) |
 | 261117-077 | Check PriorTilt progress and newly completed comparison points | 2026-11-17 | be547ae3 | Verified19/39; PriorTilt5/13;20 one-CPU workers continue | [261117-077](./quick/261117-077-check-priortilt-fig1-progress-and-newly-/) |
 | 261116-ta4 | Check PriorTilt Fig1 completed points and paper agreement | 2026-11-16 | 97d6423d | Verified 15/39 audited pairs; 24 one-CPU workers continue | [261116-ta4](./quick/261116-ta4-check-priortilt-completed-fig1-points-an/) |
