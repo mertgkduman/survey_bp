@@ -1,0 +1,110 @@
+{
+  "array": {
+    "argv": [
+      "sbatch",
+      "--parsable",
+      "--partition=common,scavenger",
+      "--account=pfisterlab",
+      "--nodes=1",
+      "--ntasks=1",
+      "--time=4-00:00:00",
+      "--chdir=/hpc/group/pfisterlab/mg551/storage/survey_bp",
+      "--export=ALL,PYTHONPATH=/hpc/group/pfisterlab/mg551/storage/survey_bp/src,OMP_NUM_THREADS=1,OPENBLAS_NUM_THREADS=1,MKL_NUM_THREADS=1,NUMBA_NUM_THREADS=1",
+      "--cpus-per-task=10",
+      "--mem=24G",
+      "--requeue",
+      "--signal=B:USR1@180",
+      "--job-name=priortilt-10cpu",
+      "--dependency=afterany:61946754",
+      "--array=0,1,2,15,16,17,18,27,28,29,30,31,32,33,34,35%16",
+      "--output=/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/priortilt-2611-13373/results/parallel-%A_%a.log",
+      "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/priortilt-2611-13373/parallel-worker.sh"
+    ],
+    "id": "61971019",
+    "indices": [
+      0,
+      1,
+      2,
+      15,
+      16,
+      17,
+      18,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35
+    ]
+  },
+  "cancel_requested": [
+    "61946754_35",
+    "61946754_34",
+    "61946754_33",
+    "61946754_32",
+    "61946754_31",
+    "61946754_30",
+    "61946754_29",
+    "61946754_28",
+    "61946754_27",
+    "61946754_18",
+    "61946754_17",
+    "61946754_16",
+    "61946754_15",
+    "61946754_2",
+    "61946754_1",
+    "61946754_0"
+  ],
+  "collector": {
+    "argv": [
+      "sbatch",
+      "--parsable",
+      "--partition=common,scavenger",
+      "--account=pfisterlab",
+      "--nodes=1",
+      "--ntasks=1",
+      "--time=4-00:00:00",
+      "--chdir=/hpc/group/pfisterlab/mg551/storage/survey_bp",
+      "--export=ALL,PYTHONPATH=/hpc/group/pfisterlab/mg551/storage/survey_bp/src,OMP_NUM_THREADS=1,OPENBLAS_NUM_THREADS=1,MKL_NUM_THREADS=1,NUMBA_NUM_THREADS=1",
+      "--cpus-per-task=1",
+      "--mem=12G",
+      "--job-name=priortilt-par-collect",
+      "--dependency=afterok:61971019",
+      "--output=/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/priortilt-2611-13373/results/parallel-collect-%j.log",
+      "--wrap=exec /hpc/group/pfisterlab/mg551/storage/survey_bp/.venv/bin/python /hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/priortilt-2611-13373/parallel_report.py"
+    ],
+    "id": "61971020"
+  },
+  "created_utc": "2026-11-17T16:18:48.258735+00:00",
+  "resource_amendment_sha256": "da570e399be73f21d768d015c124b02fb5ee82796bda498effa284e8ddeb6a22",
+  "superseded_collector": {
+    "id": "61946755",
+    "returncode": 0,
+    "stderr": ""
+  },
+  "superseded_workers": {
+    "ids": [
+      "61946754_35",
+      "61946754_34",
+      "61946754_33",
+      "61946754_32",
+      "61946754_31",
+      "61946754_30",
+      "61946754_29",
+      "61946754_28",
+      "61946754_27",
+      "61946754_18",
+      "61946754_17",
+      "61946754_16",
+      "61946754_15",
+      "61946754_2",
+      "61946754_1",
+      "61946754_0"
+    ],
+    "returncode": 0,
+    "stderr": ""
+  }
+}

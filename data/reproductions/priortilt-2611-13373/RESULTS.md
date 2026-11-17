@@ -1,6 +1,6 @@
 # PriorTilt Fig. 1 — canonical reproduction campaign
 
-23/39 complete plotted points passed the fresh-process full-ledger audit. Each point uses one CPU for X/Z memories sequentially.
+23/39 complete plotted points passed the fresh-process full-ledger audit. The completed snapshot originated from one-CPU workers. Remaining points now continue with ten CPUs per point under the resource amendment.
 
 Source: [Ye and Delfosse, arXiv:2611.13373v1](https://arxiv.org/html/2611.13373v1), Fig. 1; exact released circuits, rates and full-precision three-phase schedules. This is a canonical float64 adaptation; native prefix/suffix arithmetic and RNG are separate references.
 
@@ -37,3 +37,5 @@ The CSV retains both denominators, errors, nonconvergence, mean all-path BP swee
 ![Source and canonical comparison](comparison.png)
 
 The event ledgers remain under ignored `results/`; audit receipts and their hashes bind the published rows. `run.py --index N --audit` independently reevaluates all original DEM detector and logical equations, reconciles work/lineage and replays chunk endpoints before issuing a receipt. Publication rehashes bound chunks and shared samples.
+
+Execution update (2026-11-17): all16 remaining points were migrated to ten CPUs each. Original committed samples and stopping remain intact. See [resource amendment](PARALLEL.md). Future refreshes use `parallel_report.py`; concurrent timing cohorts and speculative compute are recorded separately.

@@ -1,0 +1,48 @@
+{
+  "cases": [
+    {
+      "code": "BB144",
+      "events": 160,
+      "full_fresh_process_audit": true,
+      "inherited_markers": {
+        "x": "492ff0e5f1327361128426d75d7895fd0d101437010b700e648bdc3bbbe1cd40",
+        "z": "d2054ed9f08283378c9e7a41b4a40cd449a846abb1a283d91e709ebd106106f6"
+      },
+      "method": "priortilt",
+      "resume_receipt_unchanged": true,
+      "science_arrays": "candidate,prediction,stats,trace bitwise equal to frozen sequential worker",
+      "workers": 10
+    },
+    {
+      "code": "BB70",
+      "events": 160,
+      "full_fresh_process_audit": true,
+      "inherited_markers": {
+        "x": "1dec895fed3aab9133ca5be2b7b9f58c7b1d48926357bc5a861fcd1fcdb09c79",
+        "z": "6a4b528a5238a8519d7009c14676ba80e09f1aceb27894c6e8c2dff88b32f7b9"
+      },
+      "method": "relay",
+      "resume_receipt_unchanged": true,
+      "science_arrays": "candidate,prediction,stats,trace bitwise equal to frozen sequential worker",
+      "workers": 10
+    },
+    {
+      "code": "GB102",
+      "events": 160,
+      "full_fresh_process_audit": true,
+      "inherited_markers": {
+        "x": "c3980e6cdfb52c1987d54f5b4437d0d1c05136543e6fa377006bf904772ec9e7",
+        "z": "b25a7933325ae49be706ffa50b12f0b366efa25fb47bf6e9b04c321e3392904d"
+      },
+      "method": "beam",
+      "resume_receipt_unchanged": true,
+      "science_arrays": "candidate,prediction,stats,trace bitwise equal to frozen sequential worker",
+      "workers": 10
+    }
+  ],
+  "controller": "priortilt-ordered-processes-v1",
+  "events": 480,
+  "parallel_source_sha256": "22235bf65538dcedfcb2a4868fdeec953ccb23a3f6adad1cdcfd8a997c8d4d68",
+  "parent_plan_sha256": "3e466081790d913ae2fb0a477f654bd0218504a79e7d969b989b62043b7e829c",
+  "scope": "separate qualification seeds;10 spawned process workers, full paper budgets, inherited prefix, full audits, resume; timings excluded from bitwise comparison"
+}

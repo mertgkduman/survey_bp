@@ -1,0 +1,21 @@
+{
+  "authorization": "User: use 10 processors per remaining points",
+  "controller": "priortilt-ordered-processes-v1",
+  "cpus_per_point": 10,
+  "implementation_sha256": {
+    "data/reproductions/priortilt-2611-13373/PARALLEL.md": "254f289ef57a41bd5de6ff796ed54a3c3c97f0e4fb67b0673b5d39c36c473409",
+    "data/reproductions/priortilt-2611-13373/parallel-qualification.json": "3c39de1830debcbcea45971c8410d46c9005ab4336ed3d9bda1341a0795cc721",
+    "data/reproductions/priortilt-2611-13373/parallel-worker.sh": "bc18cb3fe2397069a4c533d1d7b201754a55b0ce9697269a6570363f100d152c",
+    "data/reproductions/priortilt-2611-13373/parallel.py": "22235bf65538dcedfcb2a4868fdeec953ccb23a3f6adad1cdcfd8a997c8d4d68",
+    "data/reproductions/priortilt-2611-13373/parallel_control.py": "cf2e73412444fb5095be15a80e49d046fc2a98dafb9de8eedf926536497bd1e0",
+    "data/reproductions/priortilt-2611-13373/parallel_report.py": "d3c21275e88127eb09623c7c23e1c4a93a1624427b5431a9fec5d9d7815074b9",
+    "data/reproductions/priortilt-2611-13373/qualify_parallel.py": "97f0f519ad12effc438eddf6934035c06e0c1a37e2c4e15afcaa20edf4e1b7bc",
+    "tests/test_prior_tilt_parallel.py": "86d02e5cb702afff359641342465f93c27a8a56d7eabdfaaf0a3cb68889a3719"
+  },
+  "ordering": "concurrent sealed batches; commit in each basis global-shot order; speculative work separate",
+  "parent_plan_sha256": "3e466081790d913ae2fb0a477f654bd0218504a79e7d969b989b62043b7e829c",
+  "schema": "priortilt-resource-amendment-v1",
+  "science": "unchanged decoder, circuit, samples, RNG, point identity and per-basis20-error/100M prefix",
+  "timing": "new concurrent timing cohort; original per-shot fields retained; no standalone latency equivalence claim",
+  "workers": 10
+}
