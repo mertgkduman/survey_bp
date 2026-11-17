@@ -1,0 +1,94 @@
+{
+  "snapshot_points": 7,
+  "complete_pair_shots": 345963,
+  "complete_pair_errors": 280,
+  "checks": [
+    {
+      "point": "bb144-p003000-relay",
+      "local": 0.00011865201719522032,
+      "paper": 0.00010848123593886951,
+      "local_ci95": [
+        6.727491995954818e-05,
+        0.00018584770123832438
+      ],
+      "local_over_paper": 1.0937561336605914,
+      "paper_inside": true
+    },
+    {
+      "point": "bb144-p004000-relay",
+      "local": 0.001135205450832965,
+      "paper": 0.0011181121796664932,
+      "local_ci95": [
+        0.0006444103881943023,
+        0.0017752883955670755
+      ],
+      "local_over_paper": 1.0152876173583676,
+      "paper_inside": true
+    },
+    {
+      "point": "bb144-p004000-beam",
+      "local": 0.0012686540546097752,
+      "paper": 0.0013240820474950843,
+      "local_ci95": [
+        0.0007202833006612306,
+        0.0019835379856972435
+      ],
+      "local_over_paper": 0.9581385511644324,
+      "paper_inside": true
+    },
+    {
+      "point": "bb144-p005000-priortilt",
+      "local": 0.005508743317930598,
+      "paper": 0.00439469945387781,
+      "local_ci95": [
+        0.003143112967795064,
+        0.008555739405202501
+      ],
+      "local_over_paper": 1.2534971676094424,
+      "paper_inside": true
+    },
+    {
+      "point": "bb144-p005000-relay",
+      "local": 0.009531887394482814,
+      "paper": 0.007860099786113831,
+      "local_ci95": [
+        0.00546507791924981,
+        0.014707772543219422
+      ],
+      "local_over_paper": 1.2126929242453732,
+      "paper_inside": true
+    },
+    {
+      "point": "bb144-p005000-beam",
+      "local": 0.010883347421808959,
+      "paper": 0.011173111565604544,
+      "local_ci95": [
+        0.006249849135369598,
+        0.016757290736880804
+      ],
+      "local_over_paper": 0.9740659401730491,
+      "paper_inside": true
+    },
+    {
+      "point": "bb70-p002000-beam",
+      "local": 3.3007067123998774e-05,
+      "paper": 2.8486966820419017e-05,
+      "local_ci95": [
+        1.8712729681938322e-05,
+        5.170749989087027e-05
+      ],
+      "local_over_paper": 1.1586725723406894,
+      "paper_inside": true
+    }
+  ],
+  "scope": "worker full-ledger audits retained; collector rehashes all bound chunks/shared samples; this independent check recomputes aggregate source/count/interval/work arithmetic, without rerunning simulations",
+  "frozen_plan_sha256": "3e466081790d913ae2fb0a477f654bd0218504a79e7d969b989b62043b7e829c",
+  "csv_sha256": "b2b98cd9795ddd36fed3470e0165c9d70cb355cad653c73d42fdbd5a724e9a5f",
+  "osd_benchmark_sha256": "352d93a8c247e20b483434d7298bb66419f37ca62773986e949878363a6aa6a1",
+  "osd_implementation_sha256": "b2e4b1685afb20f5c10acaad31837184fb654004d05e027e2438431659b59586",
+  "osd_cs10_speed_range": [
+    2.322487371189885,
+    3.5291834650186917
+  ],
+  "osd_scope": "CS10 vs CS10 on64 warm source-derived fixtures; twelve alternating rounds; native final-only with original syndrome check vs optimized full candidates/digest/work/check; BP/constructor/JIT excluded; host-target C++ -O3 -march=native; original qualification preserved; no exclusive physical core claim"
+}
