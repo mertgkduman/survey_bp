@@ -292,14 +292,14 @@ These four task requirements supplement the original 84 journal requirements.
 Their completion does not close the paused Phase 7 native admission or Phase 11
 source/statistical gates.
 
-- [x] **OSDV2-01:** Cached nonuniform original-channel priors, explicit source/ML scores, uniform popcount and independent weighted candidate/winner oracles.
-- [x] **OSDV2-02:** Sparse inputs without dense-H retention, storage crossover measurements, optimized single responses and bounded exact-matrix/order affine cache with qualified speed measurements.
-- [x] **OSDV2-03:** Stream pair scoring and candidate hashing; preserve weights through their digest stage, versioned fast/full evidence, optional materialization, mandatory ledgers and replay.
-- [x] **OSDV2-04:** Precise versioned work, stage timings and measured peak memory; matched OSD0/CS1/CS10/CS60 ablations, nonuniform/larger-sparse/real-BP-failure cases and complete canonical BP-OSD latency tables.
+- [x] **OSDC-01:** Cached nonuniform original-channel priors, explicit source/ML scores, uniform popcount and independent weighted candidate/winner oracles.
+- [x] **OSDC-02:** Sparse inputs without dense-H retention, storage crossover measurements, optimized single responses and bounded exact-matrix/order affine cache with qualified speed measurements.
+- [x] **OSDC-03:** Stream pair scoring and candidate hashing; preserve weights through their digest stage, versioned fast/full evidence, optional materialization, mandatory ledgers and replay.
+- [x] **OSDC-04:** Precise versioned work, stage timings and measured peak memory; matched OSD0/CS1/CS10/CS60 ablations, nonuniform/larger-sparse/real-BP-failure cases and complete canonical BP-OSD latency tables.
 
 | Requirement | Owner | Status | Evidence |
 |---|---|---|---|
-| OSDV2-01 | Phase 11.1 | Complete | Independent dense/native/weighted checks |
-| OSDV2-02 | Phase 11.1 | Complete | Storage/cache/response ablations |
-| OSDV2-03 | Phase 11.1 | Complete | Digest equivalence and fresh ledger replay |
-| OSDV2-04 | Phase 11.1 | Complete | 540 standalone/280 pipeline timing rows, memory/stage tables |
+| OSDC-01 | Phase 11.1 | Complete | Independent dense/native/weighted checks |
+| OSDC-02 | Phase 11.1 | Complete | Storage/cache/response ablations |
+| OSDC-03 | Phase 11.1 | Complete | Digest equivalence and fresh ledger replay |
+| OSDC-04 | Phase 11.1 | Complete | 540 standalone/280 pipeline timing rows, memory/stage tables |

@@ -5,16 +5,16 @@ current_phase: 11
 current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
-stopped_at: "PriorTilt/Relay Rust sources compared: no direct crate reuse; historical derivation unproven; ten-CPU campaign continues"
-last_updated: "2026-11-17T18:12:01.396Z"
+stopped_at: Scoped Phase 11.1 complete; Phase 11 scientific gates and ten-CPU PriorTilt campaign continue unchanged
+last_updated: "2026-11-17T19:41:55.051Z"
 last_activity: 2026-11-17
-last_activity_desc: Quick261117-htb compares PriorTilt and Relay Rust manifests, kernels and retained history with bounded provenance conclusions.
-state_head: 654e6368f2b764a0d6556a9715f1fcc0ef0f0d8d
+last_activity_desc: Completed user-scoped Phase 11.1 (3/3 plans, verification passed) at9cf8239c. Qualified weighted sparse OSD v2 preserves stable order, first minima and uniform digests; source/ML weighted oracles and full native candidate checks pass. 540 standalone and280 whole canonical BP-OSD timing rows on one CPU, OSD0/CS1/CS10/CS60, five matrices and two channels. LP1054 uniform CS10 2.485→2.143ms, whole failure-conditioned BP-OSD4.466→4.108ms; small-input regressions and cache/order limits explicit. Fresh replay verifies240 OSD and2660 pipeline ledgers.122 regressions pass/5 skips plus5 receipt checks. Frozen v1/canonical sweeps/campaigns and16 existing collector outputs untouched. Parent Phase11 source gates and PriorTilt ten-CPU campaign remain unchanged; scoped autonomous task complete.
+state_head: 9cf8239c18fccb064e0752662c0796a9b35ef342
 progress:
   total_phases: 15
-  completed_phases: 8
-  total_plans: 176
-  completed_plans: 160
+  completed_phases: 9
+  total_plans: 179
+  completed_plans: 163
 ---
 
 # Project State
@@ -30,12 +30,12 @@ See: .planning/PROJECT.md (updated 2026-10-12)
 
 Phase: 11 (Quaternary Reproduction and Comparisons) — EXECUTING
 Plan: 17 of 25
-Total Phases: 14
+Total Phases: 15
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
-Last activity: 2026-11-17 — quick261117-htb compares Rust implementation provenance
-Last Activity Description: PriorTilt priortilt_rs has no Relay package in direct dependencies or full lockfile. Its flat-Vec/raw-pointer macro core and prefix/suffix check minima differ from Relay's generic SparseBipartiteGraph/ndarray and two-minimum check update; current Relay main cdfdc996ce55582c4c431f8d8392bcce57175e36 adds four-lane optimization beyond pinned v0.2.2. PriorTilt window-statistic prior offsets and Relay gamma-memory/legs are distinct policies over min-sum math. Initial public PriorTilt Rust already has the flat implementation and an unspecified C++ comment; retained history does not prove independent authorship or exclude adaptation. README resimulation wording/licenses/common PyO3 or observable interfaces are not provenance proof. Static manifest/structure/history assertions pass; primary-source links and version bounds recorded. No runtime, benchmark, campaign, frozen/source/kernel/model/public/v1/gate/counter changes; other collector outputs unstaged. Ten-CPU continuations remain unchanged.
+Last activity: 2026-11-17 — Phase 11.1 weighted streaming OSD qualification complete
+Last Activity Description: Completed user-scoped Phase 11.1 (3/3 plans, verification passed) at9cf8239c. Qualified weighted sparse OSD v2 preserves stable order, first minima and uniform digests; source/ML weighted oracles and full native candidate checks pass. 540 standalone and280 whole canonical BP-OSD timing rows on one CPU, OSD0/CS1/CS10/CS60, five matrices and two channels. LP1054 uniform CS10 2.485→2.143ms, whole failure-conditioned BP-OSD4.466→4.108ms; small-input regressions and cache/order limits explicit. Fresh replay verifies240 OSD and2660 pipeline ledgers.122 regressions pass/5 skips plus5 receipt checks. Frozen v1/canonical sweeps/campaigns and16 existing collector outputs untouched. Parent Phase11 source gates and PriorTilt ten-CPU campaign remain unchanged; scoped autonomous task complete.
 
 Previous source-scoring audit:
 Last activity: 2026-11-17 — quick261117-h97 audits author syndrome versus observable success
@@ -128,7 +128,7 @@ Prior interface activity: Quick task 261109-mcf centrally filters active v2 curv
 
 Prior kernel activity: Quick task 261109-hhq rejects invalid changing-prior PD-prime compositions and gives new shared Sinter execution observation-v2 identity with exact shared-v1 replay. Final production regression: 1,712 passed, 20 skipped; final shared decoder tests: 161 passed (overlapping suites). Real Sinter worker: 24 verified v2 shots; earlier shared-v1: 15 ledgers / 58 shots replayed; 82 legacy receipts byte-identical. Scanned and hashed 3,839 tracked data/experiment files without finding an affected campaign; all remain unchanged. Prior mathematics, upstream and GPU evidence is carried by source/evidence hashes. HTML can consume the qualified inventory; scientific publication gates remain unchanged. See spikes/CANONICAL-KERNEL-SHARED-POLICY-FIXES.md.
 
-Progress: 8 of 14 phases complete (57%); 159 of 176 plans complete. Phase 11 has 17 of 25 plans complete; plan 17 is the first open number but depends on source reviews 18 and 19, while plan 20's blocked-target review is complete.
+Progress: 8 of 14 phases complete ([██████░░░░] 60%); 159 of 176 plans complete. Phase 11 has 17 of 25 plans complete; plan 17 is the first open number but depends on source reviews 18 and 19, while plan 20's blocked-target review is complete.
 
 ## Performance Metrics
 
@@ -500,7 +500,7 @@ Latest kernel work: completed F01 → F02 corrections and qualification in quick
 **Resume file:** None
 
 Last session: 2026-11-10T22:51:46+00:00
-Stopped at: Results plot axes and curve visibility verified in Chromium
+Stopped at: Scoped Phase 11.1 complete; Phase 11 scientific gates and ten-CPU PriorTilt campaign continue unchanged
 Next step: Requested builder request action and display/catalog cleanup are complete; resume the existing Phase 11 scientific work when directed. Preserve identity versions and qualification labels. Phase 11 scientific gaps and Phase 5 human review remain open; Phase 7 stays paused.
 
 Design continuation: `.planning/phases/05-guided-and-perturbative-bp-interventions/05-DESIGN-TASKS.md`.

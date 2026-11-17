@@ -5,7 +5,7 @@
 Build a provenance-preserving research platform from paper evidence through native references and canonical policy execution to statistically qualified experiments. The first journal milestone contains CSS code-capacity with separate X/Z decoding, correlated quaternary code-capacity, and circuit-level decoding, in that order. The systematic map, documentation, and experiment registry grow alongside the software and are completed with the manuscript and release evidence.
 
 **Milestone:** v1.0 — platform and first journal-paper evidence.
-**Structure:** End-to-end capability slices (`mvp` mode), fine granularity. Fourteen phases are used because the three required regimes each need distinct implementation and experimental qualification; phase counts are not a reason to merge those gates or defer publication scope.
+**Structure:** End-to-end capability slices (`mvp` mode), fine granularity. Fourteen core phases plus user-scoped insertion 11.1 are used because the three required regimes each need distinct implementation and experimental qualification; phase counts are not a reason to merge those gates or defer publication scope.
 **Planning status:** Phases 1–4, 6, and 8–10 are complete. Phase 5 implementation is technically verified with human visual review still open. Phase 7 is paused at 6/15 completed plans by user direction to prioritize BP variants; its halted OSD qualification remains recorded. Phase 11 has 17/25 completed plans and open scientific evidence gaps. Circuit and journal phase plan counts remain TBD.
 
 ## Phases
@@ -21,6 +21,7 @@ Build a provenance-preserving research platform from paper evidence through nati
 - [x] **Phase 9: CSS Reproduction and Controlled Comparisons** — Qualify selected source results and isolate policy contributions in CSS decoding. (completed 2026-10-12)
 - [x] **Phase 10: Correlated Quaternary Execution** — Add joint Pauli inference and explicitly compatible policy compositions. (completed 2026-10-08)
 - [ ] **Phase 11: Quaternary Reproduction and Comparisons** — Qualify correlated decoding and compare it with separate binary inference.
+- [x] **Phase 11.1: Qualified weighted streaming OSD-CS** — User-scoped successor qualification; preserve the open scientific gates of Phase 11. (completed 2026-11-17)
 - [ ] **Phase 12: Circuit Models and Canonical Integration** — Decode noisy extraction circuits with validated detector/observable semantics.
 - [ ] **Phase 13: Circuit Reproduction and Comparisons** — Qualify source-faithful circuit experiments and controlled policy comparisons.
 - [ ] **Phase 14: Completed Mapping Study and Journal Evidence** — Complete the literature map, reproducible artifacts, documentation, and manuscript.
@@ -768,16 +769,16 @@ Plans:
 ### Phase 11.1: Qualified weighted streaming OSD-CS (INSERTED)
 
 **Goal:** Qualify nonuniform, sparse, streaming canonical OSD-CS while preserving candidate enumeration, stable LLR ties and first-minimum selection, with independent equivalence and matched performance evidence.
-**Requirements:** OSDV2-01 weighted priors; OSDV2-02 sparse/storage/cache; OSDV2-03 streaming evidence/replay; OSDV2-04 work/timing/memory/ablations/end-to-end qualification.
+**Requirements:** OSDC-01 weighted priors; OSDC-02 sparse/storage/cache; OSDC-03 streaming evidence/replay; OSDC-04 work/timing/memory/ablations/end-to-end qualification.
 **Depends on:** Qualified canonical BP and spike056 OSD foundation (independent of open Phase 11 source gates).
-**Plans:** 3 plans
+**Plans:** 3/3 plans complete
 **Execution scope:** User-requested `$gsd-autonomous` task only, equivalent to `--only 11.1`; unrelated milestones/gates remain open.
 
 Plans:
 
-- [ ] 11.1-01-PLAN.md — Weighted sparse OSD and independent correctness.
-- [ ] 11.1-02-PLAN.md — Bounded affine reuse and streaming evidence.
-- [ ] 11.1-03-PLAN.md — Matched performance and publication.
+- [x] 11.1-01-PLAN.md — Weighted sparse OSD and independent correctness.
+- [x] 11.1-02-PLAN.md — Bounded affine reuse and streaming evidence.
+- [x] 11.1-03-PLAN.md — Matched performance and publication.
 
 ### Phase 12: Circuit Models and Canonical Integration
 
@@ -846,6 +847,7 @@ Plans:
 | 9. CSS Reproduction and Controlled Comparisons | 20/20 | Complete    | 2026-10-12 |
 | 10. Correlated Quaternary Execution | 16/16 | Complete    | 2026-10-08 |
 | 11. Quaternary Reproduction and Comparisons | 17/25 | In progress; scientific gaps open |  |
+| 11.1. Qualified weighted streaming OSD-CS | 3/3 | Complete    | 2026-11-17 |
 | 12. Circuit Models and Canonical Integration | 0/TBD | Not started | - |
 | 13. Circuit Reproduction and Comparisons | 0/TBD | Not started | - |
 | 14. Completed Mapping Study and Journal Evidence | 0/TBD | Not started | - |
