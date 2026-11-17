@@ -86,6 +86,19 @@ Reproduce Fig. 1 of PriorTilt (arXiv:2611.13373v1) using the source circuit arti
 - Run one processor per point, preserve raw results/manifests and prior campaign configurations, and retain all-path work and observable-failure semantics.
 - Qualify PriorTilt using an independent mathematical oracle and source cross-checks before production, without replacing the canonical BP engine with a native wrapper.
 
+### workbench-feedback-forecast
+
+Infer likely user feedback on results presentation and related controls from earlier user-directed HTML revisions, the latest paper-figure update and newly published research. Distinguish direct historical requests, observed gaps and speculative preferences.
+
+**Requirements:**
+
+- The user selected all three checks and **feedback forecast only**; no HTML mock-up or production edits.
+- Inspect recent-result discovery, paper comparisons/work/latency, and selectors/defaults/builder.
+- Ground predictions in actual history, source and live-browser evidence; state confidence.
+- Preserve already-requested multi-rate filtering, group toggles, duplicate exclusion, automatic axes, custom inputs and archived v1.
+- Do not silently reverse earlier measured-only presentation rules or conflate paper references with local measurements.
+- Forecasts are not approved implementation requirements.
+
 ## Spikes
 
 | # | Idea | Name | Type | Validates | Verdict | Tags |
@@ -151,6 +164,9 @@ Reproduce Fig. 1 of PriorTilt (arXiv:2611.13373v1) using the source circuit arti
 | 058 | priortilt-figure1 | Source artifacts and Fig1 contract | standard | Given published data/circuits, extract exact rates, models, metric and decoder configurations and verify immutable artifact identities. | VALIDATED | circuit, source, provenance |
 | 059 | priortilt-figure1 | Canonical PriorTilt policy qualification | comparison | Given independent scalar mathematics and pinned source, preserve messages across six-sweep rounds and qualify offsets, phase boundaries, randomness and work. | VALIDATED | canonical, priortilt, mathematics |
 | 060 | priortilt-figure1 | Fig1 one-CPU campaign | standard | Given qualified source-configured decoders and circuits, freeze and dispatch independent point workers with traceable ledgers and source comparisons. | PARTIAL | circuit, campaign, figure1 |
+| 061 | workbench-feedback-forecast | Recent results and study discovery | standard | History and live behavior support explicitly qualified feedback predictions; no production changes. | PARTIAL | html, workbench, forecast |
+| 062 | workbench-feedback-forecast | Paper comparisons, metrics and work | standard | History and live behavior support explicitly qualified feedback predictions; no production changes. | PARTIAL | html, workbench, forecast |
+| 063 | workbench-feedback-forecast | Controls, defaults and experiment builder | standard | History and live behavior support explicitly qualified feedback predictions; no production changes. | PARTIAL | html, workbench, forecast |
 
 Ordered closure of D03 → D04 → D01 → D02 → D05: [correction report](CANONICAL-KERNEL-COMPLETENESS-FIXES.md), [combined verification](042-batch-evidence-fix/verification.json), and [execution contracts](../../docs/canonical-kernel-contracts.md). Historical 034–037 verdicts remain as originally observed.
 

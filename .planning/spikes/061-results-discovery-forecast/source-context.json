@@ -1,0 +1,20 @@
+{
+  "head": "f5a3fa2784f261ae5e2f5e460ed0ed8f5c6ca01e",
+  "scope": "current worktree; catalog has pre-existing collector changes",
+  "source_sha256": {
+    "web/research/index.html": "6b76c3483633e8bb8ab1fd3d03936a7a2528e82c9b2b2823a6eb63a6bda9bae5",
+    "web/research/app.js": "10c5046fdf8fbcd21d4d26cec76cb5ed1b45b4f8980381d42d524bf5cbe64d8f",
+    "web/research/style.css": "c1a5f70cd5a47126c21a2f8452a15e4ae9cb180283791ff6d47dea0673530cd0",
+    "web/research/curve-projection.js": "47c50030027f0bde5aa1439ccee8d3a088f6fb82bf5b817bc4378628cfb5d8a9",
+    "web/research/paper-figures.js": "5bb9f56c1d23cdf58f1bb0dab67307e252ae2345c1c2f1723f4ff11529e92f7d",
+    "web/research/catalog.json": "7568edbfa073d44d2faf1e44099a15d9570459af94b67151b0f5a0c046c92ef4"
+  },
+  "historical_ui_commits": [
+    "300cb12b",
+    "dc39055e",
+    "8d35f045",
+    "324b53a9",
+    "781055fb"
+  ],
+  "alignment": "all three, feedback forecast only"
+}

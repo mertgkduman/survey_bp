@@ -1,0 +1,17 @@
+{
+  "files": {
+    ".planning/spikes/061-results-discovery-forecast/FORECAST.md": "be771969d4616c08aa00e5193772803f95c2b3c98c55a6ad721caf23b6d0a131",
+    ".planning/spikes/061-results-discovery-forecast/before-paper-update.png": "1c51435305cd05ef449c9cf5e83cba871477a6316608e01ef3e435b67457612a",
+    ".planning/spikes/061-results-discovery-forecast/browser-observations.json": "f76be2d0c68a63c86a79886a5910adc53461332ca18647875a28fa94c9b37d00",
+    ".planning/spikes/061-results-discovery-forecast/current-custom.png": "0eb279993c806a452a70ac31c58d1e3c1c4e741cbf5fdce03bcacb1ffddad730",
+    ".planning/spikes/061-results-discovery-forecast/forecast.json": "a8249daf7263e2151a86ad38551668189d68982ed5caf3bb113c66661081b3c3",
+    ".planning/spikes/061-results-discovery-forecast/probe.py": "970ba96198a5338735969614c68af1bd4a9634c89f5e3f20c879a72b9ff328fd",
+    ".planning/spikes/061-results-discovery-forecast/source-context.json": "c26b7c3c63515f9b10134d660813f4835dcb016563a3d089ac6987422d0a5db0",
+    ".planning/spikes/061-results-discovery-forecast/verification.json": "6b1d9f4b147b494aec74650e70aef863e57c184b265a01bee09135a087ecfe2b",
+    ".planning/spikes/062-paper-comparison-forecast/lp-default-empty.png": "c3b67a17515ff59188ebe7ac477e84e9a623d922e4bb2d5a7a3ab8d37d1606ef",
+    ".planning/spikes/062-paper-comparison-forecast/yao-current.png": "9b1f1ae41bb98652777c578aa17cece7030ee4e1ca399dd25969bc07a41a2c25",
+    ".planning/spikes/063-workbench-controls-forecast/builder-current.png": "1818e7272b8244827866ff3af63265fcf8a3dd7a1142e7ca4342e9ccdc1aca0f"
+  },
+  "schema": "workbench-feedback-inspection-v1",
+  "scope": "read-only observations; forecasts not approved requirements"
+}

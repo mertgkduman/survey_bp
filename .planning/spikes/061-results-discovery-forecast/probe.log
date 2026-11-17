@@ -1,0 +1,747 @@
+{
+  "catalog": {
+    "rawSeries": 1570,
+    "activeCurves": 453,
+    "activePoints": 3229,
+    "activeCodes": [
+      {
+        "id": "a5",
+        "label": "A5 [[180,10]]"
+      },
+      {
+        "id": "b2",
+        "label": "B2 [[882,48]]"
+      },
+      {
+        "id": "b1",
+        "label": "B1 [[882,24]]"
+      },
+      {
+        "id": "c2",
+        "label": "C2 [[1922,50]]"
+      },
+      {
+        "id": "double-gross",
+        "label": "double-Gross [[288,12,18]]"
+      },
+      {
+        "id": "bb72",
+        "label": "Bravyi BB72 [[72,12,6]]"
+      },
+      {
+        "id": "unicycle74",
+        "label": "MacKay unicycle [[74,18]]"
+      },
+      {
+        "id": "unicycle274",
+        "label": "MacKay unicycle [[274,110]]"
+      },
+      {
+        "id": "toric11",
+        "label": "Roffe toric [[242,2,11]]"
+      },
+      {
+        "id": "toric13",
+        "label": "Roffe toric [[338,2,13]]"
+      },
+      {
+        "id": "toric15",
+        "label": "Roffe toric [[450,2,15]]"
+      },
+      {
+        "id": "toric9",
+        "label": "Roffe toric [[162,2,9]]"
+      },
+      {
+        "id": "lp1054",
+        "label": "Lifted product [[1054,140]], distance unverified"
+      }
+    ],
+    "activeCircuits": [],
+    "paperOptions": [
+      {
+        "id": "",
+        "label": "Custom plots"
+      },
+      {
+        "id": "yao-2312-10950-v2",
+        "label": "Belief Propagation Decoding of Quantum LDPC Codes with Guided Decimation"
+      },
+      {
+        "id": "relaybp-2506-01779-v2",
+        "label": "RelayBP"
+      },
+      {
+        "id": "beamsearch-2512-07057-v2",
+        "label": "BeamSearch"
+      },
+      {
+        "id": "bpsf-2507-00254-v1",
+        "label": "BP-SF"
+      },
+      {
+        "id": "panteleev-2012-04068-v2",
+        "label": "Quantum LDPC Codes with Almost Linear Minimum Distance"
+      },
+      {
+        "id": "mackay-0304161-v3",
+        "label": "Sparse Graph Codes for Quantum Error-Correction"
+      },
+      {
+        "id": "roffe-2005-07016-v2",
+        "label": "Decoding Across the Quantum LDPC Code Landscape"
+      }
+    ],
+    "activeEvidence": [
+      "controlled_css_adaptation",
+      "canonical_adaptation",
+      "source_informed_canonical_adaptation",
+      "controlled_local_baseline"
+    ],
+    "figures": [
+      {
+        "id": "yao-fig-2",
+        "label": "Fig. 2 \u00b7 B1",
+        "paper": "yao-2312-10950-v2",
+        "paperCurves": 3,
+        "additionalCurves": 13
+      },
+      {
+        "id": "yao-fig-3",
+        "label": "Fig. 3 \u00b7 B1",
+        "paper": "yao-2312-10950-v2",
+        "paperCurves": 5,
+        "additionalCurves": 10
+      },
+      {
+        "id": "yao-fig-4",
+        "label": "Fig. 4 \u00b7 B1",
+        "paper": "yao-2312-10950-v2",
+        "paperCurves": 2,
+        "additionalCurves": 13
+      },
+      {
+        "id": "yao-fig-5",
+        "label": "Fig. 5 \u00b7 C2",
+        "paper": "yao-2312-10950-v2",
+        "paperCurves": 2,
+        "additionalCurves": 6
+      },
+      {
+        "id": "yao-fig-6",
+        "label": "Fig. 6 \u00b7 B1",
+        "paper": "yao-2312-10950-v2",
+        "paperCurves": 7,
+        "additionalCurves": 9
+      },
+      {
+        "id": "yao-fig-7",
+        "label": "Fig. 7 \u00b7 A5",
+        "paper": "yao-2312-10950-v2",
+        "paperCurves": 2,
+        "additionalCurves": 4
+      },
+      {
+        "id": "yao-fig-8",
+        "label": "Fig. 8 \u00b7 B2",
+        "paper": "yao-2312-10950-v2",
+        "paperCurves": 2,
+        "additionalCurves": 4
+      },
+      {
+        "id": "roffe-fig-3",
+        "label": "Fig. 3 \u00b7 Toric codes",
+        "paper": "roffe-2005-07016-v2",
+        "paperCurves": 8,
+        "additionalCurves": 332
+      },
+      {
+        "id": "mackay-fig-15",
+        "label": "Fig. 15 \u00b7 Construction U",
+        "paper": "mackay-0304161-v3",
+        "paperCurves": 0,
+        "additionalCurves": 24
+      },
+      {
+        "id": "lp1054-example-4",
+        "label": "Example 4 \u00b7 LP [[1054,140]]",
+        "paper": "panteleev-2012-04068-v2",
+        "paperCurves": 0,
+        "additionalCurves": 25
+      },
+      {
+        "id": "relay-css-comparison",
+        "label": "RelayBP \u00b7 Controlled CSS comparison",
+        "paper": "relaybp-2506-01779-v2",
+        "paperCurves": 0,
+        "additionalCurves": 3
+      },
+      {
+        "id": "beam-css-comparison",
+        "label": "BeamSearch \u00b7 Controlled CSS comparison",
+        "paper": "beamsearch-2512-07057-v2",
+        "paperCurves": 0,
+        "additionalCurves": 3
+      },
+      {
+        "id": "bpsf-css-comparison",
+        "label": "BP-SF \u00b7 Controlled CSS comparison",
+        "paper": "bpsf-2507-00254-v1",
+        "paperCurves": 0,
+        "additionalCurves": 12
+      }
+    ],
+    "freshnessWords": [],
+    "containsPriorTilt": false,
+    "containsOsdV2": false
+  },
+  "customGeometry": {
+    "viewport": 1050,
+    "card": {
+      "top": 436.578125,
+      "height": 1375.640625
+    },
+    "chart": {
+      "top": 810.546875,
+      "height": 470.53125
+    },
+    "curves": {
+      "top": 660.609375,
+      "height": 31.5
+    },
+    "table": {
+      "top": 1291.578125,
+      "height": 405,
+      "scrollWidth": 2110,
+      "clientWidth": 910
+    },
+    "documentHeight": 1921
+  },
+  "duplicatePickerExcludesVisible": true,
+  "yao": {
+    "figures": 7,
+    "geometry": {
+      "viewport": 1050,
+      "card": {
+        "top": 539.46875,
+        "height": 1722.234375
+      },
+      "chart": {
+        "top": 1260.03125,
+        "height": 470.53125
+      },
+      "curves": {
+        "top": 818.09375,
+        "height": 270
+      },
+      "table": {
+        "top": 1741.0625,
+        "height": 405,
+        "scrollWidth": 2071,
+        "clientWidth": 910
+      },
+      "documentHeight": 12812
+    },
+    "paperDefault": true,
+    "additionalDefault": false,
+    "additionalRows": 105,
+    "expandedCurveCount": 15,
+    "lineColors": [
+      "#087d78",
+      "#b47412",
+      "#5066aa",
+      "#ac4447",
+      "#608333",
+      "#8058a2",
+      "#087d78",
+      "#b47412",
+      "#5066aa",
+      "#ac4447",
+      "#608333",
+      "#8058a2",
+      "#087d78",
+      "#b47412",
+      "#5066aa"
+    ],
+    "metricChoices": [
+      "Logical / observable failure rate",
+      "Mean iterations / shot",
+      "Mean directed edge updates / shot",
+      "Mean decoding time \u00b7 s"
+    ]
+  },
+  "mackay": {
+    "rowsDefault": 0,
+    "paperGroupDisabled": true,
+    "additionalDefault": false,
+    "emptyMessage": "Additional curves (24)\nParameter key\n\nNo qualified paper reproduction curves are available in this view. Select Additional curves to show the retained adaptations.\n\nMetric\nLogical / observable failure rate\nMean iterations / shot\nMean directed edge updates / shot\nMean decoding time \u00b7 s\n0.01\n0.0175\n0.025\n0.0325\n0.04\n10\u22128\n10\u22127\n10\u22126\n10\u22125\n10\u22124\n10\u22123\n10\u22122\n10\u22121\n100\nComponent bit-flip probability p_bit flip\nFailure probability \u00b7 log scale\nAll curves are hidden. Hover or focus a curve name for a faint preview.\n\ud835\udc5d\nb\ni\nt\n\u00a0\nf\nl\ni\np\n=\n2\n3\n\ud835\udc5d\nd\ne\np\no\nl\na\nr\ni\nz\ni\nn\ng\np\nbit\u00a0flip\n\t\u200b\n\n=\n3\n2\n\t\u200b\n\np\ndepolarizing\n\t\u200b\n\n\nDepolarizing coordinates are converted automatically; X-only coordinates are unchanged. Depolarizing noise has X, Y, Z each with probability p/3. The channels remain distinct.\n\nSeries\tNoise\tMetric\tObserved value\tSamples\tFailures\tType I / II\tCI\tMean iterations / shot\tMean directed edge updates / shot\tTime\tEvidence\tAvailability\nExport visible table\nDownload run settings\nRun details and reproduction",
+    "rowsAfterAdditional": 120
+  },
+  "lp": {
+    "rowsDefault": 0,
+    "paperGroupDisabled": true
+  },
+  "roffeGeometry": {
+    "viewport": 1050,
+    "card": {
+      "top": 539.46875,
+      "height": 1722.234375
+    },
+    "chart": {
+      "top": 1260.03125,
+      "height": 470.53125
+    },
+    "curves": {
+      "top": 818.09375,
+      "height": 270
+    },
+    "table": {
+      "top": 1741.0625,
+      "height": 405,
+      "scrollWidth": 1842,
+      "clientWidth": 910
+    },
+    "documentHeight": 2370
+  },
+  "roffeTable": {
+    "columns": [
+      "Series",
+      "Noise",
+      "Metric",
+      "Observed value",
+      "Samples",
+      "Failures",
+      "Type I / II",
+      "CI",
+      "Mean iterations / shot",
+      "Mean directed edge updates / shot",
+      "Time",
+      "Evidence",
+      "Availability"
+    ],
+    "curveCount": 340,
+    "originalSourceDatasetRows": 0
+  },
+  "roffeColors": [
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447",
+    "#608333",
+    "#8058a2",
+    "#087d78",
+    "#b47412",
+    "#5066aa",
+    "#ac4447"
+  ],
+  "savedUrlBeforeReload": "http://127.0.0.1:8883/web/research/#results",
+  "paperAfterReload": "",
+  "builder": {
+    "families": [
+      "BP, binary CSS",
+      "Q-BP, joint Pauli"
+    ],
+    "variants": [
+      "Off",
+      "On, Q-BPGD"
+    ],
+    "circuits": [
+      "Custom Stim circuit"
+    ],
+    "codeOptions": [
+      "A5 [[180,10]]",
+      "B2 [[882,48]]",
+      "B1 [[882,24]]",
+      "C2 [[1922,50]]",
+      "double-Gross [[288,12,18]]",
+      "Bravyi BB72 [[72,12,6]]",
+      "MacKay unicycle [[74,18]]",
+      "MacKay unicycle [[274,110]]",
+      "Roffe toric [[242,2,11]]",
+      "Roffe toric [[338,2,13]]",
+      "Roffe toric [[450,2,15]]",
+      "Roffe toric [[162,2,9]]",
+      "Lifted product [[1054,140]], distance unverified",
+      "Custom parity check matrix"
+    ],
+    "presetCount": 565,
+    "beforeMinSum": {
+      "build-format": "float64",
+      "build-scope": "scalar_edges",
+      "build-hard": "strict_pauli",
+      "build-shortcut": "false"
+    },
+    "afterMinSum": {
+      "build-format": "int8",
+      "build-scope": "scalar_edges",
+      "build-hard": "min_llr",
+      "build-shortcut": "true"
+    },
+    "osdPreset": {
+      "id": "roffe-canonical-bp-osd-fast:toric11:bp_osd0",
+      "label": "BP+OSD-0, MS, d = 0, c = none, T = 242, p\u2080 = p, \u03b1\u209c = 1 \u2212 2\u207b\u1d57, noise = X-only, precision = float64, code = Roffe toric [[242,2,11]]"
+    },
+    "osdFeedback": "This saved decoder has a study-specific execution path. Use Run details \u2192 Original run / analysis commands (or Download original experiment where available). Its policies cannot be substituted by a plain decoder.",
+    "savedNote": "Derived from BP+OSD-0, MS, d = 0, c = none, T = 242, p\u2080 = p, \u03b1\u209c = 1 \u2212 2\u207b\u1d57, noise = X-only, precision = float64. Editing creates a new experiment identity.",
+    "osdPackageEnabled": false
+  },
+  "beforePaperUpdate": {
+    "paperButtons": 0,
+    "geometry": {
+      "viewport": 1050,
+      "card": {
+        "top": 265.890625,
+        "height": 1375.640625
+      },
+      "chart": {
+        "top": 639.859375,
+        "height": 470.53125
+      },
+      "curves": {
+        "top": 489.921875,
+        "height": 31.5
+      },
+      "table": {
+        "top": 1120.890625,
+        "height": 405,
+        "scrollWidth": 2110,
+        "clientWidth": 910
+      },
+      "documentHeight": 1750
+    },
+    "scope": "pre-781055fb index/app/style, same current catalog and shared helper versions"
+  },
+  "pageErrors": [],
+  "catalog_sha256": "7568edbfa073d44d2faf1e44099a15d9570459af94b67151b0f5a0c046c92ef4",
+  "scope": "Existing live/historical HTML only; no mock-up, simulations or production edits."
+}

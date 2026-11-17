@@ -1,0 +1,88 @@
+{
+  "kind": "inferred-feedback-forecast",
+  "accepted_implementation_requirements": false,
+  "user_scope": "all three checks; feedback forecast only",
+  "items": [
+    {
+      "rank": 1,
+      "area": "discovery",
+      "confidence": "Very high",
+      "likely_feedback": "Why are PriorTilt and the latest efficiency results still missing from Available experiment results?",
+      "desired_change": "Publish reviewed recent studies through the shared catalog; show audited progress/freshness. PriorTilt gets named Fig.1 views. OSD v2 gets an efficiency/benchmark view with its own scope.",
+      "evidence": "No priortilt/2611.13373/weighted-streaming-osd-v2 records in current catalog; 453 active curves, 13 codes, zero active circuits. New data exists in reproduction/benchmark reports.",
+      "guardrail": "Plot only fully audited compatible multi-rate local curves. Progress is separate; do not turn pending results into measurements or benchmark timings into LER points."
+    },
+    {
+      "rank": 2,
+      "area": "comparisons",
+      "confidence": "High",
+      "likely_feedback": "Opening a paper should take me straight to useful comparisons, not an empty graph.",
+      "desired_change": "Keep separate named figures, paper-configuration curves selected and one group switch for our comparisons. Give adaptation-only views an obvious Show comparisons action and state their qualification before plotting.",
+      "evidence": "MacKay Fig.15 has zero paper curves and24 additional; LP Example4 has zero paper curves and25 additional. Both default to zero visible rows. Relay/Beam/BP-SF controlled CSS views likewise have zero paper reproductions.",
+      "guardrail": "Do not relabel an inferred budget or controlled adaptation as an exact source reproduction, or fabricate an LP paper LER figure."
+    },
+    {
+      "rank": 3,
+      "area": "comparisons",
+      "confidence": "High",
+      "likely_feedback": "There is too much interface before I can see the result.",
+      "desired_change": "Show the chart earlier; use compact figure navigation and a concise curve shortlist, retaining all requested parameter values in accessible expanded labels/details. Put large tables and detailed evidence behind deliberate expansion.",
+      "evidence": "With the same catalog the custom chart moves from top640px before the paper update to811px now. Current paper chart begins at1260px in a1050px viewport. Yao page is12812px high; Roffe offers340 curve controls.",
+      "guardrail": "Preserve separate plots, exact configurations, group controls and exportable full tables. Cosmetic simplification must not erase scientific context."
+    },
+    {
+      "rank": 4,
+      "area": "comparisons",
+      "confidence": "Very high",
+      "likely_feedback": "Compare decoders at the paper budget or the same measured cost, and make the tradeoff visible.",
+      "desired_change": "Make paper-budget, extended-budget and runtime-matched results distinct; keep iterations and directed updates adjacent. Expose whole BP-OSD time, BP/OSD split, hardware/cohort/evidence mode, and regression cases. Consider LER-versus-cost and linked views at a fixed p.",
+      "evidence": "Your corrections about88200 iterations, runtime matching to OSD0, damping/scale/offset tuning and work units. Current metrics exist, but are a single per-card dropdown; new OSD benchmark is not catalogued.",
+      "guardrail": "Never substitute standalone OSD speed for whole BP-OSD latency, mix one-/ten-CPU timing cohorts, or pool incompatible iteration/counter versions."
+    },
+    {
+      "rank": 5,
+      "area": "controls",
+      "confidence": "Very high",
+      "likely_feedback": "Changing to min-sum should not silently change precision or stopping behavior.",
+      "desired_change": "Make update rule, message resolution, hard decision and zero-syndrome shortcut explicit independent settings; preserve them when changing one control or explain a required compatibility change.",
+      "evidence": "Live selection changes float64\u2192int8, strict_pauli\u2192min_llr and shortcut false\u2192true. Source is the build-rule handler in app.js.",
+      "guardrail": "This is a confirmed behavior; its undesirability is inferred from your modularity/fair-comparison requirements. No controls were changed in this spike."
+    },
+    {
+      "rank": 6,
+      "area": "comparisons",
+      "confidence": "High",
+      "likely_feedback": "Which parameters and success metric produced each plotted point?",
+      "desired_change": "Make noise/physical-versus-component p, metric definition and per-point selected T,damping,scale,offset/gamma leg settings easy to inspect. Distinguish original paper reference, paper-configuration local runs and new comparisons.",
+      "evidence": "Repeated user questions about X/Z block failure, paper budget, mean iterations/edge updates, tuned settings and circuit observable success. Current main table lacks explicit per-point tuning columns and source references are deliberately excluded.",
+      "guardrail": "Adding a paper-reference overlay is a medium-confidence design hypothesis because earlier v2 deliberately shows only local measurements. References must stay separately labeled and must not enter local selectors/denominators."
+    },
+    {
+      "rank": 7,
+      "area": "controls",
+      "confidence": "High goal; medium implementation scope",
+      "likely_feedback": "If I can compare a decoder, I want a clear way to reproduce or request that exact configuration.",
+      "desired_change": "Connect supported full-stack methods to faithful reproduce/extend/request actions; distinguish runnable portable specs from study-specific command recipes before the user selects one. Expose qualified new controls only through supported execution routes.",
+      "evidence": "Builder has565 presets but only BP/Q-BP and optional Q-BPGD visual families. Selecting a BP+OSD preset blocks the general package builder and directs to study commands.",
+      "guardrail": "The block currently correctly prevents substitution by plain BP. Some new families need backend/manifest qualification, not just a new dropdown option."
+    },
+    {
+      "rank": 8,
+      "area": "controls",
+      "confidence": "Medium",
+      "likely_feedback": "Remember the paper, figure and curves I selected, and let me share that comparison.",
+      "desired_change": "Persist or deep-link valid selections, metric and visibility; reconcile them against available evidence when the catalog changes.",
+      "evidence": "Opening Roffe leaves URL at#results; reload returns to Custom plots. Only uploaded results currently persist.",
+      "guardrail": "Discard stale/hidden inputs and keep custom matrix/Stim functionality, as previously requested."
+    },
+    {
+      "rank": 9,
+      "area": "controls",
+      "confidence": "Medium",
+      "likely_feedback": "Too many similar options and reused colors make the comparisons harder to follow.",
+      "desired_change": "Group/filter curve choices by method, code, budget and tuning role; use consistent curve encodings across figures and expose full labels on demand. Update stale help text.",
+      "evidence": "Roffe has8 paper plus332 additional curve controls; color palette repeats every six curves. Recommendations still says paper selectors moved to v1 although current v2 has seven paper options.",
+      "guardrail": "Do not remove scientifically distinct cohorts merely because labels look alike; preserve exact evidence identity and all requested parameter values."
+    }
+  ]
+}
