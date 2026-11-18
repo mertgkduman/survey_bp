@@ -1,0 +1,47 @@
+[
+  {
+    "point": "bb70-p000500-beam",
+    "basis": "x",
+    "errors": 18
+  },
+  {
+    "point": "gb102-p000500-relay",
+    "basis": "x",
+    "errors": 9
+  },
+  {
+    "point": "gb102-p000500-relay",
+    "basis": "z",
+    "errors": 8
+  },
+  {
+    "point": "bb144-p001000-priortilt",
+    "basis": "x",
+    "errors": 19
+  },
+  {
+    "point": "bb144-p001000-priortilt",
+    "basis": "z",
+    "errors": 16
+  },
+  {
+    "point": "bb70-p000500-priortilt",
+    "basis": "x",
+    "errors": 8
+  },
+  {
+    "point": "bb70-p000500-priortilt",
+    "basis": "z",
+    "errors": 18
+  },
+  {
+    "point": "gb102-p000500-priortilt",
+    "basis": "x",
+    "errors": 6
+  },
+  {
+    "point": "gb102-p000500-priortilt",
+    "basis": "z",
+    "errors": 5
+  }
+]

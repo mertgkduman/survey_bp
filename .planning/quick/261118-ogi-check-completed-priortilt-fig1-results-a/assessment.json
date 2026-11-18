@@ -1,0 +1,432 @@
+{
+  "snapshot_points": 38,
+  "complete_pair_shots": 1661754800,
+  "complete_pair_errors": 1447,
+  "checks": [
+    {
+      "point": "bb144-p001000-priortilt",
+      "local": 2.916666666666667e-08,
+      "paper": 2.0822853284576558e-08,
+      "local_ci95": [
+        1.5825353389132754e-08,
+        4.9066056273248854e-08
+      ],
+      "local_over_paper": 1.4007046137269938,
+      "paper_inside": true
+    },
+    {
+      "point": "bb144-p001000-relay",
+      "local": 8.486833543400162e-08,
+      "paper": 8.966822110399222e-08,
+      "local_ci95": [
+        4.8113098857312685e-08,
+        1.3295639416907637e-07
+      ],
+      "local_over_paper": 0.9464706045141237,
+      "paper_inside": true
+    },
+    {
+      "point": "bb144-p001000-beam",
+      "local": 5.5490061260565273e-08,
+      "paper": 6.5e-08,
+      "local_ci95": [
+        3.1458125115823947e-08,
+        8.693181915316237e-08
+      ],
+      "local_over_paper": 0.8536932501625427,
+      "paper_inside": true
+    },
+    {
+      "point": "bb144-p002000-priortilt",
+      "local": 2.7233347198690894e-06,
+      "paper": 2.466731055052689e-06,
+      "local_ci95": [
+        1.5439029112750414e-06,
+        4.266411978971905e-06
+      ],
+      "local_over_paper": 1.1040257973364345,
+      "paper_inside": true
+    },
+    {
+      "point": "bb144-p002000-relay",
+      "local": 5.807795511934579e-06,
+      "paper": 5.4952897290183425e-06,
+      "local_ci95": [
+        3.2925466513059764e-06,
+        9.098521993143705e-06
+      ],
+      "local_over_paper": 1.0568679356915474,
+      "paper_inside": true
+    },
+    {
+      "point": "bb144-p002000-beam",
+      "local": 4.289475255270203e-06,
+      "paper": 5.441166691720201e-06,
+      "local_ci95": [
+        2.4317781092247956e-06,
+        6.7199313360264986e-06
+      ],
+      "local_over_paper": 0.7883374096583879,
+      "paper_inside": true
+    },
+    {
+      "point": "bb144-p003000-priortilt",
+      "local": 5.5735983685614126e-05,
+      "paper": 5.740602031388392e-05,
+      "local_ci95": [
+        3.159969551980347e-05,
+        8.730906181581503e-05
+      ],
+      "local_over_paper": 0.9709083364577723,
+      "paper_inside": true
+    },
+    {
+      "point": "bb144-p003000-relay",
+      "local": 0.00011865201719522032,
+      "paper": 0.00010848123593886951,
+      "local_ci95": [
+        6.727491995954818e-05,
+        0.00018584770123832438
+      ],
+      "local_over_paper": 1.0937561336605914,
+      "paper_inside": true
+    },
+    {
+      "point": "bb144-p003000-beam",
+      "local": 0.00013115978733085432,
+      "paper": 0.00011014153457726738,
+      "local_ci95": [
+        7.436802508196719e-05,
+        0.00020543417083951007
+      ],
+      "local_over_paper": 1.1908294889321889,
+      "paper_inside": true
+    },
+    {
+      "point": "bb144-p004000-priortilt",
+      "local": 0.0006415944122111914,
+      "paper": 0.0006761113644340866,
+      "local_ci95": [
+        0.0003640003270857751,
+        0.0010041251161343801
+      ],
+      "local_over_paper": 0.9489478301377373,
+      "paper_inside": true
+    },
+    {
+      "point": "bb144-p004000-relay",
+      "local": 0.001135205450832965,
+      "paper": 0.0011181121796664932,
+      "local_ci95": [
+        0.0006444103881943023,
+        0.0017752883955670755
+      ],
+      "local_over_paper": 1.0152876173583676,
+      "paper_inside": true
+    },
+    {
+      "point": "bb144-p004000-beam",
+      "local": 0.0012686540546097752,
+      "paper": 0.0013240820474950843,
+      "local_ci95": [
+        0.0007202833006612306,
+        0.0019835379856972435
+      ],
+      "local_over_paper": 0.9581385511644324,
+      "paper_inside": true
+    },
+    {
+      "point": "bb144-p005000-priortilt",
+      "local": 0.005508743317930598,
+      "paper": 0.00439469945387781,
+      "local_ci95": [
+        0.003143112967795064,
+        0.008555739405202501
+      ],
+      "local_over_paper": 1.2534971676094424,
+      "paper_inside": true
+    },
+    {
+      "point": "bb144-p005000-relay",
+      "local": 0.009531887394482814,
+      "paper": 0.007860099786113831,
+      "local_ci95": [
+        0.00546507791924981,
+        0.014707772543219422
+      ],
+      "local_over_paper": 1.2126929242453732,
+      "paper_inside": true
+    },
+    {
+      "point": "bb144-p005000-beam",
+      "local": 0.010883347421808959,
+      "paper": 0.011173111565604544,
+      "local_ci95": [
+        0.006249849135369598,
+        0.016757290736880804
+      ],
+      "local_over_paper": 0.9740659401730491,
+      "paper_inside": true
+    },
+    {
+      "point": "bb70-p000500-priortilt",
+      "local": 2.8888888888888887e-08,
+      "paper": 2.5427617873185898e-08,
+      "local_ci95": [
+        1.4311608822454367e-08,
+        5.2323322343428835e-08
+      ],
+      "local_over_paper": 1.1361225040019574,
+      "paper_inside": true
+    },
+    {
+      "point": "bb70-p000500-relay",
+      "local": 7.310709245362259e-08,
+      "paper": 8.986883756324493e-08,
+      "local_ci95": [
+        4.144547699721237e-08,
+        1.1453100626742952e-07
+      ],
+      "local_over_paper": 0.813486570382906,
+      "paper_inside": true
+    },
+    {
+      "point": "bb70-p000500-beam",
+      "local": 7.418595144678657e-08,
+      "paper": 6.972222222222221e-08,
+      "local_ci95": [
+        4.166700230498779e-08,
+        1.1830833572944165e-07
+      ],
+      "local_over_paper": 1.0640216143762218,
+      "paper_inside": true
+    },
+    {
+      "point": "bb70-p000800-priortilt",
+      "local": 1.693831916853704e-07,
+      "paper": 1.5657799418802937e-07,
+      "local_ci95": [
+        9.602581302253921e-08,
+        2.653589917963245e-07
+      ],
+      "local_over_paper": 1.0817815911089248,
+      "paper_inside": true
+    },
+    {
+      "point": "bb70-p000800-relay",
+      "local": 4.2722318461724735e-07,
+      "paper": 4.816781071295067e-07,
+      "local_ci95": [
+        2.4219913251108757e-07,
+        6.692959375169952e-07
+      ],
+      "local_over_paper": 0.8869474827561173,
+      "paper_inside": true
+    },
+    {
+      "point": "bb70-p000800-beam",
+      "local": 3.674539916545319e-07,
+      "paper": 3.763888888888889e-07,
+      "local_ci95": [
+        2.083150845203806e-07,
+        5.75660423806166e-07
+      ],
+      "local_over_paper": 0.9762615276430368,
+      "paper_inside": true
+    },
+    {
+      "point": "bb70-p001000-priortilt",
+      "local": 3.9583625594848494e-07,
+      "paper": 4.6778764699367433e-07,
+      "local_ci95": [
+        2.2440541155519567e-07,
+        6.201246084536525e-07
+      ],
+      "local_over_paper": 0.8461879198657797,
+      "paper_inside": true
+    },
+    {
+      "point": "bb70-p001000-relay",
+      "local": 9.800819063822045e-07,
+      "paper": 1.1130911166357822e-06,
+      "local_ci95": [
+        5.556231622095911e-07,
+        1.5354139351568879e-06
+      ],
+      "local_over_paper": 0.880504652075936,
+      "paper_inside": true
+    },
+    {
+      "point": "bb70-p001000-beam",
+      "local": 1.0805132949128724e-06,
+      "paper": 9.80952380952381e-07,
+      "local_ci95": [
+        6.125593602804179e-07,
+        1.6927510526675344e-06
+      ],
+      "local_over_paper": 1.1014941355907921,
+      "paper_inside": true
+    },
+    {
+      "point": "bb70-p002000-priortilt",
+      "local": 1.163633294417265e-05,
+      "paper": 1.5085533154519537e-05,
+      "local_ci95": [
+        6.596872729460543e-06,
+        1.822946218000058e-05
+      ],
+      "local_over_paper": 0.7713570892710858,
+      "paper_inside": true
+    },
+    {
+      "point": "bb70-p002000-relay",
+      "local": 2.196188383677033e-05,
+      "paper": 2.428477297730926e-05,
+      "local_ci95": [
+        1.2450755185220372e-05,
+        3.440501311596837e-05
+      ],
+      "local_over_paper": 0.9043479161732603,
+      "paper_inside": true
+    },
+    {
+      "point": "bb70-p002000-beam",
+      "local": 3.3007067123998774e-05,
+      "paper": 2.8486966820419017e-05,
+      "local_ci95": [
+        1.8712729681938322e-05,
+        5.170749989087027e-05
+      ],
+      "local_over_paper": 1.1586725723406894,
+      "paper_inside": true
+    },
+    {
+      "point": "gb102-p000500-priortilt",
+      "local": 1.2222222222222222e-08,
+      "paper": 1.1666666666666667e-08,
+      "local_ci95": [
+        3.588717693690741e-09,
+        2.9973530822673884e-08
+      ],
+      "local_over_paper": 1.0476190476190477,
+      "paper_inside": true
+    },
+    {
+      "point": "gb102-p000500-relay",
+      "local": 1.888888888888889e-08,
+      "paper": 1.511111111111111e-08,
+      "local_ci95": [
+        7.4103467155395394e-09,
+        3.932626298023522e-08
+      ],
+      "local_over_paper": 1.2500000000000002,
+      "paper_inside": true
+    },
+    {
+      "point": "gb102-p000800-priortilt",
+      "local": 1.2905263960987097e-07,
+      "paper": 1.1244776224975803e-07,
+      "local_ci95": [
+        7.316182719807435e-08,
+        2.0217638557165003e-07
+      ],
+      "local_over_paper": 1.147667477128018,
+      "paper_inside": true
+    },
+    {
+      "point": "gb102-p000800-relay",
+      "local": 1.501883137328862e-07,
+      "paper": 1.760230863746578e-07,
+      "local_ci95": [
+        8.514395152570273e-08,
+        2.3528793863644936e-07
+      ],
+      "local_over_paper": 0.853230771179734,
+      "paper_inside": true
+    },
+    {
+      "point": "gb102-p000800-beam",
+      "local": 2.0270734892281323e-07,
+      "paper": 1.911111111111111e-07,
+      "local_ci95": [
+        1.1491776547930489e-07,
+        3.175652644892533e-07
+      ],
+      "local_over_paper": 1.060677988549604,
+      "paper_inside": true
+    },
+    {
+      "point": "gb102-p001000-priortilt",
+      "local": 3.8468020460754335e-07,
+      "paper": 3.6369821759844206e-07,
+      "local_ci95": [
+        2.1808087802283554e-07,
+        6.026473392252441e-07
+      ],
+      "local_over_paper": 1.0576906511878137,
+      "paper_inside": true
+    },
+    {
+      "point": "gb102-p001000-relay",
+      "local": 4.4132211017154674e-07,
+      "paper": 4.86348004894521e-07,
+      "local_ci95": [
+        2.501920255353281e-07,
+        6.913835668937791e-07
+      ],
+      "local_over_paper": 0.9074204185689229,
+      "paper_inside": true
+    },
+    {
+      "point": "gb102-p001000-beam",
+      "local": 6.144885453197206e-07,
+      "paper": 5.8e-07,
+      "local_ci95": [
+        3.4836268188423285e-07,
+        9.62669210903904e-07
+      ],
+      "local_over_paper": 1.0594630091719321,
+      "paper_inside": true
+    },
+    {
+      "point": "gb102-p002000-priortilt",
+      "local": 1.906919763377626e-05,
+      "paper": 2.098878265545429e-05,
+      "local_ci95": [
+        1.0810788204474577e-05,
+        2.987350137203079e-05
+      ],
+      "local_over_paper": 0.908542336485666,
+      "paper_inside": true
+    },
+    {
+      "point": "gb102-p002000-relay",
+      "local": 2.7868735010660542e-05,
+      "paper": 2.455242688017085e-05,
+      "local_ci95": [
+        1.5799571007606672e-05,
+        4.365829629288809e-05
+      ],
+      "local_over_paper": 1.1350704818987984,
+      "paper_inside": true
+    },
+    {
+      "point": "gb102-p002000-beam",
+      "local": 2.7868735010660542e-05,
+      "paper": 2.8600900806211423e-05,
+      "local_ci95": [
+        1.5799571007606672e-05,
+        4.365829629288809e-05
+      ],
+      "local_over_paper": 0.974400603655397,
+      "paper_inside": true
+    }
+  ],
+  "preserved_previous_points": 28,
+  "frozen_file_count": 63,
+  "scope": "retained full-worker audit receipts with manifest/policy/frozen-identity verification; independent aggregate source/count/stopping/CI/work and prior-point reconciliation; no fresh complete raw-ledger/sample rehash and no simulation reruns",
+  "frozen_plan_sha256": "3e466081790d913ae2fb0a477f654bd0218504a79e7d969b989b62043b7e829c",
+  "csv_sha256": "f0650b3a71add569fbb2a60eb17680f23566d78f8cdca28aa91aac85a75fedb4",
+  "progress_committed_shots": 1861754800,
+  "progress_committed_errors": 1460
+}

@@ -1,0 +1,198 @@
+{
+  "frozen_file_count": 63,
+  "plan_sha256": "3e466081790d913ae2fb0a477f654bd0218504a79e7d969b989b62043b7e829c",
+  "points": [
+    {
+      "audit_sha256": "060d18556e6f36f9c96158774f49f76ef37b90b68ffc292482e62a0c593f2346",
+      "manifest_sha256": "74ef63c1c4501ba6f3c7428f77dcfbd92a95eac50082ed15534c78a5fed33f07",
+      "point": "bb144-p001000-priortilt"
+    },
+    {
+      "audit_sha256": "bee7dc09a1b539268045fda3721d560f5f630e932abe96ccd3fd1555807adfb5",
+      "manifest_sha256": "1011643821c40309546024d4bc1812555fa4d6b52e42ce747cb0adeed30bd81c",
+      "point": "bb144-p001000-relay"
+    },
+    {
+      "audit_sha256": "6a213142f6bb1ad0ad3548547ed1e93d5d427d04855a7dfeccaf81f2509e80df",
+      "manifest_sha256": "675580694fd5461332ecf9a633efc5a1152b330e36b424d73c624d0a8575b5f8",
+      "point": "bb144-p001000-beam"
+    },
+    {
+      "audit_sha256": "a98ca362cda6ca3d20a6c0a1ab987d41f3b225890a37811ecb810cffb33f246b",
+      "manifest_sha256": "af7bbdf06b0d4acc5823562f456caa01f11ae92712d49c155963d146c7d96081",
+      "point": "bb144-p002000-priortilt"
+    },
+    {
+      "audit_sha256": "85e76cbd982cb9083ea2c2e7bd41c4b72c5984fc19ed4318afd521b5a13da254",
+      "manifest_sha256": "db9e98290ab753d4c0c30de6be7af6bf9fd2d15d77ea1c82171ec0da8fd15b06",
+      "point": "bb144-p002000-relay"
+    },
+    {
+      "audit_sha256": "f71bbd688f4daf36980fd007659688eee8f077c823ea8a4290cb011c1fb7ff55",
+      "manifest_sha256": "ad6341741b58565364dd039fdef4c0ace869c446f11236c1ef8ddf2ce5fa049a",
+      "point": "bb144-p002000-beam"
+    },
+    {
+      "audit_sha256": "4b1a7b5d60abc6fb3cce38814f2ec08fd137e96adc41d8fc8dadaa2d890c0702",
+      "manifest_sha256": "49920a588e03d2f27a0c7040183313653ee5e02f99d5b3665c7cd1978004f012",
+      "point": "bb144-p003000-priortilt"
+    },
+    {
+      "audit_sha256": "15ea990c668fb7d940e8ce96abfb0bfd5fc355c2076dd5d702756b01aaaa79bd",
+      "manifest_sha256": "0f71a70f0ebfcfb92c07d22c1c19c89b1828432e43228206e0c329b100eeca5c",
+      "point": "bb144-p003000-relay"
+    },
+    {
+      "audit_sha256": "bdbdf8d8f7595df6a6be60a52fd44c5af2cbf8ad22fa22d08c8b97fac57d97b1",
+      "manifest_sha256": "bab2514f08d5ef690ac25b987a445497fff3aac604c8c8d23ce21a9a9e4fe98a",
+      "point": "bb144-p003000-beam"
+    },
+    {
+      "audit_sha256": "fe768c856a19114e9513a79148b3cf83498976168277602a43d7952f8ae69454",
+      "manifest_sha256": "11f346e4af31c7196b9ed92e080583bb1de5d23aa3f3a6685ed1b9894494e22a",
+      "point": "bb144-p004000-priortilt"
+    },
+    {
+      "audit_sha256": "1449e45577011d95b97f371e4494149a45d4f9eb9b048afcc8b5f481d0842166",
+      "manifest_sha256": "88f8aa60afd28400d1ae30f21af7d91d424775e7bd57d768d79e91384367b4b3",
+      "point": "bb144-p004000-relay"
+    },
+    {
+      "audit_sha256": "77937509c4e23f6638122e7784933508a5b566c03c55e301e8701519735148eb",
+      "manifest_sha256": "f1d2d961affc72fc82c58ef1efffdf68ecfc955986c0adb2bf77c0a267697c66",
+      "point": "bb144-p004000-beam"
+    },
+    {
+      "audit_sha256": "149c6b4581b1b669fdf668ba328c9fc8bab528fb7557df31d3227b72a266e7d3",
+      "manifest_sha256": "57c6c1811cfa2355c43fc58ab44df665a92dea791a17ceb8c76ce18877347f82",
+      "point": "bb144-p005000-priortilt"
+    },
+    {
+      "audit_sha256": "078d558be56589c80663fc320ffff7fb3530c58c3404738a5c044b9c40a6ed00",
+      "manifest_sha256": "625bf9e28953a53feb8d19188b0daf7c19b21d0b1c24b24388f6af41b15b2445",
+      "point": "bb144-p005000-relay"
+    },
+    {
+      "audit_sha256": "26391ccf165c9297267a280f99238b926c7cacfa7be3e89c27bfa5907fefc78a",
+      "manifest_sha256": "fefedac487c6bf283700ab5c3d762b6a8708363ac3f178917b51cf4abed78a4c",
+      "point": "bb144-p005000-beam"
+    },
+    {
+      "audit_sha256": "91158ebc75d6ccf745870496dc516c79cbe0ca0d857f2c3f51e79dc7cd41d0fe",
+      "manifest_sha256": "8cb2b5b225464db15b5d847b5701044a23fb969f3a0ac7454540a9ef57c8613c",
+      "point": "bb70-p000500-priortilt"
+    },
+    {
+      "audit_sha256": "76ab3e6483bb62dbb568c00e87bbce46fa04e0e9c56e41b2adee2fe765c6ca89",
+      "manifest_sha256": "b20d4f6e6f4465e3f0a5918ec74f8f269375d395b43733c7a360b481f9e8d6c2",
+      "point": "bb70-p000500-relay"
+    },
+    {
+      "audit_sha256": "8c949ee8341e51bab42bea3806ec92bbe23bb3f044471ad17a579ef9e7439c08",
+      "manifest_sha256": "2f31f8442349948c0b795a87de6227360cfe9b639ec16df0dd6ae7163879bc2a",
+      "point": "bb70-p000500-beam"
+    },
+    {
+      "audit_sha256": "7aa87a6a2c9c00c63945370f2a8edb2742a6c106be80c5ace6f34766005a1c91",
+      "manifest_sha256": "c5029a837a507825ced53a63b590b71645c64c540834eedc26545db4391c12ca",
+      "point": "bb70-p000800-priortilt"
+    },
+    {
+      "audit_sha256": "090054bae37995861501a0e70669872cfcef3cfa28a583993d3da6532ca19145",
+      "manifest_sha256": "b00e53024db7636efe77b8ebf25a9edc5b11da1d8ac7282b3997c8e02750474e",
+      "point": "bb70-p000800-relay"
+    },
+    {
+      "audit_sha256": "aafafecb1832da4802cf21e8cd8c6be35b874e08a07982a3b680b0ebcae863f3",
+      "manifest_sha256": "00977a209413e5fe7c2bfccbc58818c130005ca3006ad21183f12f0ee43150a9",
+      "point": "bb70-p000800-beam"
+    },
+    {
+      "audit_sha256": "9a8e6d51b4fc21bf6daf312d23652a9413921afe6688b7de3d9b2d23e9036f71",
+      "manifest_sha256": "9631cf67e7fbbbc3118f30fd2a2d6c8923d0e6cd195d20f8a6be54dba466749d",
+      "point": "bb70-p001000-priortilt"
+    },
+    {
+      "audit_sha256": "751549aec14ae8fb591a974ea1cf820d557c20c8656e7b2f9d0de1af1b9e393f",
+      "manifest_sha256": "dfb4f098ea2a5d111b13efa399ae0fc49b4da493927acde7af12784253efab9b",
+      "point": "bb70-p001000-relay"
+    },
+    {
+      "audit_sha256": "a685d4d7a312ec85d60e9a15b2741d95a538f14919a2d9fff872d4428681bd67",
+      "manifest_sha256": "96dc501e40a01a1beb2e81d04fec643a785ae74676e64c76fe09097c0642c7de",
+      "point": "bb70-p001000-beam"
+    },
+    {
+      "audit_sha256": "bf497423b85e77c37c505eaaa9aac8d1548d3a6f6570223705fe6fa8c808fa04",
+      "manifest_sha256": "c65de7a14f7f24fbac47153bca2009f66acb9e580691c49e483bb30de8803f3f",
+      "point": "bb70-p002000-priortilt"
+    },
+    {
+      "audit_sha256": "765681d857f824146f30f2e15fbaebdc60c2409086aefc14a710ffa10b152483",
+      "manifest_sha256": "534b4f4ca968ecc1397567aa317e678b1e9aa707fa711cdd3ac0bd972074a622",
+      "point": "bb70-p002000-relay"
+    },
+    {
+      "audit_sha256": "0a565bce272402e34adcde28bb0f551c2af4d5cae82e8a7593dbacb416e815e7",
+      "manifest_sha256": "0a3adb5f4c5cc9637c60ed36eb0e2e6b9f63660b64115e33a657815da933e53e",
+      "point": "bb70-p002000-beam"
+    },
+    {
+      "audit_sha256": "829b4da7ee2ce411cd78afa30b31225140c5ef67951d593e2f9d06560fb21606",
+      "manifest_sha256": "6e4ca06c895935e6f2d79667f848ffcce0e2c533a9c04b560db07f8f9dd526a6",
+      "point": "gb102-p000500-priortilt"
+    },
+    {
+      "audit_sha256": "d449e52bf691ff521af52ccaa927100472d905f48ee79b1b8a7f22e7edf87c50",
+      "manifest_sha256": "51bc17b747209c9a48e40e7208da3b6c9617c712fc99fe70bc981af642131b3f",
+      "point": "gb102-p000500-relay"
+    },
+    {
+      "audit_sha256": "23a7851263d77ade252e9d13e5488d357d5953630b7818becf39d44ea31dfa71",
+      "manifest_sha256": "562b494c914cadcc8efea74ed1aa64a702a24ede406d8d98b56c36d6310e0439",
+      "point": "gb102-p000800-priortilt"
+    },
+    {
+      "audit_sha256": "ca5d486f929eae7c0581a6d367d5b805defbc89f19ce77e3e82c74552fbfc073",
+      "manifest_sha256": "b82d848bcf528bc0cf8184ea8057ada79f90cbe614216c7e3a4e3b94670b8c70",
+      "point": "gb102-p000800-relay"
+    },
+    {
+      "audit_sha256": "dd91ec168f33cc8fb6b3382b83adec8ded0876bf172edd041f519fcd1cea2f55",
+      "manifest_sha256": "8d72c8b36879350804b11754f8a672f92ac63d5273e858b85549cbc4e50d3a50",
+      "point": "gb102-p000800-beam"
+    },
+    {
+      "audit_sha256": "5fa63b8f3158c94ac26cebd4d8befba28b96ff59da73105f957664060fa39dcf",
+      "manifest_sha256": "c8920d84137ed29fcf886d338905452656d235b191bb6a32dc15c5f4a06ec467",
+      "point": "gb102-p001000-priortilt"
+    },
+    {
+      "audit_sha256": "a970de98ca66ab48b95846d6ac9b4de06adcf77001d74ec96504f7d08b836551",
+      "manifest_sha256": "ee1c6cf6ee0f1f998b104adefb9eb667de63aabc0ae8e78284999f79793b5136",
+      "point": "gb102-p001000-relay"
+    },
+    {
+      "audit_sha256": "f2548debace8f2eac421960c296ae4a86bab772c3104f3e5924a27e44f5e38dc",
+      "manifest_sha256": "f11b81ad24a8b1aef441017ed05e25b69eacd689d32f7f4f9730e4682cac7b8a",
+      "point": "gb102-p001000-beam"
+    },
+    {
+      "audit_sha256": "6adbc240b4401f400eeda24ac0ff0ac9e0e055a81cbaac6f8257a27ad3eb5863",
+      "manifest_sha256": "a2769f64843ef4bece7903d680d2c9c200f442f0bab29aecad986a9cd6cb9202",
+      "point": "gb102-p002000-priortilt"
+    },
+    {
+      "audit_sha256": "6a04756241955ac5fd8d8a020df01d34e1b99610416151fb537fa2e400be7142",
+      "manifest_sha256": "dba4c6e1d3fb3e1277b32196920ccc9b82f7c5e91f88751e653c552903a5861f",
+      "point": "gb102-p002000-relay"
+    },
+    {
+      "audit_sha256": "1407480a9022d9d63a48842e98df9415bd0d218d6b4cf6073135cc76f23861b3",
+      "manifest_sha256": "467dc49d928004c25a604344f39905a1ab5a74ccd00874e947c94a8470cca3a2",
+      "point": "gb102-p002000-beam"
+    }
+  ],
+  "resource_amendment_sha256": "da570e399be73f21d768d015c124b02fb5ee82796bda498effa284e8ddeb6a22",
+  "scope": "Matching final full-worker audit/complete receipts and manifests/resolved policies; frozen identities and terminal summaries checked. Raw event ledgers and shared samples NOT freshly rehashed for this status snapshot. Canonical publication remains unchanged pending scheduled final collector."
+}

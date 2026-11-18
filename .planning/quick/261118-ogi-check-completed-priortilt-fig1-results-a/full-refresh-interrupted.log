@@ -1,0 +1,21 @@
+Traceback (most recent call last):
+  File "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/priortilt-2611-13373/parallel_report.py", line 18, in <module>
+    if __name__=='__main__':collect()
+                            ^^^^^^^^^
+  File "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/priortilt-2611-13373/parallel_report.py", line 10, in collect
+    report.collect()
+  File "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/priortilt-2611-13373/report.py", line 82, in collect
+    plan=run.load();values=rows(plan)
+                           ^^^^^^^^^^
+  File "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/priortilt-2611-13373/report.py", line 35, in rows
+    a=audited(plan,j)
+      ^^^^^^^^^^^^^^^
+  File "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/priortilt-2611-13373/report.py", line 28, in audited
+    run.verify_noise_binding(plan,job,basis,meta['start'],meta)
+  File "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/priortilt-2611-13373/run.py", line 159, in verify_noise_binding
+    if meta['sampling']!=expected or meta['sha256']!=value['noise_sha256'] or sha(path)!=meta['sha256']:raise ValueError('sample binding changed')
+                                                                              ^^^^^^^^^
+  File "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/priortilt-2611-13373/run.py", line 35, in sha
+    while block:=f.read(4*1024*1024):h.update(block)
+                 ^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt

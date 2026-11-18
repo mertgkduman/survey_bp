@@ -1,0 +1,37 @@
+{
+  "timestamp_utc": "2026-11-18T22:50:53Z",
+  "unchanged_full_previous_csv_rows": 28,
+  "status_snapshot_points": 38,
+  "methods": {
+    "priortilt": 13,
+    "relay": 13,
+    "beam": 12
+  },
+  "shots": 1661754800,
+  "errors": 1447,
+  "paper_values_inside_pointwise_local95": 38,
+  "local_over_paper_range": [
+    0.7713570892710858,
+    1.4007046137269938
+  ],
+  "fully_compared_strata": 12,
+  "priortilt_lowest_estimate_strata": 12,
+  "relay_over_priortilt_ler_range": [
+    1.1472441391201564,
+    2.9097715005943408
+  ],
+  "beam_over_priortilt_ler_range": [
+    1.4614529434263206,
+    2.836552312687852
+  ],
+  "parallel_work_points": 15,
+  "sealed_parallel_stages_declared_in_work_receipts": 145339,
+  "inherited_marker_digests_preserved_in_audits": 45747,
+  "inherited_markers_sampled_and_rehashed": 90,
+  "canonical_markers_npz_noise_sampled": 90,
+  "stage_markers_npz_noise_sampled": 87,
+  "resource_check_scope": "Retain completed full-worker audits; reconcile all additive receipt totals and all inherited marker digest maps. Fresh on-disk checks are deterministic first/middle/last per basis for inherited, canonical and stage evidence. This is not a fresh full-stage/ledger rehash.",
+  "computed_shots": 1190545664,
+  "retained_shots": 1189379980,
+  "speculative_shots": 1165684
+}

@@ -1,0 +1,629 @@
+{
+  "timestamp_utc": "2026-11-18T22:40:01Z",
+  "points": [
+    {
+      "point": "bb144-p001000-beam",
+      "audited": true,
+      "bases": {
+        "x": {
+          "shots": 53664836,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        },
+        "z": {
+          "shots": 68213472,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        }
+      }
+    },
+    {
+      "point": "bb144-p001000-priortilt",
+      "audited": true,
+      "bases": {
+        "x": {
+          "shots": 100000000,
+          "errors": 19,
+          "stop_reason": "shot_cap"
+        },
+        "z": {
+          "shots": 100000000,
+          "errors": 16,
+          "stop_reason": "shot_cap"
+        }
+      }
+    },
+    {
+      "point": "bb144-p001000-relay",
+      "audited": true,
+      "bases": {
+        "x": {
+          "shots": 37143730,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        },
+        "z": {
+          "shots": 41669172,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        }
+      }
+    },
+    {
+      "point": "bb144-p002000-beam",
+      "audited": true,
+      "bases": {
+        "x": {
+          "shots": 690348,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        },
+        "z": {
+          "shots": 888778,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        }
+      }
+    },
+    {
+      "point": "bb144-p002000-priortilt",
+      "audited": true,
+      "bases": {
+        "x": {
+          "shots": 1256803,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        },
+        "z": {
+          "shots": 1192846,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        }
+      }
+    },
+    {
+      "point": "bb144-p002000-relay",
+      "audited": true,
+      "bases": {
+        "x": {
+          "shots": 719387,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        },
+        "z": {
+          "shots": 477417,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        }
+      }
+    },
+    {
+      "point": "bb144-p003000-beam",
+      "audited": true,
+      "bases": {
+        "x": {
+          "shots": 21287,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        },
+        "z": {
+          "shots": 31527,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        }
+      }
+    },
+    {
+      "point": "bb144-p003000-priortilt",
+      "audited": true,
+      "bases": {
+        "x": {
+          "shots": 47671,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        },
+        "z": {
+          "shots": 80228,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        }
+      }
+    },
+    {
+      "point": "bb144-p003000-relay",
+      "audited": true,
+      "bases": {
+        "x": {
+          "shots": 24559,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        },
+        "z": {
+          "shots": 32816,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        }
+      }
+    },
+    {
+      "point": "bb144-p004000-beam",
+      "audited": true,
+      "bases": {
+        "x": {
+          "shots": 2957,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        },
+        "z": {
+          "shots": 2364,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        }
+      }
+    },
+    {
+      "point": "bb144-p004000-priortilt",
+      "audited": true,
+      "bases": {
+        "x": {
+          "shots": 4737,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        },
+        "z": {
+          "shots": 5752,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        }
+      }
+    },
+    {
+      "point": "bb144-p004000-relay",
+      "audited": true,
+      "bases": {
+        "x": {
+          "shots": 3155,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        },
+        "z": {
+          "shots": 2746,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        }
+      }
+    },
+    {
+      "point": "bb144-p005000-beam",
+      "audited": true,
+      "bases": {
+        "x": {
+          "shots": 280,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        },
+        "z": {
+          "shots": 338,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        }
+      }
+    },
+    {
+      "point": "bb144-p005000-priortilt",
+      "audited": true,
+      "bases": {
+        "x": {
+          "shots": 650,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        },
+        "z": {
+          "shots": 566,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        }
+      }
+    },
+    {
+      "point": "bb144-p005000-relay",
+      "audited": true,
+      "bases": {
+        "x": {
+          "shots": 315,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        },
+        "z": {
+          "shots": 393,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        }
+      }
+    },
+    {
+      "point": "bb70-p000500-beam",
+      "audited": true,
+      "bases": {
+        "x": {
+          "shots": 100000000,
+          "errors": 18,
+          "stop_reason": "shot_cap"
+        },
+        "z": {
+          "shots": 41011040,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        }
+      }
+    },
+    {
+      "point": "bb70-p000500-priortilt",
+      "audited": true,
+      "bases": {
+        "x": {
+          "shots": 100000000,
+          "errors": 8,
+          "stop_reason": "shot_cap"
+        },
+        "z": {
+          "shots": 100000000,
+          "errors": 18,
+          "stop_reason": "shot_cap"
+        }
+      }
+    },
+    {
+      "point": "bb70-p000500-relay",
+      "audited": true,
+      "bases": {
+        "x": {
+          "shots": 62610970,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        },
+        "z": {
+          "shots": 59078786,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        }
+      }
+    },
+    {
+      "point": "bb70-p000800-beam",
+      "audited": true,
+      "bases": {
+        "x": {
+          "shots": 16307665,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        },
+        "z": {
+          "shots": 9612294,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        }
+      }
+    },
+    {
+      "point": "bb70-p000800-priortilt",
+      "audited": true,
+      "bases": {
+        "x": {
+          "shots": 50216098,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        },
+        "z": {
+          "shots": 17759307,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        }
+      }
+    },
+    {
+      "point": "bb70-p000800-relay",
+      "audited": true,
+      "bases": {
+        "x": {
+          "shots": 13234136,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        },
+        "z": {
+          "shots": 8569842,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        }
+      }
+    },
+    {
+      "point": "bb70-p001000-beam",
+      "audited": true,
+      "bases": {
+        "x": {
+          "shots": 6624128,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        },
+        "z": {
+          "shots": 2982691,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        }
+      }
+    },
+    {
+      "point": "bb70-p001000-priortilt",
+      "audited": true,
+      "bases": {
+        "x": {
+          "shots": 13566669,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        },
+        "z": {
+          "shots": 9577053,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        }
+      }
+    },
+    {
+      "point": "bb70-p001000-relay",
+      "audited": true,
+      "bases": {
+        "x": {
+          "shots": 4405117,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        },
+        "z": {
+          "shots": 4672283,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        }
+      }
+    },
+    {
+      "point": "bb70-p002000-beam",
+      "audited": true,
+      "bases": {
+        "x": {
+          "shots": 117935,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        },
+        "z": {
+          "shots": 156889,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        }
+      }
+    },
+    {
+      "point": "bb70-p002000-priortilt",
+      "audited": true,
+      "bases": {
+        "x": {
+          "shots": 398510,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        },
+        "z": {
+          "shots": 366703,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        }
+      }
+    },
+    {
+      "point": "bb70-p002000-relay",
+      "audited": true,
+      "bases": {
+        "x": {
+          "shots": 170875,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        },
+        "z": {
+          "shots": 248101,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        }
+      }
+    },
+    {
+      "point": "gb102-p000500-beam",
+      "audited": false,
+      "bases": {
+        "x": {
+          "shots": 100000000,
+          "errors": 7,
+          "stop_reason": "shot_cap"
+        },
+        "z": {
+          "shots": 100000000,
+          "errors": 6,
+          "stop_reason": "shot_cap"
+        }
+      }
+    },
+    {
+      "point": "gb102-p000500-priortilt",
+      "audited": true,
+      "bases": {
+        "x": {
+          "shots": 100000000,
+          "errors": 6,
+          "stop_reason": "shot_cap"
+        },
+        "z": {
+          "shots": 100000000,
+          "errors": 5,
+          "stop_reason": "shot_cap"
+        }
+      }
+    },
+    {
+      "point": "gb102-p000500-relay",
+      "audited": true,
+      "bases": {
+        "x": {
+          "shots": 100000000,
+          "errors": 9,
+          "stop_reason": "shot_cap"
+        },
+        "z": {
+          "shots": 100000000,
+          "errors": 8,
+          "stop_reason": "shot_cap"
+        }
+      }
+    },
+    {
+      "point": "gb102-p000800-beam",
+      "audited": true,
+      "bases": {
+        "x": {
+          "shots": 21541473,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        },
+        "z": {
+          "shots": 22323309,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        }
+      }
+    },
+    {
+      "point": "gb102-p000800-priortilt",
+      "audited": true,
+      "bases": {
+        "x": {
+          "shots": 33064976,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        },
+        "z": {
+          "shots": 35932181,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        }
+      }
+    },
+    {
+      "point": "gb102-p000800-relay",
+      "audited": true,
+      "bases": {
+        "x": {
+          "shots": 25499672,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        },
+        "z": {
+          "shots": 35250303,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        }
+      }
+    },
+    {
+      "point": "gb102-p001000-beam",
+      "audited": true,
+      "bases": {
+        "x": {
+          "shots": 7643051,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        },
+        "z": {
+          "shots": 6864264,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        }
+      }
+    },
+    {
+      "point": "gb102-p001000-priortilt",
+      "audited": true,
+      "bases": {
+        "x": {
+          "shots": 10442982,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        },
+        "z": {
+          "shots": 12928582,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        }
+      }
+    },
+    {
+      "point": "gb102-p001000-relay",
+      "audited": true,
+      "bases": {
+        "x": {
+          "shots": 8178778,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        },
+        "z": {
+          "shots": 13101473,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        }
+      }
+    },
+    {
+      "point": "gb102-p002000-beam",
+      "audited": true,
+      "bases": {
+        "x": {
+          "shots": 156698,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        },
+        "z": {
+          "shots": 162358,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        }
+      }
+    },
+    {
+      "point": "gb102-p002000-priortilt",
+      "audited": true,
+      "bases": {
+        "x": {
+          "shots": 199810,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        },
+        "z": {
+          "shots": 279612,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        }
+      }
+    },
+    {
+      "point": "gb102-p002000-relay",
+      "audited": true,
+      "bases": {
+        "x": {
+          "shots": 156698,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        },
+        "z": {
+          "shots": 162358,
+          "errors": 20,
+          "stop_reason": "target_observable_errors"
+        }
+      }
+    }
+  ]
+}

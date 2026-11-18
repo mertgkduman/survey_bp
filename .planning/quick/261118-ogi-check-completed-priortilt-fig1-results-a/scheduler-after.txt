@@ -1,0 +1,4 @@
+             JOBID                           NAME      STATE   CPUS         TIME
+       61971019_29                priortilt-10cpu    RUNNING     10   1-06:32:01
+          59184152               mobile-gsd-mg551    RUNNING      2  28-04:48:50
+          61971020          priortilt-par-collect    PENDING      1         0:00

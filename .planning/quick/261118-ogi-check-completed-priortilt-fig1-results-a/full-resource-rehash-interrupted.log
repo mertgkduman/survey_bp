@@ -1,0 +1,15 @@
+PASS bb144-p001000-beam stages 13308 computed/retained/speculative shots 109019136 108902180 116956
+Traceback (most recent call last):
+  File "/hpc/group/pfisterlab/mg551/storage/survey_bp/.planning/quick/261118-ogi-check-completed-priortilt-fig1-results-a/check_resources.py", line 42, in <module>
+    for summary in pool.map(retained_summary,s['chunks'].items()):
+  File "/hpc/home/mg551/miniconda3/lib/python3.12/concurrent/futures/_base.py", line 619, in result_iterator
+    yield _result_or_cancel(fs.pop())
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/hpc/home/mg551/miniconda3/lib/python3.12/concurrent/futures/_base.py", line 317, in _result_or_cancel
+    return fut.result(timeout)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/hpc/home/mg551/miniconda3/lib/python3.12/concurrent/futures/_base.py", line 451, in result
+    self._condition.wait(timeout)
+  File "/hpc/home/mg551/miniconda3/lib/python3.12/threading.py", line 355, in wait
+    waiter.acquire()
+KeyboardInterrupt
