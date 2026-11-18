@@ -5,11 +5,11 @@ current_phase: 11
 current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
-stopped_at: Workbench feedback forecast delivered; no implementation authorized; research campaigns unchanged
-last_updated: "2026-11-17T21:39:20.444Z"
-last_activity: 2026-11-17
-last_activity_desc: Completed requested feedback forecast only across discovery, paper comparisons/work and controls/builder. No mock-up or production/catalog changes. Read earlier user-directed v2 revisions and latest781055fb paper update; actual browser observations use identical captured catalog for current and pre-paper-update UI. Snapshot453 active curves/3229 points/13 codes/0 circuits,7 paper options and565 builder presets. PriorTilt and OSDv2 benchmark absent; adaptation-only MacKay/LP views default empty; paper chart begins1260px below initial1050px viewport; min-sum changes float64→int8 and shortcut false→true; savedOSD general-builder route blocked, paper choice lost on reload. Forecast priorities/confidence and existing-feature guardrails recorded. Final browser run no errors; initial historical-route harness closure error retained/corrected. Source/catalog hashes unchanged; user preferences remain unvalidated, so all3 spike verdictsPARTIAL. Parent scientific phases, jobs, models and16 pre-existing collector changes untouched. Evidence920ef6db.
-state_head: 920ef6db22d13732ac866dbf887ab48c24fa2225
+stopped_at: 38 audited Fig1 points checked; all PriorTilt/Relay complete; last GB102 Beam audit and collector61971020 pending
+last_updated: "2026-11-18T22:54:19.664Z"
+last_activity: 2026-11-18
+last_activity_desc: "Checked38/39 full-worker-audited points (1,661,754,800 basis shots/1,447 observable errors):PriorTilt13/13,Relay13/13,Beam12/13. All38 paper ordinates lie within pointwise local95% intervals; PriorTilt lowest estimate in all12 complete three-method strata, with overlapping uncertainty and unmatched latency explicit. All28 prior full CSV rows identical. Separate checked status CSV/table retains final audit/complete receipts with manifest/policy/frozen checks, independent source/count/stopping/CI/work reconciliation and sampled disk bindings. Full rehash attempts deliberately stopped as duplicate work for status; logs retained and no completed fresh whole-ledger rehash claimed. Main publication remains28 pending final collector61971020. All39 sampling complete; GB102 Beam/.0005 final audit remains on10 CPUs. Fifteen parallel resource receipt totals reconcile1,190,545,664 computed=1,189,379,980 retained+1,165,684 speculative;45,747 inherited digests preserved in full audits, with90 inherited/90 canonical/87 stage disk bindings sampled. All63 frozen files and parent/resource identities unchanged. No simulations or production/public/v1/kernel/model/phase-gate changes;16 pre-existing collector outputs unstaged. Spike060 remainsPARTIAL. Evidence30275791."
+state_head: 30275791d1b027149119c05d822d0ed166c4cc86
 progress:
   total_phases: 15
   completed_phases: 9
@@ -34,8 +34,8 @@ Total Phases: 15
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
-Last activity: 2026-11-17 — spikes061–063 forecast workbench feedback from history and live UI
-Last Activity Description: Completed requested feedback forecast only across discovery, paper comparisons/work and controls/builder. No mock-up or production/catalog changes. Read earlier user-directed v2 revisions and latest781055fb paper update; actual browser observations use identical captured catalog for current and pre-paper-update UI. Snapshot453 active curves/3229 points/13 codes/0 circuits,7 paper options and565 builder presets. PriorTilt and OSDv2 benchmark absent; adaptation-only MacKay/LP views default empty; paper chart begins1260px below initial1050px viewport; min-sum changes float64→int8 and shortcut false→true; savedOSD general-builder route blocked, paper choice lost on reload. Forecast priorities/confidence and existing-feature guardrails recorded. Final browser run no errors; initial historical-route harness closure error retained/corrected. Source/catalog hashes unchanged; user preferences remain unvalidated, so all3 spike verdictsPARTIAL. Parent scientific phases, jobs, models and16 pre-existing collector changes untouched. Evidence920ef6db.
+Last activity: 2026-11-18 — quick261118-ogi checks all13 PriorTilt points and38 audited Fig1 results
+Last Activity Description: Checked38/39 full-worker-audited points (1,661,754,800 basis shots/1,447 observable errors):PriorTilt13/13,Relay13/13,Beam12/13. All38 paper ordinates lie within pointwise local95% intervals; PriorTilt lowest estimate in all12 complete three-method strata, with overlapping uncertainty and unmatched latency explicit. All28 prior full CSV rows identical. Separate checked status CSV/table retains final audit/complete receipts with manifest/policy/frozen checks, independent source/count/stopping/CI/work reconciliation and sampled disk bindings. Full rehash attempts deliberately stopped as duplicate work for status; logs retained and no completed fresh whole-ledger rehash claimed. Main publication remains28 pending final collector61971020. All39 sampling complete; GB102 Beam/.0005 final audit remains on10 CPUs. Fifteen parallel resource receipt totals reconcile1,190,545,664 computed=1,189,379,980 retained+1,165,684 speculative;45,747 inherited digests preserved in full audits, with90 inherited/90 canonical/87 stage disk bindings sampled. All63 frozen files and parent/resource identities unchanged. No simulations or production/public/v1/kernel/model/phase-gate changes;16 pre-existing collector outputs unstaged. Spike060 remainsPARTIAL. Evidence30275791.
 
 Previous source-scoring audit:
 Last activity: 2026-11-17 — quick261117-h97 audits author syndrome versus observable success
@@ -466,6 +466,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 | 261106-nd0 | Refine workbench curves, composable policies, circuit sweeps and per-point budgets | 2026-11-06 | dc39055 | Verified (144 tests + 22 browser checks) | [261106-nd0-refine-workbench-result-semantics-and-co](./quick/261106-nd0-refine-workbench-result-semantics-and-co/) |
 | 261117-kva | Verify 28 PriorTilt Fig1 points and explain small-matrix OSD runtime regressions | 2026-11-17 | 355b9e97 | — | [261117-kva-check-current-priortilt-fig1-results-and](./quick/261117-kva-check-current-priortilt-fig1-results-and/) |
+| 261118-ogi | Check 38 audited Fig1 results; all 13 PriorTilt points complete | 2026-11-18 | 30275791 | — | [261118-ogi-check-completed-priortilt-fig1-results-a](./quick/261118-ogi-check-completed-priortilt-fig1-results-a/) |
 
 ### Roadmap Evolution
 
@@ -501,7 +502,7 @@ Latest kernel work: completed F01 → F02 corrections and qualification in quick
 **Resume file:** None
 
 Last session: 2026-11-10T22:51:46+00:00
-Stopped at: Workbench feedback forecast delivered; no implementation authorized; research campaigns unchanged
+Stopped at: 38 audited Fig1 points checked; all PriorTilt/Relay complete; last GB102 Beam audit and collector61971020 pending
 Next step: Requested builder request action and display/catalog cleanup are complete; resume the existing Phase 11 scientific work when directed. Preserve identity versions and qualification labels. Phase 11 scientific gaps and Phase 5 human review remain open; Phase 7 stays paused.
 
 Design continuation: `.planning/phases/05-guided-and-perturbative-bp-interventions/05-DESIGN-TASKS.md`.

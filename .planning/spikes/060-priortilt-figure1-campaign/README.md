@@ -81,3 +81,31 @@ BB70 PriorTilt/.0005 after100M shots/basis with8/18 errors; that unaudited point
 is excluded. Parent/resource identities and63 frozen files unchanged. No new
 simulations or production changes; campaign remains PARTIAL. See the
 [check summary](../../quick/261117-kva-check-current-priortilt-fig1-results-and/SUMMARY.md).
+
+## All PriorTilt points audited — quick261118-ogi
+
+Checked status:38/39 fully worker-audited points (1,661,754,800 decoded
+memory-basis shots/1,447 observable errors):PriorTilt13/13,Relay13/13,Beam12/13.
+All39 have completed sampling; only GB102 Beam/p=.0005 awaits its full audit
+on10 CPUs. Collector61971020 remains pending. All38 paper ordinates fall within
+local pointwise95% intervals; ratios0.771–1.401. PriorTilt has the lowest estimate
+in all12 complete three-method strata, with overlapping uncertainty and no
+matched-latency claim. New rare PriorTilt values include BB144/.0012.917e-8,
+BB70/.0005 2.889e-8,GB102/.0005 1.222e-8 andGB102/.0008 1.291e-7 LER/cycle.
+All28 previous full CSV rows are unchanged.
+
+This is a separately labelled checked status CSV/table from matching final
+full-worker audit receipts, manifest/policy/frozen checks, independent aggregate
+source/count/stopping/interval/work checks and sampled on-disk bindings. It is
+not a completed fresh full raw-ledger rehash. Complete rehash attempts were
+deliberately stopped as duplicate work for a status query; logs retained.
+The main canonical publication stays at28 until the scheduled final collector
+refreshes it. All15 parallel receipt totals reconcile:1,190,545,664 computed
+shots=1,189,379,980 retained+1,165,684 speculative; all45,747 inherited digests
+are preserved in full-audit receipts. Fresh sampled checks cover90 inherited,
+90 canonical NPZ/noise and87 stage NPZ/noise bindings. All63 frozen files and
+parent/resource identities unchanged; no new simulations or production edits.
+Verdict remainsPARTIAL until the last audit completes. See the
+[check summary](../../quick/261118-ogi-check-completed-priortilt-fig1-results-a/SUMMARY.md),
+[all PriorTilt rates](../../quick/261118-ogi-check-completed-priortilt-fig1-results-a/PRIORTILT-TABLE.md)
+and [status CSV](../../quick/261118-ogi-check-completed-priortilt-fig1-results-a/comparison-snapshot.csv).
