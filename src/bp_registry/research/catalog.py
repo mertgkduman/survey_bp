@@ -1152,8 +1152,78 @@ def build_catalog(repository: Path) -> dict[str, Any]:
             "codes": codes, "circuits": circuits, "channels": input_registry(repository)["channels"], "datasets": datasets, "result_series": series,
             "public_retired_dataset_ids": registry.get("public_retired_dataset_ids", []),
             "limitations": ["Raw per-shot ledgers are never exported as though tracked when a study marks them local_only.", "A source transcription, canonical adaptation, and source-faithful result are distinct evidence statuses."]}
-    from .catalog_model import extend_catalog
-    return extend_catalog(catalog, registry, repository)
+    from .catalog_model import extend_catalog, validate_catalog
+    catalog = extend_catalog(catalog, registry, repository)
+    _add_priortilt_results(catalog, repository)
+    return validate_catalog(catalog)
+
+
+def _add_priortilt_results(catalog: dict[str, Any], repository: Path) -> None:
+    """Expose the audited X/Z aggregate without inventing a shot denominator."""
+    base = "data/reproductions/priortilt-2611-13373"
+    path = f"{base}/comparison.csv"
+    if not (repository / path).is_file():
+        return
+    paper_id = "priortilt-2611-13373-v1"
+    dataset_id = "priortilt-figure-1-canonical"
+    catalog["papers"].append({"paper_id": paper_id, "title": "PriorTilt: Decoding quantum LDPC codes with sparse perturbations of belief propagation priors", "identity": "arXiv:2611.13373v1", "kind": "paper", "source_url": "https://arxiv.org/abs/2611.13373v1", "evidence_path": f"{base}/RESULTS.md"})
+    code_ids = {}
+    for code in ("BB144", "BB70", "GB102"):
+        identifier = f"priortilt-{code.lower()}-memory-x"
+        code_ids[code] = identifier
+    names = {"priortilt": "PriorTilt", "relay": "RelayBP", "beam": "BeamSearch"}
+    for method, name in names.items():
+        catalog["decoders"].append({"decoder_id": f"priortilt-paper-{method}", "label": name, "evidence_status": "canonical_adaptation", "configuration": {"source": f"{base}/source.json", "method": method}})
+    points = []
+    grouped = {}
+    for row in _csv_rows(repository / path):
+        metadata = {
+            "source_figure": "1",
+            "source_evidence_path": path,
+            "audit_sha256": row["audit_sha256"],
+            "metric": "Logical error rate per cycle",
+            "confidence_level": 0.95,
+            "uncertainty_method": "simultaneous X/Z bounds, transformed to LER per cycle",
+            "cycles": _integer(row["cycles"]),
+            "denominator_definition": "separate X and Z memory samples, transformed to LER per cycle",
+        }
+        for basis in ("x", "z"):
+            for field in ("shots", "errors", "nonconvergence"):
+                key = f"{basis}_{field}"
+                metadata[key] = _integer(row[key])
+            for field in ("mean_iterations", "mean_directed_edge_updates", "mean_decode_ms"):
+                key = f"{basis}_{field}"
+                metadata[key] = _number(row[key])
+        point = _point(
+            x=_number(row["p"]), y=_number(row["ler_per_cycle"]),
+            ci_low=_number(row["ci95_low"]), ci_high=_number(row["ci95_high"]),
+            status="complete", source_value=_number(row["paper_ler_per_cycle"]), metadata=metadata,
+        )
+        points.append(point)
+        grouped.setdefault((row["code"], row["method"]), []).append(point)
+    catalog["datasets"].append(_dataset(dataset_id, label="PriorTilt Figure 1 canonical X/Z comparison", paper_id=paper_id, evidence_status="canonical_adaptation", source_path=path, points=points, assets=[_asset(repository, path, label="Audited comparison", kind="csv"), _asset(repository, f"{base}/RESULTS.md", label="Reproduction report", kind="report")], caveat="Separate X/Z samples with 20-error or 100-million-shot per-basis stopping; local bounds and paper uncertainty use different conventions."))
+    for (code, method), members in grouped.items():
+        decoder_id = f"priortilt-paper-{method}"
+        catalog["result_series"].append({"dataset_id": dataset_id, "code_id": code_ids[code], "decoder_id": decoder_id, "source_decoder_id": decoder_id, "label": names[method], "channel_kind": "embedded_circuit", "points": members, "series_id": f"{dataset_id}-{code.lower()}-{method}"})
+    catalog["experiments"].append({"experiment_id": dataset_id, "dataset_id": dataset_id, "paper_ids": [paper_id], "code_ids": list(code_ids.values()), "decoder_ids": [f"priortilt-paper-{method}" for method in names], "evidence_status": "canonical_adaptation", "description": "Audited source comparison using separate X and Z memories.", "reproduction_recipe": {"kind": "retained_source_only", "commands": [], "original_instruction_path": f"{base}/RESULTS.md", "budget_note": "Review the retained audited results and frozen plan."}})
+    catalog["paper_figures"].append({"figure_id": "priortilt-figure-1", "paper_id": paper_id, "label": "Figure 1 · Circuit-level logical error rates", "note": "Canonical adaptation using separate X and Z memories. The RelayBP and BeamSearch curves reproduce the comparisons in this paper.", "source_path": f"{base}/source.json", "source_figure": "1", "code_ids": list(code_ids.values()), "reproduction_rules": [{"dataset_id": dataset_id, "source_decoder_ids": [f"priortilt-paper-{method}" for method in names], "source_figure": "1"}]})
+    for figure in catalog["paper_figures"]:
+        if figure["figure_id"] in {"relay-css-comparison", "beam-css-comparison", "bpsf-css-comparison"}:
+            figure["label"] = "BB72 · Supplementary code-capacity study"
+    for method, target in (("relay", "relaybp-2506-01779-v2"), ("beam", "beamsearch-2512-07057-v2")):
+        name = names[method]
+        catalog["paper_figures"].append({
+            "figure_id": f"{method}-priortilt-figure-1",
+            "paper_id": target,
+            "label": f"{name} · PriorTilt Figure 1 comparison",
+            "note": "This is the canonical circuit-level adaptation of the comparison in PriorTilt Figure 1, with separately sampled X and Z memories. It uses the PriorTilt paper's configuration and is attributed to that paper.",
+            "source_path": f"{base}/RESULTS.md",
+            "source_figure": "1",
+            "code_ids": list(code_ids.values()),
+            "reproduction_rules": [],
+            "guest_rules": [{"dataset_id": dataset_id, "source_decoder_ids": [f"priortilt-paper-{method}"]}],
+            "guest_paper_id": paper_id,
+        })
 
 
 def write_catalog(repository: Path, destination: Path) -> dict[str, Any]:

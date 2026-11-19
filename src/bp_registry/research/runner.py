@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from types import SimpleNamespace
+
 import csv
 from hashlib import sha256, file_digest
 from importlib.metadata import PackageNotFoundError, version
@@ -56,6 +58,29 @@ def _code(spec: Mapping[str, object], repository: Mapping[str, object] | object 
 
 def _policy(decoder: Mapping[str, object]) -> BpFloodingPolicy | None:
     return None if decoder["policy"] is None else BpFloodingPolicy.from_spec(decoder["policy"])  # type: ignore[arg-type]
+
+
+def _mbbp_sweeps(ledger: Mapping[str, Any], check_count: int, policy: Mapping[str, Any]) -> int:
+    """Count started member passes from the committed check-local work ledger."""
+    bases = {basis["member_id"]: basis for basis in policy["options"]["bases"]}
+    total = 0
+    for member in ledger["execution"]["receipt"]["members"]:
+        checks = check_count + len(bases[member["member_id"]]["redundant_transforms"])
+        steps = member["work"]["convergence_checks"]
+        total += (steps + checks - 1) // checks
+    return total
+
+
+def _shared_sweeps(ledger: Mapping[str, Any], decoder: Any, policy: Mapping[str, Any]) -> int:
+    if policy["controller"] == "mbbp":
+        return _mbbp_sweeps(ledger, decoder.table.check_count, policy)
+    if policy["controller"] != "single" or policy["schedule"] == "flooding":
+        return ledger["iterations"]
+    if policy["schedule"] == "residual":
+        units = decoder.table.edge_count
+    else:
+        units = decoder._local_schedule("admission").unit_count
+    return (ledger["iterations"] + units - 1) // units
 
 
 def _append(records: list[dict[str, object]] | None, emit, record: dict[str, object]) -> None:
@@ -147,11 +172,28 @@ def _binary_rows(spec: Mapping[str, object], code: CssCode, *, emit=None, collec
         limits = _point_limits(spec, point_index)
         p0 = float(point["decoder_p0"])
         prior = 2.0 * p0 / 3.0 if channel["kind"] in {"depolarizing", "explicit"} else p0
-        x_graph = CompiledBinaryFlooding.from_check_matrix(code.hz, rule=rule, profile=profile, policy=policy)
-        z_graph = CompiledBinaryFlooding.from_check_matrix(code.hx, rule=rule, profile=profile, policy=policy)
+        shared = decoder.get("shared_policy")
+        tilt = decoder.get("prior_tilt")
+        if tilt is not None:
+            from bp_registry.canonical.prior_tilt import PriorTiltDecoder, PriorTiltSpec
+            from bp_registry.canonical.schedules import EdgeTable
+            prior_llrs = np.full(code.n, np.log((1.0 - prior) / prior))
+            tilt_spec = PriorTiltSpec(**tilt)
+            x_graph = PriorTiltDecoder(EdgeTable.from_check_matrix(code.hz), prior_llrs, tilt_spec, int(sampling["seed"]))
+            z_graph = PriorTiltDecoder(EdgeTable.from_check_matrix(code.hx), prior_llrs, tilt_spec, int(sampling["seed"]))
+        elif shared is not None:
+            from bp_registry.canonical.policy_decoder import BinaryPolicy, BinaryPolicyDecoder
+            shared_policy = BinaryPolicy.model_validate_json(json.dumps(shared))
+            x_graph = BinaryPolicyDecoder(code.hz, shared_policy)
+            z_graph = BinaryPolicyDecoder(code.hx, shared_policy)
+        else:
+            x_graph = CompiledBinaryFlooding.from_check_matrix(code.hz, rule=rule, profile=profile, policy=policy)
+            z_graph = CompiledBinaryFlooding.from_check_matrix(code.hx, rule=rule, profile=profile, policy=policy)
         if effective is None:
-            effective = {"x_component": x_graph.effective_numerics,
-                         "z_component": z_graph.effective_numerics, "resolved_rate_points": []}
+            effective = ({"prior_tilt": tilt, "resolved_rate_points": []} if tilt is not None else
+                         {"shared_policy": shared, "resolved_rate_points": []} if shared is not None else
+                         {"x_component": x_graph.effective_numerics,
+                          "z_component": z_graph.effective_numerics, "resolved_rate_points": []})
         effective["resolved_rate_points"].append({"physical_p": point.get("physical_p"),
             "decoder_p0": p0, "decoder_prior_kind": "separate_bernoulli_components",
             "x_bernoulli_probability": prior, "z_bernoulli_probability": prior,
@@ -165,8 +207,22 @@ def _binary_rows(spec: Mapping[str, object], code: CssCode, *, emit=None, collec
             started = time.perf_counter()
             sample = _sample_pauli(code, point, channel, seed=int(sampling["seed"]), shot_id=shot_id, point_index=point_index, prepared_code=pauli_code, code_identity=pauli_identity)
             sampled_at = time.perf_counter()
-            x = x_graph.run(sample.observation.syndrome[len(code.hx):], error_rate=prior, max_iterations=int(budget["max_iterations"]))
-            z = z_graph.run(sample.observation.syndrome[:len(code.hx)], error_rate=prior, max_iterations=int(budget["max_iterations"]))
+            x_syndrome = sample.observation.syndrome[len(code.hx):]
+            z_syndrome = sample.observation.syndrome[:len(code.hx)]
+            def decode_component(graph, syndrome, component):
+                if not np.any(syndrome):
+                    return SimpleNamespace(candidate=np.zeros(code.n, dtype=np.uint8), converged=True, iterations=0)
+                if tilt is not None:
+                    return graph.decode(syndrome, shot=shot_id)
+                if shared is not None:
+                    result = graph.decode(syndrome, error_rate=prior, shot_identity=f"{sample.sample_identity}:{component}")
+                    if shared["controller"] == "mbbp" or (shared["controller"] == "single" and shared["schedule"] != "flooding"):
+                        return SimpleNamespace(candidate=result.candidate, converged=result.converged,
+                                               iterations=_shared_sweeps(result.ledger, graph, shared), ledger=result.ledger)
+                    return result
+                return graph.run(syndrome, error_rate=prior, max_iterations=int(budget["max_iterations"]))
+            x = decode_component(x_graph, x_syndrome, "x")
+            z = decode_component(z_graph, z_syndrome, "z")
             decoded_at = time.perf_counter()
             truth = sample.hidden
             ev = evaluate_candidate(code, true_x=truth.x, true_z=truth.z, candidate_x=x.candidate, candidate_z=z.candidate)
@@ -186,6 +242,11 @@ def _binary_rows(spec: Mapping[str, object], code: CssCode, *, emit=None, collec
                             "candidate": sha256(_canonical({"sample": sample.sample_identity,
                                 "x": x.candidate.tolist(), "z": z.candidate.tolist()})).hexdigest()},
                 "iterations": {"x": x.iterations, "z": z.iterations}, "work_units": {"unit": "binary_component_sweeps", "x": x.iterations, "z": z.iterations},
+                **({"policy_execution": {"x": getattr(x, "ledger", None), "z": getattr(z, "ledger", None)}} if shared is not None else {}),
+                **({"prior_tilt_execution": {component: None if not hasattr(result, "trace") else
+                    {"rounds": result.trace.tolist(), "random_draws": result.random_draws,
+                     "directed_edge_updates": result.directed_edge_updates, "biased_node_updates": result.biased_node_updates}
+                    for component, result in (("x", x), ("z", z))}} if tilt is not None else {}),
                 "decode_seconds": decoded_at - sampled_at, "end_to_end_seconds": time.perf_counter() - started,
                 "sampling_mode": "adaptive_stopping" if _adaptive_sampling(limits) else "fixed_shots", "sampling_stop_mode": limits["stop_mode"],
                 "sampling_stop_reason": stop_reason})
@@ -216,7 +277,12 @@ def _bp4_rows(spec: Mapping[str, object], code: CssCode, *, emit=None, collect: 
         else:
             graph = CompiledBp4Graph.from_css(code, p0, rule=decoder["rule"], policy=policy)
         if effective is None:
-            effective = {**graph.effective_numerics, "resolved_rate_points": []}
+            if decoder["implementation"] == "qbp_variable_serial":
+                effective = {"algorithm": "qbp_variable_serial", "numerical_profile": profile.as_evidence(), "resolved_rate_points": []}
+            elif "mbp4" in decoder:
+                effective = {"algorithm": "fixed_alpha_mbp4", "mbp4": dict(decoder["mbp4"]), "numerical_profile": profile.as_evidence(), "resolved_rate_points": []}
+            else:
+                effective = {**graph.effective_numerics, "resolved_rate_points": []}
         effective["resolved_rate_points"].append({"physical_p": point.get("physical_p"),
             "decoder_p0": p0, "decoder_prior_kind": "depolarizing_joint",
             "decoder_prior_pauli_order": "I,X,Y,Z",
@@ -231,7 +297,27 @@ def _bp4_rows(spec: Mapping[str, object], code: CssCode, *, emit=None, collect: 
             started = time.perf_counter()
             sample = _sample_pauli(code, point, channel, seed=int(sampling["seed"]), shot_id=shot_id, point_index=point_index, prepared_code=pauli_code, code_identity=pauli_identity)
             sampled_at = time.perf_counter()
-            if decoder["variant"] == "qbpgd":
+            if not np.any(sample.observation.syndrome):
+                result = SimpleNamespace(candidate=np.zeros(code.n, dtype=np.uint8), iterations=0, converged=True)
+                iterations, converged = 0, True
+                extra = {"rounds": 0, "fixations": 0} if decoder["variant"] == "qbpgd" else {}
+            elif decoder["implementation"] == "qbp_variable_serial":
+                from bp_registry.quaternary.kernel import ScalarLlrBp4Kernel
+                from bp_registry.quaternary.schedules import QbpVariableSerialSchedule
+                session = ScalarLlrBp4Kernel(profile=profile).new_session(sample.observation, priors)
+                schedule = QbpVariableSerialSchedule(session)
+                result = session.last
+                for _ in range(int(budget["max_iterations"])):
+                    result = schedule.sweep().result
+                    if result.converged:
+                        break
+                iterations, converged, extra = result.iteration, result.converged, {}
+            elif "mbp4" in decoder:
+                from bp_registry.quaternary.mbp4 import FixedAlphaMbp4Kernel, Mbp4Spec
+                mbp4_spec = Mbp4Spec(**decoder["mbp4"], max_iterations=int(budget["max_iterations"]))
+                result = FixedAlphaMbp4Kernel(mbp4_spec, profile=profile).new_session(sample.observation, priors).run()
+                iterations, converged, extra = len(result.sweeps), result.termination == "converged", {}
+            elif decoder["variant"] == "qbpgd":
                 knobs = decoder["qbpgd"]
                 assert isinstance(knobs, Mapping)
                 result = graph.run_qbpgd(sample.observation.syndrome, iterations_per_round=int(knobs["iterations_per_round"]), epsilon=float(knobs["epsilon"]), round_limit=knobs["round_limit"])
@@ -255,12 +341,13 @@ def _bp4_rows(spec: Mapping[str, object], code: CssCode, *, emit=None, collect: 
                 "shot_id": shot_id, "sample_identity": sample.sample_identity,
                 "physical_channel_identity": sample.ledger["channel_identity"], "physical_pauli_order": sample.ledger["pauli_order"], "candidate": result.candidate.tolist(), "outcome": ev.outcome,
                 "logical_action": None if ev.logical_action is None else [list(row) for row in ev.logical_action], "converged": bool(converged),
-                "termination_reason": ("round_cap" if not converged else "first_valid") if decoder["variant"] == "qbpgd" else
+                "termination_reason": "zero_syndrome_shortcut" if iterations == 0 and converged else ("round_cap" if not converged else "first_valid") if decoder["variant"] == "qbpgd" else
                     "iteration_cap" if not decoder["stop_on_convergence"] or not converged else
                     "zero_syndrome_shortcut" if iterations == 0 else "first_valid",
                 "lineage": {"sample": sample.sample_identity, "original_problem": original.lineage_id,
                             "working_problem": working_id, "candidate": candidate_id},
                 "iterations": iterations, "work_units": {"unit": "bp4_joint_sweeps", "value": iterations, **extra}, "decode_seconds": decoded_at - sampled_at, "end_to_end_seconds": time.perf_counter() - started,
+                **({"mbp4_execution": result.as_evidence()} if "mbp4" in decoder and hasattr(result, "as_evidence") else {}),
                 "sampling_mode": "adaptive_stopping" if _adaptive_sampling(limits) else "fixed_shots", "sampling_stop_mode": limits["stop_mode"],
                 "sampling_stop_reason": stop_reason})
             total_used += 1
@@ -288,7 +375,12 @@ def _circuit_rows(spec: Mapping[str, object], repository: Mapping[str, object] |
         from bp_registry.circuit import CanonicalBpSinterDecoder
     except ImportError as error:
         raise RuntimeError("circuit execution requires the optional stim and sinter dependencies") from error
-    adapter = CanonicalBpSinterDecoder(max_iterations=int(decoder["max_iterations"]), rule=str(decoder["rule"]), tie_break=str(decoder["tie_break"]))
+    if "shared_policy" in decoder:
+        from bp_registry.canonical.policy_decoder import BinaryPolicy
+        from bp_registry.circuit import SharedPolicySinterDecoder
+        adapter = SharedPolicySinterDecoder(BinaryPolicy.model_validate_json(json.dumps(decoder["shared_policy"])))
+    else:
+        adapter = CanonicalBpSinterDecoder(max_iterations=int(decoder["max_iterations"]), rule=str(decoder["rule"]), tie_break=str(decoder["tie_break"]))
     rows: list[dict[str, object]] = []
     total_used = 0
     sweep = spec["channel"].get("noise_sweep")
@@ -299,6 +391,10 @@ def _circuit_rows(spec: Mapping[str, object], repository: Mapping[str, object] |
         circuit = stim.Circuit(current_text)
         dem = circuit.detector_error_model(decompose_errors=False)
         detailed = adapter.compile_decoder_for_dem(dem=dem)
+        if "prior_tilt" in decoder:
+            from bp_registry.canonical.prior_tilt import PriorTiltDecoder, PriorTiltSpec
+            tilt_decoder = PriorTiltDecoder(detailed.model.table, detailed.model.prior_llrs,
+                                            PriorTiltSpec(**decoder["prior_tilt"]), int(sampling["seed"]))
         sampler = circuit.compile_detector_sampler(seed=int(sampling["seed"]) + point_index)
         start = int(sampling["shot_start"])
         # Stim's stream is batch-shape dependent.  Advance the skipped prefix
@@ -319,24 +415,56 @@ def _circuit_rows(spec: Mapping[str, object], repository: Mapping[str, object] |
                 raise RuntimeError("legacy total max_shots reached before all rate-point stopping targets")
             detector, truth = sampler.sample(shots=1, separate_observables=True)
             shot_started = time.perf_counter()
-            prediction = sinter.predict_observables(dem=dem, dets=detector.astype(np.bool_), decoder="portable_canonical_bp", custom_decoders={"portable_canonical_bp": adapter})
-            predicted_at = time.perf_counter()
-            detailed_prediction, converged, iterations = detailed.decode_detailed(detector)
-            if not np.array_equal(prediction, detailed_prediction.astype(bool)):
-                raise RuntimeError("Sinter custom-decoder predictions disagree with the detailed canonical adapter")
+            policy_execution = None
+            zero_syndrome = not np.any(detector)
+            if zero_syndrome:
+                prediction = np.zeros((1, circuit.num_observables), dtype=np.bool_)
+                converged = np.ones(1, dtype=bool)
+                iterations = np.zeros(1, dtype=np.int64)
+                predicted_at = time.perf_counter()
+            elif "prior_tilt" in decoder:
+                result = tilt_decoder.decode(detector[0].astype(np.uint8) ^ detailed.model.syndrome_bias, shot=start + index)
+                prediction = (((detailed.model.observable_matrix @ result.candidate) % 2) ^ detailed.model.observable_bias)[None, :].astype(bool)
+                converged = np.array([result.converged], dtype=bool)
+                iterations = np.array([result.iterations], dtype=np.int64)
+                policy_execution = {"rounds": result.trace.tolist(), "random_draws": result.random_draws,
+                                    "directed_edge_updates": result.directed_edge_updates, "biased_node_updates": result.biased_node_updates}
+                predicted_at = time.perf_counter()
+            else:
+                prediction = sinter.predict_observables(dem=dem, dets=detector.astype(np.bool_), decoder="portable_canonical_bp", custom_decoders={"portable_canonical_bp": adapter})
+                predicted_at = time.perf_counter()
+                detail = detailed.decode_detailed(detector)
+                if "shared_policy" in decoder:
+                    detailed_prediction, converged, iterations = detail.predictions, detail.converged, detail.iterations
+                    policy_execution = detail.ledger[1]["binary_execution"]
+                    shared = decoder["shared_policy"]
+                    if shared["controller"] == "mbbp" or (shared["controller"] == "single" and shared["schedule"] != "flooding"):
+                        iterations = np.array([_shared_sweeps(policy_execution, detailed.decoder, shared)], dtype=np.int64)
+                else:
+                    detailed_prediction, converged, iterations = detail
+                if not np.array_equal(prediction, detailed_prediction.astype(bool)):
+                    raise RuntimeError("Sinter custom-decoder predictions disagree with the detailed canonical adapter")
             failure = bool(np.any(prediction[0] != truth[0]))
             flagged = failure and not bool(converged[0])
             unflagged = failure and bool(converged[0])
             failures += failure; type_i += flagged; type_ii += unflagged
             stop_reason = _stopping_reason(limits, shots=index + 1, failures=failures, type_i=type_i, type_ii=type_ii)
+            if zero_syndrome:
+                termination = "zero_syndrome_shortcut"
+            elif converged[0]:
+                termination = "detector_fit" if iterations[0] else "initial_candidate_fit"
+            else:
+                termination = "iteration_cap"
             row = {"kind": "shot", "family": "circuit_dem_bp", "rate_index": point_index, "p": point.get("physical_p"), "decoder_p0": None,
                    "setting_label": point["label"], "shot_id": start + index,
                    "detector_events": detector[0].astype(int).tolist(), "observable_truth": truth[0].astype(int).tolist(), "observable_prediction": prediction[0].astype(int).tolist(),
                    "detector_fit": bool(converged[0]), "observable_failure": failure, "type_i": flagged, "type_ii": unflagged,
                    "outcome": "observable_failure" if failure else "observable_success",
-                   "termination_reason": "initial_candidate_fit" if int(iterations[0]) == 0 and converged[0] else "detector_fit" if converged[0] else "iteration_cap",
+                   "termination_reason": termination,
                    "converged": bool(converged[0]), "iterations": int(iterations[0]), "work_units": {"unit": "circuit_dem_bp_sweeps", "value": int(iterations[0])}, "decode_seconds": predicted_at - shot_started, "end_to_end_seconds": time.perf_counter() - shot_started,
                    "sampling_mode": "adaptive_stopping" if _adaptive_sampling(limits) else "fixed_shots", "sampling_stop_mode": limits["stop_mode"], "sampling_stop_reason": stop_reason}
+            if "shared_policy" in decoder or "prior_tilt" in decoder:
+                row["policy_execution"] = policy_execution
             rows.append(row)
             total_used += 1
             if emit is not None: emit(row)
@@ -344,8 +472,11 @@ def _circuit_rows(spec: Mapping[str, object], repository: Mapping[str, object] |
             index += 1
         resolved.append({"label": point["label"], "physical_p": point.get("physical_p"), "stim_sha256": sha256(current_text.encode()).hexdigest(), "dem_sha256": sha256(str(dem).encode()).hexdigest()})
     numerics = REFERENCE_CPU_F64 if decoder["rule"] == "spa" else MIN_SUM_CPU_F64
+    numerical_evidence = ({"backend": "canonical-prior-tilt", "policy": decoder["prior_tilt"]} if "prior_tilt" in decoder else
+                          {"backend": "shared-binary-policy", "policy": decoder["shared_policy"]} if "shared_policy" in decoder else
+                          {**numerics.as_evidence(), "backend": "cpu-numba-circuit-adapter", "exact_zero_decision": int(decoder["tie_break"] == "one")})
     return rows, {"dem_sha256": [item["dem_sha256"] for item in resolved], "adapter": dict(decoder),
-        "numerical_profile": {**numerics.as_evidence(), "backend": "cpu-numba-circuit-adapter", "exact_zero_decision": int(decoder["tie_break"] == "one")}, "sinter_prediction": True,
+        "numerical_profile": numerical_evidence, "sinter_prediction": "prior_tilt" not in decoder,
         "detectors": circuit.num_detectors, "observables": circuit.num_observables,
         "dem_projection": "independent_mechanisms; logical-only and detector-free faults follow the existing adapter bias/projection contract",
         "observable_evaluation": "any declared observable prediction differs from sampled truth; type_i is an observable failure without detector fit and type_ii is an observable failure with detector fit",

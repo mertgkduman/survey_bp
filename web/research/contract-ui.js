@@ -46,8 +46,10 @@ const known=v=>typeof v==="number"&&Number.isFinite(v);
     closed(spec.provenance, contract.field_sets.provenance, "provenance");
     closed(spec.problem, contract.field_sets[circuit ? "circuit_problem" : "code_problem"], "problem");
     closed(spec.channel, spec.channel.kind === "embedded_circuit" ? ["kind","noise_sweep"] : contract.field_sets[spec.channel.kind === "explicit" ? "explicit_channel" : "channel"], "channel", ["noise_sweep"]);
-    const decoderFields = [...contract.field_sets[circuit ? "circuit_decoder" : "decoder"], ...(!circuit && d.variant === "qbpgd" ? ["qbpgd"] : [])];
-    closed(d, decoderFields, "decoder");
+    const portable = d.implementation === "shared_policy" || d.implementation === "prior_tilt";
+    const routeFields = ["shared_policy", "prior_tilt", "mbp4"];
+    const decoderFields = [...new Set([...contract.field_sets[circuit ? "circuit_decoder" : "decoder"], ...routeFields, ...(!circuit && d.variant === "qbpgd" ? ["qbpgd"] : [])])];
+    closed(d, decoderFields, "decoder", routeFields);
     if (errors.length) return errors;
     for (const field of ["stop_failures", "stop_type_i", "stop_type_ii"]) if (spec.sampling[field] != null) check(Number.isSafeInteger(spec.sampling[field]) && spec.sampling[field] > 0, `${field} must be a positive integer or empty.`);
 
@@ -71,6 +73,38 @@ const known=v=>typeof v==="number"&&Number.isFinite(v);
     }
     if(spec.budgets.max_shots!=null){check(Number.isSafeInteger(spec.budgets.max_shots)&&spec.budgets.max_shots>0,'Legacy total budget must be positive or null.');const targets=spec.rate_points.map((_,i)=>sampling(spec,i).shots);if(targets.every(v=>v!=null))check(spec.budgets.max_shots>=targets.reduce((a,b)=>a+b,0)+(circuit?spec.rate_points.length*spec.sampling.shot_start:0),'Legacy total budget is smaller than the per-point shot targets.');}
     check(Number.isSafeInteger(spec.budgets.max_iterations) && spec.budgets.max_iterations >= (circuit ? 0 : 1), "Supply an integer iteration cap.");
+    if(portable){
+      check(d.family === (circuit ? "circuit_dem_bp" : "binary_css"),"This policy requires binary CSS or a circuit detector error model.");
+      if(!circuit)check(d.variant === "plain" && d.policy === null && d.stop_on_convergence === true,"The selected policy owns the binary check and stopping rules.");
+      if(d.implementation === "prior_tilt"){
+        const p=d.prior_tilt;
+        closed(p,["initial","round_len","rounds","ends","phases"],"PriorTilt parameters",["ends","phases"]);
+        check(!("shared_policy" in d),"Supply one canonical policy route.");
+        check(p && Number.isSafeInteger(p.initial) && Number.isSafeInteger(p.round_len) && Number.isSafeInteger(p.rounds)
+          && p.round_len>0 && p.initial>=p.round_len && p.rounds>=0 && p.initial+p.rounds*p.round_len<=spec.budgets.max_iterations,
+          "PriorTilt requires a total sweep cap covering initial + rounds × round length.");
+      }else{
+        const p=d.shared_policy;
+        check(!("prior_tilt" in d),"Supply one canonical policy route.");
+        check(p?.version==="binary-policy-v1"&&["single",...(contract.shared_policy_controllers||[])].includes(p.controller),"Unknown canonical binary policy or controller.");
+        if(p?.controller==="single")check(p.max_iterations===spec.budgets.max_iterations,"The shared policy iteration cap must match the total budget.");
+        if(p?.controller==="guided_decimation")check(p.options?.round_limit*p.options?.sweeps_per_round<=spec.budgets.max_iterations,"BPGD rounds × sweeps exceed the total iteration budget.");
+        if(p?.schedule==="layered")check(Array.isArray(p.partitions)&&p.partitions.length>0,"Layered scheduling requires check partitions.");
+        if(p?.memory?.bindings?.some((b,i)=>b.kind==="pdprime_delta_mix"&&i!==0))errors.push("PD-prime delta mixing requires a fixed prior and the first field position.");
+        if(p?.memory&&["residual","group_shuffled"].includes(p.schedule))errors.push("The selected schedule requires unmodified memory.");
+      }
+    }else if(d.implementation==="mbp4"){
+      closed(d.mbp4,["alpha","schedule"],"MBP4 parameters");
+      check(!circuit&&d.family==="bp4"&&d.variant==="plain"&&d.rule==="sum_product"&&d.policy===null&&d.stop_on_convergence===true&&
+        known(d.mbp4?.alpha)&&d.mbp4.alpha>0&&["qbp_flooding","qbp_variable_serial"].includes(d.mbp4.schedule),
+        "MBP4 requires a fixed positive α and a compatible Pauli schedule.");
+      check(!("shared_policy" in d)&&!("prior_tilt" in d),"Supply one canonical policy route.");
+    }else{
+      check(!routeFields.some(k=>k in d),"The implementation must match the supplied policy route.");
+      if(d.implementation==="qbp_variable_serial")check(!circuit&&d.family==="bp4"&&d.variant==="plain"&&d.rule==="sum_product"&&d.policy===null&&d.stop_on_convergence===true,
+        "Variable-serial Q-BP uses the plain sum-product kernel and first-valid stopping.");
+    }
+
     if (circuit) {
       closed(spec.problem.circuit, contract.field_sets[spec.problem.circuit?.kind === "registered" ? "registered_input" : "inline_stim"], "circuit");
       closed(spec.problem.dem, ["decompose_errors"], "dem");
@@ -79,7 +113,7 @@ const known=v=>typeof v==="number"&&Number.isFinite(v);
       else check(spec.rate_points.length===1,'A circuit sweep needs its declared source noise probability.');
       for(const p of spec.rate_points){closed(p,sweep?['label','physical_p']:contract.field_sets.circuit_rate_point,'circuit rate point');check(typeof p.label==='string'&&p.label.length>0,'Circuit settings need a label.');if(sweep)check(known(p.physical_p)&&p.physical_p>=0&&p.physical_p<=1,'Circuit noise rates must lie in [0,1].');}
       if(sweep&&spec.problem.circuit?.kind==='inline_stim')for(const point of spec.rate_points)try{sweepStim(spec.problem.circuit.text,sweep.source_probability,point.physical_p,contract);}catch(e){errors.push(e.message);}
-      check(d.family === "circuit_dem_bp" && d.implementation === "canonical_sinter" && contract.rules_by_family.circuit_dem_bp.includes(d.rule) && d.numerical_profile === contract.circuit_rule_profiles[d.rule], "Circuit execution supports only the pinned plain float64 v1 Sinter adapter.");
+      check(d.family === "circuit_dem_bp" && (d.implementation === "canonical_sinter" || portable) && contract.rules_by_family.circuit_dem_bp.includes(d.rule) && d.numerical_profile === contract.circuit_rule_profiles[d.rule], "The detector-kernel rule and profile do not agree.");
       check(!("policy" in d) && !["damping", "resolution", "variant"].some(k => k in d), "Circuit damping, resolution overlays, and interventions are unsupported.");
       check(spec.channel.kind === "embedded_circuit" && spec.problem.dem?.decompose_errors === false, "Circuit noise comes from Stim text and requires decompose_errors=false.");
       check(spec.problem.circuit?.kind === "registered" || (spec.problem.circuit?.kind === "inline_stim" && typeof spec.problem.circuit.text === "string" && spec.problem.circuit.text.trim().length > 0), "Supply Stim text or a registered circuit.");
@@ -93,7 +127,7 @@ const known=v=>typeof v==="number"&&Number.isFinite(v);
       check(spec.problem.kind === (d.family === "bp4" ? "pauli_code_capacity" : "css_code_capacity"), "Decoder family and problem regime disagree.");
       check(["depolarizing", "x_only", "explicit"].includes(spec.channel.kind), "Unsupported code-capacity noise model.");
       check(contract.rules.includes(d.rule), "Unsupported update rule.");
-      check(d.implementation === "compiled", "This custom experiment route uses the compiled canonical implementation.");
+      check(d.implementation === "compiled" || ["mbp4","qbp_variable_serial"].includes(d.implementation) || portable, "Unknown canonical implementation.");
       if (d.family === "binary_css") check(d.variant === "plain" && d.stop_on_convergence === true, "Binary compiled BP uses first-valid stopping and plain BP only.");
       if (d.family === "binary_css" && d.rule === "min_sum") check(d.policy !== null, "Binary min-sum requires its explicit v2 numerical policy overlay.");
       if (d.family === "bp4") check(["plain", "qbpgd"].includes(d.variant) && typeof d.stop_on_convergence === "boolean", "Unsupported BP4 procedure or stopping rule.");

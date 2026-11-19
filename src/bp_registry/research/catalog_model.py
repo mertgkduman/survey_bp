@@ -48,7 +48,7 @@ def validate_catalog(catalog: dict[str, Any]) -> dict[str, Any]:
             if not isinstance(figure.get(field), str) or not figure[field]:
                 raise ValueError(f"paper figure needs {field}")
         codes = figure.get("code_ids")
-        if not isinstance(codes, list) or not codes or any(c not in indexes["codes"] for c in codes):
+        if not isinstance(codes, list) or not codes or any(c not in indexes["codes"] and c not in indexes["circuits"] for c in codes):
             raise ValueError("paper figure has unresolved codes")
         rules = figure.get("reproduction_rules")
         if not isinstance(rules, list):
@@ -60,6 +60,14 @@ def validate_catalog(catalog: dict[str, Any]) -> dict[str, Any]:
             arms = rule.get("source_decoder_ids")
             if not isinstance(arms, list) or not arms or any(not isinstance(a, str) or not a for a in arms):
                 raise ValueError("paper reproduction rules need explicit decoder arms")
+        for rule in figure.get("guest_rules", []):
+            dataset = indexes["datasets"].get(rule.get("dataset_id"))
+            guest_paper = figure.get("guest_paper_id")
+            if dataset is None or guest_paper not in dataset.get("paper_ids", [dataset.get("paper_id")]):
+                raise ValueError("guest figure rule has an unresolved source paper or dataset")
+            arms = rule.get("source_decoder_ids")
+            if not isinstance(arms, list) or not arms or any(not isinstance(a, str) or not a for a in arms):
+                raise ValueError("guest figure rules need explicit decoder arms")
     for experiment in catalog["experiments"]:
         for paper in experiment.get("paper_ids", []):
             if paper not in indexes["papers"]:

@@ -32,7 +32,7 @@ def verify(url,output):
     with sync_playwright() as p:
         browser = p.chromium.launch();page = browser.new_page(accept_downloads=True,viewport={'width':1550,'height':1100})
         page.on('pageerror',lambda error:errors.append(str(error)))
-        app = (REPO/'web/research/app.js').read_text().replace('\nload();','\nwindow.testRefreshCatalog=c=>{S.catalog=c;fillSavedChoices();renderCards();availability();};\nload();')
+        app = (REPO/'web/research/app.js').read_text().replace('\nload();','\nwindow.testRefreshCatalog=c=>{S.catalog=c;fillSavedChoices();renderCards();};\nload();')
         page.route('**/app.js',lambda route:route.fulfill(body=app,content_type='text/javascript'))
         page.route('**/catalog.json',lambda route:route.fulfill(body=json.dumps(catalog),content_type='application/json'))
         page.goto(url+'#results');page.wait_for_function("document.querySelector('#catalog-status').textContent.includes('measured')")

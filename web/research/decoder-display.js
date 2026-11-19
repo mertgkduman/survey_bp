@@ -15,8 +15,32 @@ function describe(decoder,series={}){
  const isJoint=family=>['bp4','joint_pauli_bp4','quaternary'].includes(family);
  const ruleName=x=>({sum_product:'SP',spa:'SP',direct_extrinsic_tanh_product:'SP',min_sum:'MS',offset_min_sum:'OMS',binary_spa:'SP'})[x]||x;
  let retired=null;
- if(request){const d=request.decoder,p=d.policy;algorithm=d.family==='circuit_dem_bp'?'Detector BP':d.variant==='qbpgd'?'Q-BPGD':d.family==='bp4'?'Q-BP':'Binary BP';rule=ruleName(d.rule);precision=p?.resolution?.format||(d.family==='bp4'&&d.rule==='min_sum'?'int8':'float64');const v1=/^(binary-spa-flooding|quaternary-bp4)-f64-v1$/.test(d.numerical_profile||'');if(v1&&d.family!=='circuit_dem_bp')retired='Retired globally clipped code-capacity v1 kernel';
-  add('d',p?.damping??(d.numerical_profile?.endsWith('-v2')&&d.rule!=='min_sum'?.1:0));if(d.variant==='qbpgd'){add('Tᵣ',d.qbpgd.iterations_per_round);add('R',d.qbpgd.round_limit);add('ε',d.qbpgd.epsilon);}else add('T',d.max_iterations??request.budgets.max_iterations);if(p?.resolution?.scale!=null)add('s',p.resolution.scale);else if(d.family==='bp4'&&d.rule==='min_sum')add('s',16);if(d.rule==='min_sum'){add('α',p?.alpha??1);add('β',p?.beta??0);}const priors=[...new Set(request.rate_points.map(p=>p.decoder_p0))];if(d.family!=='circuit_dem_bp')add('p₀',request.rate_points.every(p=>p.decoder_p0===p.physical_p)?'p':priors.length===1?priors[0]:'sweep');
+ if(request){
+  const d=request.decoder,shared=d.shared_policy,controller=shared?.controller;
+  const p=d.policy||shared?.flooding_policy;
+  const controllerNames={guided_decimation:'BPGD',beam:'BeamSearch',relay:'RelayBP',syndrome_flip:'BP-SF',impulse:'Impulse BP',freezing:'Freezing BP',sign_flip:'Sign-flip BP',restart_belief:'Restart Belief',mbbp:'Multiple-bases BP'};
+  algorithm=d.implementation==='prior_tilt'?'PriorTilt':d.implementation==='mbp4'?'MBP4':d.implementation==='qbp_variable_serial'?'Q-BP variable serial':controllerNames[controller]||
+   (d.family==='circuit_dem_bp'?'Detector BP':d.variant==='qbpgd'?'Q-BPGD':d.family==='bp4'?'Q-BP':'Binary BP');
+  rule=ruleName(['prior_tilt','relay','beam','sign_flip','mbbp'].includes(d.implementation==='prior_tilt'?d.implementation:controller)?
+   'min_sum':p?.check_rule||shared?.rule||d.rule);
+  precision=p?.resolution?.format||(d.family==='bp4'&&d.rule==='min_sum'?'int8':'float64');
+  const v1=/^(binary-spa-flooding|quaternary-bp4)-f64-v1$/.test(d.numerical_profile||'');
+  if(v1&&d.family!=='circuit_dem_bp'&&d.implementation==='compiled')retired='Retired globally clipped code-capacity v1 kernel';
+  const damping=shared?.memory?.bindings?.find(binding=>binding.kind==='v2c_damping');
+  add('d',p?.damping??(damping?1-damping.parameters.gamma:shared?.damping_gamma==null?
+   (d.implementation==='compiled'&&d.numerical_profile?.endsWith('-v2')&&d.rule!=='min_sum'?.1:0):1-shared.damping_gamma));
+  if(d.variant==='qbpgd'){add('Tᵣ',d.qbpgd.iterations_per_round);add('R',d.qbpgd.round_limit);add('ε',d.qbpgd.epsilon);}
+  else if(controller==='guided_decimation'){add('Tᵣ',shared.options.sweeps_per_round);add('R',shared.options.round_limit);}
+  else if(d.implementation==='prior_tilt'){add('I₀',d.prior_tilt.initial);add('Tᵣ',d.prior_tilt.round_len);add('R',d.prior_tilt.rounds);}
+  else add('T',d.max_iterations??request.budgets.max_iterations);
+  if(d.implementation==='mbp4')add('α',d.mbp4.alpha);
+  if(p?.resolution?.scale!=null)add('s',p.resolution.scale);else if(d.family==='bp4'&&d.rule==='min_sum')add('s',16);
+  if(p?.check_rule==='min_sum'){add('α',p.alpha);add('β',p.beta);}
+  const priors=[...new Set(request.rate_points.map(p=>p.decoder_p0))];
+  if(d.family!=='circuit_dem_bp')add('p₀',request.rate_points.every(p=>p.decoder_p0===p.physical_p)?'p':priors.length===1?priors[0]:'sweep');
+ }else if(series.dataset_id==='priortilt-figure-1-canonical'){
+  algorithm=({priortilt:'PriorTilt',relay:'RelayBP',beam:'BeamSearch'})[cfg.method]||series.label;
+  precision='float64';
  }else if(effective.family==='bpgd'){algorithm='BPGD';rule=ruleName(effective.check_rule);precision=effective.message_resolution||effective.precision;add('d',effective.damping_old);add('cᵥ',effective.binary_paper_v2c_cap);add('Tᵣ',effective.controller.iterations_per_round);add('R',effective.controller.round_limit);add('p₀',effective.prior);
  }else if(effective.controller?.kind==='unicycle_extra_bit_hypotheses'){algorithm='Unicycle BP';rule=ruleName(effective.check_rule);precision=effective.message_resolution||effective.precision;add('d',effective.v2c_damping);add('c',effective.check_cap);add('T',effective.max_iterations);add('Tₕ',effective.controller.iterations_per_branch);add('H',effective.controller.branch_count);if(effective.controller.certified_pruning)add('d_min',effective.controller.minimum_distance_bounds?.[series.code_id]);add('p₀',effective.prior);
  }else if(effective.controller){algorithm='Q-BPGD';rule='SP';precision='float64';const p=effective.arm_policy;add('d',p.v2c_damping);add('c',p.check_cap);add('p₀',p.decoder_p0);add('Tᵣ',effective.controller.iterations_per_round);add('R',effective.controller.round_limit);add('ε',effective.controller.epsilon);

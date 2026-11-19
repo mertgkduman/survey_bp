@@ -246,6 +246,38 @@
       "stop_type_ii"
     ]
   },
+  "mbp4": {
+    "domains": [
+      "bp4"
+    ],
+    "fields": [
+      "alpha",
+      "schedule"
+    ],
+    "schedules": [
+      "qbp_flooding",
+      "qbp_variable_serial"
+    ]
+  },
+  "prior_tilt": {
+    "domains": [
+      "binary_css",
+      "circuit_dem_bp"
+    ],
+    "fields": [
+      "initial",
+      "round_len",
+      "rounds",
+      "ends",
+      "phases"
+    ],
+    "phase_order": [
+      "pi",
+      "c1",
+      "c2",
+      "theta"
+    ]
+  },
   "profiles": {
     "binary_css": [
       "binary-spa-flooding-f64-v1",
@@ -260,10 +292,22 @@
       "binary-min-sum-flooding-f64-v1"
     ]
   },
+  "qbp_variable_serial": {
+    "domains": [
+      "bp4"
+    ],
+    "numerical_profile": "quaternary-bp4-f64-v1"
+  },
   "registered_circuit_ids": [
     "relay-surface-d3",
     "relay-bb144-memory-z",
-    "beamsearch-bb144-memory-z-p005"
+    "beamsearch-bb144-memory-z-p005",
+    "priortilt-bb144-memory-x",
+    "priortilt-bb144-memory-z",
+    "priortilt-bb70-memory-x",
+    "priortilt-bb70-memory-z",
+    "priortilt-gb102-memory-x",
+    "priortilt-gb102-memory-z"
   ],
   "registered_code_aliases": {
     "A5": "a5",
@@ -333,6 +377,18 @@
     ]
   },
   "schema": "research-experiment-v1",
+  "shared_policy_controllers": [
+    "single",
+    "guided_decimation",
+    "beam",
+    "relay",
+    "syndrome_flip",
+    "impulse",
+    "freezing",
+    "sign_flip",
+    "restart_belief",
+    "mbbp"
+  ],
   "stim_noise_sweep": {
     "argument_match_tolerance": 1e-15,
     "noisy_gate_names": [

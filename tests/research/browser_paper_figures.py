@@ -15,14 +15,14 @@ def verify(output,url):
         browser=p.chromium.launch()
         page=browser.new_page(accept_downloads=True,viewport={'width':1500,'height':1100})
         page.on('pageerror',lambda e:errors.append(str(e)))
-        app=(ROOT/'web/research/app.js').read_text().replace('\nload();','\nwindow.testRefreshCatalog=c=>{S.catalog=c;fillSavedChoices();renderCards();availability();};\nload();')
+        app=(ROOT/'web/research/app.js').read_text().replace('\nload();','\nwindow.testRefreshCatalog=c=>{S.catalog=c;fillSavedChoices();renderCards();};\nload();')
         page.route('**/app.js',lambda r:r.fulfill(body=app,content_type='text/javascript'))
         page.goto(url+'#results');page.wait_for_function("document.querySelector('#catalog-status').textContent.includes('measured')")
         custom_input=page.locator('[data-plot]').first.locator('[data-select=input]').input_value()
-        page.locator('[data-paper="yao-2312-10950-v2"]').click()
+        page.locator('#select-paper').select_option('yao-2312-10950-v2')
         assert page.locator('[data-figure]').count()==7
         assert [x.split(' · ')[0] for x in page.locator('[data-figure] .card-heading h3').all_text_contents()]==[f'Fig. {i}' for i in range(2,9)]
-        assert page.locator('#paper-heading a').get_attribute('href')=='https://arxiv.org/abs/2312.10950v2'
+        assert page.locator('.paper-heading a').first.get_attribute('href')=='https://arxiv.org/abs/2312.10950v2'
         cards=page.locator('[data-figure]')
         for i in range(cards.count()):
             card=cards.nth(i)
@@ -62,7 +62,7 @@ def verify(output,url):
         card.locator('[data-group=paper]').check()
         checks.append('Figure-labelled settings and CSV contain only visible scoped evidence; both groups off safely disables exports')
 
-        page.locator('[data-paper="roffe-2005-07016-v2"]').click()
+        page.locator('#select-paper').select_option('roffe-2005-07016-v2')
         card=page.locator('[data-figure=roffe-fig-3]')
         assert card.count()==1 and card.locator('[data-group=paper]').is_checked()
         assert card.locator('[data-select=input] option').count()==5
@@ -80,22 +80,37 @@ def verify(output,url):
         page.evaluate('c=>testRefreshCatalog(c)',catalog)
         checks.append('Roffe Fig. 3 includes four labelled toric codes; canonical regular BP is default while CS10/OSD0 and tuning stay additional')
 
-        page.locator('[data-paper="mackay-0304161-v3"]').click()
+        page.locator('#select-paper').select_option('mackay-0304161-v3')
         card=page.locator('[data-figure=mackay-fig-15]')
         assert 'inferred' in card.locator('.figure-note').inner_text()
-        assert card.locator('[data-group=paper]').is_disabled() and card.locator('tbody tr').count()==0
-        card.locator('[data-group=additional]').check();assert card.locator('tbody tr').count()>0
-        page.locator('[data-paper="panteleev-2012-04068-v2"]').click()
+        assert card.locator('[data-group=paper]').is_disabled()
+        assert card.locator('.mackay-results tbody tr').count()>0
+        assert card.locator('.mackay-results').evaluate('(n)=>!!(n.compareDocumentPosition(n.parentElement.querySelector("svg")) & Node.DOCUMENT_POSITION_FOLLOWING)')
+        page.locator('#select-paper').select_option('panteleev-2012-04068-v2')
         card=page.locator('[data-figure=lp1054-example-4]')
         assert 'no LER figure' in card.locator('.figure-note').inner_text()
         assert card.locator('[data-group=paper]').is_disabled()
         card.locator('[data-group=additional]').check();assert card.locator('tbody tr').count()>0
         checks.append('MacKay inferred settings and LP Example 4 remain explicitly additional; no invented exact-reproduction figure')
 
-        page.locator('[data-paper=""]').click()
+        page.locator('#select-paper').select_option('priortilt-2611-13373-v1')
+        assert page.locator('[data-figure=priortilt-figure-1] tbody tr').count()==39
+        page.locator('#add-paper').click()
+        page.locator('#select-additional-paper').select_option('relaybp-2506-01779-v2')
+        assert page.locator('[data-figure=relay-priortilt-figure-1] tbody tr').count()==13
+        page.locator('#add-paper').click()
+        search=page.locator('#additional-paper-search input')
+        search.fill('beamsearch')
+        search.press('ArrowDown');search.press('Enter')
+        assert page.locator('[data-figure=beam-priortilt-figure-1] tbody tr').count()==13
+        page.locator('[data-paper=beamsearch-2512-07057-v2]').locator('.paper-heading button').click()
+        assert page.locator('[data-figure=beam-priortilt-figure-1]').count()==0
+        checks.append('PriorTilt 39 audited points, 13 Relay and 13 Beam guest points, keyboard paper search and add/remove paper')
+
+        page.locator('#select-paper').select_option('')
         assert page.locator('[data-figure]').count()==0
         assert page.locator('[data-plot]').first.locator('[data-select=input]').input_value()==custom_input
-        page.locator('[data-paper="yao-2312-10950-v2"]').click()
+        page.locator('#select-paper').select_option('yao-2312-10950-v2')
         # An actual new catalog member from an import defaults to Additional.
         extended=json.loads(json.dumps(catalog));source=next(s for s in extended['result_series'] if s['dataset_id']=='yao-vanilla-a5-b2' and s['code_id']=='a5')
         new=json.loads(json.dumps(source));new.update(series_id='paper-browser-import',decoder_id='paper-browser-import',dataset_id='paper-browser-import',source_decoder_id='new-policy')
@@ -111,13 +126,13 @@ def verify(output,url):
             for point in s['points']:point['x']=.06
         page.evaluate('c=>testRefreshCatalog(c)',empty)
         assert page.locator('[data-figure]').count()==0
-        assert page.locator('[data-paper]').count()==1
-        assert page.locator('#build-code').input_value()=='custom'
+        assert page.locator('#select-paper option').count()==1
+        assert page.locator('#build-code option').count()>1
         assert page.locator('[data-plot] tbody tr').count()==0
         checks.append('Custom plots survive switching; new imports stay additional; empty refresh removes stale paper/figure/input selections')
         page.set_viewport_size({'width':390,'height':850})
         page.evaluate('c=>testRefreshCatalog(c)',catalog)
-        page.locator('[data-paper="yao-2312-10950-v2"]').click()
+        page.locator('#select-paper').select_option('yao-2312-10950-v2')
         assert page.evaluate('document.documentElement.scrollWidth<=innerWidth+1')
         page.screenshot(path=str(output/'mobile.png'),full_page=False)
         page.set_viewport_size({'width':1500,'height':1100})

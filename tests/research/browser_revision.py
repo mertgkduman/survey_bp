@@ -33,8 +33,8 @@ def verify(root: Path, output: Path, url: str):
         assert 'bit-flip probability' in card.locator('svg').text_content()
         assert 'depolarizing (X, Y, Z: p/3 each)' in card.locator('tbody').inner_text()
         assert card.locator('select[data-select="input"] option[value="relay-surface-d3"]').count() == 0
-        assert page.locator('#build-circuit option').count() == 1
-        checks.append('Q-BP names, comma separators, hidden public fixture, conditional bit-flip axis and hidden single-rate circuits')
+        assert page.locator('#build-circuit option[value=relay-surface-d3]').count() == 1
+        checks.append('Q-BP names, comma separators, hidden public fixture, conditional bit-flip axis and registered circuit choices')
 
         page.locator('[data-nav="builder"]').click()
         search = page.locator('#decoder-search input')
@@ -57,7 +57,7 @@ def verify(root: Path, output: Path, url: str):
 
         page.locator('#build-code').select_option('custom')
         page.locator('#build-matrix').fill(json.dumps(FIXTURE))
-        page.locator('#build-variant').select_option('qbpgd')
+        page.locator('#build-variant').select_option('guided_decimation')
         assert page.locator('#numerical-controls').is_visible()
         assert page.locator('#decimation-controls').is_visible()
         page.locator('#build-rule').select_option('min_sum')

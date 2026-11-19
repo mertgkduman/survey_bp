@@ -5,7 +5,7 @@
 <meta name="description" content="View BP-based QLDPC experiment results, reproduce them locally, and build new comparisons.">
 <title>BP-based QLDPC decoding workbench · v2</title>
 <link rel="stylesheet" href="vendor/katex/katex.min.css"><link rel="stylesheet" href="style.css">
-<script defer src="vendor/katex/katex.min.js"></script><script defer src="zip.js"></script><script defer src="contract-ui.js"></script><script defer src="result-import.js"></script><script defer src="decoder-display.js"></script><script defer src="curve-projection.js"></script><script defer src="paper-figures.js"></script><script defer src="plot-data.js"></script><script defer src="app.js"></script>
+<script defer src="vendor/katex/katex.min.js"></script><script defer src="zip.js"></script><script defer src="contract-ui.js"></script><script defer src="result-import.js"></script><script defer src="decoder-display.js"></script><script defer src="curve-projection.js"></script><script defer src="paper-figures.js"></script><script defer src="plot-data.js"></script><script defer src="builder-policies.js"></script><script defer src="app.js"></script>
 </head>
 <body>
 <a class="skip" href="#main-content">Skip to content</a>
@@ -60,10 +60,16 @@ cd /path/to/survey_bp
 </div>
 </section>
 <section id="results" class="page" aria-labelledby="results-heading" hidden>
-<div class="section-head"><div><h2 id="results-heading">Available experiment results</h2><p>Results measured with this package. Each saved decoder keeps its exact run settings.</p></div><button id="add-plot" type="button">+ Add plot</button></div>
-<nav id="paper-options" class="paper-options" aria-label="Choose a paper or custom plots"></nav>
-<div id="paper-heading" class="paper-heading" aria-live="polite"></div>
-<div class="results-layout"><div id="plot-grid" class="plot-grid"></div><aside id="availability" class="availability" aria-label="Available policies and codes"></aside></div>
+<div class="section-head"><div><h2 id="results-heading">Available experiment results</h2><p>Results measured with this package. Each saved decoder keeps its exact run settings.</p></div><button id="add-plot" type="button">+ Add plot</button><button id="add-paper" type="button" aria-controls="paper-add-options" aria-expanded="false" hidden>+ Add paper</button></div>
+<div id="paper-options" class="paper-options">
+<label>Paper or custom plots<select id="select-paper"></select></label>
+<div id="paper-search"></div>
+</div>
+<div id="paper-add-options" class="paper-options" hidden>
+<label>Additional paper<select id="select-additional-paper"></select></label>
+<div id="additional-paper-search"></div>
+</div>
+<div id="plot-grid" class="plot-grid"></div>
 </section>
 <section id="builder" class="page" aria-labelledby="builder-heading" hidden>
 <h2 id="builder-heading">Experiment builder</h2>
@@ -75,11 +81,13 @@ cd /path/to/survey_bp
 <fieldset><legend>Decoder builder</legend><div class="fields">
 <label>Use for<select id="build-regime"><option value="code">Code</option><option value="circuit">Circuit</option></select></label>
 <label>Decoder<select id="build-family"><option value="binary_css">BP, binary CSS</option><option value="bp4">Q-BP, joint Pauli</option></select></label>
-<label>Guided decimation<select id="build-variant"><option value="plain">Off</option><option value="qbpgd">On, Q-BPGD</option></select></label>
+<label>Guided decimation<select id="build-variant"><option value="plain">Off</option><option value="guided_decimation">On</option></select></label>
 <label>Check update<select id="build-rule"><option value="sum_product">Sum-product</option><option value="min_sum">Min-sum</option></select></label>
 <label>Maximum iterations<input id="build-iterations" type="number" min="1" value="100"></label>
-<label>Numerical profile<select id="build-version"><option value="v2">Canonical float64 v2</option><option value="v1">Historical float64 v1</option></select></label>
-</div><details id="numerical-controls"><summary>Damping, scaling, and precision</summary><div class="fields">
+</div>
+<div id="policy-controls" class="fields"></div>
+<p id="policy-order" class="small muted" aria-live="polite" hidden></p>
+<details id="numerical-controls"><summary>Damping, scaling, and precision</summary><div class="fields">
 <label>Damping d · old-message weight<input id="build-damping" type="number" min="0" max="0.999" step="0.05" value="0.1"></label>
 <label>Message resolution<select id="build-format"><option>float64</option><option>float32</option><option>float16</option><option>int8</option><option>int16</option><option>int32</option></select></label>
 <label>Fixed-point scale s<input id="build-scale" type="number" min="1" value="16"></label>
@@ -88,7 +96,6 @@ cd /path/to/survey_bp
 <label>MS scale α<input id="build-alpha" type="number" min="0.001" step="0.1" value="1"></label>
 <label>MS offset β<input id="build-beta" type="number" min="0" step="0.05" value="0"></label>
 <label>Q-BP hard decision<select id="build-hard"><option value="strict_pauli">Strict Pauli ladder</option><option value="min_llr">Minimum LLR</option></select></label>
-<label>Zero-syndrome shortcut<select id="build-shortcut"><option value="false">Complete at least one sweep</option><option value="true">Allow zero-syndrome shortcut</option></select></label>
 <label>Stopping<select id="build-stop"><option value="true">First syndrome-matching candidate</option><option value="false">Complete iteration cap, Q-BP only</option></select></label>
 </div></details>
 <details id="decimation-controls" hidden><summary>Guided-decimation budget</summary><div class="fields"><label>Sweeps per round<input id="build-per-round" type="number" min="1" value="10"></label><label>Maximum rounds<input id="build-rounds" type="number" min="1" value="2"></label><label>Fixation ε<input id="build-epsilon" type="number" min="0" step="any" value="0.0000000001"></label></div></details>
@@ -96,12 +103,12 @@ cd /path/to/survey_bp
 <aside id="kernel-guide" class="kernel-guide" aria-label="Canonical decoder update rules"></aside>
 </fieldset>
 <fieldset><legend id="input-legend">Code</legend>
-<div id="code-input"><label>Code / check representation<select id="build-code"></select></label><p class="muted small">A code may have different parity-check representations. The selected matrices, row order, and logical basis identify this input.</p><details id="matrix-input"><summary>Parity check matrix</summary><p id="matrix-note" class="small muted" role="status"></p><label>CSS matrices, JSON<textarea id="build-matrix" rows="9" spellcheck="false" placeholder='{"hx": [[…]], "hz": [[…]]}'></textarea></label><label>Or load a CSS matrix file<input id="matrix-file" type="file" accept=".json"></label><p class="small muted">Use binary hx / hz with the same width, commuting over GF(2). Supply both lx / lz or neither. <a href="../../docs/research-interface.md#custom-css-input" target="_blank">Input format ↗</a></p></details></div>
-<div id="circuit-input" hidden><label>Circuit<select id="build-circuit"></select></label><label>Stim circuit text<textarea id="build-stim" rows="12" spellcheck="false">R 0
+<div id="code-input"><label>Code / check representation<select id="build-code"></select></label><div id="builder-code-sources"></div><details id="matrix-input" open><summary>Parity check matrices</summary><p id="matrix-note" class="small muted" role="status"></p><label>CSS matrices, JSON<textarea id="build-matrix" rows="9" spellcheck="false" placeholder='{"hx": [[…]], "hz": [[…]]}'></textarea></label><label>Or load a CSS matrix file<input id="matrix-file" type="file" accept=".json"></label><p class="small muted">Use binary hx / hz with the same width, commuting over GF(2). Supply both lx / lz or neither. <a href="../../docs/research-interface.md#custom-css-input" target="_blank">Input format ↗</a></p></details></div>
+<div id="circuit-input" hidden><label>Circuit<select id="build-circuit"></select></label><div id="builder-circuit-sources"></div><p id="circuit-feedback" class="small muted" role="status"></p><label>Stim circuit text<textarea id="build-stim" rows="12" spellcheck="false">R 0
 X_ERROR(0.1) 0
 M 0
 DETECTOR rec[-1]
-OBSERVABLE_INCLUDE(0) rec[-1]</textarea></label><label>Or upload .stim<input id="stim-file" type="file" accept=".stim"></label><label>Replace this source noise probability<input id="build-circuit-base" type="number" min="0" max="1" step="any" value="0.1"></label><p class="muted small">Enter a rate sweep below to replace matching noise probabilities. Gate targets, coordinates, and other probability values stay as supplied. Each rate gets its own Stim input. The supported circuit adapter uses plain flooding SPA / MS.</p></div>
+OBSERVABLE_INCLUDE(0) rec[-1]</textarea></label><label>Or upload .stim<input id="stim-file" type="file" accept=".stim"></label><label>Replace this source noise probability<input id="build-circuit-base" type="number" min="0" max="1" step="any" value="0.1"></label><p class="muted small">The rate sweep replaces matching noise probabilities in the Stim circuit.</p></div>
 </fieldset>
 </div>
 <fieldset class="simulation"><legend>Simulation settings</legend><div class="fields">
@@ -132,7 +139,7 @@ OBSERVABLE_INCLUDE(0) rec[-1]</textarea></label><label>Or upload .stim<input id=
 <h2 id="recommendations-heading">Version difference and Recommendations</h2>
 <div class="recommend-grid"><article><h3>1. What moved out of the main workflow</h3><ul><li>Paper, experiment, and dataset selectors: retained in the <a href="v1/">v1 archive</a>. V2 selects code/circuit and a saved decoder; run details remain attached to every curve.</li><li>Published source transcriptions: kept in the source catalog and v1, excluded from v2 measured curves.</li><li>Full provenance, confidence methods, sampling cohorts, and raw-data availability: available under each plot’s run details and in exported receipts.</li><li>Study-specific Relay, Beam, memory, and degeneracy policies: retained in registered workflows. The builder explains compatibility rather than replacing them with plain BP.</li><li>Advanced numerical controls and complete JSON: moved into expandable sections.</li><li>Exact historical identities and ledgers: preserved in their original directories.</li></ul></article><article><h3>2. Further recommendations</h3><ul><li>Add a shared review queue for uploaded results, with server-side hash and ledger verification before publication. This MVP stores browser imports locally; the CLI persists them to the repository index.</li><li>Keep matrix representation and code equivalence separate; support multiple named check representations per code family.</li><li>Use a common policy editor as more interventions become qualified for the portable runner.</li><li>Add paired rescue/loss comparisons, anytime-valid confidence intervals for adaptive sampling, and benchmark machine profiles.</li><li>Offer shared axes and saved comparison layouts for multi-plot analysis.</li><li>Expand circuit-policy qualification and retain detector/observable semantics.</li></ul><p><a href="../../docs/research-interface.md" target="_blank">Full interface and data contracts ↗</a></p></article></div>
 </section>
-<section id="policies" class="page" aria-labelledby="policies-heading" hidden><h2 id="policies-heading">Policies</h2><p>Update equations, tunable parameters, and supported execution routes.</p><div id="policy-list"></div></section>
+<section id="policies" class="page" aria-labelledby="policies-heading" hidden><h2 id="policies-heading">Policies</h2><div id="policy-glossary"></div><div id="policy-list"></div></section>
 <footer>BP research workbench · <a href="v1/">v1 archive</a> · simulations execute locally after download</footer>
 </main></div><noscript>Enable JavaScript to view retained results and prepare experiment packages.</noscript>
 </body></html>

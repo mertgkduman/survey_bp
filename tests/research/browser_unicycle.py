@@ -68,7 +68,7 @@ def verify(output: Path, url: str):
         page = browser.new_page(viewport={"width": 1512, "height": 1100}, accept_downloads=True)
         page.on("pageerror", lambda e: errors.append(str(e)))
         app = (ROOT / "web/research/app.js").read_text().replace("\nload();", """
-window.testRefreshCatalog=c=>{S.catalog=c;fillSavedChoices();renderCards();availability();};
+window.testRefreshCatalog=c=>{S.catalog=c;fillSavedChoices();renderCards();};
 window.testSelection=()=>({cards:S.cards.map(c=>({input:c.input,decoder:c.decoder,hidden:[...c.hidden]})),spec:S.spec});
 load();""")
         page.route("**/app.js", lambda route: route.fulfill(body=app, content_type="text/javascript"))
@@ -82,7 +82,7 @@ load();""")
         for name in ("unicycle74", "unicycle274"):
             assert page.locator(f'#build-code option[value="{name}"]').count() == 0
             assert page.locator(f'[data-select=input] option[value="{name}"]').count() == 0
-        assert "MacKay unicycle" not in page.locator("#availability").inner_text()
+        assert page.locator("#availability").count() == 0
         checks.append("One-rate Construction U results hide both registered inputs and all their saved decoders")
 
         page.evaluate("c=>testRefreshCatalog(c)", catalog)

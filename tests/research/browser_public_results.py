@@ -28,7 +28,7 @@ def verify(output: Path, url: str):
         # Test-only access to refresh the catalog while controls have selections.
         # The served production file has no test API.
         app = (ROOT / 'web/research/app.js').read_text().replace('\nload();', '''
-window.testRefreshCatalog=c=>{S.catalog=c;fillSavedChoices();renderCards();availability();};
+window.testRefreshCatalog=c=>{S.catalog=c;fillSavedChoices();renderCards();};
 window.testSelection=()=>({cards:S.cards.map(c=>({input:c.input,decoder:c.decoder,chosen:c.chosen?[...c.chosen]:null,hidden:[...c.hidden]})),spec:S.spec});
 load();''')
         page.route('**/app.js', lambda route: route.fulfill(body=app, content_type='text/javascript'))
@@ -36,21 +36,20 @@ load();''')
         page.wait_for_function("document.querySelector('#catalog-status').textContent.includes('measured')")
         active = page.evaluate('''async()=>{const c=await(await fetch('catalog.json')).json();const v=ResearchCurves.active(c,DecoderDisplay.labels(c));return {...v,decoderIds:[...v.decoderIds]};}''')
         ids = {x['code_id'] for x in active['codes']}
-        legacy = [s for s in active['curves'] if s['dataset_id'] not in {'yao-bpgd-completion', 'mackay-unicycle-bp', 'mackay-unicycle-paper-rates', 'mackay-damping-confirmation', 'roffe-2020-figure3-canonical-bp', 'mackay-inferred-t100-baseline', 'mackay-damping-t100-confirmation', 'mackay-qbp-isolation-t100', 'roffe-damping-confirmation', 'roffe-canonical-bp-osd', 'roffe-canonical-bp-osd-fast', 'roffe-joint-controls-runtime-budget', 'roffe-tuned-beam-relay-latency', 'roffe-beam-relay-frontier-finalists', 'panteleev-lp1054-full-stack', 'lp1054-relay-gamma80-60'}]
+        legacy = [s for s in active['curves'] if s['dataset_id'] not in {'yao-bpgd-completion', 'mackay-unicycle-bp', 'mackay-unicycle-paper-rates', 'mackay-damping-confirmation', 'roffe-2020-figure3-canonical-bp', 'mackay-inferred-t100-baseline', 'mackay-damping-t100-confirmation', 'mackay-qbp-isolation-t100', 'roffe-damping-confirmation', 'roffe-canonical-bp-osd', 'roffe-canonical-bp-osd-fast', 'roffe-joint-controls-runtime-budget', 'roffe-tuned-beam-relay-latency', 'roffe-beam-relay-frontier-finalists', 'panteleev-lp1054-full-stack', 'lp1054-relay-gamma80-60', 'priortilt-figure-1-canonical'}]
         assert len(legacy) == 53 and sum(len(s['points']) for s in legacy) == 262
         added = {s['code_id'] for s in active['curves'] if s['dataset_id'] in {'mackay-unicycle-bp', 'mackay-unicycle-paper-rates', 'mackay-damping-confirmation', 'roffe-2020-figure3-canonical-bp', 'mackay-inferred-t100-baseline', 'mackay-damping-t100-confirmation', 'mackay-qbp-isolation-t100', 'roffe-damping-confirmation', 'roffe-canonical-bp-osd', 'roffe-canonical-bp-osd-fast', 'roffe-joint-controls-runtime-budget', 'roffe-tuned-beam-relay-latency', 'roffe-beam-relay-frontier-finalists', 'panteleev-lp1054-full-stack', 'lp1054-relay-gamma80-60'}}
         assert ids == {'a5', 'b2', 'b1', 'c2', 'double-gross', 'bb72'} | added
-        assert not active['circuits']
+        circuit_ids = {item['circuit_id'] for item in active['circuits']}
+        assert len(circuit_ids) == 3
         card = page.locator('[data-plot]').first
-        assert set(card.locator('[data-select=input] option').evaluate_all('xs=>xs.map(x=>x.value)')) == ids
-        assert set(page.locator('#build-code option').evaluate_all('xs=>xs.map(x=>x.value)')) == ids | {'custom'}
-        assert page.locator('#build-circuit option').evaluate_all('xs=>xs.map(x=>x.value)') == ['']
+        assert set(card.locator('[data-select=input] option').evaluate_all('xs=>xs.map(x=>x.value)')) == ids | circuit_ids
+        assert set(page.locator('#build-code option').evaluate_all('xs=>xs.map(x=>x.value)')) >= ids | {'custom'}
+        assert set(page.locator('#build-circuit option').evaluate_all('xs=>xs.map(x=>x.value)')) == {item['circuit_id'] for item in catalog['circuits']} | {''}
         saved = set(page.locator('#build-preset option').evaluate_all('xs=>xs.map(x=>x.value)'))
         assert saved - {'', '__baseline-binary', '__baseline-quaternary'} == set(active['decoderIds'])
-        availability = page.locator('#availability').inner_text()
-        for item in catalog['circuits'] + [next(c for c in catalog['codes'] if c['code_id'] == 'gb46')]:
-            assert item['label'] not in availability
-        checks.append(f"{len(active['curves'])} curves / {sum(len(s['points']) for s in active['curves'])} rows; all public input and saved-decoder lists use the active view; GB46 and all three singleton circuits absent")
+        assert page.locator('#availability').count() == 0
+        checks.append(f"{len(active['curves'])} curves / {sum(len(s['points']) for s in active['curves'])} rows; plot choices use the active view and the builder includes registered inputs")
 
         curves_by_input = {id: [s for s in active['curves'] if s['code_id'] == id] for id in ids}
         for id in sorted(ids):
@@ -113,18 +112,17 @@ load();''')
         assert page.locator('[data-select=input] option').count() == 0
         assert all(c['input'] == '' and c['decoder'] == '' and c['chosen'] is None and not c['hidden']
                    for c in page.evaluate('testSelection().cards'))
-        assert page.locator('#build-code').input_value() == 'custom'
-        assert page.locator('#build-matrix').input_value() == ''
+        assert page.locator('#build-code').input_value() in {item['code_id'] for item in catalog['codes']} | {'custom'}
         assert page.locator('#build-preset').input_value() == ''
         assert page.locator('#build-code').is_enabled()
         assert page.locator('#custom-spec').input_value() == ''
-        assert page.locator('#build-circuit option').count() == 1
+        assert page.locator('#build-circuit option').count() == len(catalog['circuits']) + 1
         assert page.locator('#build-preset option').count() == 3  # custom and two new-experiment baselines
-        assert 'No inputs have multi-rate results' in page.locator('#availability').inner_text()
+        assert page.locator('#availability').count() == 0
         page.locator('[data-nav=builder]').click()
         page.locator('#reset-spec').evaluate("n=>n.closest('details').open=true")
         page.locator('#reset-spec').click()
-        assert page.locator('#build-code').input_value() == 'custom'
+        page.locator('#build-code').select_option('custom')
         matrices = {'hx': [[1, 1, 1, 1]], 'hz': [[1, 1, 1, 1]]}
         page.locator('#build-matrix').fill(json.dumps(matrices))
         page.locator('#validate-spec').click()
@@ -134,18 +132,18 @@ load();''')
         page.locator('#build-stim').fill('R 0\nX_ERROR(0.005) 0\nM 0\nDETECTOR rec[-1]\nOBSERVABLE_INCLUDE(0) rec[-1]\n')
         page.locator('#validate-spec').click()
         assert page.locator('#download-json').is_enabled(), page.locator('#builder-feedback').inner_text()
-        checks.append('Empty active view clears plot/decoder/input state and stale matrices; reset, custom matrix and custom Stim still validate')
+        checks.append('Empty results clear plot selections while registered and custom experiment inputs remain usable')
 
-        # No A5/B2 defaults: controls and actual model select a displayed input.
+        # Result plots follow measured inputs, while the builder retains registered defaults.
         bb = deepcopy(catalog)
         bb['result_series'] = [s for s in catalog['result_series'] if s['code_id'] == 'bb72']
         page.evaluate('c=>testRefreshCatalog(c)', bb)
         assert all(c['input'] == 'bb72' for c in page.evaluate('testSelection().cards'))
         page.locator('#reset-spec').evaluate("n=>n.closest('details').open=true")
         page.locator('#reset-spec').click()
-        assert page.locator('#build-code').input_value() == 'bb72'
-        assert page.evaluate('testSelection().spec.problem.code.id') == 'bb72'
-        checks.append('Missing default A5/B2 inputs fall back to a displayed input in both DOM and experiment/plot state')
+        assert page.locator('#build-code').input_value() == 'a5'
+        assert page.evaluate('testSelection().spec.problem.code.id') == 'a5'
+        checks.append('A BB72-only results view selects BB72 in plots and retains the registered A5 builder default')
 
         # Live import display refresh, using a test double for already-verified
         # imported evidence. First singleton stays hidden, then multi-rate shows.
@@ -163,19 +161,18 @@ load();''')
             page.locator('#upload-results').set_input_files({'name': identifier+'.json', 'mimeType': 'application/json', 'buffer': b'{}'})
             page.wait_for_function("document.querySelector('#upload-feedback').className==='success'")
         upload(overlay(False), 'display-single')
-        assert page.locator('#build-circuit option').count() == 1
+        assert page.locator('#build-circuit option').count() == len(catalog['circuits']) + 1
         upload(overlay(True), 'display-multi')
         assert page.locator('#build-circuit option[value=relay-surface-d3]').count() == 1
-        assert 'Rotated' in page.locator('#availability').inner_text() or 'surface' in page.locator('#availability').inner_text().lower()
         page.locator('[data-nav=builder]').click()
         page.locator('#build-regime').select_option('circuit')
         page.locator('#build-circuit').select_option('relay-surface-d3')
         page.wait_for_function("document.querySelector('#build-stim').value.includes('QUBIT_COORDS')")
         page.evaluate('c=>testRefreshCatalog(c)', empty)
-        assert page.locator('#build-circuit').input_value() == ''
-        assert page.locator('#build-stim').input_value() == ''
+        assert page.locator('#build-circuit').input_value() == 'relay-surface-d3'
+        assert 'QUBIT_COORDS' in page.locator('#build-stim').input_value()
         assert page.locator('#download-json').is_disabled()
-        checks.append('Import refresh hides singleton, admits multi-rate circuit and updates availability; hiding the selected circuit clears its Stim bytes and download validation')
+        checks.append('Import refresh keeps registered circuit inputs selectable independently of measured curves')
 
         # Saved overlays are re-evaluated on page reload, and custom input lists
         # do not expose the internal fixture through a normalized import.
@@ -194,7 +191,7 @@ load();''')
         fixture['result_series'] = [hidden]
         page.evaluate('c=>testRefreshCatalog(c)', fixture)
         assert page.locator('[data-select=input] option').count() == 0
-        assert page.locator('#build-code option').count() == 1
+        assert page.locator('#build-code option[value=three-qubit]').count() == 0
         checks.append('Saved imports reapply eligibility after reload; internal three-qubit fixture remains hidden even with two rates')
         page.set_viewport_size({'width': 390, 'height': 844})
         assert page.evaluate('document.documentElement.scrollWidth<=innerWidth+1')

@@ -128,6 +128,43 @@ def test_bounded_qbpgd_executes_with_the_result_iterations_field(tmp_path: Path)
     assert summary["rows"][0]["work_unit"] == "bp4_joint_sweeps"
 
 
+def test_zero_syndrome_shortcut_is_used_even_when_legacy_policy_disables_it(tmp_path: Path) -> None:
+    value = specimen()
+    value["decoder"]["policy"] = {
+        "version": "bp-flooding-policy-v1", "check_rule": "sum_product",
+        "resolution": {"version": "bp-resolution-v1", "format": "float64", "scale": None, "scope": "scalar_edges", "coefficients": "float64"},
+        "damping": 0.0, "alpha": 1.0, "beta": 0.0, "hard_decision": "min_llr", "zero_syndrome_shortcut": False,
+    }
+    value["sampling"]["shots"] = value["budgets"]["max_shots"] = 1
+    value["rate_points"][0]["physical_p"] = 0.0
+    output = tmp_path / "shortcut"
+    run_experiment(value, output=output)
+    event = json.loads((output / "events.jsonl").read_text())
+    assert event["iterations"] == {"x": 0, "z": 0}
+    assert event["candidate_x"] == event["candidate_z"] == [0, 0, 0]
+
+
+@pytest.mark.parametrize("method", ["guided_decimation", "prior_tilt"])
+def test_portable_binary_policy_runs_and_preserves_work(tmp_path: Path, method: str) -> None:
+    from bp_registry.canonical.policy_decoder import BinaryPolicy
+    value = specimen()
+    value["sampling"]["shots"] = value["budgets"]["max_shots"] = 5
+    value["budgets"]["max_iterations"] = 10
+    value["rate_points"][0]["physical_p"] = 0.5
+    if method == "guided_decimation":
+        options = {"kind": "guided_decimation", "variant": "algorithm1_v2_interpretation", "source_revision": "arxiv:2312.10950v2", "finite_bias_magnitude": 25.0, "zero_rule": "positive_prior_for_zero_posterior", "final_round_rule": "return_after_last_fixation", "round_limit": 2, "sweeps_per_round": 2}
+        value["decoder"]["implementation"] = "shared_policy"
+        value["decoder"]["shared_policy"] = BinaryPolicy(controller=method, options=options).model_dump(mode="json")
+    else:
+        value["decoder"]["implementation"] = method
+        value["decoder"]["prior_tilt"] = {"initial": 2, "round_len": 1, "rounds": 1, "ends": [], "phases": [[0.1, 0.5, 0.8, 2.0]]}
+    output = tmp_path / method
+    assert run_experiment(value, output=output)["rows"][0]["n"] == 5
+    events = [json.loads(row) for row in (output / "events.jsonl").read_text().splitlines()]
+    assert any(event["iterations"]["x"] or event["iterations"]["z"] for event in events)
+    assert all(max(event["iterations"].values()) <= 10 for event in events)
+
+
 def test_zero_and_noncommuting_embedded_codes_are_rejected() -> None:
     zero = specimen()
     zero["problem"]["code"]["hx"] = []
@@ -137,6 +174,89 @@ def test_zero_and_noncommuting_embedded_codes_are_rejected() -> None:
     noncommuting["problem"]["code"]["hz"] = [[1, 0, 0]]
     with pytest.raises(ValueError, match="commute"):
         validate_experiment(noncommuting)
+
+
+def test_mbp4_portable_runner_emits_source_recurrence_evidence(tmp_path: Path) -> None:
+    value = specimen()
+    value["problem"]["kind"] = "pauli_code_capacity"
+    value["decoder"] = {"family": "bp4", "implementation": "mbp4", "variant": "plain", "rule": "sum_product", "numerical_profile": "quaternary-bp4-f64-v1", "policy": None, "schedule": "flooding", "stop_on_convergence": True, "mbp4": {"alpha": 0.9, "schedule": "qbp_flooding"}}
+    value["sampling"]["shots"] = value["budgets"]["max_shots"] = 5
+    value["rate_points"][0]["physical_p"] = 0.5
+    output = tmp_path / "mbp4"
+    run_experiment(value, output=output)
+    events = [json.loads(row) for row in (output / "events.jsonl").read_text().splitlines()]
+    assert any("mbp4_execution" in event for event in events)
+    assert all(event["iterations"] <= value["budgets"]["max_iterations"] for event in events)
+
+
+def test_qbp_variable_serial_portable_runner(tmp_path: Path) -> None:
+    value = specimen()
+    value["problem"]["kind"] = "pauli_code_capacity"
+    value["decoder"] = {"family": "bp4", "implementation": "qbp_variable_serial", "variant": "plain", "rule": "sum_product", "numerical_profile": "quaternary-bp4-f64-v1", "policy": None, "schedule": "flooding", "stop_on_convergence": True}
+    value["sampling"]["shots"] = value["budgets"]["max_shots"] = 5
+    value["rate_points"][0]["physical_p"] = 0.5
+    output = tmp_path / "qbp-serial"
+    run_experiment(value, output=output)
+    events = [json.loads(row) for row in (output / "events.jsonl").read_text().splitlines()]
+    assert any(event["iterations"] > 0 for event in events)
+    assert all(event["iterations"] <= value["budgets"]["max_iterations"] for event in events)
+
+
+@pytest.mark.parametrize("circuit", [False, True])
+def test_mbbp_portable_member_pass_accounting(tmp_path: Path, circuit: bool) -> None:
+    from bp_registry.canonical.policy_decoder import BinaryPolicy
+    if circuit:
+        pytest.importorskip("stim")
+        value = json.loads((ROOT / "research/examples/circuit.json").read_text())
+        value["problem"]["circuit"]["text"] = "R 0\nX_ERROR(0.5) 0\nM 0\nDETECTOR rec[-1]\nOBSERVABLE_INCLUDE(0) rec[-1]\n"
+        value["decoder"]["max_iterations"] = 10
+    else:
+        value = specimen()
+        value["rate_points"][0]["physical_p"] = 0.5
+    value["sampling"].update({"seed": 5, "shot_start": 0, "shots": 8})
+    value["budgets"].update({"max_shots": 8, "max_iterations": 10})
+    options = {"bases": [{"member_id": "base", "local_ordinal": 0, "partition_identity": "declared", "permutation_identity": "identity", "redundant_transforms": [[1]]}], "max_iterations": 2}
+    value["decoder"]["implementation"] = "shared_policy"
+    value["decoder"]["shared_policy"] = BinaryPolicy(controller="mbbp", options=options).model_dump(mode="json")
+    output = tmp_path / "mbbp"
+    run_experiment(value, output=output)
+    events = [json.loads(row) for row in (output / "events.jsonl").read_text().splitlines()]
+    if circuit:
+        assert any(event["policy_execution"] is not None for event in events)
+        assert all(event["iterations"] <= 2 for event in events)
+    else:
+        assert any(any(event["iterations"].values()) for event in events)
+        assert all(max(event["iterations"].values()) <= 2 for event in events)
+
+
+def test_local_schedule_counts_started_passes_under_budget(tmp_path: Path) -> None:
+    from bp_registry.canonical.policy_decoder import BinaryPolicy
+    value = specimen()
+    value["sampling"].update({"seed": 5, "shot_start": 0, "shots": 8})
+    value["budgets"].update({"max_shots": 8, "max_iterations": 2})
+    value["rate_points"][0]["physical_p"] = 0.5
+    value["decoder"]["implementation"] = "shared_policy"
+    value["decoder"]["shared_policy"] = BinaryPolicy(schedule="variable_node_serial", max_iterations=2).model_dump(mode="json")
+    output = tmp_path / "serial"
+    run_experiment(value, output=output)
+    events = [json.loads(row) for row in (output / "events.jsonl").read_text().splitlines()]
+    assert any(any(event["iterations"].values()) for event in events)
+    assert all(max(event["iterations"].values()) <= 2 for event in events)
+
+
+def test_mbbp_preflight_rejects_unbound_graph_and_work_budget() -> None:
+    from bp_registry.canonical.policy_decoder import BinaryPolicy
+    value = specimen()
+    options = {"bases": [{"member_id": "base", "local_ordinal": 0, "partition_identity": "declared", "permutation_identity": "identity", "redundant_transforms": [[1, 1]]}], "max_iterations": 2}
+    value["decoder"]["implementation"] = "shared_policy"
+    value["decoder"]["shared_policy"] = BinaryPolicy(controller="mbbp", options=options).model_dump(mode="json")
+    with pytest.raises(ValueError, match="transforms must match"):
+        validate_experiment(value)
+    options["bases"][0]["redundant_transforms"] = [[1]]
+    options["max_iterations"] = 4
+    value["decoder"]["shared_policy"] = BinaryPolicy(controller="mbbp", options=options).model_dump(mode="json")
+    with pytest.raises(ValueError, match="controller sweeps exceed"):
+        validate_experiment(value)
 
 
 def test_circuit_summary_partitions_observable_failures_by_detector_fit(tmp_path: Path) -> None:
@@ -155,6 +275,30 @@ def test_circuit_summary_partitions_observable_failures_by_detector_fit(tmp_path
     event = json.loads((tmp_path / "circuit/events.jsonl").read_text())
     assert event["outcome"] in {"observable_success", "observable_failure"}
     assert event["termination_reason"]
+
+
+@pytest.mark.parametrize("method", ["guided_decimation", "prior_tilt"])
+def test_circuit_policy_execution_for_nonzero_detectors(tmp_path: Path, method: str) -> None:
+    pytest.importorskip("stim")
+    pytest.importorskip("sinter")
+    from bp_registry.canonical.policy_decoder import BinaryPolicy
+    value = json.loads((ROOT / "research/examples/circuit.json").read_text())
+    value["problem"]["circuit"]["text"] = "R 0\nX_ERROR(0.5) 0\nM 0\nDETECTOR rec[-1]\nOBSERVABLE_INCLUDE(0) rec[-1]\n"
+    value["sampling"].update({"seed": 5, "shot_start": 0, "shots": 8})
+    value["budgets"].update({"max_shots": 8, "max_iterations": 10})
+    value["decoder"]["max_iterations"] = 10
+    if method == "guided_decimation":
+        options = {"kind": "guided_decimation", "variant": "algorithm1_v2_interpretation", "source_revision": "arxiv:2312.10950v2", "finite_bias_magnitude": 25.0, "zero_rule": "positive_prior_for_zero_posterior", "final_round_rule": "return_after_last_fixation", "round_limit": 2, "sweeps_per_round": 2}
+        value["decoder"]["implementation"] = "shared_policy"
+        value["decoder"]["shared_policy"] = BinaryPolicy(controller=method, options=options).model_dump(mode="json")
+    else:
+        value["decoder"]["implementation"] = method
+        value["decoder"]["prior_tilt"] = {"initial": 2, "round_len": 1, "rounds": 1, "ends": [], "phases": [[0.1, 0.5, 0.8, 2.0]]}
+    output = tmp_path / method
+    run_experiment(value, output=output)
+    events = [json.loads(row) for row in (output / "events.jsonl").read_text().splitlines()]
+    assert any(any(event["detector_events"]) and event["policy_execution"] is not None for event in events)
+    assert all(event["iterations"] <= 10 for event in events)
 
 
 def test_circuit_shot_prefix_uses_one_shot_stim_chunks_for_stream_identity() -> None:
@@ -323,7 +467,13 @@ def test_circuit_zero_iterations_reports_initial_fit_or_cap(tmp_path, prior, see
     output = tmp_path / "initial"
     run_experiment(value, output=output)
     events = [json.loads(line) for line in (output / "events.jsonl").read_text().splitlines()]
-    assert all(row["termination_reason"] == ("initial_candidate_fit" if row["converged"] else "iteration_cap") for row in events)
+    for row in events:
+        if not any(row["detector_events"]):
+            assert row["termination_reason"] == "zero_syndrome_shortcut"
+        elif row["converged"]:
+            assert row["termination_reason"] == "initial_candidate_fit"
+        else:
+            assert row["termination_reason"] == "iteration_cap"
     assert any(row["termination_reason"] == expected for row in events)
 
 

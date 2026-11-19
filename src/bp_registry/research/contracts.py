@@ -218,6 +218,64 @@ def _decoder(value: object, *, problem_kind: str) -> dict[str, Any]:
     if not isinstance(value, Mapping):
         raise ValueError("decoder must be an object")
     family = value.get("family")
+    if value.get("implementation") == "qbp_variable_serial":
+        if family != "bp4" or problem_kind == "circuit":
+            raise ValueError("Q-BP variable-serial execution requires a Pauli code-capacity problem")
+        base = dict(value)
+        base["implementation"] = "compiled"
+        decoder = _decoder(base, problem_kind=problem_kind)
+        if decoder["variant"] != "plain" or decoder["rule"] != "sum_product" or decoder["policy"] is not None or decoder["numerical_profile"] != "quaternary-bp4-f64-v1" or not decoder["stop_on_convergence"]:
+            raise ValueError("Q-BP variable-serial execution requires the v1 sum-product profile without a flooding overlay")
+        decoder["implementation"] = "qbp_variable_serial"
+        return decoder
+    if "mbp4" in value:
+        from bp_registry.quaternary.mbp4 import Mbp4Spec
+        if family != "bp4" or problem_kind == "circuit" or value.get("implementation") != "mbp4":
+            raise ValueError("MBP4 requires a Pauli code-capacity problem")
+        settings = _object(value["mbp4"], "decoder.mbp4", keys={"alpha", "schedule"})
+        policy = Mbp4Spec(alpha=settings["alpha"], schedule=settings["schedule"])
+        base = dict(value)
+        base.pop("mbp4")
+        base["implementation"] = "compiled"
+        decoder = _decoder(base, problem_kind=problem_kind)
+        if decoder["variant"] != "plain" or decoder["rule"] != "sum_product" or decoder["policy"] is not None or decoder["numerical_profile"] != "quaternary-bp4-f64-v1":
+            raise ValueError("fixed-alpha MBP4 uses its own v1 sum-product recurrence and no flooding overlay")
+        decoder["implementation"] = "mbp4"
+        decoder["mbp4"] = {"alpha": policy.alpha, "schedule": policy.schedule}
+        return decoder
+    if "prior_tilt" in value:
+        from bp_registry.canonical.prior_tilt import PriorTiltSpec
+        if value.get("implementation") != "prior_tilt":
+            raise ValueError("prior_tilt requires implementation=prior_tilt")
+        settings = _object(value["prior_tilt"], "decoder.prior_tilt", keys={"initial", "round_len", "rounds", "ends", "phases"})
+        policy = PriorTiltSpec(**settings)
+        base = dict(value)
+        base.pop("prior_tilt")
+        base["implementation"] = "canonical_sinter" if problem_kind == "circuit" else "compiled"
+        decoder = _decoder(base, problem_kind=problem_kind)
+        if problem_kind != "circuit" and family != "binary_css":
+            raise ValueError("PriorTilt requires binary CSS or circuit DEM")
+        decoder["implementation"] = "prior_tilt"
+        decoder["prior_tilt"] = {"initial": policy.initial, "round_len": policy.round_len, "rounds": policy.rounds,
+                                 "ends": list(policy.ends), "phases": [list(phase) for phase in policy.phases]}
+        return decoder
+    shared = value.get("shared_policy")
+    if shared is not None:
+        from bp_registry.canonical.policy_decoder import BinaryPolicy
+        if value.get("implementation") != "shared_policy":
+            raise ValueError("shared_policy requires implementation=shared_policy")
+        policy = BinaryPolicy.model_validate_json(json.dumps(shared))
+        if policy.controller not in {"single", "guided_decimation", "beam", "relay", "syndrome_flip", "impulse", "freezing", "sign_flip", "restart_belief", "mbbp"}:
+            raise ValueError("portable shared policy controllers require explicit total-work budget support")
+        base = dict(value)
+        base.pop("shared_policy")
+        base["implementation"] = "canonical_sinter" if problem_kind == "circuit" else "compiled"
+        decoder = _decoder(base, problem_kind=problem_kind)
+        if problem_kind != "circuit" and family != "binary_css":
+            raise ValueError("shared binary policies require binary CSS or circuit DEM")
+        decoder["implementation"] = "shared_policy"
+        decoder["shared_policy"] = policy.model_dump(mode="json")
+        return decoder
     if problem_kind == "circuit":
         decoder = _object(value, "decoder", keys=CLOSED_FIELDS["circuit_decoder"])
         if (family != "circuit_dem_bp" or decoder["implementation"] != "canonical_sinter"
@@ -271,6 +329,16 @@ def _decoder(value: object, *, problem_kind: str) -> dict[str, Any]:
     return decoder
 
 
+def _check_mbbp_graph(decoder: Mapping[str, Any], check_counts: tuple[int, ...]) -> None:
+    shared = decoder.get("shared_policy")
+    if not shared or shared["controller"] != "mbbp":
+        return
+    for basis in shared["options"]["bases"]:
+        for transform in basis["redundant_transforms"]:
+            if any(len(transform) != count for count in check_counts) or not any(transform):
+                raise ValueError("MBBP redundant transforms must match every selected original check family")
+
+
 def _rate_points(value: object, *, channel_kind: str, circuit: bool = False) -> list[dict[str, Any]]:
     if not isinstance(value, list) or not value:
         raise ValueError("rate_points must be a nonempty list")
@@ -307,6 +375,12 @@ def interface_contract() -> dict[str, object]:
     except (ImportError, AttributeError):
         pass
     return {
+        "shared_policy_controllers": ["single", "guided_decimation", "beam", "relay", "syndrome_flip", "impulse", "freezing", "sign_flip", "restart_belief", "mbbp"],
+        "prior_tilt": {"domains": ["binary_css", "circuit_dem_bp"],
+                       "fields": ["initial", "round_len", "rounds", "ends", "phases"],
+                       "phase_order": ["pi", "c1", "c2", "theta"]},
+        "mbp4": {"domains": ["bp4"], "fields": ["alpha", "schedule"], "schedules": ["qbp_flooding", "qbp_variable_serial"]},
+        "qbp_variable_serial": {"domains": ["bp4"], "numerical_profile": "quaternary-bp4-f64-v1"},
         "timing_boundaries": {kind: timing_boundaries(kind) for kind in ("css_code_capacity", "pauli_code_capacity", "circuit")},
         "schema": SCHEMA,
         "field_sets": {name: sorted(fields) for name, fields in CLOSED_FIELDS.items()},
@@ -409,6 +483,8 @@ def validate_experiment(spec: object, *, repository: Mapping[str, object] | str 
         raise ValueError("Pauli code-capacity needs decoder.family=bp4")
     rates = _rate_points(root["rate_points"], channel_kind=channel["kind"], circuit=kind == "circuit")
     sampling = _sampling(root["sampling"])
+    if "prior_tilt" in decoder and sampling["seed"] >= 2**63:
+        raise ValueError("PriorTilt sampling seed must fit a nonnegative signed int64")
     budgets = _object(root["budgets"], "budgets", keys=CLOSED_FIELDS["budgets"])
     if budgets["max_shots"] is not None:
         budgets["max_shots"] = _positive_int(budgets["max_shots"], "budgets.max_shots")
@@ -419,6 +495,40 @@ def validate_experiment(spec: object, *, repository: Mapping[str, object] | str 
         raise ValueError("code-capacity execution requires a positive max_iterations budget")
     if kind == "circuit" and decoder["max_iterations"] > budgets["max_iterations"]:
         raise ValueError("decoder.max_iterations exceeds budgets.max_iterations")
+    if "shared_policy" in decoder:
+        expected = decoder["max_iterations"] if kind == "circuit" else budgets["max_iterations"]
+        shared = decoder["shared_policy"]
+        if shared["controller"] == "single" and shared["max_iterations"] != expected:
+            raise ValueError("shared policy max_iterations must equal the declared iteration budget")
+        if shared["controller"] != "single":
+            from bp_registry.canonical.policy_decoder import _source_spec
+            source = _source_spec(shared["controller"], shared["options"])
+            controller = shared["controller"]
+            if controller == "guided_decimation":
+                total = source.round_limit * source.sweeps_per_round
+            elif controller == "beam":
+                total = source.initial_iterations + source.max_extra_units * source.extra_iterations_per_unit
+            elif controller == "relay":
+                total = sum(leg.max_iterations for leg in source.legs)
+            elif controller == "syndrome_flip":
+                total = source.baseline_sweeps + source.test_cap * source.attempt_sweeps
+            elif controller == "impulse":
+                total = source.baseline_sweeps + source.attempt_cap * source.attempt_sweeps
+            elif controller == "freezing":
+                total = source.period_sweeps + source.retry_cap * source.lifetime_sweeps
+            elif controller == "sign_flip":
+                total = source.trunk_sweeps + source.continuation_sweeps
+            elif controller == "mbbp":
+                total = len(source.bases) * source.max_iterations
+            else:
+                total = source.root_sweeps + source.eta * source.t_cap * source.residual_sweeps
+            if total > expected:
+                raise ValueError("shared policy controller sweeps exceed the declared iteration budget")
+    if "prior_tilt" in decoder:
+        settings = decoder["prior_tilt"]
+        limit = decoder["max_iterations"] if kind == "circuit" else budgets["max_iterations"]
+        if settings["initial"] + settings["round_len"] * settings["rounds"] > limit:
+            raise ValueError("PriorTilt sweeps exceed the declared iteration budget")
     if kind == "circuit" and budgets["max_shots"] is not None and sampling["shots"] is not None and len(rates) * (sampling["shot_start"] + sampling["shots"]) > budgets["max_shots"]:
         raise ValueError("circuit shot_start requires replay/discard and exceeds the total max_shots cap")
     for index in range(len(rates)):
@@ -461,13 +571,19 @@ def validate_experiment(spec: object, *, repository: Mapping[str, object] | str 
             sweep_stim_text(value, source_probability=float(channel["noise_sweep"]["source_probability"]), physical_p=float(point["physical_p"]))
             for point in rates
         ]
-        adapter = CanonicalBpSinterDecoder(max_iterations=decoder["max_iterations"], rule=decoder["rule"], tie_break=decoder["tie_break"])
+        if "shared_policy" in decoder:
+            from bp_registry.canonical.policy_decoder import BinaryPolicy
+            from bp_registry.circuit import SharedPolicySinterDecoder
+            adapter = SharedPolicySinterDecoder(BinaryPolicy.model_validate_json(json.dumps(decoder["shared_policy"])))
+        else:
+            adapter = CanonicalBpSinterDecoder(max_iterations=decoder["max_iterations"], rule=decoder["rule"], tie_break=decoder["tie_break"])
         for rate_index, text in enumerate(texts):
             circuit = stim.Circuit(text)
             if circuit.num_observables < 1:
                 raise ValueError(f"circuit rate point {rate_index} has no declared observable")
             dem = circuit.detector_error_model(decompose_errors=False)
-            adapter.compile_decoder_for_dem(dem=dem)
+            compiled = adapter.compile_decoder_for_dem(dem=dem)
+            _check_mbbp_graph(decoder, (compiled.model.table.check_count,))
         if sampling["seed"] >= 2**64:
             raise ValueError("Stim sampling seed must fit uint64")
     else:
@@ -483,6 +599,7 @@ def validate_experiment(spec: object, *, repository: Mapping[str, object] | str 
             code = CssCode(np.asarray(ref["hx"]), np.asarray(ref["hz"]),
                            None if "lx" not in ref else np.asarray(ref["lx"]),
                            None if "lz" not in ref else np.asarray(ref["lz"])).validate()
+        _check_mbbp_graph(decoder, (code.hx.shape[0], code.hz.shape[0]))
         if code.hx.shape[0] == 0 or code.hz.shape[0] == 0:
             raise ValueError("Portable CSS input requires nonempty X and Z check families")
         if np.any(~np.any(code.hx, axis=1)) or np.any(~np.any(code.hz, axis=1)):

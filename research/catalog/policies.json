@@ -24,16 +24,16 @@
       "execution_status": "builder_supported",
       "execution": {
         "custom_builder": {
-          "status": "supported",
-          "scope": "Binary CSS and BP4 custom runs accept flooding only."
+          "status": "supported_with_restrictions",
+          "scope": "Available for compatible binary CSS and detector-error-model configurations subject to policy-specific operands and validation."
         },
         "registered_study": {
           "status": "supported_in_study_specific_paths",
           "scope": "Some retained canonical studies use other declared schedules; they are not builder controls."
         },
         "circuit": {
-          "status": "supported_plain_only",
-          "scope": "The pinned Sinter adapter accepts flooding plain BP only."
+          "status": "supported_with_restrictions",
+          "scope": "Available on compatible binary detector-error-model configurations with declared parameters and original-problem evaluation."
         }
       },
       "source_url": null,
@@ -57,16 +57,16 @@
       "execution_status": "builder_supported",
       "execution": {
         "custom_builder": {
-          "status": "supported_with_v2_policy",
-          "scope": "An explicit flooding policy is accepted only with the unbounded v2 numerical profiles."
+          "status": "supported_with_restrictions",
+          "scope": "Available for compatible binary CSS and detector-error-model configurations subject to policy-specific operands and validation."
         },
         "registered_study": {
           "status": "supported_when_declared",
           "scope": "Study-specific damping settings remain arm-specific and cannot be inferred from this generic control."
         },
         "circuit": {
-          "status": "unavailable",
-          "scope": "The custom circuit adapter rejects a policy/resolution overlay."
+          "status": "supported_with_restrictions",
+          "scope": "Available on compatible binary detector-error-model configurations with declared parameters and original-problem evaluation."
         }
       },
       "source_url": "https://arxiv.org/html/2411.08177v2#S4.SS2",
@@ -78,9 +78,9 @@
       "label": "Normalized and offset min-sum",
       "category": "check update",
       "equations": [
-        "m_{c\\to v}=(-1)^{s_c}\\!\\prod_{u\\in N(c)\\setminus\\{v\\}}\\operatorname{sign}(q_{u\\to c})\\min_{u\\in N(c)\\setminus\\{v\\}}|q_{u\\to c}|",
+        "m_{c\\to v}=(-1)^{s_c}\\!\\prod_{u\\in N(c)\\setminus\\{v\\}}\\operatorname{sign}(m_{u\\to c})\\min_{u\\in N(c)\\setminus\\{v\\}}|m_{u\\to c}|",
         "m_{c\\to v}^{\\mathrm{NMS}}=\\alpha m_{c\\to v}",
-        "m_{c\\to v}^{\\mathrm{OMS}}=\\operatorname{sat}\\!\\left((-1)^{s_c}\\prod\\operatorname{sign}(q_{u\\to c})\\max\\!\\left(0,\\min|q_{u\\to c}|-\\beta\\right)\\right)"
+        "m_{c\\to v}^{\\mathrm{OMS}}=\\operatorname{sat}\\!\\left((-1)^{s_c}\\prod\\operatorname{sign}(m_{u\\to c})\\max\\!\\left(0,\\min|m_{u\\to c}|-\\beta\\right)\\right)"
       ],
       "notation": "q_{u\\to c} is an incoming check LLR; alpha is a positive scale; beta is a nonnegative offset. The first formula is the undiscounted min-sum check update.",
       "parameters": [
@@ -106,16 +106,16 @@
       "execution_status": "builder_supported",
       "execution": {
         "custom_builder": {
-          "status": "supported_with_v2_policy",
-          "scope": "Binary CSS and BP4 accept min_sum with an explicit matching flooding policy; a binary min_sum request without one is rejected."
+          "status": "supported_with_restrictions",
+          "scope": "Available for compatible binary CSS and detector-error-model configurations subject to policy-specific operands and validation."
         },
         "registered_study": {
           "status": "supported_when_declared",
           "scope": "The actual alpha, beta, clipping, and numerical profile belong to the selected decoder record."
         },
         "circuit": {
-          "status": "plain_adapter_only",
-          "scope": "Circuit min-sum has a pinned adapter profile, not this configurable policy overlay."
+          "status": "supported_with_restrictions",
+          "scope": "Available on compatible binary detector-error-model configurations with declared parameters and original-problem evaluation."
         }
       },
       "source_url": null,
@@ -168,16 +168,16 @@
       "execution_status": "builder_supported",
       "execution": {
         "custom_builder": {
-          "status": "supported_with_v2_policy",
-          "scope": "Resolution is part of bp-flooding-policy-v1 and requires a v2 numerical profile."
+          "status": "supported_with_restrictions",
+          "scope": "Available for compatible binary CSS and detector-error-model configurations subject to policy-specific operands and validation."
         },
         "registered_study": {
           "status": "record_specific",
           "scope": "A retained result's numerical identity is its decoder record, not a page-level default."
         },
         "circuit": {
-          "status": "unavailable",
-          "scope": "The circuit adapter does not accept this policy object."
+          "status": "supported_with_restrictions",
+          "scope": "Available on compatible binary detector-error-model configurations with declared parameters and original-problem evaluation."
         }
       },
       "source_url": null,
@@ -188,7 +188,7 @@
       "label": "Uniform posterior memory",
       "category": "state memory",
       "equations": [
-        "\\lambda_v^{(\\ell+1)}=(1-\\gamma)\\lambda_{v,\\mathrm{channel}}+\\gamma\\,\\lambda_{v,\\mathrm{posterior}}^{(\\ell)}"
+        "\\lambda_{v,\\mathrm{eff}}^{(\\ell+1)}=(1-\\gamma)\\lambda_{v,\\mathrm{channel}}+\\gamma L_v^{(\\ell)}"
       ],
       "notation": "ell indexes complete BP legs. The next leg's effective prior blends the channel prior with the previous leg's posterior using one uniform gamma; this is a cross-leg prior transfer, not ordinary within-leg V2C damping.",
       "parameters": [
@@ -201,19 +201,19 @@
           "meaning": "Number of sequential BP legs; messages/history transfer only if the named study explicitly says so."
         }
       ],
-      "execution_status": "registered_study_only",
+      "execution_status": "builder_supported",
       "execution": {
         "custom_builder": {
-          "status": "unavailable",
-          "scope": "The custom builder has no cross-leg memory control."
+          "status": "supported_with_restrictions",
+          "scope": "Available for compatible binary CSS and detector-error-model configurations subject to policy-specific operands and validation."
         },
         "registered_study": {
           "status": "supported_when_declared",
           "scope": "Canonical memory compositions are study-specific and retain their own state-lifecycle evidence."
         },
         "circuit": {
-          "status": "unavailable",
-          "scope": "No source-faithful circuit memory policy is offered through the custom circuit adapter."
+          "status": "supported_with_restrictions",
+          "scope": "Available on compatible binary detector-error-model configurations with declared parameters and original-problem evaluation."
         }
       },
       "source_url": null,
@@ -224,10 +224,10 @@
       "label": "Modified BP4 (MBP4)",
       "category": "quaternary update",
       "equations": [
-        "\\Gamma_n^W=\\Lambda_n^W+\\alpha^{-1}\\!\\sum_{m:\\langle S_{mn},W\\rangle=1}\\Delta_{m\\to n}",
-        "\\Gamma_{n\\to m}^W=\\Gamma_n^W-\\langle S_{mn},W\\rangle\\Delta_{m\\to n}"
+        "L_v^a=\\lambda_v^a+\\alpha^{-1}\\sum_{c\\in N(v)}A_{cv}(a)m_{c\\to v}",
+        "L_{v\\to c}^a=L_v^a-A_{cv}(a)m_{c\\to v}"
       ],
-      "notation": "W is a Pauli hypothesis, Lambda is its channel LLR, Delta is a check-to-variable contribution, and the bracket is 1 exactly when W anticommutes with the edge stabilizer label. This registry exposes fixed-alpha MBP4 only; it does not claim an adaptive-alpha variant.",
+      "notation": "For Pauli hypothesis a, lambda is the channel LLR, L is the posterior LLR, and A is one exactly when a anticommutes with the edge stabilizer label. The fixed-alpha MBP4 recurrence uses scalar check messages.",
       "parameters": [
         {
           "symbol": "alpha",
@@ -240,18 +240,18 @@
             "qbp_flooding",
             "qbp_variable_serial"
           ],
-          "meaning": "Specialized canonical MBP4 execution choices, not custom research-builder schedule controls."
+          "meaning": "Portable Q-BP schedules supported by fixed-alpha MBP4."
         }
       ],
-      "execution_status": "mapped_mechanism_only",
+      "execution_status": "builder_supported",
       "execution": {
         "custom_builder": {
-          "status": "unavailable",
-          "scope": "The builder supports plain BP4 and Q-BPGD, not an MBP4 control."
+          "status": "supported_with_restrictions",
+          "scope": "Fixed-alpha MBP4 for Q-BP with flooding or variable-node serial schedule. Alternate numerical policies are excluded."
         },
         "registered_study": {
           "status": "mechanism_only",
-          "scope": "The source is mapped in the literature registry; no qualified source-experiment result is implied."
+          "scope": "The mechanism is implemented; no qualified source-experiment result is implied."
         },
         "circuit": {
           "status": "unavailable",
@@ -260,14 +260,26 @@
       },
       "source_url": "https://arxiv.org/abs/2104.13659",
       "source_label": "Modified BP4 primary source",
-      "source_note": "Kuo and Lai's Modified BP4 source; implementation identity and source-experiment qualification remain separate."
+      "source_note": "Kuo and Lai's Modified BP4 source; implementation identity and source-experiment qualification remain separate.",
+      "literature": [
+        {
+          "title": "Exploiting degeneracy in belief propagation decoding of quantum codes",
+          "url": "https://arxiv.org/abs/2104.13659",
+          "reference": "Algorithm 1, MBP4",
+          "equations": [
+            "\\Gamma_n^W=\\Lambda_n^W+\\alpha^{-1}\\!\\sum_{m:\\langle S_{mn},W\\rangle=1}\\Delta_{m\\to n}",
+            "\\Gamma_{n\\to m}^W=\\Gamma_n^W-\\langle S_{mn},W\\rangle\\Delta_{m\\to n}"
+          ],
+          "note": "Paper notation uses Gamma for posterior LLR, Lambda for channel LLR, Delta for check messages, and a symplectic commutation indicator."
+        }
+      ]
     },
     {
       "id": "relay_disordered_memory",
       "label": "RelayBP disordered memory",
       "category": "state memory",
       "equations": [
-        "\\lambda_{v,\\mathrm{eff}}^{(\\ell+1)}=(1-\\gamma_v^{(\\ell)})\\lambda_{v,\\mathrm{channel}}+\\gamma_v^{(\\ell)}\\lambda_{v,\\mathrm{posterior}}^{(\\ell)}",
+        "\\lambda_{v,\\mathrm{eff}}^{(\\ell+1)}=(1-\\gamma_v^{(\\ell)})\\lambda_{v,\\mathrm{channel}}+\\gamma_v^{(\\ell)}L_v^{(\\ell)}",
         "\\gamma_v^{(\\ell)}=\\gamma_{\\mathrm{low}}+w\\,u_v,\\qquad u_v\\sim\\operatorname{Uniform}(0,1)"
       ],
       "notation": "A Relay leg transfers posterior information only through its next effective prior. The initial leg may use one uniform gamma; later legs use a seeded per-variable disordered gamma. No message buffer or other history crosses a leg in the registered canonical adaptation.",
@@ -285,24 +297,35 @@
           "meaning": "Arm-specific topology and BP budget; they are not generic defaults."
         }
       ],
-      "execution_status": "registered_study_only",
+      "execution_status": "builder_supported",
       "execution": {
         "custom_builder": {
-          "status": "unavailable",
-          "scope": "The custom builder exposes no Relay controller."
+          "status": "supported_with_restrictions",
+          "scope": "Available for compatible binary CSS and detector-error-model configurations subject to policy-specific operands and validation."
         },
         "registered_study": {
           "status": "controlled_css_adaptation",
           "scope": "The registered BB72 fair Relay/Beam study is a controlled CSS adaptation, not a reproduction of the paper's circuit curves."
         },
         "circuit": {
-          "status": "unavailable",
-          "scope": "Pinned Relay circuits run through the plain adapter only; they do not expose the source Relay decoder."
+          "status": "supported_with_restrictions",
+          "scope": "Available on compatible binary detector-error-model configurations with declared parameters and original-problem evaluation."
         }
       },
       "source_url": "https://arxiv.org/abs/2506.01779v2",
       "source_label": "RelayBP primary source",
-      "source_note": "RelayBP primary source. The per-leg lifecycle above is explicitly the registered canonical adaptation."
+      "source_note": "RelayBP primary source. The per-leg lifecycle above is explicitly the registered canonical adaptation.",
+      "literature": [
+        {
+          "title": "Improved belief propagation is sufficient for real-time decoding of quantum memory",
+          "url": "https://arxiv.org/abs/2506.01779v2",
+          "reference": "Equation (4)",
+          "equations": [
+            "\\Lambda_{j}(t)=(1-\\gamma_{j})\\Lambda_{j}(0)+\\gamma_{j}M_{j}(t-1)"
+          ],
+          "note": "The source updates the bias each iteration and transfers final marginals between relay legs."
+        }
+      ]
     },
     {
       "id": "binary_guided_decimation",
@@ -310,7 +333,7 @@
       "category": "intervention",
       "equations": [
         "v^\\star=\\operatorname*{arg\\,max}_{v\\in U}|L_v|",
-        "L_{v^\\star}\\leftarrow A\\,\\operatorname{sgn}_+(L_{v^\\star}),\\qquad A=25"
+        "\\lambda_{v^\\star}\\leftarrow A\\,\\operatorname{sgn}_+(L_{v^\\star}),\\qquad A=25"
       ],
       "notation": "U is the undecimated set and L_v is the post-BP reliability. The project controller declares sgn_+(0)=+1 and a continuing-message lifecycle; the source's zero boundary and final-round treatment are not qualified as author-code exact.",
       "parameters": [
@@ -327,19 +350,19 @@
           "meaning": "The source-record magnitude is 25 in the admitted canonical interpretation."
         }
       ],
-      "execution_status": "registered_study_only",
+      "execution_status": "builder_supported",
       "execution": {
         "custom_builder": {
-          "status": "unavailable",
-          "scope": "The research builder does not expose binary BPGD."
+          "status": "supported_with_restrictions",
+          "scope": "Available for compatible binary CSS and detector-error-model configurations subject to policy-specific operands and validation."
         },
         "registered_study": {
           "status": "canonical_adaptation",
           "scope": "Paper-root BPGD records are separate from source records and do not establish author-code equivalence."
         },
         "circuit": {
-          "status": "not_applicable",
-          "scope": "The mapped target is binary CSS code-capacity decoding, not the pinned circuit adapter."
+          "status": "supported_with_restrictions",
+          "scope": "Available on compatible binary detector-error-model configurations with declared parameters and original-problem evaluation."
         }
       },
       "source_url": "https://arxiv.org/abs/2312.10950v2",
@@ -412,24 +435,33 @@
           "meaning": "Required decoder-only seed for deterministic declared test order in the repository adaptation."
         }
       ],
-      "execution_status": "registered_study_only",
+      "execution_status": "builder_supported",
       "execution": {
         "custom_builder": {
-          "status": "unavailable",
-          "scope": "The custom research builder does not expose BP-SF."
+          "status": "supported_with_restrictions",
+          "scope": "Available for compatible binary CSS and detector-error-model configurations subject to policy-specific operands and validation."
         },
         "registered_study": {
           "status": "controlled_css_adaptation",
           "scope": "Retained BB72 arms use seeded serial first-valid selection; the BP-SF source uses min-sum and parallel speculative tests."
         },
         "circuit": {
-          "status": "unavailable",
-          "scope": "The source's circuit-level comparisons are not exposed through the custom adapter."
+          "status": "supported_with_restrictions",
+          "scope": "Available on compatible binary detector-error-model configurations with declared parameters and original-problem evaluation."
         }
       },
       "source_url": "https://arxiv.org/abs/2507.00254v1",
       "source_label": "BP-SF primary source",
-      "source_note": "BP-SF primary source. Do not infer source parallelism or source runtime from the retained serial CSS adaptation."
+      "source_note": "BP-SF primary source. Do not infer source parallelism or source runtime from the retained serial CSS adaptation.",
+      "literature": [
+        {
+          "title": "Fully Parallelized BP Decoding for Quantum LDPC Codes Can Outperform BP-OSD",
+          "url": "https://arxiv.org/abs/2507.00254v1",
+          "reference": "Section 4, speculative decoding",
+          "equations": [],
+          "note": "The paper chooses unreliable bits using oscillation statistics and runs independent BP attempts on modified syndromes."
+        }
+      ]
     },
     {
       "id": "beam_search",
@@ -454,24 +486,36 @@
           "meaning": "Profile-specific BP effort used by the controlled BB72 study; it is not an equal-work normalization."
         }
       ],
-      "execution_status": "registered_study_only",
+      "execution_status": "builder_supported",
       "execution": {
         "custom_builder": {
-          "status": "unavailable",
-          "scope": "The custom builder has no BeamSearch controller."
+          "status": "supported_with_restrictions",
+          "scope": "Available for compatible binary CSS and detector-error-model configurations subject to policy-specific operands and validation."
         },
         "registered_study": {
           "status": "controlled_css_adaptation",
           "scope": "The registered BB72 comparison has width 2 and at most four rounds in its selected profiles; it is not a source circuit reproduction."
         },
         "circuit": {
-          "status": "unavailable",
-          "scope": "Pinned BeamSearch circuits are run by the plain adapter only; the source BeamSearch decoder is not offered."
+          "status": "supported_with_restrictions",
+          "scope": "Available on compatible binary detector-error-model configurations with declared parameters and original-problem evaluation."
         }
       },
       "source_url": "https://arxiv.org/abs/2512.07057v2",
       "source_label": "BeamSearch primary source",
-      "source_note": "BeamSearch primary source. The displayed controller equations are the controlled CSS adaptation's transparent abstraction, not a claim that it reproduces every source branch transition."
+      "source_note": "BeamSearch primary source. The displayed controller equations are the controlled CSS adaptation's transparent abstraction, not a claim that it reproduces every source branch transition.",
+      "literature": [
+        {
+          "title": "Beam search decoder for quantum LDPC codes",
+          "url": "https://arxiv.org/abs/2512.07057v2",
+          "reference": "Algorithm 3, lines 25–30",
+          "equations": [
+            "\\texttt{nextp.next\\_pos}\\leftarrow\\arg\\min_{j\\in\\mathcal U}|\\texttt{sum\\_LLR}[j]|",
+            "\\texttt{nextp.score}\\leftarrow\\sum_{j\\in\\mathcal U}|\\texttt{sum\\_LLR}[j]|/\\texttt{iters}"
+          ],
+          "note": "The source uses the accumulated posterior LLR in each branch and keeps the highest-scoring paths."
+        }
+      ]
     },
     {
       "id": "unicycle_extra_bit_hypotheses",
@@ -511,6 +555,403 @@
       "source_url": "https://arxiv.org/abs/quant-ph/0304161v3",
       "source_label": "MacKay et al. Construction U",
       "source_note": "Source-derived mechanism with controlled noise, iteration ceiling and numerical settings; no paper-curve agreement claim."
+    },
+    {
+      "id": "prior_tilt",
+      "label": "PriorTilt sparse prior perturbation",
+      "category": "prior modification",
+      "equations": [
+        "\\lambda_{v,\\mathrm{eff}}^{(t)}=\\lambda_{v,\\mathrm{channel}}+o_v^{(\\ell)}",
+        "S_v^{(\\ell-1)}<\\theta\\lambda_{v,\\mathrm{channel}}",
+        "o_v^{(\\ell)}=\\begin{cases}-c_1M_v^{-,(\\ell-1)},&\\text{with probability }\\pi,\\\\-c_2M_v^{+,(\\ell-1)},&\\text{with probability }1-\\pi.\\end{cases}"
+      ],
+      "notation": "Each round uses posterior sums and extrema of posterior and outgoing messages from the preceding round. Ineligible nodes have zero offset. Messages persist across rounds.",
+      "parameters": [
+        {
+          "symbol": "initial_iterations, iterations_per_round, rounds",
+          "meaning": "Initial BP budget, modified round length, and number of rounds."
+        },
+        {
+          "symbol": "theta, pi, c1, c2",
+          "meaning": "Eligibility threshold, probability of the no-error-favoring offset, and offset scales."
+        },
+        {
+          "symbol": "root_seed",
+          "meaning": "Seed for independent per-node offset direction draws."
+        }
+      ],
+      "execution_status": "builder_supported",
+      "execution": {
+        "custom_builder": {
+          "status": "supported_with_restrictions",
+          "scope": "Available for compatible binary CSS and detector-error-model configurations subject to policy-specific operands and validation."
+        },
+        "registered_study": {
+          "status": "canonical_adaptation",
+          "scope": "Circuit-level PriorTilt Figure 1 canonical reproduction."
+        },
+        "circuit": {
+          "status": "supported_with_restrictions",
+          "scope": "Available on compatible binary detector-error-model configurations with declared parameters and original-problem evaluation."
+        }
+      },
+      "source_url": "https://arxiv.org/abs/2611.13373v1",
+      "source_label": "PriorTilt primary source",
+      "source_note": "Offsets are recomputed at round boundaries and BP messages are retained.",
+      "literature": [
+        {
+          "title": "PriorTilt: Decoding quantum LDPC codes with sparse perturbations of belief propagation priors",
+          "url": "https://arxiv.org/abs/2611.13373v1",
+          "reference": "Equations (3), (6), and (7)",
+          "equations": [
+            "\\widetilde{\\Lambda}_{j}(t)=\\Lambda_{j}+o_{j}(\\tau(t))",
+            "S_{j}(\\tau-1)<\\theta\\Lambda_{j}",
+            "o_{j}(\\tau)=\\begin{cases}-c_{1}M_{j}^{-}(\\tau-1),&\\text{with probability }\\pi,\\\\-c_{2}M_{j}^{+}(\\tau-1),&\\text{with probability }1-\\pi.\\end{cases}"
+          ],
+          "note": "The paper sets the offset to zero for nodes that do not meet the threshold."
+        }
+      ]
+    },
+    {
+      "id": "layered",
+      "label": "Layered check schedule",
+      "category": "schedule",
+      "equations": [],
+      "notation": "Process a conflict-free layer of checks together and expose each completed layer before the next. Explicit partitions must cover the original checks.",
+      "parameters": [],
+      "execution_status": "builder_supported",
+      "execution": {
+        "custom_builder": {
+          "status": "supported_with_restrictions",
+          "scope": "Available for compatible binary CSS and detector-error-model configurations subject to policy-specific operands and validation."
+        },
+        "registered_study": {
+          "status": "canonical_adaptation",
+          "scope": "The available controller and policy routes carry their declared adaptation and provenance."
+        },
+        "circuit": {
+          "status": "supported_with_restrictions",
+          "scope": "Available on compatible binary detector-error-model configurations with declared parameters and original-problem evaluation."
+        }
+      },
+      "source_url": "",
+      "source_note": "See the execution route and declared experiment configuration for compatibility."
+    },
+    {
+      "id": "check_node_serial",
+      "label": "Check-node serial schedule",
+      "category": "schedule",
+      "equations": [],
+      "notation": "Visit checks in declared order and expose each local update before processing the next check.",
+      "parameters": [],
+      "execution_status": "builder_supported",
+      "execution": {
+        "custom_builder": {
+          "status": "supported_with_restrictions",
+          "scope": "Available for compatible binary CSS and detector-error-model configurations subject to policy-specific operands and validation."
+        },
+        "registered_study": {
+          "status": "canonical_adaptation",
+          "scope": "The available controller and policy routes carry their declared adaptation and provenance."
+        },
+        "circuit": {
+          "status": "supported_with_restrictions",
+          "scope": "Available on compatible binary detector-error-model configurations with declared parameters and original-problem evaluation."
+        }
+      },
+      "source_url": "",
+      "source_note": "See the execution route and declared experiment configuration for compatibility."
+    },
+    {
+      "id": "variable_node_serial",
+      "label": "Variable-node serial schedule",
+      "category": "schedule",
+      "equations": [],
+      "notation": "Visit variables in declared order and expose each local update before processing the next variable.",
+      "parameters": [],
+      "execution_status": "builder_supported",
+      "execution": {
+        "custom_builder": {
+          "status": "supported_with_restrictions",
+          "scope": "Binary CSS and detector-error models, and plain Q-BP with fixed sum-product, subject to configuration validation."
+        },
+        "registered_study": {
+          "status": "canonical_adaptation",
+          "scope": "The available controller and policy routes carry their declared adaptation and provenance."
+        },
+        "circuit": {
+          "status": "supported_with_restrictions",
+          "scope": "Available on compatible binary detector-error-model configurations with declared parameters and original-problem evaluation."
+        }
+      },
+      "source_url": "",
+      "source_note": "See the execution route and declared experiment configuration for compatibility."
+    },
+    {
+      "id": "group_shuffled",
+      "label": "Group-shuffled schedule",
+      "category": "schedule",
+      "equations": [],
+      "notation": "Use source-defined overlapping check groups of size two with overlap one. Requires at least two checks and sum-product updates.",
+      "parameters": [],
+      "execution_status": "builder_supported",
+      "execution": {
+        "custom_builder": {
+          "status": "supported_with_restrictions",
+          "scope": "Available for compatible binary CSS and detector-error-model configurations subject to policy-specific operands and validation."
+        },
+        "registered_study": {
+          "status": "canonical_adaptation",
+          "scope": "The available controller and policy routes carry their declared adaptation and provenance."
+        },
+        "circuit": {
+          "status": "supported_with_restrictions",
+          "scope": "Available on compatible binary detector-error-model configurations with declared parameters and original-problem evaluation."
+        }
+      },
+      "source_url": "",
+      "source_note": "See the execution route and declared experiment configuration for compatibility."
+    },
+    {
+      "id": "residual",
+      "label": "Residual schedule",
+      "category": "schedule",
+      "equations": [
+        "r_{c\\to v}=|\\widetilde m_{c\\to v}-m_{c\\to v}|"
+      ],
+      "notation": "Choose a check-to-variable edge by its pending message residual, then refresh dependent priorities. Requires an undamped sum-product kernel and a nonempty edge pool.",
+      "parameters": [],
+      "execution_status": "builder_supported",
+      "execution": {
+        "custom_builder": {
+          "status": "supported_with_restrictions",
+          "scope": "Available for compatible binary CSS and detector-error-model configurations subject to policy-specific operands and validation."
+        },
+        "registered_study": {
+          "status": "canonical_adaptation",
+          "scope": "The available controller and policy routes carry their declared adaptation and provenance."
+        },
+        "circuit": {
+          "status": "supported_with_restrictions",
+          "scope": "Available on compatible binary detector-error-model configurations with declared parameters and original-problem evaluation."
+        }
+      },
+      "source_url": "",
+      "source_note": "See the execution route and declared experiment configuration for compatibility."
+    },
+    {
+      "id": "pdbp_field_mix",
+      "label": "PDBP field mixing",
+      "category": "memory",
+      "equations": [
+        "L_v^{(t+1)}=(1-\\gamma)L_{v,\\mathrm{fresh}}^{(t+1)}+\\gamma L_v^{(t)}"
+      ],
+      "notation": "Mix the complete fresh effective field with the previous field.",
+      "parameters": [],
+      "execution_status": "builder_supported",
+      "execution": {
+        "custom_builder": {
+          "status": "supported_with_restrictions",
+          "scope": "Available for compatible binary CSS and detector-error-model configurations subject to policy-specific operands and validation."
+        },
+        "registered_study": {
+          "status": "canonical_adaptation",
+          "scope": "The available controller and policy routes carry their declared adaptation and provenance."
+        },
+        "circuit": {
+          "status": "supported_with_restrictions",
+          "scope": "Available on compatible binary detector-error-model configurations with declared parameters and original-problem evaluation."
+        }
+      },
+      "source_url": "",
+      "source_note": "See the execution route and declared experiment configuration for compatibility."
+    },
+    {
+      "id": "pdprime_delta_mix",
+      "label": "PD-prime delta mixing",
+      "category": "memory",
+      "equations": [
+        "L_v^{(t+1)}=L_v^{(t)}+(1-\\gamma)\\sum_{c\\in N(v)}(m_{c\\to v}^{(t+1)}-m_{c\\to v}^{(t)})"
+      ],
+      "notation": "Apply the check-to-variable message delta to the stored field. Requires fixed prior and first field position.",
+      "parameters": [],
+      "execution_status": "builder_supported",
+      "execution": {
+        "custom_builder": {
+          "status": "supported_with_restrictions",
+          "scope": "Available for compatible binary CSS and detector-error-model configurations subject to policy-specific operands and validation."
+        },
+        "registered_study": {
+          "status": "canonical_adaptation",
+          "scope": "The available controller and policy routes carry their declared adaptation and provenance."
+        },
+        "circuit": {
+          "status": "supported_with_restrictions",
+          "scope": "Available on compatible binary detector-error-model configurations with declared parameters and original-problem evaluation."
+        }
+      },
+      "source_url": "",
+      "source_note": "See the execution route and declared experiment configuration for compatibility."
+    },
+    {
+      "id": "posterior_momentum",
+      "label": "Posterior momentum",
+      "category": "memory",
+      "equations": [
+        "g_v^{(t+1)}=\\gamma g_v^{(t)}+(1-\\gamma)(L_v^{(t)}-L_{v,\\mathrm{fresh}}^{(t+1)})",
+        "L_v^{(t+1)}=L_v^{(t)}-\\alpha g_v^{(t+1)}"
+      ],
+      "notation": "Carry posterior velocity across updates and subtract the current check message when constructing extrinsic messages.",
+      "parameters": [],
+      "execution_status": "builder_supported",
+      "execution": {
+        "custom_builder": {
+          "status": "supported_with_restrictions",
+          "scope": "Available for compatible binary CSS and detector-error-model configurations subject to policy-specific operands and validation."
+        },
+        "registered_study": {
+          "status": "canonical_adaptation",
+          "scope": "The available controller and policy routes carry their declared adaptation and provenance."
+        },
+        "circuit": {
+          "status": "supported_with_restrictions",
+          "scope": "Available on compatible binary detector-error-model configurations with declared parameters and original-problem evaluation."
+        }
+      },
+      "source_url": "",
+      "source_note": "See the execution route and declared experiment configuration for compatibility."
+    },
+    {
+      "id": "impulse_decoding",
+      "label": "Impulse decoding",
+      "category": "intervention",
+      "equations": [
+        "s_{\\mathrm{work}}=s\\oplus Hf"
+      ],
+      "notation": "Run bounded forced-coordinate attempts using an exact shortened working problem, then lift and evaluate each candidate on the original problem.",
+      "parameters": [],
+      "execution_status": "builder_supported",
+      "execution": {
+        "custom_builder": {
+          "status": "supported_with_restrictions",
+          "scope": "Available for compatible binary CSS and detector-error-model configurations subject to policy-specific operands and validation."
+        },
+        "registered_study": {
+          "status": "canonical_adaptation",
+          "scope": "The available controller and policy routes carry their declared adaptation and provenance."
+        },
+        "circuit": {
+          "status": "supported_with_restrictions",
+          "scope": "Available on compatible binary detector-error-model configurations with declared parameters and original-problem evaluation."
+        }
+      },
+      "source_url": "",
+      "source_note": "See the execution route and declared experiment configuration for compatibility."
+    },
+    {
+      "id": "freezing",
+      "label": "Temporary freezing",
+      "category": "intervention",
+      "equations": [],
+      "notation": "Temporarily freeze selected variables on a working graph, then release and evaluate the lifted result on the original problem.",
+      "parameters": [],
+      "execution_status": "builder_supported",
+      "execution": {
+        "custom_builder": {
+          "status": "supported_with_restrictions",
+          "scope": "Available for compatible binary CSS and detector-error-model configurations subject to policy-specific operands and validation."
+        },
+        "registered_study": {
+          "status": "canonical_adaptation",
+          "scope": "The available controller and policy routes carry their declared adaptation and provenance."
+        },
+        "circuit": {
+          "status": "supported_with_restrictions",
+          "scope": "Available on compatible binary detector-error-model configurations with declared parameters and original-problem evaluation."
+        }
+      },
+      "source_url": "",
+      "source_note": "See the execution route and declared experiment configuration for compatibility."
+    },
+    {
+      "id": "sign_flipping",
+      "label": "Posterior sign flipping",
+      "category": "intervention",
+      "equations": [
+        "L_v\\leftarrow-L_v"
+      ],
+      "notation": "After a failed trunk, flip the selected posterior sign and continue the message state using the registered sign-only adaptation.",
+      "parameters": [],
+      "execution_status": "builder_supported",
+      "execution": {
+        "custom_builder": {
+          "status": "supported_with_restrictions",
+          "scope": "Available for compatible binary CSS and detector-error-model configurations subject to policy-specific operands and validation."
+        },
+        "registered_study": {
+          "status": "canonical_adaptation",
+          "scope": "The available controller and policy routes carry their declared adaptation and provenance."
+        },
+        "circuit": {
+          "status": "supported_with_restrictions",
+          "scope": "Available on compatible binary detector-error-model configurations with declared parameters and original-problem evaluation."
+        }
+      },
+      "source_url": "",
+      "source_note": "See the execution route and declared experiment configuration for compatibility."
+    },
+    {
+      "id": "restart_belief",
+      "label": "Restart belief",
+      "category": "intervention",
+      "equations": [
+        "s_{\\mathrm{work}}=s\\oplus Hf",
+        "\\hat e=\\hat e_{\\mathrm{work}}\\oplus f"
+      ],
+      "notation": "Decode residual syndromes with declared inserted errors and select an original-valid candidate according to the restart controller.",
+      "parameters": [],
+      "execution_status": "builder_supported",
+      "execution": {
+        "custom_builder": {
+          "status": "supported_with_restrictions",
+          "scope": "Available for compatible binary CSS and detector-error-model configurations subject to policy-specific operands and validation."
+        },
+        "registered_study": {
+          "status": "canonical_adaptation",
+          "scope": "The available controller and policy routes carry their declared adaptation and provenance."
+        },
+        "circuit": {
+          "status": "supported_with_restrictions",
+          "scope": "Available on compatible binary detector-error-model configurations with declared parameters and original-problem evaluation."
+        }
+      },
+      "source_url": "",
+      "source_note": "See the execution route and declared experiment configuration for compatibility."
+    },
+    {
+      "id": "multiple_bases_bp",
+      "label": "Multiple-bases BP",
+      "category": "intervention",
+      "equations": [],
+      "notation": "Decode with declared original-row transformations and select among member candidates using the declared vote or frequency rule.",
+      "parameters": [],
+      "execution_status": "builder_supported",
+      "execution": {
+        "custom_builder": {
+          "status": "supported_with_restrictions",
+          "scope": "Binary CSS with explicitly declared original-row transforms and per-member budgets."
+        },
+        "registered_study": {
+          "status": "canonical_adaptation",
+          "scope": "The available controller and policy routes carry their declared adaptation and provenance."
+        },
+        "circuit": {
+          "status": "supported_with_restrictions",
+          "scope": "Binary detector-error models with explicitly declared original-row transforms and per-member budgets."
+        }
+      },
+      "source_url": "",
+      "source_note": "See the execution route and declared experiment configuration for compatibility."
     }
   ],
   "code_families": [
@@ -567,7 +1008,7 @@
         }
       ],
       "availability": "css_artifacts_and_pinned_circuit_fixtures",
-      "notes": "BB72 and double-gross are CSS inputs. The BB144 entries are pinned source Stim fixtures whose only current execution route is the plain circuit adapter, not the named source decoder.",
+      "notes": "BB72 and double-Gross are CSS inputs. BB144 entries identify source Stim fixtures. The decoder and parameters selected for an experiment define its execution route.",
       "source_url": "https://arxiv.org/abs/2308.07915"
     },
     {
@@ -606,7 +1047,7 @@
     },
     {
       "id": "unicycle",
-      "label": "MacKay unicycle (Construction U)",
+      "label": "Unicycle (Construction U)",
       "code_ids": [
         "unicycle74",
         "unicycle274"
@@ -631,6 +1072,60 @@
       "availability": "registered_css_artifact",
       "notes": "Figure 3 source constructions from Roffe 2020; row-major ring-HGP ordering and project-derived paired logicals. Public choices require measured multi-rate evidence.",
       "source_url": "https://arxiv.org/abs/2005.07016v2"
+    },
+    {
+      "id": "lifted_product",
+      "label": "Lifted product",
+      "code_ids": [
+        "lp1054"
+      ],
+      "circuit_code_ids": [],
+      "circuits": [],
+      "availability": "registered_css_artifact",
+      "notes": "The registered [[1054,140]] construction has an unverified distance.",
+      "source_url": "https://arxiv.org/abs/2012.04068"
+    }
+  ],
+  "glossary": [
+    {
+      "symbol": "v,c",
+      "meaning": "Variable and check node indices. Circuit variables represent error mechanisms and checks represent detectors."
+    },
+    {
+      "symbol": "t,\\ell",
+      "meaning": "BP iteration and controller leg or round indices."
+    },
+    {
+      "symbol": "H,s",
+      "meaning": "Binary parity-check matrix and observed syndrome."
+    },
+    {
+      "symbol": "m_{v\\to c},m_{c\\to v}",
+      "meaning": "Variable-to-check and check-to-variable LLR messages."
+    },
+    {
+      "symbol": "\\lambda_{v,\\mathrm{channel}},L_v",
+      "meaning": "Channel prior LLR and current posterior LLR. Positive values favor no error."
+    },
+    {
+      "symbol": "d,\\alpha,\\beta",
+      "meaning": "Old-message damping weight, min-sum scale, and min-sum offset."
+    },
+    {
+      "symbol": "\\gamma_v",
+      "meaning": "Memory strength applied at variable v."
+    },
+    {
+      "symbol": "B,U_b",
+      "meaning": "Beam width and unfixed variables of branch b."
+    },
+    {
+      "symbol": "\\theta,\\pi,c_1,c_2",
+      "meaning": "PriorTilt eligibility threshold, direction probability, and nonnegative offset strengths."
+    },
+    {
+      "symbol": "a,A_{cv}(a)",
+      "meaning": "Pauli hypothesis a and indicator that it anticommutes with the edge stabilizer label."
     }
   ]
 }

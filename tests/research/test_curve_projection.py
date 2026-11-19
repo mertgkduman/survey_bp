@@ -217,14 +217,19 @@ def test_rebuilt_catalog_uses_same_active_view_as_browser_and_preserves_retained
     from bp_registry.research.catalog import build_catalog
     c = build_catalog(ROOT)
     view = active_view(c)
-    legacy = [s for s in view['curves'] if s['dataset_id'] not in {'yao-bpgd-completion', 'mackay-unicycle-bp', 'mackay-unicycle-paper-rates', 'mackay-damping-confirmation', 'roffe-2020-figure3-canonical-bp', 'mackay-inferred-t100-baseline', 'mackay-damping-t100-confirmation', 'mackay-qbp-isolation-t100', 'roffe-damping-confirmation', 'roffe-canonical-bp-osd', 'roffe-canonical-bp-osd-fast', 'roffe-joint-controls-runtime-budget', 'roffe-tuned-beam-relay-latency', 'roffe-beam-relay-frontier-finalists', 'panteleev-lp1054-full-stack', 'lp1054-relay-gamma80-60'}]
+    legacy = [s for s in view['curves'] if s['dataset_id'] not in {'yao-bpgd-completion', 'mackay-unicycle-bp', 'mackay-unicycle-paper-rates', 'mackay-damping-confirmation', 'roffe-2020-figure3-canonical-bp', 'mackay-inferred-t100-baseline', 'mackay-damping-t100-confirmation', 'mackay-qbp-isolation-t100', 'roffe-damping-confirmation', 'roffe-canonical-bp-osd', 'roffe-canonical-bp-osd-fast', 'roffe-joint-controls-runtime-budget', 'roffe-tuned-beam-relay-latency', 'roffe-beam-relay-frontier-finalists', 'panteleev-lp1054-full-stack', 'lp1054-relay-gamma80-60', 'priortilt-figure-1-canonical'}]
     assert len(legacy) == 53
     assert sum(len(s['points']) for s in legacy) == 262
     added = {s['code_id'] for s in view['curves'] if s['dataset_id'] in {'mackay-unicycle-bp', 'mackay-unicycle-paper-rates', 'mackay-damping-confirmation', 'roffe-2020-figure3-canonical-bp', 'mackay-inferred-t100-baseline', 'mackay-damping-t100-confirmation', 'mackay-qbp-isolation-t100', 'roffe-damping-confirmation', 'roffe-canonical-bp-osd', 'roffe-canonical-bp-osd-fast', 'roffe-joint-controls-runtime-budget', 'roffe-tuned-beam-relay-latency', 'roffe-beam-relay-frontier-finalists', 'panteleev-lp1054-full-stack', 'lp1054-relay-gamma80-60'}}
     assert {code['code_id'] for code in view['codes']} == {'a5', 'b2', 'b1', 'c2', 'double-gross', 'bb72'} | added
-    assert view['circuits'] == []
+    prior = [curve for curve in view['curves'] if curve['dataset_id'] == 'priortilt-figure-1-canonical']
+    assert len(prior) == 9 and sum(len(curve['points']) for curve in prior) == 39
+    assert {curve['algorithm'] for curve in prior} == {'PriorTilt', 'RelayBP', 'BeamSearch'}
+    assert {circuit['circuit_id'] for circuit in view['circuits']} == {curve['code_id'] for curve in prior}
     from bp_registry.research.inputs import input_registry
-    assert len(c['codes']) == len(input_registry(ROOT)['codes']) and len(c['circuits']) == 3
+    registry = input_registry(ROOT)
+    assert len(c['codes']) == len(registry['codes'])
+    assert len(c['circuits']) == len(registry['circuits'])
     assert any(s['code_id'] == 'relay-surface-d3' for s in c['result_series'])
     assert all(len({p['x'] for p in s['points']}) >= 2 for s in view['curves'])
 

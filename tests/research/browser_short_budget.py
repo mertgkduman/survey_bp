@@ -38,7 +38,7 @@ def verify(url,output):
         browser=p.chromium.launch();page=browser.new_page(accept_downloads=True,viewport={'width':1512,'height':1100})
         page.on('pageerror',lambda e:errors.append(str(e)))
         app=(ROOT/'web/research/app.js').read_text().replace('\nload();','''
-window.testRefreshCatalog=c=>{S.catalog=c;fillSavedChoices();renderCards();availability();};
+window.testRefreshCatalog=c=>{S.catalog=c;fillSavedChoices();renderCards();};
 window.testSelection=()=>({cards:S.cards.map(c=>({input:c.input,decoder:c.decoder})),spec:S.spec});
 load();''')
         page.route('**/app.js',lambda route:route.fulfill(body=app,content_type='text/javascript'))

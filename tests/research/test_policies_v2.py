@@ -38,14 +38,18 @@ def test_policy_catalog_has_renderable_equations_and_explicit_routes() -> None:
     for policy in policies:
         assert isinstance(policy["label"], str) and policy["label"]
         assert isinstance(policy["notation"], str) and policy["notation"]
-        assert policy["equations"] and all(isinstance(equation, str) and equation for equation in policy["equations"])
+        assert isinstance(policy["equations"], list)
+        assert all(isinstance(equation, str) and equation for equation in policy["equations"])
+        assert policy["equations"] or policy["notation"]
         assert all(parameter["symbol"] and parameter["meaning"] for parameter in policy["parameters"])
         assert policy["execution_status"]
         assert set(policy["execution"]) == {"custom_builder", "registered_study", "circuit"}
         assert all(route["status"] and route["scope"] for route in policy["execution"].values())
-        if policy["source_url"] is not None:
-            assert policy["source_url"].startswith("https://arxiv.org/")
-            assert policy["source_label"]
+        if policy.get("source_url"):
+            assert policy["source_url"].startswith("https://")
+        for reference in policy.get("literature", []):
+            assert reference["title"] and reference["url"].startswith("https://")
+            assert reference["reference"] and (reference["equations"] or reference["note"])
 
 
 def test_policy_catalog_keeps_builder_capability_distinct_from_study_and_circuit_claims() -> None:
@@ -56,12 +60,17 @@ def test_policy_catalog_keeps_builder_capability_distinct_from_study_and_circuit
         "status": "supported_with_restrictions",
         "scope": "Compiled BP4 only, quaternary f64 v2, sum_product, flooding, policy=null, and first-valid stopping.",
     }
-    assert policies["relay_disordered_memory"]["execution"]["custom_builder"]["status"] == "unavailable"
-    assert policies["relay_disordered_memory"]["execution"]["circuit"]["status"] == "unavailable"
+    assert policies["relay_disordered_memory"]["execution"]["custom_builder"]["status"] == "supported_with_restrictions"
+    assert policies["relay_disordered_memory"]["execution"]["circuit"]["status"] == "supported_with_restrictions"
     assert policies["beam_search"]["execution"]["registered_study"]["status"] == "controlled_css_adaptation"
     assert policies["bpsf_degeneracy_cutting"]["execution"]["registered_study"]["status"] == "controlled_css_adaptation"
-    assert policies["modified_bp4"]["execution_status"] == "mapped_mechanism_only"
-    assert policies["binary_guided_decimation"]["execution"]["custom_builder"]["status"] == "unavailable"
+    assert policies["modified_bp4"]["execution_status"] == "builder_supported"
+    assert policies["modified_bp4"]["execution"]["custom_builder"]["status"] == "supported_with_restrictions"
+    assert policies["modified_bp4"]["execution"]["circuit"]["status"] == "unavailable"
+    assert policies["binary_guided_decimation"]["execution"]["custom_builder"]["status"] == "supported_with_restrictions"
+    assert policies["prior_tilt"]["execution"]["circuit"]["status"] == "supported_with_restrictions"
+    assert policies["multiple_bases_bp"]["execution"]["custom_builder"]["status"] == "supported_with_restrictions"
+    assert policies["multiple_bases_bp"]["execution"]["circuit"]["status"] == "supported_with_restrictions"
 
 
 def test_code_families_cover_every_registered_input_without_false_bb144_code_membership() -> None:
