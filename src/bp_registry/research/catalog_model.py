@@ -14,6 +14,27 @@ ENTITY_IDS = {"papers": "paper_id", "decoders": "decoder_id", "codes": "code_id"
               "circuits": "circuit_id", "channels": "channel_id", "experiments": "experiment_id", "datasets": "dataset_id"}
 
 
+def apply_paper_view_metadata(catalog: dict[str, Any], presentation: dict[str, Any]) -> None:
+    """Attach captions to a figure's original paper and coverage to its own paper."""
+    paper_views = presentation.get("paper_views", {})
+    source_captions = presentation.get("source_captions", {})
+    for paper in catalog["papers"]:
+        view = paper_views.get(paper["paper_id"])
+        if view:
+            paper["coverage"] = view["coverage"]
+            if "title" in view:
+                paper["title"] = view["title"]
+    for figure in catalog.get("paper_figures", []):
+        source_paper = figure.get("guest_paper_id", figure["paper_id"])
+        caption = source_captions.get(source_paper, {}).get(str(figure.get("source_figure")))
+        if caption:
+            figure["source_caption"] = caption
+            number = caption.get("figure_number", figure["source_figure"])
+            figure["label"] = f'Figure {number} "{caption["quote"]}"'
+            if "context" in caption:
+                figure["label"] += f' · {caption["context"]}'
+
+
 def validate_catalog(catalog: dict[str, Any]) -> dict[str, Any]:
     """Reject unresolved/ambiguous relationships before publishing the static file."""
     indexes = {}

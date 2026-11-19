@@ -6,7 +6,7 @@ import subprocess
 
 import pytest
 
-from bp_registry.research.catalog_model import extend_catalog, validate_catalog
+from bp_registry.research.catalog_model import apply_paper_view_metadata, extend_catalog, validate_catalog
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -122,6 +122,27 @@ def test_catalog_rebuild_loads_and_hashes_the_figure_registry(tmp_path):
     path.write_text(json.dumps({'schema':'unknown','figures':figures}))
     with pytest.raises(ValueError,match='unsupported paper figure'):
         extend_catalog(c,{'paper_figures_path':'figures.json'},tmp_path)
+
+
+def test_paper_views_use_guest_caption_and_preserve_evidence_scope():
+    catalog = fixture()
+    figure = catalog["paper_figures"][0]
+    guest = deepcopy(figure)
+    guest.update(figure_id="guest", paper_id="unrelated", guest_paper_id="paper",
+                 guest_rules=guest["reproduction_rules"], reproduction_rules=[])
+    catalog["paper_figures"].append(guest)
+    caption = {"figure_number": "4", "quote": "Source caption"}
+    coverage = {"summary": "Partial coverage.", "remaining_experiments": ["Run the baseline."]}
+    apply_paper_view_metadata(catalog, {
+        "paper_views": {"unrelated": {"title": "Full paper title", "coverage": coverage}},
+        "source_captions": {"paper": {"3": caption}},
+    })
+    assert catalog["papers"][1]["title"] == "Full paper title"
+    assert catalog["papers"][1]["coverage"] == coverage
+    assert all(entry["source_figure"] == "3" for entry in catalog["paper_figures"])
+    assert all(entry["label"] == 'Figure 4 "Source caption"' for entry in catalog["paper_figures"])
+    assert all(entry["source_caption"] == caption for entry in catalog["paper_figures"])
+    validate_catalog(catalog)
 
 
 def test_missing_comparison_context_does_not_invent_a_runnable_recipe(tmp_path):

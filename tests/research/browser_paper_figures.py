@@ -21,7 +21,12 @@ def verify(output,url):
         custom_input=page.locator('[data-plot]').first.locator('[data-select=input]').input_value()
         page.locator('#select-paper').select_option('yao-2312-10950-v2')
         assert page.locator('[data-figure]').count()==7
-        assert [x.split(' · ')[0] for x in page.locator('[data-figure] .card-heading h3').all_text_contents()]==[f'Fig. {i}' for i in range(2,9)]
+        headings=page.locator('[data-figure] .card-heading h3').all_text_contents()
+        assert all(heading.startswith(f'Figure {number} ') for number,heading in enumerate(headings,2))
+        assert page.locator('[data-figure] .card-heading q').count()==7
+        coverage=page.locator('.paper-coverage')
+        assert 'Figures 4–5' in coverage.inner_text()
+        assert coverage.evaluate('node => !!(node.compareDocumentPosition(node.nextElementSibling) & Node.DOCUMENT_POSITION_FOLLOWING)')
         assert page.locator('.paper-heading a').first.get_attribute('href')=='https://arxiv.org/abs/2312.10950v2'
         cards=page.locator('[data-figure]')
         for i in range(cards.count()):
@@ -49,7 +54,8 @@ def verify(output,url):
 
         with page.expect_download() as download:card.get_by_role('button',name='Download run settings',exact=True).click()
         path=output/'figure3-settings.json';download.value.save_as(path);receipt=json.loads(path.read_text())
-        assert receipt['figure_label']=='Fig. 3 · B1' and receipt['paper_id']=='yao-2312-10950-v2'
+        assert receipt['figure_label']=='Figure 3 "different BP iterations per round" · BPGD on B1'
+        assert receipt['paper_id']=='yao-2312-10950-v2'
         assert all(s['paper_group']=='paper' for s in receipt['series'])
         assert all(p.get('source_figure') in (None,'3') for s in receipt['series'] for p in s['points'])
         with page.expect_download() as download:card.get_by_role('button',name='Export visible table',exact=True).click()
@@ -82,6 +88,7 @@ def verify(output,url):
 
         page.locator('#select-paper').select_option('mackay-0304161-v3')
         card=page.locator('[data-figure=mackay-fig-15]')
+        assert card.locator('.card-heading h3').inner_text().startswith('Figure 16 ')
         assert 'inferred' in card.locator('.figure-note').inner_text()
         assert card.locator('[data-group=paper]').is_disabled()
         assert card.locator('.mackay-results tbody tr').count()>0
@@ -95,17 +102,35 @@ def verify(output,url):
 
         page.locator('#select-paper').select_option('priortilt-2611-13373-v1')
         assert page.locator('[data-figure=priortilt-figure-1] tbody tr').count()==39
+        prior=page.locator('[data-paper=priortilt-2611-13373-v1]')
+        caption=prior.locator('[data-figure=priortilt-figure-1] .card-heading q').text_content()
+        assert caption=='Logical error rates of PriorTilt, Relay-BP, and beam search decoders for the three benchmark codes.'
+        assert 'Table 4' in prior.locator('.paper-coverage').inner_text()
+        assert prior.locator('.paper-coverage').evaluate('node => node.nextElementSibling.matches("[data-figure]")')
         page.locator('#add-paper').click()
         page.locator('#select-additional-paper').select_option('relaybp-2506-01779-v2')
         assert page.locator('[data-figure=relay-priortilt-figure-1] tbody tr').count()==13
+        relay=page.locator('[data-paper=relaybp-2506-01779-v2]')
+        assert relay.locator('.paper-heading h3').inner_text()=='Improved belief propagation is sufficient for real-time decoding of quantum memory'
+        assert 'Figure 2' in relay.locator('.paper-coverage').inner_text()
+        assert relay.locator('[data-figure=relay-priortilt-figure-1] q').text_content()==caption
+        left,right=prior.bounding_box(),relay.bounding_box()
+        assert abs(left['y']-right['y'])<1 and right['x']>=left['x']+left['width']
+        assert abs(left['width']-right['width'])<1
+        page.set_viewport_size({'width':390,'height':850})
+        top,bottom=prior.bounding_box(),relay.bounding_box()
+        assert abs(top['x']-bottom['x'])<1 and bottom['y']>=top['y']+top['height']
+        assert page.evaluate('document.documentElement.scrollWidth<=innerWidth+1')
+        page.set_viewport_size({'width':1500,'height':1100})
         page.locator('#add-paper').click()
         search=page.locator('#additional-paper-search input')
-        search.fill('beamsearch')
+        search.fill('Beam search decoder')
         search.press('ArrowDown');search.press('Enter')
         assert page.locator('[data-figure=beam-priortilt-figure-1] tbody tr').count()==13
+        assert page.locator('[data-paper=beamsearch-2512-07057-v2] h3').first.inner_text()=='Beam search decoder for quantum LDPC codes'
         page.locator('[data-paper=beamsearch-2512-07057-v2]').locator('.paper-heading button').click()
         assert page.locator('[data-figure=beam-priortilt-figure-1]').count()==0
-        checks.append('PriorTilt 39 audited points, 13 Relay and 13 Beam guest points, keyboard paper search and add/remove paper')
+        checks.append('Research paper titles, quoted source captions, coverage lists, side-by-side desktop panels, mobile stacking, and keyboard navigation')
 
         page.locator('#select-paper').select_option('')
         assert page.locator('[data-figure]').count()==0

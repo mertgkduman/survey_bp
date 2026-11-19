@@ -294,5 +294,147 @@
       "reproduction_rules": [],
       "source_figure": null
     }
-  ]
+  ],
+  "paper_views": {
+    "yao-2312-10950-v2": {
+      "coverage": {
+        "summary": "The workbench includes canonical BP-family curves for Figures 2–8.",
+        "remaining_experiments": [
+          "Figures 4–5 · Reproduce BP-OSD-0 and BP-SI on B1 and C2 with the source serial normalized min-sum settings.",
+          "Figures 7–8 · Complete the source-setting Q-BPGD sweeps and BP-OSD comparisons on A5 (order 10) and B2 (order 0).",
+          "Table 1 · Match the B1 mean decimation-round counts at the reported bit-flip rates."
+        ]
+      }
+    },
+    "bravyi-2308-07915": {
+      "coverage": {
+        "summary": "The workbench shows a controlled BB72 code-capacity study.",
+        "remaining_experiments": [
+          "Figure 2A · Reproduce the BB circuit-level memory sweeps using d syndrome cycles and the paper’s min-sum BP+OSD-CS settings.",
+          "Figure 2B · Match the BB144 comparison with 12 surface-code patches at distances 9, 11, 13, and 15."
+        ]
+      },
+      "title": "High-threshold and low-overhead fault-tolerant quantum memory"
+    },
+    "relaybp-2506-01779-v2": {
+      "coverage": {
+        "summary": "The circuit curves here are from the PriorTilt comparison. The original Relay-BP experiments still need reproductions.",
+        "remaining_experiments": [
+          "Figure 2 · Sweep the memory-strength intervals and reproduce the circuit curves for gross, two-gross, and the distance-11 surface code, with the source XZ and XYZ decoders and baselines.",
+          "Figure 3 · Sweep BP, memory BP, and Relay-BP work limits on gross at p = 0.003 and reproduce the LER versus mean-iteration comparison."
+        ]
+      },
+      "title": "Improved belief propagation is sufficient for real-time decoding of quantum memory"
+    },
+    "beamsearch-2512-07057-v2": {
+      "coverage": {
+        "summary": "The circuit curves here are from the PriorTilt comparison. The original beam search experiments still need reproductions.",
+        "remaining_experiments": [
+          "Figures 2–4 · Reproduce the BB144, BB90, and HGP450 circuit sweeps with the published beam configurations and BP+OSD baseline.",
+          "Tables 2–3 · Match the BB144 mean and 99.9th-percentile decoding times with comparable timing conditions."
+        ]
+      },
+      "title": "Beam search decoder for quantum LDPC codes"
+    },
+    "bpsf-2507-00254-v1": {
+      "coverage": {
+        "summary": "The workbench shows a controlled BB72 code-capacity study. The published BP-SF experiments still need reproductions.",
+        "remaining_experiments": [
+          "Figures 1–2 · Reproduce the gross-code nonconvergence and oscillation diagnostics.",
+          "Figures 4–5 · Run the coprime-BB [[154,6,16]] and BB [[288,12,18]] code-capacity sweeps.",
+          "Figures 6–8 · Run the BB144 and coprime-BB [[154,6,16]] and [[126,12,10]] circuit sweeps, resolving the Figure 7 code identity.",
+          "Figure 9 · Reproduce the gross-code logical-error versus serial-iteration sweep at p = 0.003."
+        ]
+      },
+      "title": "Fully Parallelized BP Decoding for Quantum LDPC Codes Can Outperform BP-OSD"
+    },
+    "panteleev-2012-04068-v2": {
+      "coverage": {
+        "summary": "The workbench shows controlled depolarizing sweeps on the lifted-product code from Example 4.",
+        "remaining_experiments": [
+          "Example 4 · Reproduce the BP-OSD search for low-weight non-degenerate codewords."
+        ]
+      }
+    },
+    "mackay-0304161-v3": {
+      "coverage": {
+        "summary": "The workbench uses a quantum outcome evaluator for the Construction U comparisons. The source experiment classified classical block errors.",
+        "remaining_experiments": [
+          "Figure 16 · Reproduce the 274-bit Construction U sum-product experiment with the source matrix and its total, detected, and undetected block errors.",
+          "Figures 13–15 and 17–18 · Reproduce the Construction B sweeps and the cross-construction performance comparisons."
+        ]
+      },
+      "title": "Sparse-Graph Codes for Quantum Error-Correction"
+    },
+    "roffe-2005-07016-v2": {
+      "coverage": {
+        "summary": "The workbench includes the Figure 3 regular-BP curves and additional toric-code experiments.",
+        "remaining_experiments": [
+          "Figure 3 · Reproduce BP+OSD-CS at depth 60 for toric distances 9, 11, 13, and 15.",
+          "Figures 4–5 · Reproduce the depth-60 BP+OSD-CS threshold sweeps on the semi-topological and constant-rate families.",
+          "Figure 6 · Compare exhaustive OSD (depth 12) and combination sweep OSD (depth 86) on the distance-15 toric code."
+        ]
+      }
+    },
+    "priortilt-2611-13373-v1": {
+      "coverage": {
+        "summary": "All 39 XZ logical-error-rate points in Figure 1 have audited canonical runs.",
+        "remaining_experiments": [
+          "Standard BP comparison · Match the BB144 min-sum baseline at p = 0.001 with the paper’s 18,060-iteration cap.",
+        "Tables 2–3 · Reproduce mean and 99th-percentile Z-memory times at p = 0.001 for all three benchmark codes on a comparable single-core setup.",
+          "Table 4 · Complete the BB144 XYZ logical-error and timing comparison at p = 0.003.",
+          "Table 5 · Measure the fraction of nodes eligible for a prior offset on the source X/Z shot cohorts at p = 0.001 and 0.002."
+        ]
+      }
+    }
+  },
+  "source_captions": {
+    "yao-2312-10950-v2": {
+      "2": {
+        "quote": "different decimation orders",
+        "context": "BPGD on B1"
+      },
+      "3": {
+        "quote": "different BP iterations per round",
+        "context": "BPGD on B1"
+      },
+      "4": {
+        "quote": "various decoders",
+        "context": "B1 under bit-flip noise"
+      },
+      "5": {
+        "quote": "various decoders",
+        "context": "C2 under bit-flip noise"
+      },
+      "6": {
+        "quote": "different decimation round limits",
+        "context": "BPGD on B1"
+      },
+      "7": {
+        "quote": "over depolarizing noise",
+        "context": "Decoder comparison on A5"
+      },
+      "8": {
+        "quote": "over depolarizing noise",
+        "context": "Decoder comparison on B2"
+      }
+    },
+    "mackay-0304161-v3": {
+      "15": {
+        "figure_number": "16",
+        "quote": "Performance of the construction-U code",
+        "context": "274 bits and 82 checks on a binary symmetric channel"
+      }
+    },
+    "roffe-2005-07016-v2": {
+      "3": {
+        "quote": "Toric code threshold plot comparing the BP decoder (dashed lines) versus the BP+OSD-CS decoder (solid lines)."
+      }
+    },
+    "priortilt-2611-13373-v1": {
+      "1": {
+        "quote": "Logical error rates of PriorTilt, Relay-BP, and beam search decoders for the three benchmark codes."
+      }
+    }
+  }
 }

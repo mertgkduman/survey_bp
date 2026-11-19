@@ -1152,9 +1152,11 @@ def build_catalog(repository: Path) -> dict[str, Any]:
             "codes": codes, "circuits": circuits, "channels": input_registry(repository)["channels"], "datasets": datasets, "result_series": series,
             "public_retired_dataset_ids": registry.get("public_retired_dataset_ids", []),
             "limitations": ["Raw per-shot ledgers are never exported as though tracked when a study marks them local_only.", "A source transcription, canonical adaptation, and source-faithful result are distinct evidence statuses."]}
-    from .catalog_model import extend_catalog, validate_catalog
+    from .catalog_model import apply_paper_view_metadata, extend_catalog, validate_catalog
     catalog = extend_catalog(catalog, registry, repository)
     _add_priortilt_results(catalog, repository)
+    if registry.get("paper_figures_path"):
+        apply_paper_view_metadata(catalog, _read_json(repository / registry["paper_figures_path"]))
     return validate_catalog(catalog)
 
 
@@ -1206,16 +1208,15 @@ def _add_priortilt_results(catalog: dict[str, Any], repository: Path) -> None:
         decoder_id = f"priortilt-paper-{method}"
         catalog["result_series"].append({"dataset_id": dataset_id, "code_id": code_ids[code], "decoder_id": decoder_id, "source_decoder_id": decoder_id, "label": names[method], "channel_kind": "embedded_circuit", "points": members, "series_id": f"{dataset_id}-{code.lower()}-{method}"})
     catalog["experiments"].append({"experiment_id": dataset_id, "dataset_id": dataset_id, "paper_ids": [paper_id], "code_ids": list(code_ids.values()), "decoder_ids": [f"priortilt-paper-{method}" for method in names], "evidence_status": "canonical_adaptation", "description": "Audited source comparison using separate X and Z memories.", "reproduction_recipe": {"kind": "retained_source_only", "commands": [], "original_instruction_path": f"{base}/RESULTS.md", "budget_note": "Review the retained audited results and frozen plan."}})
-    catalog["paper_figures"].append({"figure_id": "priortilt-figure-1", "paper_id": paper_id, "label": "Figure 1 · Circuit-level logical error rates", "note": "Canonical adaptation using separate X and Z memories. The RelayBP and BeamSearch curves reproduce the comparisons in this paper.", "source_path": f"{base}/source.json", "source_figure": "1", "code_ids": list(code_ids.values()), "reproduction_rules": [{"dataset_id": dataset_id, "source_decoder_ids": [f"priortilt-paper-{method}" for method in names], "source_figure": "1"}]})
+    catalog["paper_figures"].append({"figure_id": "priortilt-figure-1", "paper_id": paper_id, "label": "Figure 1 · Circuit-level logical error rates", "note": "Local confidence intervals use separately sampled X and Z memories.", "source_path": f"{base}/source.json", "source_figure": "1", "code_ids": list(code_ids.values()), "reproduction_rules": [{"dataset_id": dataset_id, "source_decoder_ids": [f"priortilt-paper-{method}" for method in names], "source_figure": "1"}]})
     for figure in catalog["paper_figures"]:
         if figure["figure_id"] in {"relay-css-comparison", "beam-css-comparison", "bpsf-css-comparison"}:
             figure["label"] = "BB72 · Supplementary code-capacity study"
     for method, target in (("relay", "relaybp-2506-01779-v2"), ("beam", "beamsearch-2512-07057-v2")):
-        name = names[method]
         catalog["paper_figures"].append({
             "figure_id": f"{method}-priortilt-figure-1",
             "paper_id": target,
-            "label": f"{name} · PriorTilt Figure 1 comparison",
+            "label": "PriorTilt Figure 1 comparison",
             "note": "This is the canonical circuit-level adaptation of the comparison in PriorTilt Figure 1, with separately sampled X and Z memories. It uses the PriorTilt paper's configuration and is attributed to that paper.",
             "source_path": f"{base}/RESULTS.md",
             "source_figure": "1",

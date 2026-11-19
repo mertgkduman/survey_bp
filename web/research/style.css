@@ -57,7 +57,7 @@ textarea[readonly] { background:#f7faf9; }
 .table-wrap .work-average { width:8rem; min-width:8rem; max-width:8rem; white-space:normal; }
 .paper-heading { margin-bottom:1rem; }
 .paper-heading:empty { display:none; }
-.paper-heading a { font-size:.83rem; }
+.paper-heading a { font-size:inherit; }
 .figure-note { line-height:1.65; }
 .curve-groups { display:flex; flex-wrap:wrap; gap:.6rem 1.2rem; border-top:1px solid var(--line); margin-top:.7rem; padding:.7rem .4rem; }
 .curve-groups label { display:flex; align-items:center; gap:.4rem; font-size:.78rem; }
@@ -68,9 +68,16 @@ textarea[readonly] { background:#f7faf9; }
 .paper-options { max-width:42rem; display:grid; gap:.65rem; margin:0 0 1.15rem; }
 .paper-options .curve-picker { margin:0; }
 #paper-add-options { padding:1rem; border:1px solid var(--line); border-radius:7px; background:white; }
-.paper-section { display:grid; min-width:0; gap:1rem; }
-.paper-heading { margin:1.1rem 0 0; }
-.paper-heading h3 { margin:0; }
+.plot-grid.compare { align-items:start; }
+.paper-section { display:grid; min-width:0; align-content:start; gap:1rem; }
+.paper-heading { margin:1.1rem 0 0; flex-wrap:wrap; }
+.paper-heading h3 { margin:0; flex:1 1 15rem; overflow-wrap:anywhere; }
+.paper-coverage { padding:.9rem 1rem; border:1px solid var(--line); border-radius:7px; background:var(--wash); font-size:.83rem; }
+.paper-coverage h4 { margin:0 0 .45rem; }
+.paper-coverage p { margin:.3rem 0 .55rem; }
+.paper-coverage ul { margin:0; padding-inline-start:1.15rem; }
+.paper-coverage li + li { margin-top:.35rem; }
+.source-caption { quotes:'"' '"'; }
 .input-sources { display:flex; flex-wrap:wrap; column-gap:1.2rem; row-gap:.25rem; padding-left:1.1rem; margin:.45rem 0 1rem; }
 .policy-glossary { display:grid; grid-template-columns:minmax(8rem,max-content) minmax(0,1fr); column-gap:1rem; row-gap:.6rem; padding:1rem; background:white; border:1px solid var(--line); border-radius:7px; }
 .policy-glossary dd { margin:0; color:var(--muted); }

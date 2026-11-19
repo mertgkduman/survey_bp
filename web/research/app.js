@@ -136,7 +136,16 @@ function paperSections(grid){
    const remove=el('button',{type:'button',class:'secondary','aria-label':'Remove '+paper.title},'Remove paper');
    remove.onclick=()=>{S.paperIds=S.paperIds.filter(p=>p!==id);renderCards();};heading.append(remove);
   }
-  section.append(heading);grid.append(section);return[id,section];
+  section.append(heading);
+  const coverage=paper.coverage;
+  if(coverage?.remaining_experiments?.length){
+   const label='coverage-'+id,aside=el('aside',{class:'paper-coverage','aria-labelledby':label});
+   const list=el('ul');
+   for(const experiment of coverage.remaining_experiments)list.append(el('li',{},experiment));
+   aside.append(el('h4',{id:label},'Experiments still needed'),el('p',{},coverage.summary),list);
+   section.append(aside);
+  }
+  grid.append(section);return[id,section];
  }));
 }
 function showInputPapers(target,id){
@@ -190,13 +199,26 @@ function curvePicker(card){
  label.append(input);wrap.append(label,list,status);return wrap;
 }
 function parameterKey(card){const details=el('details',{class:'parameter-key'});details.append(el('summary',{},'Parameter key'));const definitions=new Map();for(const s of selected(card)){const info=S.display.get(s.source_series_id||s.series_id)||s;for(const p of info?.parameters||[])if(DecoderDisplay.symbols[p.symbol])definitions.set(p.symbol,DecoderDisplay.symbols[p.symbol]);if(info?.parameters.some(p=>p.value==='n'))definitions.set('n',DecoderDisplay.symbols.n);}const dl=el('dl');for(const [symbol,meaning]of definitions){dl.append(el('dt',{},symbol),el('dd',{},meaning));}details.append(el('p',{class:'small muted'},'SP = sum-product; MS = min-sum; OMS = offset min-sum. Every displayed parameter is followed by its value. Parameters come from the saved specification; coefficient rounding and exact numerical conventions are retained in run settings.'),dl);return details;}
+function figureHeading(figure,card){
+ const caption=figure?.source_caption;
+ if(!caption)return el('h3',{},figure?.label||`Plot ${card.id}`);
+ const heading=el('h3',{},`Figure ${caption.figure_number||figure.source_figure} `);
+ const source=record('papers',figure.guest_paper_id||figure.paper_id);
+ const quote=el('q',{class:'source-caption'},caption.quote);
+ if(source?.source_url)quote.cite=source.source_url;
+ heading.append(quote);
+ if(caption.context)heading.append(document.createTextNode(' · '+caption.context));
+ return heading;
+}
 function renderCards(){
  reconcilePapers();renderPapers();
- const grid=$('plot-grid');grid.classList.toggle('compare',S.cards.length>1&&!S.paperIds.length);grid.replaceChildren();
+ const grid=$('plot-grid');
+ grid.classList.toggle('compare',(S.paperIds.length||S.cards.length)>1);
+ grid.replaceChildren();
  const sections=paperSections(grid);
  for(const card of S.cards){
   reconcileCard(card);
-  const figure=figureFor(card),container=sections.get(figure?.paper_id)||grid,box=el('article',{class:'plot-card','data-plot':card.id,...(figure?{'data-figure':figure.figure_id}:{})}),heading=el('div',{class:'card-heading'});heading.append(el('h3',{},figure?.label||`Plot ${card.id}`));
+  const figure=figureFor(card),container=sections.get(figure?.paper_id)||grid,box=el('article',{class:'plot-card','data-plot':card.id,...(figure?{'data-figure':figure.figure_id}:{})}),heading=el('div',{class:'card-heading'});heading.append(figureHeading(figure,card));
   if(S.cards.length>1&&!figure){const remove=el('button',{type:'button',class:'secondary','aria-label':`Remove plot ${card.id}`},'Remove');remove.onclick=()=>{S.cards=S.cards.filter(c=>c!==card);renderCards();};heading.append(remove);}box.append(heading);if(figure){box.append(el('p',{class:'small muted figure-note'},figure.note));
    const source=record('papers',figure.guest_paper_id);
    if(source)box.append(el('a',{href:source.source_url,class:'small',target:'_blank',rel:'noopener'},source.title));

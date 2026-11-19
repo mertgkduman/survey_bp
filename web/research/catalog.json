@@ -243658,7 +243658,7 @@
     },
     {
       "path": "research/catalog/paper-figures.json",
-      "sha256": "16672e27803d148395c473ecb9a196c51a06e31f880537bd05c9a8733c983dc5"
+      "sha256": "bc1f2646f28b00cdcfa1dcb09904a8fd7be05403c8f0133c10677bd8163c4d1b"
     }
   ],
   "limitations": [
@@ -243671,7 +243671,7 @@
         "b1"
       ],
       "figure_id": "yao-fig-2",
-      "label": "Fig. 2 \u00b7 B1",
+      "label": "Figure 2 \"different decimation orders\" \u00b7 BPGD on B1",
       "note": "Canonical reproductions of the plotted BP/BPGD configurations; published sample counts and some numerical safeguards are unavailable. Additional curves include tuning and channel adaptations. BP-OSD and BP-SI source curves are outside this reproduced set.",
       "paper_id": "yao-2312-10950-v2",
       "reproduction_rules": [
@@ -243691,6 +243691,10 @@
           ]
         }
       ],
+      "source_caption": {
+        "context": "BPGD on B1",
+        "quote": "different decimation orders"
+      },
       "source_figure": "2",
       "source_path": "data/reproductions/yao-2312-10950-non-osd/source_points.json"
     },
@@ -243699,7 +243703,7 @@
         "b1"
       ],
       "figure_id": "yao-fig-3",
-      "label": "Fig. 3 \u00b7 B1",
+      "label": "Figure 3 \"different BP iterations per round\" \u00b7 BPGD on B1",
       "note": "Canonical reproductions of the plotted BP/BPGD configurations; published sample counts and some numerical safeguards are unavailable. Additional curves include tuning and channel adaptations. BP-OSD and BP-SI source curves are outside this reproduced set. The paper reports conflicting ordinates for the nominally identical T=10 curves in Figs. 3 and 4; their source scopes stay separate.",
       "paper_id": "yao-2312-10950-v2",
       "reproduction_rules": [
@@ -243724,6 +243728,10 @@
           ]
         }
       ],
+      "source_caption": {
+        "context": "BPGD on B1",
+        "quote": "different BP iterations per round"
+      },
       "source_figure": "3",
       "source_path": "data/reproductions/yao-2312-10950-non-osd/source_points.json"
     },
@@ -243732,7 +243740,7 @@
         "b1"
       ],
       "figure_id": "yao-fig-4",
-      "label": "Fig. 4 \u00b7 B1",
+      "label": "Figure 4 \"various decoders\" \u00b7 B1 under bit-flip noise",
       "note": "Canonical reproductions of the plotted BP/BPGD configurations; published sample counts and some numerical safeguards are unavailable. Additional curves include tuning and channel adaptations. BP-OSD and BP-SI source curves are outside this reproduced set. The paper reports conflicting ordinates for the nominally identical T=10 curves in Figs. 3 and 4; their source scopes stay separate.",
       "paper_id": "yao-2312-10950-v2",
       "reproduction_rules": [
@@ -243751,6 +243759,10 @@
           ]
         }
       ],
+      "source_caption": {
+        "context": "B1 under bit-flip noise",
+        "quote": "various decoders"
+      },
       "source_figure": "4",
       "source_path": "data/reproductions/yao-2312-10950-non-osd/source_points.json"
     },
@@ -243759,7 +243771,7 @@
         "c2"
       ],
       "figure_id": "yao-fig-5",
-      "label": "Fig. 5 \u00b7 C2",
+      "label": "Figure 5 \"various decoders\" \u00b7 C2 under bit-flip noise",
       "note": "Canonical reproductions of the plotted BP/BPGD configurations; published sample counts and some numerical safeguards are unavailable. Additional curves include tuning and channel adaptations. BP-OSD and BP-SI source curves are outside this reproduced set.",
       "paper_id": "yao-2312-10950-v2",
       "reproduction_rules": [
@@ -243778,6 +243790,10 @@
           ]
         }
       ],
+      "source_caption": {
+        "context": "C2 under bit-flip noise",
+        "quote": "various decoders"
+      },
       "source_figure": "5",
       "source_path": "data/reproductions/yao-2312-10950-non-osd/source_points.json"
     },
@@ -243786,7 +243802,7 @@
         "b1"
       ],
       "figure_id": "yao-fig-6",
-      "label": "Fig. 6 \u00b7 B1",
+      "label": "Figure 6 \"different decimation round limits\" \u00b7 BPGD on B1",
       "note": "Canonical reproductions of the plotted BP/BPGD configurations; published sample counts and some numerical safeguards are unavailable. Additional curves include tuning and channel adaptations. BP-OSD and BP-SI source curves are outside this reproduced set.",
       "paper_id": "yao-2312-10950-v2",
       "reproduction_rules": [
@@ -243813,6 +243829,10 @@
           ]
         }
       ],
+      "source_caption": {
+        "context": "BPGD on B1",
+        "quote": "different decimation round limits"
+      },
       "source_figure": "6",
       "source_path": "data/reproductions/yao-2312-10950-non-osd/source_points.json"
     },
@@ -243821,7 +243841,7 @@
         "a5"
       ],
       "figure_id": "yao-fig-7",
-      "label": "Fig. 7 \u00b7 A5",
+      "label": "Figure 7 \"over depolarizing noise\" \u00b7 Decoder comparison on A5",
       "note": "Canonical reproductions of the plotted BP/BPGD configurations; published sample counts and some numerical safeguards are unavailable. Additional curves include tuning and channel adaptations. BP-OSD and BP-SI source curves are outside this reproduced set.",
       "paper_id": "yao-2312-10950-v2",
       "reproduction_rules": [
@@ -243834,6 +243854,10 @@
           "source_figure": "7"
         }
       ],
+      "source_caption": {
+        "context": "Decoder comparison on A5",
+        "quote": "over depolarizing noise"
+      },
       "source_figure": "7",
       "source_path": "data/reproductions/yao-2312-10950-non-osd/source_points.json"
     },
@@ -243842,7 +243866,7 @@
         "b2"
       ],
       "figure_id": "yao-fig-8",
-      "label": "Fig. 8 \u00b7 B2",
+      "label": "Figure 8 \"over depolarizing noise\" \u00b7 Decoder comparison on B2",
       "note": "Canonical reproductions of the plotted BP/BPGD configurations; published sample counts and some numerical safeguards are unavailable. Additional curves include tuning and channel adaptations. BP-OSD and BP-SI source curves are outside this reproduced set.",
       "paper_id": "yao-2312-10950-v2",
       "reproduction_rules": [
@@ -243855,6 +243879,10 @@
           "source_figure": "8"
         }
       ],
+      "source_caption": {
+        "context": "Decoder comparison on B2",
+        "quote": "over depolarizing noise"
+      },
       "source_figure": "8",
       "source_path": "data/reproductions/yao-2312-10950-non-osd/source_points.json"
     },
@@ -243866,7 +243894,7 @@
         "toric15"
       ],
       "figure_id": "roffe-fig-3",
-      "label": "Fig. 3 \u00b7 Toric codes",
+      "label": "Figure 3 \"Toric code threshold plot comparing the BP decoder (dashed lines) versus the BP+OSD-CS decoder (solid lines).\"",
       "note": "The default curves reproduce regular BP with the paper\u2019s codes, rate grids, min-sum schedule and T=n. Canonical floating-point and row-order conventions are documented adaptations. CS-10 and OSD-0 differ from the paper\u2019s CS-60 and belong to Additional curves, alongside Q-BP and tuning.",
       "paper_id": "roffe-2005-07016-v2",
       "reproduction_rules": [
@@ -243883,6 +243911,9 @@
           ]
         }
       ],
+      "source_caption": {
+        "quote": "Toric code threshold plot comparing the BP decoder (dashed lines) versus the BP+OSD-CS decoder (solid lines)."
+      },
       "source_figure": "3",
       "source_path": "data/reproductions/roffe-2005-07016-bp/source.json"
     },
@@ -243892,10 +243923,15 @@
         "unicycle74"
       ],
       "figure_id": "mackay-fig-15",
-      "label": "Fig. 15 \u00b7 Construction U",
+      "label": "Figure 16 \"Performance of the construction-U code\" \u00b7 274 bits and 82 checks on a binary symmetric channel",
       "note": "No exact paper configuration is established: the iteration cap is unstated and T=100 is inferred. The source reports classical block errors; these curves report quantum block failures. All local runs are Additional curves. Length 74 has no source ordinate at the retained five rates.",
       "paper_id": "mackay-0304161-v3",
       "reproduction_rules": [],
+      "source_caption": {
+        "context": "274 bits and 82 checks on a binary symmetric channel",
+        "figure_number": "16",
+        "quote": "Performance of the construction-U code"
+      },
       "source_figure": "15",
       "source_path": "data/reproductions/mackay-0304161-unicycle/source.json"
     },
@@ -243966,8 +244002,8 @@
         "priortilt-gb102-memory-x"
       ],
       "figure_id": "priortilt-figure-1",
-      "label": "Figure 1 \u00b7 Circuit-level logical error rates",
-      "note": "Canonical adaptation using separate X and Z memories. The RelayBP and BeamSearch curves reproduce the comparisons in this paper.",
+      "label": "Figure 1 \"Logical error rates of PriorTilt, Relay-BP, and beam search decoders for the three benchmark codes.\"",
+      "note": "Local confidence intervals use separately sampled X and Z memories.",
       "paper_id": "priortilt-2611-13373-v1",
       "reproduction_rules": [
         {
@@ -243980,6 +244016,9 @@
           "source_figure": "1"
         }
       ],
+      "source_caption": {
+        "quote": "Logical error rates of PriorTilt, Relay-BP, and beam search decoders for the three benchmark codes."
+      },
       "source_figure": "1",
       "source_path": "data/reproductions/priortilt-2611-13373/source.json"
     },
@@ -243999,10 +244038,13 @@
           ]
         }
       ],
-      "label": "RelayBP \u00b7 PriorTilt Figure 1 comparison",
+      "label": "Figure 1 \"Logical error rates of PriorTilt, Relay-BP, and beam search decoders for the three benchmark codes.\"",
       "note": "This is the canonical circuit-level adaptation of the comparison in PriorTilt Figure 1, with separately sampled X and Z memories. It uses the PriorTilt paper's configuration and is attributed to that paper.",
       "paper_id": "relaybp-2506-01779-v2",
       "reproduction_rules": [],
+      "source_caption": {
+        "quote": "Logical error rates of PriorTilt, Relay-BP, and beam search decoders for the three benchmark codes."
+      },
       "source_figure": "1",
       "source_path": "data/reproductions/priortilt-2611-13373/RESULTS.md"
     },
@@ -244022,16 +244064,27 @@
           ]
         }
       ],
-      "label": "BeamSearch \u00b7 PriorTilt Figure 1 comparison",
+      "label": "Figure 1 \"Logical error rates of PriorTilt, Relay-BP, and beam search decoders for the three benchmark codes.\"",
       "note": "This is the canonical circuit-level adaptation of the comparison in PriorTilt Figure 1, with separately sampled X and Z memories. It uses the PriorTilt paper's configuration and is attributed to that paper.",
       "paper_id": "beamsearch-2512-07057-v2",
       "reproduction_rules": [],
+      "source_caption": {
+        "quote": "Logical error rates of PriorTilt, Relay-BP, and beam search decoders for the three benchmark codes."
+      },
       "source_figure": "1",
       "source_path": "data/reproductions/priortilt-2611-13373/RESULTS.md"
     }
   ],
   "papers": [
     {
+      "coverage": {
+        "remaining_experiments": [
+          "Figures 4\u20135 \u00b7 Reproduce BP-OSD-0 and BP-SI on B1 and C2 with the source serial normalized min-sum settings.",
+          "Figures 7\u20138 \u00b7 Complete the source-setting Q-BPGD sweeps and BP-OSD comparisons on A5 (order 10) and B2 (order 0).",
+          "Table 1 \u00b7 Match the B1 mean decimation-round counts at the reported bit-flip rates."
+        ],
+        "summary": "The workbench includes canonical BP-family curves for Figures 2\u20138."
+      },
       "evidence_path": "data/reproductions/yao-2312-10950-non-osd/source_points.json",
       "identity": "arXiv:2312.10950v2",
       "kind": "paper",
@@ -244049,40 +244102,70 @@
       "title": "Dr. Pfister presentation excerpt"
     },
     {
+      "coverage": {
+        "remaining_experiments": [
+          "Figure 2A \u00b7 Reproduce the BB circuit-level memory sweeps using d syndrome cycles and the paper\u2019s min-sum BP+OSD-CS settings.",
+          "Figure 2B \u00b7 Match the BB144 comparison with 12 surface-code patches at distances 9, 11, 13, and 15."
+        ],
+        "summary": "The workbench shows a controlled BB72 code-capacity study."
+      },
       "evidence_path": "data/studies/bb72-css-bp-v1.json",
       "identity": "arXiv:2308.07915",
       "kind": "paper",
       "paper_id": "bravyi-2308-07915",
       "registered_scope": "BB72 controlled CSS studies; original circuit-level BP-OSD is not registered here",
       "source_url": "https://arxiv.org/abs/2308.07915",
-      "title": "Bivariate bicycle codes"
+      "title": "High-threshold and low-overhead fault-tolerant quantum memory"
     },
     {
+      "coverage": {
+        "remaining_experiments": [
+          "Figure 2 \u00b7 Sweep the memory-strength intervals and reproduce the circuit curves for gross, two-gross, and the distance-11 surface code, with the source XZ and XYZ decoders and baselines.",
+          "Figure 3 \u00b7 Sweep BP, memory BP, and Relay-BP work limits on gross at p = 0.003 and reproduce the LER versus mean-iteration comparison."
+        ],
+        "summary": "The circuit curves here are from the PriorTilt comparison. The original Relay-BP experiments still need reproductions."
+      },
       "evidence_path": "data/studies/fair-beam-relay-css-v2.json",
       "identity": "arXiv:2506.01779v2",
       "kind": "paper",
       "paper_id": "relaybp-2506-01779-v2",
       "registered_scope": "fair-beam-relay-css-v2 is registered through ensure_study; paper circuit reproduction is not",
       "source_url": "https://arxiv.org/abs/2506.01779v2",
-      "title": "RelayBP"
+      "title": "Improved belief propagation is sufficient for real-time decoding of quantum memory"
     },
     {
+      "coverage": {
+        "remaining_experiments": [
+          "Figures 2\u20134 \u00b7 Reproduce the BB144, BB90, and HGP450 circuit sweeps with the published beam configurations and BP+OSD baseline.",
+          "Tables 2\u20133 \u00b7 Match the BB144 mean and 99.9th-percentile decoding times with comparable timing conditions."
+        ],
+        "summary": "The circuit curves here are from the PriorTilt comparison. The original beam search experiments still need reproductions."
+      },
       "evidence_path": "data/studies/fair-beam-relay-css-v2.json",
       "identity": "arXiv:2512.07057v2",
       "kind": "paper",
       "paper_id": "beamsearch-2512-07057-v2",
       "registered_scope": "fair-beam-relay-css-v2 is registered through ensure_study; paper circuit reproduction is not",
       "source_url": "https://arxiv.org/abs/2512.07057v2",
-      "title": "BeamSearch"
+      "title": "Beam search decoder for quantum LDPC codes"
     },
     {
+      "coverage": {
+        "remaining_experiments": [
+          "Figures 1\u20132 \u00b7 Reproduce the gross-code nonconvergence and oscillation diagnostics.",
+          "Figures 4\u20135 \u00b7 Run the coprime-BB [[154,6,16]] and BB [[288,12,18]] code-capacity sweeps.",
+          "Figures 6\u20138 \u00b7 Run the BB144 and coprime-BB [[154,6,16]] and [[126,12,10]] circuit sweeps, resolving the Figure 7 code identity.",
+          "Figure 9 \u00b7 Reproduce the gross-code logical-error versus serial-iteration sweep at p = 0.003."
+        ],
+        "summary": "The workbench shows a controlled BB72 code-capacity study. The published BP-SF experiments still need reproductions."
+      },
       "evidence_path": "data/studies/bb72-bpsf-factorial-v2.json",
       "identity": "arXiv:2507.00254v1",
       "kind": "paper",
       "paper_id": "bpsf-2507-00254-v1",
       "registered_scope": "retained BB72 source-command/result package; no generic ensure_study registration",
       "source_url": "https://arxiv.org/abs/2507.00254v1",
-      "title": "BP-SF"
+      "title": "Fully Parallelized BP Decoding for Quantum LDPC Codes Can Outperform BP-OSD"
     },
     {
       "evidence_path": "literature_policies/PAPERS.md",
@@ -244121,6 +244204,12 @@
       "title": "Modified BP4"
     },
     {
+      "coverage": {
+        "remaining_experiments": [
+          "Example 4 \u00b7 Reproduce the BP-OSD search for low-weight non-degenerate codewords."
+        ],
+        "summary": "The workbench shows controlled depolarizing sweeps on the lifted-product code from Example 4."
+      },
       "evidence_path": "data/reproductions/panteleev-2012-04068-lifted-product/source.json",
       "identity": "arXiv:2012.04068v2",
       "kind": "paper",
@@ -244130,15 +244219,30 @@
       "title": "Quantum LDPC Codes with Almost Linear Minimum Distance"
     },
     {
+      "coverage": {
+        "remaining_experiments": [
+          "Figure 16 \u00b7 Reproduce the 274-bit Construction U sum-product experiment with the source matrix and its total, detected, and undetected block errors.",
+          "Figures 13\u201315 and 17\u201318 \u00b7 Reproduce the Construction B sweeps and the cross-construction performance comparisons."
+        ],
+        "summary": "The workbench uses a quantum outcome evaluator for the Construction U comparisons. The source experiment classified classical block errors."
+      },
       "evidence_path": "data/reproductions/mackay-0304161-unicycle/source.json",
       "identity": "quant-ph/0304161v3; IEEE TIT 2004",
       "kind": "paper",
       "paper_id": "mackay-0304161-v3",
       "registered_scope": "Construction U controlled BP campaign; not a paper-curve reproduction",
       "source_url": "https://arxiv.org/abs/quant-ph/0304161v3",
-      "title": "Sparse Graph Codes for Quantum Error-Correction"
+      "title": "Sparse-Graph Codes for Quantum Error-Correction"
     },
     {
+      "coverage": {
+        "remaining_experiments": [
+          "Figure 3 \u00b7 Reproduce BP+OSD-CS at depth 60 for toric distances 9, 11, 13, and 15.",
+          "Figures 4\u20135 \u00b7 Reproduce the depth-60 BP+OSD-CS threshold sweeps on the semi-topological and constant-rate families.",
+          "Figure 6 \u00b7 Compare exhaustive OSD (depth 12) and combination sweep OSD (depth 86) on the distance-15 toric code."
+        ],
+        "summary": "The workbench includes the Figure 3 regular-BP curves and additional toric-code experiments."
+      },
       "evidence_path": "data/reproductions/roffe-2005-07016-bp/source.json",
       "identity": "arXiv:2005.07016v2; Phys. Rev. Research 2, 043423 (2020)",
       "kind": "paper",
@@ -244148,6 +244252,15 @@
       "title": "Decoding Across the Quantum LDPC Code Landscape"
     },
     {
+      "coverage": {
+        "remaining_experiments": [
+          "Standard BP comparison \u00b7 Match the BB144 min-sum baseline at p = 0.001 with the paper\u2019s 18,060-iteration cap.",
+          "Tables 2\u20133 \u00b7 Reproduce mean and 99th-percentile Z-memory times at p = 0.001 for all three benchmark codes on a comparable single-core setup.",
+          "Table 4 \u00b7 Complete the BB144 XYZ logical-error and timing comparison at p = 0.003.",
+          "Table 5 \u00b7 Measure the fraction of nodes eligible for a prior offset on the source X/Z shot cohorts at p = 0.001 and 0.002."
+        ],
+        "summary": "All 39 XZ logical-error-rate points in Figure 1 have audited canonical runs."
+      },
       "evidence_path": "data/reproductions/priortilt-2611-13373/RESULTS.md",
       "identity": "arXiv:2611.13373v1",
       "kind": "paper",
