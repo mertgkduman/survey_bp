@@ -5,11 +5,11 @@ current_phase: 11
 current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
-stopped_at: Range-stabilized BP follow-up submitted for 14 strata and two decoder variants, collector 62119946 pending
-last_updated: "2026-11-19T06:27:27.088Z"
+stopped_at: 25/28 BP follow-up evaluations audited. GB102 .0005 arms and tuned XYZ remain, collector 62119946 pending. Original XYZ jobs continue.
+last_updated: "2026-11-19T17:33:14.316Z"
 last_activity: 2026-11-19
-last_activity_desc: 28 BP evaluations use 20 CPUs each and an 18,080-sweep cap, with 20 errors or 100M shots per memory. Four p=.003 tuning groups select damping, scaling and offset on separate shots. BB70/GB102 training-only circuits use verified rate rescaling. Initial 62119759 overflowed on GB102/.001 and /.002. Initial ledgers, one audited point, plan and dispatch are archived separately. Canonical min-sum uses a common power-of-two range guard for messages, prior and offset, recording every rescale. Full-cap overflow fixture, 24 neutral equivalence probes and spawned training/evaluation/audit/resume passed. Replacement ordinary array 62119937, tuning 62119938/40/42/44, tuned arrays 62119939/41/43/45 and collector 62119946 submitted. Original 50-CPU XYZ jobs continue.
-state_head: 3cb784136ef8cb72446f7ef83cc54cad97fd9f55
+last_activity_desc: Checked 25/28 audited BP points, 77,735,259 memory shots and 1,000 errors. Independent stopping/rate/CI/work checks and 134 sampled ledger/noise bindings pass. BB144/BB70 XZ select damping .25, scale 1 and offset 0. GB102 selects neutral controls. BB144 XZ p=.003 tuned estimate 1.521e-3 versus ordinary 2.032e-3 and about 34% fewer sweeps, overlapping intervals. At p=.001 tuned LER 5.59 times higher with disjoint intervals. Ordinary XYZ BP audited at 2.877e-3. Remaining both GB102 XZ .0005 and tuned XYZ, which awaits tuning round 2 of 3. Original XYZ PriorTilt and RelayBP-5 still running. Saved checked receipt-based interim report, with scheduled full publication collector unchanged.
+state_head: d73405ddde597f2ebd764ffe5bb9a07824b7a555
 progress:
   total_phases: 15
   completed_phases: 9
@@ -34,8 +34,8 @@ Total Phases: 15
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
-Last activity: 2026-11-19 — quick 261119-1m4 launches range-stabilized BP and tuned BP for XZ and XYZ
-Last Activity Description: 28 BP evaluations use 20 CPUs each and an 18,080-sweep cap, with 20 errors or 100M shots per memory. Four p=.003 tuning groups select damping, scaling and offset on separate shots. BB70/GB102 training-only circuits use verified rate rescaling. Initial 62119759 overflowed on GB102/.001 and /.002. Initial ledgers, one audited point, plan and dispatch are archived separately. Canonical min-sum uses a common power-of-two range guard for messages, prior and offset, recording every rescale. Full-cap overflow fixture, 24 neutral equivalence probes and spawned training/evaluation/audit/resume passed. Replacement ordinary array 62119937, tuning 62119938/40/42/44, tuned arrays 62119939/41/43/45 and collector 62119946 submitted. Original 50-CPU XYZ jobs continue.
+Last activity: 2026-11-19 — quick 261119-h7b checks 25 audited circuit BP results and live XYZ progress
+Last Activity Description: Checked 25/28 audited BP points, 77,735,259 memory shots and 1,000 errors. Independent stopping/rate/CI/work checks and 134 sampled ledger/noise bindings pass. BB144/BB70 XZ select damping .25, scale 1 and offset 0. GB102 selects neutral controls. BB144 XZ p=.003 tuned estimate 1.521e-3 versus ordinary 2.032e-3 and about 34% fewer sweeps, overlapping intervals. At p=.001 tuned LER 5.59 times higher with disjoint intervals. Ordinary XYZ BP audited at 2.877e-3. Remaining both GB102 XZ .0005 and tuned XYZ, which awaits tuning round 2 of 3. Original XYZ PriorTilt and RelayBP-5 still running. Saved checked receipt-based interim report, with scheduled full publication collector unchanged.
 
 Previous source-scoring audit:
 Last activity: 2026-11-17 — quick261117-h97 audits author syndrome versus observable success
@@ -471,6 +471,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 | 261118-s8d | Check XYZ progress and final 39-point XZ publication | 2026-11-19 | 9d141231 | — | [261118-s8d-check-live-xyz-priortilt-and-relaybp5-pr](./quick/261118-s8d-check-live-xyz-priortilt-and-relaybp5-pr/) |
 | 261118-ui1 | Expand decoder policies and research workbench | 2026-11-19 | a297e53d | Verified workbench and portable routes covered here. aSCED and Unicycle use registered studies. | [261118-ui1](./quick/261118-ui1-update-canonical-policy-support-and-rese/) |
 | 261119-1m4 | Run ordinary and tuned BP on the full PriorTilt circuit grid with 20 CPUs per point | 2026-11-19 | a6fc2cf4 | — | [261119-1m4-run-ordinary-and-tuned-min-sum-bp-on-pri](./quick/261119-1m4-run-ordinary-and-tuned-min-sum-bp-on-pri/) |
+| 261119-h7b | Check 25 audited BP follow-up results and XYZ progress | 2026-11-19 | d73405dd | — | [261119-h7b-check-audited-priortilt-bp-follow-up-res](./quick/261119-h7b-check-audited-priortilt-bp-follow-up-res/) |
 
 ### Roadmap Evolution
 
@@ -506,7 +507,7 @@ Latest kernel work: completed F01 → F02 corrections and qualification in quick
 **Resume file:** None
 
 Last session: 2026-11-10T22:51:46+00:00
-Stopped at: Range-stabilized BP follow-up submitted for 14 strata and two decoder variants, collector 62119946 pending
+Stopped at: 25/28 BP follow-up evaluations audited. GB102 .0005 arms and tuned XYZ remain, collector 62119946 pending. Original XYZ jobs continue.
 Next step: Requested builder request action and display/catalog cleanup are complete; resume the existing Phase 11 scientific work when directed. Preserve identity versions and qualification labels. Phase 11 scientific gaps and Phase 5 human review remain open; Phase 7 stays paused.
 
 Design continuation: `.planning/phases/05-guided-and-perturbative-bp-interventions/05-DESIGN-TASKS.md`.
