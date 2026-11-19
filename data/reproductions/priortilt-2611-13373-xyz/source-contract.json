@@ -1,0 +1,29 @@
+{
+  "source_commit": "8eefd37d694b5942fe60ec6d5c82ce97f3d2a450",
+  "circuits": [
+    {
+      "file": "BB[[144,12,12]],xyz_memory_X,error_rate=0.003,syndrome_rounds=12.stim",
+      "checks": 1728,
+      "mechanisms": 67824,
+      "edges": 391464,
+      "detector_merge_collisions": 0,
+      "execution_sha256": "515f87b2cc2722f0bfb300446209250ee36a333094511f8f9e77d9953a02e354",
+      "author_sparse_H_A_priors_exact": true
+    },
+    {
+      "file": "BB[[144,12,12]],xyz_memory_Z,error_rate=0.003,syndrome_rounds=12.stim",
+      "checks": 1728,
+      "mechanisms": 67752,
+      "edges": 391320,
+      "detector_merge_collisions": 0,
+      "execution_sha256": "0a31c31748e3a5e4ffd1838d5261c2b483473ae02b0adf5a1d63ad87ad61758e",
+      "author_sparse_H_A_priors_exact": true
+    }
+  ],
+  "source_basis_rows": 4,
+  "source_table_points": 2,
+  "source_csv_sha256": "399a17d0d9aa89c34ed3d2473a5654a947938932f82f55ed7f3b8fffdb2dbcfc",
+  "prior_schedule_exact": true,
+  "relay_budget_interpretation": "Paper explicitly specifies601 TOTAL legs=80+600*60=36080. Released CSV labels num_sets601; native Rust num_sets counts ADDITIONAL legs. Use600 as native argument, preserving the paper cap. Raw CSV retained unchanged.",
+  "scope": "Exact sparse author/canonical H and A and priors; no dense H, no dropped/split/merged mechanisms; paper total-leg budget explicit."
+}

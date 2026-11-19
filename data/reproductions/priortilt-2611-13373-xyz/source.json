@@ -1,0 +1,64 @@
+{
+  "repository": "https://github.com/ionq-publications/PriorTiltDecoder",
+  "commit": "8eefd37d694b5942fe60ec6d5c82ce97f3d2a450",
+  "paper": "https://arxiv.org/html/2611.13373v1",
+  "table": 4,
+  "prior_schedule": {
+    "initial": 60,
+    "round_len": 6,
+    "rounds": 6000,
+    "ends": [
+      50,
+      420
+    ],
+    "phases": [
+      [
+        0.07,
+        0.5,
+        0.8,
+        2.0
+      ],
+      [
+        0.1372,
+        0.5,
+        0.784,
+        0.686
+      ],
+      [
+        0.049,
+        0.5,
+        1.568,
+        1.372
+      ]
+    ]
+  },
+  "relay_spec": {
+    "initial": 80,
+    "per_leg": 60,
+    "additional": 600,
+    "results": 5,
+    "first_gamma": 0.125,
+    "gamma_low": -0.24,
+    "gamma_high": 0.66
+  },
+  "relay_budget_interpretation": "Paper explicitly specifies601 TOTAL legs=80+600*60=36080. Released CSV labels num_sets601; native Rust num_sets counts ADDITIONAL legs. Use600 as native argument, preserving the paper cap. Raw CSV retained unchanged.",
+  "circuits": [
+    {
+      "basis": "x",
+      "code": "BB144",
+      "p": 0.003,
+      "cycles": 12,
+      "file": "BB[[144,12,12]],xyz_memory_X,error_rate=0.003,syndrome_rounds=12.stim",
+      "sha256": "7ce554515a9c3d8e7983a70004bf49ce3e7ca12900424df2f6b87ce4baca3774"
+    },
+    {
+      "basis": "z",
+      "code": "BB144",
+      "p": 0.003,
+      "cycles": 12,
+      "file": "BB[[144,12,12]],xyz_memory_Z,error_rate=0.003,syndrome_rounds=12.stim",
+      "sha256": "1741baef32faeaa77e45c13ceb293079f413cdd59c952648dcf832739824a941"
+    }
+  ],
+  "source_csv_sha256": "399a17d0d9aa89c34ed3d2473a5654a947938932f82f55ed7f3b8fffdb2dbcfc"
+}

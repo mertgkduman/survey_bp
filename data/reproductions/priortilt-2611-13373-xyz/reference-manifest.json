@@ -1,0 +1,27 @@
+{
+  "qualification_only": true,
+  "prior_source_commit": "8eefd37d694b5942fe60ec6d5c82ce97f3d2a450",
+  "relay_source_commit": "14cb31a18f9b9d7d099791b793e35b8a2951f8f3",
+  "archive_sha256": "2f73bc614904eecf1aac82213b0854aff2ccc82552a2a919cf2d0caf5e05bc0f",
+  "files": {
+    "prior/LICENSE": "1349a4b6148492b44f629e64eed676612e234fe9a839e4f3b277c1482c8849f1",
+    "prior/priortilt_rs.so": "aaaa953479f95ececb78b9b17ad26ac183050100c1c3a1995912122e822d3898",
+    "relay/LICENSE": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+    "prior/priortilt/params.py": "4c6f12b3dd6a985faec397b4d7e0a3ec055e2173f207403b5e6d68fc4e39308b",
+    "prior/priortilt/sinter_priortilt.py": "14b99b21510cc305695cd737695f0cdf9c37c8ed00d57acd4a19db816b173fce",
+    "prior/priortilt/dem.py": "0c2f3dee198735432d2c9b6fa39d9282a5eaeec4f5fda5488d340db98629bcbc",
+    "prior/priortilt/__init__.py": "302337f86bab7942eb6026e57bc3ef6b85d1ef3b01e8cd0e346f3823d2e503b0",
+    "relay/relay_bp/decoder.py": "3c426c6f8aa5f5a0c76a294a7c7688576ed25bd87796b7d6eb516d263ff97b6b",
+    "relay/relay_bp/observable_decoder.py": "0d1f8b598148038db43b626c9335870e60ad61429033eb046098014aba910e9b",
+    "relay/relay_bp/__init__.py": "932b62aa25129a3da0b34ea04f5ff54294b1b5b7fc649b0e24a3b8ed11668587",
+    "relay/relay_bp/_relay_bp.cpython-312-x86_64-linux-gnu.so": "76071ce83ea9c5d0bdafc630cd8c416953caa7bd5a8a9a9e839cf5cf3e099f91",
+    "relay/relay_bp/bp/__init__.py": "f79a8d762c707aec9507430e17aeebbbd0daab79bd99507684967c545ba397c4",
+    "relay/relay_bp/stim/noise.py": "543f3f13e41ad99615f890e1c39da7f7de99580b13e7eeab74b3278af7029f08",
+    "relay/relay_bp/stim/__init__.py": "068774f7ec218eeffd0165c59f6bfb805c91f9092d62986db7fdccfa64eaa9e4",
+    "relay/relay_bp/stim/sinter/decoders.py": "6a7abb62cf56aa11734eefdd8567667af3735fc57665c98c8a44108f9f76ee24",
+    "relay/relay_bp/stim/sinter/utils.py": "f0acfe25b719b1b4a8ccc620ea4a506ca48cc7a88522b0036cb48ec21ccb82fc",
+    "relay/relay_bp/stim/sinter/check_matrices.py": "f4e6670ed1ef81925e4a3289e4cf87c360636715b449a769f92f1e942707e453",
+    "relay/relay_bp/stim/sinter/__init__.py": "f63c2b23917bfca8d323d9522138ce8ef8388d923b93e28331522cba044f3275"
+  },
+  "scope": "Immutable qualification references staged on the shared filesystem, with source licenses. Production imports canonical kernels only. Native binaries are the same preexisting source-pinned qualification builds."
+}
