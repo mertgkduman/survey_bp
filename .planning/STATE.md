@@ -475,6 +475,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 | 261119-i4j | Show source captions and compare papers | 2026-11-19 | 33d71574 | 38 tests and eight browser checks passed | [261119-i4j-use-source-captions-and-compare-paper-re](./quick/261119-i4j-use-source-captions-and-compare-paper-re/) |
 | 261119-ibq | Launch damping-first advanced circuit BP tuning on 11 anchors | 2026-11-19 | 71eb5309 | — | [261119-ibq-tune-priortilt-relaybp-and-beamsearch-bp](./quick/261119-ibq-tune-priortilt-relaybp-and-beamsearch-bp/) |
 | 261119-jgk | Constrain Construction U table cells and show full hover text | 2026-11-19 | 843cbf10 | Verified at desktop, comparison, and mobile widths | [261119-jgk-constrain-construction-u-table-cells-and](./quick/261119-jgk-constrain-construction-u-table-cells-and/) |
+| 261119-ksp | Display recorded PriorTilt work and timing by memory basis | 2026-11-19 | 02dfe835 | Verified 39 rows, guest panels, and CSV export | [261119-ksp-display-recorded-priortilt-work-and-timi](./quick/261119-ksp-display-recorded-priortilt-work-and-timi/) |
 
 ### Roadmap Evolution
 
