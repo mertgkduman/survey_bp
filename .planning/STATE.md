@@ -5,11 +5,11 @@ current_phase: 11
 current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
-stopped_at: BP follow-up production submitted for 14 strata and two decoder variants, collector 62119768 pending
-last_updated: "2026-11-19T06:21:50.606Z"
+stopped_at: Range-stabilized BP follow-up submitted for 14 strata and two decoder variants, collector 62119946 pending
+last_updated: "2026-11-19T06:27:27.088Z"
 last_activity: 2026-11-19
-last_activity_desc: Submitted 28 new BP evaluations at 20 CPUs per decoder point, 18,080 sweeps, and the existing 20-error/100M-shot per-memory rule. Four p=.003 tuning groups select damping, scale and offset on separate shots and hold the controls fixed across the evaluation grid. BB70/GB102 training-only circuits reproduce every released rate by verified scaling. Passed 24 canonical equivalence probes, bounded spawned-worker tuning/evaluation/audit/resume checks and 84 regressions. Slurm ordinary array 62119759 and tuned arrays 62119761/63/65/67, with tuning jobs 62119760/62/64/66 and collector 62119768. At launch 13 XZ BP points running and progress observed, with XYZ BP and tuning queued at account CPU limit and tuned evaluations queued on their dependencies. Existing XYZ 62102101 allocations continued. Statistical results pending.
-state_head: a6fc2cf410b27e154ce2dd8c19a30a15c94b63b4
+last_activity_desc: 28 BP evaluations use 20 CPUs each and an 18,080-sweep cap, with 20 errors or 100M shots per memory. Four p=.003 tuning groups select damping, scaling and offset on separate shots. BB70/GB102 training-only circuits use verified rate rescaling. Initial 62119759 overflowed on GB102/.001 and /.002. Initial ledgers, one audited point, plan and dispatch are archived separately. Canonical min-sum uses a common power-of-two range guard for messages, prior and offset, recording every rescale. Full-cap overflow fixture, 24 neutral equivalence probes and spawned training/evaluation/audit/resume passed. Replacement ordinary array 62119937, tuning 62119938/40/42/44, tuned arrays 62119939/41/43/45 and collector 62119946 submitted. Original 50-CPU XYZ jobs continue.
+state_head: 3cb784136ef8cb72446f7ef83cc54cad97fd9f55
 progress:
   total_phases: 15
   completed_phases: 9
@@ -34,8 +34,8 @@ Total Phases: 15
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
-Last activity: 2026-11-19 — quick 261119-1m4 launches ordinary and tuned BP for XZ and XYZ
-Last Activity Description: Submitted 28 new BP evaluations at 20 CPUs per decoder point, 18,080 sweeps, and the existing 20-error/100M-shot per-memory rule. Four p=.003 tuning groups select damping, scale and offset on separate shots and hold the controls fixed across the evaluation grid. BB70/GB102 training-only circuits reproduce every released rate by verified scaling. Passed 24 canonical equivalence probes, bounded spawned-worker tuning/evaluation/audit/resume checks and 84 regressions. Slurm ordinary array 62119759 and tuned arrays 62119761/63/65/67, with tuning jobs 62119760/62/64/66 and collector 62119768. At launch 13 XZ BP points running and progress observed, with XYZ BP and tuning queued at account CPU limit and tuned evaluations queued on their dependencies. Existing XYZ 62102101 allocations continued. Statistical results pending.
+Last activity: 2026-11-19 — quick 261119-1m4 launches range-stabilized BP and tuned BP for XZ and XYZ
+Last Activity Description: 28 BP evaluations use 20 CPUs each and an 18,080-sweep cap, with 20 errors or 100M shots per memory. Four p=.003 tuning groups select damping, scaling and offset on separate shots. BB70/GB102 training-only circuits use verified rate rescaling. Initial 62119759 overflowed on GB102/.001 and /.002. Initial ledgers, one audited point, plan and dispatch are archived separately. Canonical min-sum uses a common power-of-two range guard for messages, prior and offset, recording every rescale. Full-cap overflow fixture, 24 neutral equivalence probes and spawned training/evaluation/audit/resume passed. Replacement ordinary array 62119937, tuning 62119938/40/42/44, tuned arrays 62119939/41/43/45 and collector 62119946 submitted. Original 50-CPU XYZ jobs continue.
 
 Previous source-scoring audit:
 Last activity: 2026-11-17 — quick261117-h97 audits author syndrome versus observable success
@@ -506,7 +506,7 @@ Latest kernel work: completed F01 → F02 corrections and qualification in quick
 **Resume file:** None
 
 Last session: 2026-11-10T22:51:46+00:00
-Stopped at: BP follow-up production submitted for 14 strata and two decoder variants, collector 62119768 pending
+Stopped at: Range-stabilized BP follow-up submitted for 14 strata and two decoder variants, collector 62119946 pending
 Next step: Requested builder request action and display/catalog cleanup are complete; resume the existing Phase 11 scientific work when directed. Preserve identity versions and qualification labels. Phase 11 scientific gaps and Phase 5 human review remain open; Phase 7 stays paused.
 
 Design continuation: `.planning/phases/05-guided-and-perturbative-bp-interventions/05-DESIGN-TASKS.md`.
