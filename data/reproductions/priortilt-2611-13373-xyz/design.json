@@ -1,0 +1,71 @@
+{
+  "jobs": [
+    {
+      "bases": {
+        "x": {
+          "basis": "x",
+          "code": "BB144",
+          "cycles": 12,
+          "file": "BB[[144,12,12]],xyz_memory_X,error_rate=0.003,syndrome_rounds=12.stim",
+          "p": 0.003,
+          "sha256": "7ce554515a9c3d8e7983a70004bf49ce3e7ca12900424df2f6b87ce4baca3774"
+        },
+        "z": {
+          "basis": "z",
+          "code": "BB144",
+          "cycles": 12,
+          "file": "BB[[144,12,12]],xyz_memory_Z,error_rate=0.003,syndrome_rounds=12.stim",
+          "p": 0.003,
+          "sha256": "1741baef32faeaa77e45c13ceb293079f413cdd59c952648dcf832739824a941"
+        }
+      },
+      "code": "BB144",
+      "cycles": 12,
+      "id": "bb144-p003000-xyz-priortilt",
+      "method": "priortilt",
+      "p": 0.003
+    },
+    {
+      "bases": {
+        "x": {
+          "basis": "x",
+          "code": "BB144",
+          "cycles": 12,
+          "file": "BB[[144,12,12]],xyz_memory_X,error_rate=0.003,syndrome_rounds=12.stim",
+          "p": 0.003,
+          "sha256": "7ce554515a9c3d8e7983a70004bf49ce3e7ca12900424df2f6b87ce4baca3774"
+        },
+        "z": {
+          "basis": "z",
+          "code": "BB144",
+          "cycles": 12,
+          "file": "BB[[144,12,12]],xyz_memory_Z,error_rate=0.003,syndrome_rounds=12.stim",
+          "p": 0.003,
+          "sha256": "1741baef32faeaa77e45c13ceb293079f413cdd59c952648dcf832739824a941"
+        }
+      },
+      "code": "BB144",
+      "cycles": 12,
+      "id": "bb144-p003000-xyz-relay5",
+      "method": "relay5",
+      "p": 0.003
+    }
+  ],
+  "protocol": {
+    "batch": 64,
+    "decoding": "full undecomposed joint X/Z detector DEM for each memory experiment; no split into detector sectors",
+    "max_shots": 100000000,
+    "metric": "(X-memory observable error rate + Z-memory observable error rate)/12; nonconvergence recorded separately",
+    "minimum_free_bytes": 21474836480,
+    "noise_seed": 2026111881,
+    "numeric_profile": "canonical float64 total-minus min-sum, alpha1 offset0, hard tie1; native arithmetic/RNG separate",
+    "policy_seed": 2026111882,
+    "resources": "50 process workers per paired decoder/code/rate point, shared across X/Z memories",
+    "sampling": "sealed shared Stim detector/observable bytes per code/rate/basis; persisted bytes authoritative across SIMD producers",
+    "stopping": "20 observable errors or100M shots per memory basis, exact ordered prefix",
+    "target_errors": 20,
+    "uncertainty": "97.5% exact capped component intervals summed/cycles; at least95% pointwise X/Z coverage"
+  },
+  "schema": "priortilt-xyz-table4-campaign-v1",
+  "study_id": "priortilt-2611-13373-xyz-table4"
+}

@@ -1,0 +1,382 @@
+{
+  "actual_affinity": [
+    0,
+    1,
+    2,
+    3,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    40,
+    41,
+    42,
+    43,
+    46,
+    47,
+    48,
+    49,
+    50,
+    51,
+    52,
+    53,
+    54,
+    55,
+    56,
+    57,
+    58,
+    59,
+    60,
+    61,
+    62,
+    63,
+    64,
+    65,
+    66
+  ],
+  "cpus": 50,
+  "native_relay5": {
+    "binary_sha256": "76071ce83ea9c5d0bdafc630cd8c416953caa7bd5a8a9a9e839cf5cf3e099f91",
+    "cases": [
+      {
+        "converged_legs": 5,
+        "iterations": 5,
+        "native_candidate_work_posterior_match": true,
+        "seed": 0,
+        "shot": 0
+      },
+      {
+        "converged_legs": 5,
+        "iterations": 5,
+        "native_candidate_work_posterior_match": true,
+        "seed": 0,
+        "shot": 1
+      },
+      {
+        "converged_legs": 5,
+        "iterations": 6,
+        "native_candidate_work_posterior_match": true,
+        "seed": 0,
+        "shot": 2
+      },
+      {
+        "converged_legs": 5,
+        "iterations": 9,
+        "native_candidate_work_posterior_match": true,
+        "seed": 0,
+        "shot": 3
+      },
+      {
+        "converged_legs": 5,
+        "iterations": 5,
+        "native_candidate_work_posterior_match": true,
+        "seed": 0,
+        "shot": 4
+      },
+      {
+        "converged_legs": 5,
+        "iterations": 10,
+        "native_candidate_work_posterior_match": true,
+        "seed": 0,
+        "shot": 5
+      },
+      {
+        "converged_legs": 5,
+        "iterations": 10,
+        "native_candidate_work_posterior_match": true,
+        "seed": 0,
+        "shot": 6
+      },
+      {
+        "converged_legs": 2,
+        "iterations": 27,
+        "native_candidate_work_posterior_match": true,
+        "seed": 0,
+        "shot": 7
+      },
+      {
+        "converged_legs": 5,
+        "iterations": 5,
+        "native_candidate_work_posterior_match": true,
+        "seed": 1,
+        "shot": 0
+      },
+      {
+        "converged_legs": 5,
+        "iterations": 5,
+        "native_candidate_work_posterior_match": true,
+        "seed": 1,
+        "shot": 1
+      },
+      {
+        "converged_legs": 5,
+        "iterations": 5,
+        "native_candidate_work_posterior_match": true,
+        "seed": 1,
+        "shot": 2
+      },
+      {
+        "converged_legs": 5,
+        "iterations": 15,
+        "native_candidate_work_posterior_match": true,
+        "seed": 1,
+        "shot": 3
+      },
+      {
+        "converged_legs": 5,
+        "iterations": 5,
+        "native_candidate_work_posterior_match": true,
+        "seed": 1,
+        "shot": 4
+      },
+      {
+        "converged_legs": 5,
+        "iterations": 10,
+        "native_candidate_work_posterior_match": true,
+        "seed": 1,
+        "shot": 5
+      },
+      {
+        "converged_legs": 5,
+        "iterations": 22,
+        "native_candidate_work_posterior_match": true,
+        "seed": 1,
+        "shot": 6
+      },
+      {
+        "converged_legs": 5,
+        "iterations": 19,
+        "native_candidate_work_posterior_match": true,
+        "seed": 1,
+        "shot": 7
+      },
+      {
+        "converged_legs": 5,
+        "iterations": 5,
+        "native_candidate_work_posterior_match": true,
+        "seed": 2,
+        "shot": 0
+      },
+      {
+        "converged_legs": 5,
+        "iterations": 6,
+        "native_candidate_work_posterior_match": true,
+        "seed": 2,
+        "shot": 1
+      },
+      {
+        "converged_legs": 5,
+        "iterations": 7,
+        "native_candidate_work_posterior_match": true,
+        "seed": 2,
+        "shot": 2
+      },
+      {
+        "converged_legs": 5,
+        "iterations": 9,
+        "native_candidate_work_posterior_match": true,
+        "seed": 2,
+        "shot": 3
+      },
+      {
+        "converged_legs": 5,
+        "iterations": 5,
+        "native_candidate_work_posterior_match": true,
+        "seed": 2,
+        "shot": 4
+      },
+      {
+        "converged_legs": 5,
+        "iterations": 10,
+        "native_candidate_work_posterior_match": true,
+        "seed": 2,
+        "shot": 5
+      },
+      {
+        "converged_legs": 5,
+        "iterations": 10,
+        "native_candidate_work_posterior_match": true,
+        "seed": 2,
+        "shot": 6
+      },
+      {
+        "converged_legs": 5,
+        "iterations": 19,
+        "native_candidate_work_posterior_match": true,
+        "seed": 2,
+        "shot": 7
+      }
+    ],
+    "scope": "same explicit gamma fields; aligned native prior expression; duplicate counting, stable weighted winner, all-leg iterations and selected posterior",
+    "source_commit": "14cb31a18f9b9d7d099791b793e35b8a2951f8f3"
+  },
+  "passed": true,
+  "process_pilot": [
+    {
+      "all_pilot_shots_sequential_replay": true,
+      "bases": {
+        "x": {
+          "biased_node_updates": 119783,
+          "ci975": [
+            0.0,
+            0.12797599984079655
+          ],
+          "decode_ns": 49820083411,
+          "directed_edge_updates": 4849456032,
+          "errors": 0,
+          "iterations": 6194,
+          "joint_counts": [
+            32,
+            0,
+            0,
+            0
+          ],
+          "nonconvergence": 0,
+          "random_draws": 48167,
+          "rate": 0.0,
+          "shots": 32,
+          "stop_reason": "shot_cap"
+        },
+        "z": {
+          "biased_node_updates": 369097,
+          "ci975": [
+            0.0,
+            0.12797599984079655
+          ],
+          "decode_ns": 105148738611,
+          "directed_edge_updates": 11506373280,
+          "errors": 0,
+          "iterations": 14702,
+          "joint_counts": [
+            32,
+            0,
+            0,
+            0
+          ],
+          "nonconvergence": 0,
+          "random_draws": 142365,
+          "rate": 0.0,
+          "shots": 32,
+          "stop_reason": "shot_cap"
+        }
+      },
+      "computed_shots": 64,
+      "events": 64,
+      "full_original_dem_audit": true,
+      "full_paper_budgets": true,
+      "initialized_processes_including_audits": 200,
+      "method": "priortilt",
+      "resume_receipt_unchanged": true,
+      "retained_shots": 64,
+      "stage_decoder_pids": 15,
+      "wall_seconds": 498.0855419151485
+    },
+    {
+      "all_pilot_shots_sequential_replay": true,
+      "bases": {
+        "x": {
+          "biased_node_updates": 1741962252,
+          "ci975": [
+            0.0,
+            0.12797599984079655
+          ],
+          "decode_ns": 185603496279,
+          "directed_edge_updates": 20133776448,
+          "errors": 0,
+          "iterations": 25716,
+          "joint_counts": [
+            32,
+            0,
+            0,
+            0
+          ],
+          "nonconvergence": 0,
+          "random_draws": 31402512,
+          "rate": 0.0,
+          "shots": 32,
+          "stop_reason": "shot_cap"
+        },
+        "z": {
+          "biased_node_updates": 2709234507,
+          "ci975": [
+            0.0,
+            0.12797599984079655
+          ],
+          "decode_ns": 282085865815,
+          "directed_edge_updates": 31321252800,
+          "errors": 0,
+          "iterations": 40020,
+          "joint_counts": [
+            32,
+            0,
+            0,
+            0
+          ],
+          "nonconvergence": 0,
+          "random_draws": 47019888,
+          "rate": 0.0,
+          "shots": 32,
+          "stop_reason": "shot_cap"
+        }
+      },
+      "computed_shots": 64,
+      "events": 64,
+      "full_original_dem_audit": true,
+      "full_paper_budgets": true,
+      "initialized_processes_including_audits": 200,
+      "method": "relay5",
+      "resume_receipt_unchanged": true,
+      "retained_shots": 64,
+      "stage_decoder_pids": 45,
+      "wall_seconds": 865.5662792529911
+    }
+  ],
+  "scope": "Separate qualification seeds and32 shots/basis/method; full paper budgets; complete original-DEM audits, all-shot sequential science replay and exact resume. Production64-shot batches separately exercise ordering/prefix in unit fixtures. Canonical arithmetic/RNG adaptation retained.",
+  "slurm_job_id": "62100693",
+  "source": {
+    "circuits": [
+      {
+        "author_sparse_H_A_priors_exact": true,
+        "checks": 1728,
+        "detector_merge_collisions": 0,
+        "edges": 391464,
+        "execution_sha256": "515f87b2cc2722f0bfb300446209250ee36a333094511f8f9e77d9953a02e354",
+        "file": "BB[[144,12,12]],xyz_memory_X,error_rate=0.003,syndrome_rounds=12.stim",
+        "mechanisms": 67824
+      },
+      {
+        "author_sparse_H_A_priors_exact": true,
+        "checks": 1728,
+        "detector_merge_collisions": 0,
+        "edges": 391320,
+        "execution_sha256": "0a31c31748e3a5e4ffd1838d5261c2b483473ae02b0adf5a1d63ad87ad61758e",
+        "file": "BB[[144,12,12]],xyz_memory_Z,error_rate=0.003,syndrome_rounds=12.stim",
+        "mechanisms": 67752
+      }
+    ],
+    "prior_schedule_exact": true,
+    "relay_budget_interpretation": "Paper explicitly specifies601 TOTAL legs=80+600*60=36080. Released CSV labels num_sets601; native Rust num_sets counts ADDITIONAL legs. Use600 as native argument, preserving the paper cap. Raw CSV retained unchanged.",
+    "scope": "Exact sparse author/canonical H and A and priors; no dense H, no dropped/split/merged mechanisms; paper total-leg budget explicit.",
+    "source_basis_rows": 4,
+    "source_commit": "8eefd37d694b5942fe60ec6d5c82ce97f3d2a450",
+    "source_csv_sha256": "399a17d0d9aa89c34ed3d2473a5654a947938932f82f55ed7f3b8fffdb2dbcfc",
+    "source_table_points": 2
+  }
+}
