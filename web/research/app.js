@@ -365,6 +365,11 @@ const showOtherWork=card=>points(card).some(({p})=>otherWork(p));
 const showOsdWork=card=>points(card).some(({p})=>known(p.osd_invocation_fraction));
 const pairedMemory=card=>points(card).some(({p})=>known(p.x_shots)&&known(p.z_shots));
 const showRuntimeBudget=card=>points(card).some(({p})=>known(p.metadata?.runtime_ratio_to_bp_osd0));
+function memoryBasisMeans(point,field,unit=''){
+ const means=[point['x_'+field],point['z_'+field]];
+ if(!means.some(known))return null;
+ return means.map((mean,index)=>`${index===0?'X':'Z'} ${known(mean)?fmt(mean)+unit:'Unavailable'}`).join(' / ');
+}
 function headers(card){return [...tableStart,...(pairedMemory(card)?['Paper LER / cycle']:[]),...(showOtherWork(card)?['Other recorded work / shot']:[]),...(showOsdWork(card)?['OSD calls / shot','Mean OSD candidates / shot','Mean OSD time / shot']:[]),...(showRuntimeBudget(card)?['Time / BP+OSD-0']:[]),'Time','Evidence','Availability'];}
 function tableRows(card){
  const paired=pairedMemory(card),includeOther=showOtherWork(card),includeOsd=showOsdWork(card),includeBudget=showRuntimeBudget(card);
@@ -381,13 +386,13 @@ function tableRows(card){
    known(p.x_errors)?`X ${count(p.x_errors)} / Z ${count(p.z_errors)}`:weighted?`${count(p.raw_failures)} raw events`:count(p.failures),
    `${count(p.type_i)} / ${count(p.type_ii)}`,
    `${ci}${known(p.confidence_level)?' · '+100*p.confidence_level+'%':''} · ${p.uncertainty_method||p.ci_method||'method not reported'}`,
-   known(p.mean_iterations)?`${fmt(p.mean_iterations)} ${p.iteration_unit||'sweeps'}`:'Unavailable',
-   fmt(p.mean_directed_edge_updates),
+   memoryBasisMeans(p,'mean_iterations',' sweeps')??(known(p.mean_iterations)?`${fmt(p.mean_iterations)} ${p.iteration_unit||'sweeps'}`:'Unavailable'),
+   memoryBasisMeans(p,'mean_directed_edge_updates')??fmt(p.mean_directed_edge_updates),
    ...(paired?[fmt(p.source_value)]:[]),
    ...(includeOther?[otherWork(p)?`${fmt(p.mean_work)} ${p.work_unit}`:'Unavailable']:[]),
    ...(includeOsd?[fmt(p.osd_invocation_fraction),fmt(p.mean_osd_candidate_evaluations),known(p.mean_osd_seconds)?`${fmt(p.mean_osd_seconds)} s`:'Unavailable']:[]),
    ...(includeBudget?[known(p.metadata?.runtime_ratio_to_bp_osd0)?`${fmt(p.metadata.runtime_ratio_to_bp_osd0)}×`:'Unavailable']:[]),
-   known(p.mean_seconds)?`${fmt(p.mean_seconds)} s · ${p.runtime_scope||'see run details'}`:'Unavailable',
+   memoryBasisMeans(p,'mean_decode_ms',' ms')??(known(p.mean_seconds)?`${fmt(p.mean_seconds)} s · ${p.runtime_scope||'see run details'}`:'Unavailable'),
    `${s.evidence} · ${p.status||''}`,weighted?'Weighted estimate; proposal counts':p.raw_asset?.availability||'Retained summary',
   ];
  });
@@ -418,6 +423,9 @@ function drawMacKayTable(card,box){
 function drawTable(card,box){
  if(showOsdWork(card))box.append(el('p',{class:'small muted'},'Iteration and edge-update counts cover the BP stage. OSD calls, candidate evaluations and time are reported separately.'));
  if(showRuntimeBudget(card))box.append(el('p',{class:'small muted'},'Time / BP+OSD-0 compares measured decoder time per shot with the contemporaneous reference. Values above 1.1 exceed the study’s 10% runtime tolerance.'));
+ if(points(card).some(({p})=>known(p.x_mean_decode_ms)||known(p.z_mean_decode_ms))){
+  box.append(el('p',{class:'small muted'},'X and Z work and timing are means per shot for each memory basis. Times include decoder instrumentation and reflect the CPU allocation used for each run.'));
+ }
  const wrap=el('div',{class:'table-wrap',tabindex:'0','aria-label':`Results table for plot ${card.id}`}),table=el('table'),head=el('thead'),tr=el('tr');
  const definitions={
   [metricNames.iterations]:'Executed sweeps summed across decoder components and rounds, averaged over all sampled shots.',

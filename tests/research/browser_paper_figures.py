@@ -106,7 +106,16 @@ def verify(output,url):
         checks.append('MacKay inferred settings and LP Example 4 remain explicitly additional; no invented exact-reproduction figure')
 
         page.locator('#select-paper').select_option('priortilt-2611-13373-v1')
-        assert page.locator('[data-figure=priortilt-figure-1] tbody tr').count()==39
+        figure=page.locator('[data-figure=priortilt-figure-1]')
+        assert figure.locator('tbody tr').count()==39
+        table=figure.locator('.table-wrap table')
+        columns=table.locator('thead th').all_text_contents()
+        first=dict(zip(columns,table.locator('tbody tr').first.locator('td').all_text_contents()))
+        assert first['Mean iterations / shot']=='X 9.4872 sweeps / Z 10.686 sweeps'
+        assert first['Mean directed edge updates / shot']=='X 581980 / Z 655510'
+        assert first['Time']=='X 4.234 ms / Z 4.6831 ms'
+        assert 'decoder instrumentation' in figure.inner_text()
+        checks.append('PriorTilt Figure 1 shows the recorded work and instrumented timing separately for X and Z')
         prior=page.locator('[data-paper=priortilt-2611-13373-v1]')
         caption=prior.locator('[data-figure=priortilt-figure-1] .card-heading q').text_content()
         assert caption=='Logical error rates of PriorTilt, Relay-BP, and beam search decoders for the three benchmark codes.'
