@@ -1,0 +1,30 @@
+{
+  "qualification_passed": true,
+  "successful_job": "62100693",
+  "initial_failed_job": "62100295",
+  "initial_failure": "reference builds were node-local; stopped before any simulation; fixed by shared checksum-pinned archive",
+  "events": 128,
+  "native_relay_cases": 24,
+  "pilot_methods": [
+    {
+      "method": "priortilt",
+      "sealed_stage_worker_pids": 15,
+      "worker_initializations_across_four_sampling_audit_resume_pools": 200,
+      "all_shot_replay": true,
+      "resume_receipt_unchanged": true
+    },
+    {
+      "method": "relay5",
+      "sealed_stage_worker_pids": 45,
+      "worker_initializations_across_four_sampling_audit_resume_pools": 200,
+      "all_shot_replay": true,
+      "resume_receipt_unchanged": true
+    }
+  ],
+  "point_jobs": [
+    "62102101_0",
+    "62102101_1"
+  ],
+  "collector": "62102102",
+  "scope": "Qualification outcomes are excluded from production estimates; no completed production or paper-agreement claim."
+}

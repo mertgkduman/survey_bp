@@ -1,0 +1,52 @@
+{
+  "array": {
+    "argv": [
+      "sbatch",
+      "--parsable",
+      "--partition=common,scavenger",
+      "--account=pfisterlab",
+      "--nodes=1",
+      "--ntasks=1",
+      "--time=4-00:00:00",
+      "--chdir=/hpc/group/pfisterlab/mg551/storage/survey_bp",
+      "--export=ALL,PYTHONPATH=/hpc/group/pfisterlab/mg551/storage/survey_bp/src,OMP_NUM_THREADS=1,OPENBLAS_NUM_THREADS=1,MKL_NUM_THREADS=1,NUMBA_NUM_THREADS=1",
+      "--cpus-per-task=50",
+      "--mem=96G",
+      "--requeue",
+      "--signal=B:USR1@180",
+      "--job-name=priortilt-xyz-50",
+      "--array=0,1%2",
+      "--dependency=afterok:62100693",
+      "--output=/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/priortilt-2611-13373-xyz/results/worker-%A_%a.log",
+      "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/priortilt-2611-13373-xyz/worker.sh"
+    ],
+    "id": "62102101",
+    "indices": [
+      0,
+      1
+    ]
+  },
+  "collector": {
+    "argv": [
+      "sbatch",
+      "--parsable",
+      "--partition=common,scavenger",
+      "--account=pfisterlab",
+      "--nodes=1",
+      "--ntasks=1",
+      "--time=4-00:00:00",
+      "--chdir=/hpc/group/pfisterlab/mg551/storage/survey_bp",
+      "--export=ALL,PYTHONPATH=/hpc/group/pfisterlab/mg551/storage/survey_bp/src,OMP_NUM_THREADS=1,OPENBLAS_NUM_THREADS=1,MKL_NUM_THREADS=1,NUMBA_NUM_THREADS=1",
+      "--cpus-per-task=1",
+      "--mem=12G",
+      "--job-name=priortilt-xyz-collect",
+      "--dependency=afterok:62102101",
+      "--output=/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/priortilt-2611-13373-xyz/results/collect-%j.log",
+      "--wrap=exec /hpc/group/pfisterlab/mg551/storage/survey_bp/.venv/bin/python /hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/priortilt-2611-13373-xyz/report.py"
+    ],
+    "id": "62102102"
+  },
+  "created_utc": "2026-11-19T00:27:31.649146+00:00",
+  "plan_sha256": "d97473d7070bcc8bb9b904fbfc7d51645e6c2f5ae1f416a06cb876c4c9ea60c1",
+  "qualification_job_id": "62100693"
+}

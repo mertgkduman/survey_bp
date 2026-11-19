@@ -1,0 +1,8 @@
+........................................                                 [100%]
+=============================== warnings summary ===============================
+tests/test_circuit_relay_list.py::test_duplicate_convergences_count_and_exact_ties_keep_first
+  /hpc/group/pfisterlab/mg551/storage/survey_bp/src/bp_registry/circuit/relay_list.py:61: RuntimeWarning: overflow encountered in scalar multiply
+    for bits in gamma.view(np.uint64):lineage=(lineage^bits)*np.uint64(1099511628211)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+40 passed, 1 warning in 5.77s

@@ -1,0 +1,6 @@
+             JOBID                         NAME      STATE   CPUS         TIME          NODELIST(REASON)
+          59184152             mobile-gsd-mg551    RUNNING      2  28-06:28:25  dcc-core-ferc-u-ab39-5-6
+          62102102        priortilt-xyz-collect    PENDING      2         0:00              (Dependency)
+        62102101_0             priortilt-xyz-50    RUNNING     50         2:55 dcc-barthellab-ferc-u-ab25-4-1
+        62102101_1             priortilt-xyz-50    RUNNING     50         2:55 dcc-cagpm-ferc-u-ac39-5-5
+          61971020        priortilt-par-collect    RUNNING      2      1:07:53 dcc-fergusonlab-ferc-u-y32-3-4

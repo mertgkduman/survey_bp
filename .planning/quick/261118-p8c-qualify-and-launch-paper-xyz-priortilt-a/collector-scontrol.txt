@@ -1,0 +1,28 @@
+JobId=62102102 JobName=priortilt-xyz-collect
+   UserId=mg551(1498154) GroupId=dukeusers(1000000) MCS_label=N/A
+   Priority=11915 Nice=0 Account=pfisterlab QOS=normal
+   JobState=PENDING Reason=Dependency Dependency=afterok:62102101_*(unfulfilled)
+   Requeue=1 Restarts=0 BatchFlag=1 Reboot=0 ExitCode=0:0
+   RunTime=00:00:00 TimeLimit=4-00:00:00 TimeMin=N/A
+   SubmitTime=2026-11-18T19:27:31 EligibleTime=Unknown
+   AccrueTime=Unknown
+   StartTime=Unknown EndTime=Unknown Deadline=N/A
+   SuspendTime=None SecsPreSuspend=0 LastSchedEval=2026-11-18T19:27:31 Scheduler=Main
+   Partition=common,scavenger AllocNode:Sid=dcc-core-ferc-u-ab39-5-6:1938428
+   ReqNodeList=(null) ExcNodeList=(null)
+   NodeList=
+   NumNodes=1-1 NumCPUs=2 NumTasks=1 CPUs/Task=2 ReqB:S:C:T=0:0:*:*
+   ReqTRES=cpu=1,mem=12G,node=1,billing=1
+   AllocTRES=(null)
+   Socks/Node=* NtasksPerN:B:S:C=0:0:*:* CoreSpec=*
+   MinCPUsNode=2 MinMemoryNode=12G MinTmpDiskNode=0
+   Features=(null) DelayBoot=00:00:00
+   OverSubscribe=OK Contiguous=0 Licenses=(null) LicensesAlloc=(null) Network=(null)
+   Command=(null)
+   SubmitLine=sbatch --parsable --partition=common,scavenger --account=pfisterlab --nodes=1 --ntasks=1 --time=4-00:00:00 --chdir=/hpc/group/pfisterlab/mg551/storage/survey_bp --export=ALL,PYTHONPATH=/hpc/group/pfisterlab/mg551/storage/survey_bp/src,OMP_NUM_THREADS=1,OPENBLAS_NUM_THREADS=1,MKL_NUM_THREADS=1,NUMBA_NUM_THREADS=1 --cpus-per-task=1 --mem=12G --job-name=priortilt-xyz-collect --dependency=afterok:62102101 --output=/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/priortilt-2611-13373-xyz/results/collect-%j.log --wrap=exec /hpc/group/pfisterlab/mg551/storage/survey_bp/.venv/bin/python /hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/priortilt-2611-13373-xyz/report.py
+   WorkDir=/hpc/group/pfisterlab/mg551/storage/survey_bp
+   StdErr=
+   StdIn=/dev/null
+   StdOut=/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/priortilt-2611-13373-xyz/results/collect-62102102.log
+   TresPerTask=cpu=1
+
