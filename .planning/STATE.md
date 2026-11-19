@@ -5,11 +5,11 @@ current_phase: 11
 current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
-stopped_at: XYZ array62102101 continues50 CPUs per point; collector62102102 pending. Original XZ39/39 audited publication complete and consistent at local precision.
-last_updated: "2026-11-19T01:24:39.586Z"
-last_activity: 2026-11-19 UTC — quick261118-s8d checks XYZ progress and final39-point XZ publication
-last_activity_desc: "XYZ remains0/2 complete/audited:both array62102101 tasks RUNNING on50 CPUs each,collector62102102 pending. Checked snapshot PriorTilt X1/28,672 Z2/28,608 errors/shots;RelayBP-5 X0/6,848 Z1/6,784. No unfinished LER or paper-agreement claim. Verified85 frozen files/resource identity, manifests/policies, committed marker-prefix arithmetic and first/last NPZ/shared-noise bindings; no worker errors reported. Original XZ collector61971020 completed0:0 in1:24:02 and published39/39 full-audited points,1,861,754,800 decoded basis shots/1460 observable errors. Independent source/count/stopping/CI/work checks pass; all38 previous complete CSV rows identical, all39 paper ordinates inside local pointwise95% intervals,PriorTilt lowest estimate in all13 strata with overlapping precision/unmatched latency caveats. Last GB102 Beam/.0005 gives1.444e-8 versus source2.306e-8,within local interval. Final plot inspected; checked collector report/CSV/PNG/PDF committed. Reused completed collector full rehash; no new1.86B-shot rehash, simulations, tests or decoder changes. Frozen/source/kernel/public/v1/model/phase gates untouched; other collectors16 pre-existing outputs unstaged. XYZ reproduction continues with original paper budgets/stopping."
-state_head: 9d141231b721d9ce9404908dd34dcd9735f8eb04
+stopped_at: BP follow-up production submitted for 14 strata and two decoder variants, collector 62119768 pending
+last_updated: "2026-11-19T06:21:50.606Z"
+last_activity: 2026-11-19
+last_activity_desc: Submitted 28 new BP evaluations at 20 CPUs per decoder point, 18,080 sweeps, and the existing 20-error/100M-shot per-memory rule. Four p=.003 tuning groups select damping, scale and offset on separate shots and hold the controls fixed across the evaluation grid. BB70/GB102 training-only circuits reproduce every released rate by verified scaling. Passed 24 canonical equivalence probes, bounded spawned-worker tuning/evaluation/audit/resume checks and 84 regressions. Slurm ordinary array 62119759 and tuned arrays 62119761/63/65/67, with tuning jobs 62119760/62/64/66 and collector 62119768. At launch 13 XZ BP points running and progress observed, with XYZ BP and tuning queued at account CPU limit and tuned evaluations queued on their dependencies. Existing XYZ 62102101 allocations continued. Statistical results pending.
+state_head: a6fc2cf410b27e154ce2dd8c19a30a15c94b63b4
 progress:
   total_phases: 15
   completed_phases: 9
@@ -34,8 +34,8 @@ Total Phases: 15
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
-Last activity: 2026-11-19 UTC — quick261118-s8d checks XYZ progress and final39-point XZ publication
-Last Activity Description: XYZ remains0/2 complete/audited:both array62102101 tasks RUNNING on50 CPUs each,collector62102102 pending. Checked snapshot PriorTilt X1/28,672 Z2/28,608 errors/shots;RelayBP-5 X0/6,848 Z1/6,784. No unfinished LER or paper-agreement claim. Verified85 frozen files/resource identity, manifests/policies, committed marker-prefix arithmetic and first/last NPZ/shared-noise bindings; no worker errors reported. Original XZ collector61971020 completed0:0 in1:24:02 and published39/39 full-audited points,1,861,754,800 decoded basis shots/1460 observable errors. Independent source/count/stopping/CI/work checks pass; all38 previous complete CSV rows identical, all39 paper ordinates inside local pointwise95% intervals,PriorTilt lowest estimate in all13 strata with overlapping precision/unmatched latency caveats. Last GB102 Beam/.0005 gives1.444e-8 versus source2.306e-8,within local interval. Final plot inspected; checked collector report/CSV/PNG/PDF committed. Reused completed collector full rehash; no new1.86B-shot rehash, simulations, tests or decoder changes. Frozen/source/kernel/public/v1/model/phase gates untouched; other collectors16 pre-existing outputs unstaged. XYZ reproduction continues with original paper budgets/stopping.
+Last activity: 2026-11-19 — quick 261119-1m4 launches ordinary and tuned BP for XZ and XYZ
+Last Activity Description: Submitted 28 new BP evaluations at 20 CPUs per decoder point, 18,080 sweeps, and the existing 20-error/100M-shot per-memory rule. Four p=.003 tuning groups select damping, scale and offset on separate shots and hold the controls fixed across the evaluation grid. BB70/GB102 training-only circuits reproduce every released rate by verified scaling. Passed 24 canonical equivalence probes, bounded spawned-worker tuning/evaluation/audit/resume checks and 84 regressions. Slurm ordinary array 62119759 and tuned arrays 62119761/63/65/67, with tuning jobs 62119760/62/64/66 and collector 62119768. At launch 13 XZ BP points running and progress observed, with XYZ BP and tuning queued at account CPU limit and tuned evaluations queued on their dependencies. Existing XYZ 62102101 allocations continued. Statistical results pending.
 
 Previous source-scoring audit:
 Last activity: 2026-11-17 — quick261117-h97 audits author syndrome versus observable success
@@ -470,6 +470,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 | 261118-p8c | Qualify and launch paper XYZ comparison with 50 CPUs per point | 2026-11-19 | 1d816528 | — | [261118-p8c-qualify-and-launch-paper-xyz-priortilt-a](./quick/261118-p8c-qualify-and-launch-paper-xyz-priortilt-a/) |
 | 261118-s8d | Check XYZ progress and final 39-point XZ publication | 2026-11-19 | 9d141231 | — | [261118-s8d-check-live-xyz-priortilt-and-relaybp5-pr](./quick/261118-s8d-check-live-xyz-priortilt-and-relaybp5-pr/) |
 | 261118-ui1 | Expand decoder policies and research workbench | 2026-11-19 | a297e53d | Verified workbench and portable routes covered here. aSCED and Unicycle use registered studies. | [261118-ui1](./quick/261118-ui1-update-canonical-policy-support-and-rese/) |
+| 261119-1m4 | Run ordinary and tuned BP on the full PriorTilt circuit grid with 20 CPUs per point | 2026-11-19 | a6fc2cf4 | — | [261119-1m4-run-ordinary-and-tuned-min-sum-bp-on-pri](./quick/261119-1m4-run-ordinary-and-tuned-min-sum-bp-on-pri/) |
 
 ### Roadmap Evolution
 
@@ -505,7 +506,7 @@ Latest kernel work: completed F01 → F02 corrections and qualification in quick
 **Resume file:** None
 
 Last session: 2026-11-10T22:51:46+00:00
-Stopped at: XYZ array62102101 continues50 CPUs per point; collector62102102 pending. Original XZ39/39 audited publication complete and consistent at local precision.
+Stopped at: BP follow-up production submitted for 14 strata and two decoder variants, collector 62119768 pending
 Next step: Requested builder request action and display/catalog cleanup are complete; resume the existing Phase 11 scientific work when directed. Preserve identity versions and qualification labels. Phase 11 scientific gaps and Phase 5 human review remain open; Phase 7 stays paused.
 
 Design continuation: `.planning/phases/05-guided-and-perturbative-bp-interventions/05-DESIGN-TASKS.md`.
