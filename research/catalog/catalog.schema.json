@@ -188,6 +188,45 @@
               "null"
             ]
           },
+          "reference_curves": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["code_id", "channel_kind", "matches", "source_path", "source_paper_id", "source_kind", "metric", "points"],
+              "properties": {
+                "code_id": {"type": "string"},
+                "channel_kind": {"type": "string"},
+                "matches": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "type": "object",
+                    "required": ["dataset_id", "source_decoder_id"],
+                    "properties": {
+                      "dataset_id": {"type": "string"},
+                      "source_decoder_id": {"type": "string"}
+                    }
+                  }
+                },
+                "source_path": {"type": "string"},
+                "source_paper_id": {"type": "string"},
+                "source_kind": {"enum": ["published", "digitized"]},
+                "metric": {"type": "string"},
+                "points": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "type": "object",
+                    "required": ["x", "y"],
+                    "properties": {
+                      "x": {"type": "number", "minimum": 0, "maximum": 1},
+                      "y": {"type": "number", "exclusiveMinimum": 0, "maximum": 1}
+                    }
+                  }
+                }
+              }
+            }
+          },
           "reproduction_rules": {
             "type": "array",
             "items": {

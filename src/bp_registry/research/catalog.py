@@ -1157,6 +1157,8 @@ def build_catalog(repository: Path) -> dict[str, Any]:
     _add_priortilt_results(catalog, repository)
     if registry.get("paper_figures_path"):
         apply_paper_view_metadata(catalog, _read_json(repository / registry["paper_figures_path"]))
+        from .paper_references import add_paper_references
+        add_paper_references(catalog, repository)
     return validate_catalog(catalog)
 
 

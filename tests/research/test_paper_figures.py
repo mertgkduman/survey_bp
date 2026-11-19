@@ -7,6 +7,7 @@ import subprocess
 import pytest
 
 from bp_registry.research.catalog_model import apply_paper_view_metadata, extend_catalog, validate_catalog
+from bp_registry.research.paper_references import add_paper_references
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -51,8 +52,20 @@ def test_figure_scope_precedes_projection_and_keeps_new_imports_additional():
 
 
 def test_source_membership_cannot_make_single_rate_reproduction_qualify():
-    c=fixture();c['result_series'][0]['points']=c['result_series'][0]['points'][:1]
-    curves=views(c)[0]['curves']
+    c=fixture()
+    c['paper_figures'][0]['reference_curves']=[{
+        'code_id':'c','channel_kind':'x_only',
+        'matches':[{'dataset_id':'source','source_decoder_id':'bp'}],
+        'points':[{'x':.01,'y':.1},{'x':.02,'y':.2}],
+    }]
+    figure=views(c)[0]
+    assert figure['reference_curves'][0]['curve_ids']==[
+        s['series_id'] for s in figure['curves'] if s['paper_group']=='paper'
+    ]
+    c['result_series'][0]['points']=c['result_series'][0]['points'][:1]
+    figure=views(c)[0]
+    assert figure['reference_curves'][0]['curve_ids']==[]
+    curves=figure['curves']
     assert all(s['paper_group']=='additional' for s in curves)
 
 
@@ -109,6 +122,37 @@ def test_actual_registry_uses_source_figures_without_promoting_unknown_settings(
             assert all(s['paper_group']=='additional' for s in f['curves'])
     yao3=next(f for f in result if f['figure_id']=='yao-fig-3')
     assert any(m['dataset_id']=='yao-bpgd-completion' for s in yao3['curves'] if s['paper_group']=='paper' for m in s['provenance_members'])
+
+
+def test_paper_references_are_extracted_from_sources_without_mutating_results():
+    catalog=json.loads((ROOT/'web/research/catalog.json').read_text())
+    original=deepcopy(catalog)
+    for f in catalog['paper_figures']:
+        f.pop('reference_curves',None)
+    add_paper_references(catalog,ROOT)
+    figures={f['figure_id']:f for f in catalog['paper_figures']}
+    assert catalog['result_series']==original['result_series']
+    assert catalog['experiments']==original['experiments']
+    assert catalog['paper_figures']==original['paper_figures']
+
+    def point(figure, arm, x):
+        return next(p['y'] for r in figures[figure]['reference_curves']
+                    if any(m['source_decoder_id']==arm for m in r['matches'])
+                    for p in r['points'] if p['x']==x)
+
+    assert point('yao-fig-3','bpgd_t10_r882',.04)==6e-6
+    assert point('yao-fig-4','bpgd_t10_r882',.04)==3.21835e-6
+    roffe=figures['roffe-fig-3']['reference_curves']
+    assert {r['code_id'] for r in roffe}=={'toric9','toric11','toric13','toric15'}
+    assert sum(len(r['points']) for r in roffe)==109
+    mackay,=figures['mackay-fig-15']['reference_curves']
+    assert mackay['source_kind']=='digitized' and mackay['code_id']=='unicycle274'
+    assert mackay['metric']=='Classical block error rate' and len(mackay['points'])==5
+    prior=figures['priortilt-figure-1']['reference_curves']
+    assert sum(len(r['points']) for r in prior)==39
+    relay=figures['relay-priortilt-figure-1']['reference_curves']
+    assert relay==[r for r in prior if r['matches'][0]['source_decoder_id']=='priortilt-paper-relay']
+    assert 'reference_curves' not in figures['lp1054-example-4']
 
 
 def test_catalog_rebuild_loads_and_hashes_the_figure_registry(tmp_path):

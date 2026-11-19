@@ -41,6 +41,19 @@ start on and additional comparisons start off. Each checkbox switches its
 whole group; a partly selected group shows a mixed state. Individual curve
 controls still work, and ranges, tables and exports follow visible curves.
 
+Stars mark paper-reported points and use the color of the paired local curve.
+They appear on failure-rate plots and follow the curve visibility controls and
+axis scaling. Hover or focus a star to read its source metric and ordinate.
+Yao and PriorTilt points come from the authors' numerical data. Roffe and
+MacKay points are approximate vector-figure extractions. The MacKay markers
+show classical block error for the length-274 Construction U code paired
+with the local comparison using the inferred iteration cap.
+
+The catalog build reads the archived source files and records their checksums.
+Matches are scoped to the figure, code, channel and eligible local decoder
+arm. Settings downloads include the plotted references under
+`paper_references`. Result tables and CSV exports use local measurements.
+
 Figure membership and reproduction settings are declared in
 `research/catalog/paper-figures.json`, indexed by `sources.json`. Rules name
 retained dataset and decoder-arm identities, with source-figure scope where

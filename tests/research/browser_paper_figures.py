@@ -34,11 +34,33 @@ def verify(output,url):
             assert card.locator('[data-group=paper]').is_checked()
             assert not card.locator('[data-group=additional]').is_checked()
             assert card.locator('tbody tr').count()>0
+        assert cards.locator('.paper-star').count()==154
+        assert cards.locator('.paper-markers :is(path,line,polyline)').count()==0
+        assert cards.locator('.paper-star').evaluate_all("""stars => stars.every(star => {
+          const group=star.parentNode;
+          const curve=[...group.parentNode.querySelectorAll('.curve-group')]
+            .find(curve => curve.dataset.curve===group.dataset.curve);
+          return curve.dataset.visible==='true' &&
+            star.getAttribute('fill')===curve.querySelector('.line').getAttribute('stroke') &&
+            star.points.numberOfItems===10;
+        })""")
         checks.append('Clickable Yao title opens seven separately named figures with paper reproductions on and additional curves off')
 
         card=page.locator('[data-figure=yao-fig-3]');other=page.locator('[data-figure=yao-fig-7]')
         original_rows=card.locator('tbody tr').count();other_rows=other.locator('tbody tr').count()
         original_axes=card.locator('.y-tick').all_text_contents()
+        star=card.locator('.paper-star').first
+        star.focus()
+        assert 'Paper-reported point' in card.locator('figcaption').inner_text()
+        matching_curve=star.evaluate('star => star.parentNode.dataset.curve')
+        metric=card.get_by_role('combobox',name='Metric for plot',exact=False)
+        metric.select_option('iterations')
+        assert card.locator('.paper-star').count()==0
+        metric.select_option('rate')
+        card.locator(f'.curve-list input[data-curve="{matching_curve}"]').uncheck()
+        assert card.locator('.paper-star').count()==28
+        card.locator(f'.curve-list input[data-curve="{matching_curve}"]').check()
+        assert card.locator('.paper-star').count()==35
         card.locator('[data-group=additional]').check()
         assert card.locator('tbody tr').count()>original_rows
         assert other.locator('tbody tr').count()==other_rows
@@ -57,24 +79,30 @@ def verify(output,url):
         assert receipt['figure_label']=='Figure 3 "different BP iterations per round" · BPGD on B1'
         assert receipt['paper_id']=='yao-2312-10950-v2'
         assert all(s['paper_group']=='paper' for s in receipt['series'])
+        assert sum(len(r['points']) for r in receipt['paper_references'])==35
+        assert {r['curve_id'] for r in receipt['paper_references']}<={s['curve_id'] for s in receipt['series']}
         assert all(p.get('source_figure') in (None,'3') for s in receipt['series'] for p in s['points'])
         with page.expect_download() as download:card.get_by_role('button',name='Export visible table',exact=True).click()
         path=output/'figure3.csv';download.value.save_as(path)
         with path.open() as f:assert len(list(csv.reader(f)))-1==original_rows
         card.locator('[data-group=paper]').uncheck()
         assert card.locator('tbody tr').count()==0
+        assert card.locator('.paper-star').count()==0
         assert card.get_by_role('button',name='Export visible table',exact=True).is_disabled()
         assert card.get_by_role('button',name='Download run settings',exact=True).is_disabled()
         card.locator('[data-group=paper]').check()
-        checks.append('Figure-labelled settings and CSV contain only visible scoped evidence; both groups off safely disables exports')
+        checks.append('Stars share curve colors, appear only on rate plots, and follow visibility. Settings identify references separately and CSV rows remain measured results')
 
         page.locator('#select-paper').select_option('roffe-2005-07016-v2')
         card=page.locator('[data-figure=roffe-fig-3]')
         assert card.count()==1 and card.locator('[data-group=paper]').is_checked()
         assert card.locator('[data-select=input] option').count()==5
+        assert card.locator('.paper-star').count()==109
         assert 'CS-60' in card.locator('.figure-note').inner_text()
         card.locator('[data-select=input]').select_option('toric9')
         assert 'toric9'==card.locator('[data-select=input]').input_value()
+        assert card.locator('.paper-star').count()==25
+        assert 'digitized from the published figure' in card.locator('.paper-star').first.get_attribute('aria-label')
         assert card.locator('tbody tr').count()>0
         assert all('X-only' in x for x in card.locator('tbody tr td:nth-child(2)').all_text_contents())
         without_code=json.loads(json.dumps(catalog))
@@ -91,6 +119,7 @@ def verify(output,url):
         assert card.locator('.card-heading h3').inner_text().startswith('Figure 16 ')
         assert 'inferred' in card.locator('.figure-note').inner_text()
         assert card.locator('[data-group=paper]').is_disabled()
+        assert card.locator('.paper-star').count()==5
         assert card.locator('.mackay-results tbody tr').count()>0
         assert card.locator('.mackay-results').evaluate('(n)=>!!(n.compareDocumentPosition(n.parentElement.querySelector("svg")) & Node.DOCUMENT_POSITION_FOLLOWING)')
         table=card.locator('.mackay-results table')
@@ -103,11 +132,13 @@ def verify(output,url):
         assert 'no LER figure' in card.locator('.figure-note').inner_text()
         assert card.locator('[data-group=paper]').is_disabled()
         card.locator('[data-group=additional]').check();assert card.locator('tbody tr').count()>0
+        assert card.locator('.paper-star').count()==0
         checks.append('MacKay inferred settings and LP Example 4 remain explicitly additional; no invented exact-reproduction figure')
 
         page.locator('#select-paper').select_option('priortilt-2611-13373-v1')
         figure=page.locator('[data-figure=priortilt-figure-1]')
         assert figure.locator('tbody tr').count()==39
+        assert figure.locator('.paper-star').count()==39
         table=figure.locator('.table-wrap table')
         columns=table.locator('thead th').all_text_contents()
         first=dict(zip(columns,table.locator('tbody tr').first.locator('td').all_text_contents()))
@@ -124,6 +155,7 @@ def verify(output,url):
         page.locator('#add-paper').click()
         page.locator('#select-additional-paper').select_option('relaybp-2506-01779-v2')
         assert page.locator('[data-figure=relay-priortilt-figure-1] tbody tr').count()==13
+        assert page.locator('[data-figure=relay-priortilt-figure-1] .paper-star').count()==13
         relay=page.locator('[data-paper=relaybp-2506-01779-v2]')
         assert relay.locator('.paper-heading h3').inner_text()=='Improved belief propagation is sufficient for real-time decoding of quantum memory'
         assert 'Figure 2' in relay.locator('.paper-coverage').inner_text()
@@ -141,6 +173,7 @@ def verify(output,url):
         search.fill('Beam search decoder')
         search.press('ArrowDown');search.press('Enter')
         assert page.locator('[data-figure=beam-priortilt-figure-1] tbody tr').count()==13
+        assert page.locator('[data-figure=beam-priortilt-figure-1] .paper-star').count()==13
         assert page.locator('[data-paper=beamsearch-2512-07057-v2] h3').first.inner_text()=='Beam search decoder for quantum LDPC codes'
         page.locator('[data-paper=beamsearch-2512-07057-v2]').locator('.paper-heading button').click()
         assert page.locator('[data-figure=beam-priortilt-figure-1]').count()==0

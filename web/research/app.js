@@ -246,11 +246,23 @@ function renderCards(){
   if(figure?.paper_id==='mackay-0304161-v3')drawMacKayTable(card,box);
   drawPlot(card,box);drawTable(card,box);
   const actions=el('div',{class:'actions'}),csv=el('button',{type:'button',class:'secondary'},'Export visible table');csv.disabled=!visiblePoints.length;csv.onclick=()=>exportTable(card);actions.append(csv);
-  const receipt=el('button',{type:'button',class:'secondary'},'Download run settings');receipt.disabled=!visible(card).length;receipt.onclick=()=>{const shown=visible(card);save(`plot-${card.id}-settings.json`,JSON.stringify({schema:'research-plot-receipt-v2',...(figure?{paper_id:figure.paper_id,figure_id:figure.figure_id,figure_label:figure.label,reproduction_note:figure.note}:{}),axis:{mode:ResearchPlot.axis(shown,card.axis||'auto'),depolarizing_to_bit_flip_factor:2/3},series:shown,decoders:[...new Set(shown.flatMap(s=>evidenceMembers(s).map(m=>m.decoder_id)))].map(id=>record('decoders',id)),experiments:S.catalog.experiments.filter(e=>e.dataset_ids?.some(id=>shown.some(s=>evidenceMembers(s).some(m=>m.dataset_id===id))))},null,2)+'\n');};actions.append(receipt);
+  const receipt=el('button',{type:'button',class:'secondary'},'Download run settings');receipt.disabled=!visible(card).length;receipt.onclick=()=>{const shown=visible(card);save(`plot-${card.id}-settings.json`,JSON.stringify({schema:'research-plot-receipt-v2',...(figure?{paper_id:figure.paper_id,figure_id:figure.figure_id,figure_label:figure.label,reproduction_note:figure.note,paper_references:paperOverlays(card,shown)}:{}),axis:{mode:ResearchPlot.axis(shown,card.axis||'auto'),depolarizing_to_bit_flip_factor:2/3},series:shown,decoders:[...new Set(shown.flatMap(s=>evidenceMembers(s).map(m=>m.decoder_id)))].map(id=>record('decoders',id)),experiments:S.catalog.experiments.filter(e=>e.dataset_ids?.some(id=>shown.some(s=>evidenceMembers(s).some(m=>m.dataset_id===id))))},null,2)+'\n');};actions.append(receipt);
   if(visible(card).length===1){const reproduce=el('button',{type:'button',class:'secondary'},'Reproduce / extend');reproduce.onclick=()=>{const d=record('decoders',visible(card)[0].decoder_id),cfg=d.configuration||{};if(cfg.effective_policy?.schema==='vanilla-bp-decoder-v1'||cfg.experiment||cfg.portable_experiment||cfg.builder_preset||d.decoder_id==='priortilt-paper-priortilt')useSaved(d,card.input);else{const detail=box.querySelector('.run-details');detail.open=true;detail.scrollIntoView({block:'start'});}};actions.append(reproduce);}box.append(actions);runDetails(card,box);container.append(box);
  }
 }
 function svg(tag,attrs={},value){const n=document.createElementNS('http://www.w3.org/2000/svg',tag);for(const[k,v]of Object.entries(attrs))n.setAttribute(k,v);if(value!=null)n.textContent=value;return n;}
+function paperOverlays(card,shown){
+ return card.metric==='rate'?ResearchFigures.overlays(figureFor(card),shown):[];
+}
+function paperStar(x,y,color,description){
+ const vertices=Array.from({length:10},(_,index)=>{
+  const angle=index*Math.PI/5-Math.PI/2,radius=index%2?3.2:7;
+  return `${x+radius*Math.cos(angle)},${y+radius*Math.sin(angle)}`;
+ }).join(' ');
+ const star=svg('polygon',{points:vertices,class:'paper-star',fill:color,stroke:'white',
+  'stroke-width':1,'stroke-linejoin':'round',role:'img',tabindex:0,'aria-label':description});
+ star.append(svg('title',{},description));return star;
+}
 function drawPlot(card,box){
  const curves=selected(card);
  const shown=curves.filter(s=>!card.hidden.has(s.series_id));
@@ -277,11 +289,16 @@ function drawPlot(card,box){
  const scaleRows=rows.filter(({s})=>!shown.length||!card.hidden.has(s.series_id));
  if(!scaleRows.length){caption.textContent='No plottable observations for this selection.';return;}
 
- const coordinates=scaleRows.map(({s,p})=>plotX(s,p));
+ const overlays=paperOverlays(card,shown);
+ const paperRows=overlays.flatMap(reference=>{
+  const s=shown.find(curve=>curve.series_id===reference.curve_id);
+  return reference.points.map(p=>({s,p}));
+ });
+ const coordinates=[...scaleRows,...paperRows].map(({s,p})=>plotX(s,p));
  let xmin=Math.min(...coordinates),xmax=Math.max(...coordinates);
  if(xmin===xmax){xmin-=.005;xmax+=.005;}
  const values=log
-  ?scaleRows.flatMap(({p})=>[plotValue(card,p),p.ci_low,p.ci_high].filter(v=>known(v)&&v>0))
+  ?[...scaleRows.flatMap(({p})=>[plotValue(card,p),p.ci_low,p.ci_high].filter(v=>known(v)&&v>0)),...paperRows.map(({p})=>p.y)]
   :scaleRows.map(({p})=>plotValue(card,p));
  let ymin=Math.min(...values),ymax=Math.max(...values);
  if(log){
@@ -355,6 +372,20 @@ function drawPlot(card,box){
   }
   chart.append(group);
  }
+ for(const reference of overlays){
+  const s=shown.find(curve=>curve.series_id===reference.curve_id);
+  const color=colorFor(card,s);
+  const source=reference.source_kind==='digitized'?'Approximate paper point, digitized from the published figure':'Paper-reported point';
+  const group=svg('g',{class:'paper-markers','data-curve':s.series_id});
+  for(const p of reference.points){
+   const description=`${source}; ${s.label}; p=${fmt(p.x)}; ${reference.metric} ${fmt(p.y)}`;
+   const star=paperStar(X(plotX(s,p)),Y(p.y),color,description);
+   star.onfocus=()=>{caption.textContent=description;};
+   group.append(star);
+  }
+  chart.append(group);
+ }
+ if(overlays.length)figure.append(el('p',{class:'small muted'},'★ Paper-reported points share the color of the corresponding local curve.'));
  const axisKinds=new Set(scaleRows.map(({p})=>p.x_semantics||'physical_error_probability'));const xlabel=axisMode==='bit_flip'?'Component bit-flip probability p_bit flip':axisKinds.size>1?'Probability p / p₀ (see run settings)':axisKinds.has('circuit_setting_index')?'Circuit setting index':axisKinds.has('decoder_prior_probability')?'Decoder prior probability p₀':'Physical error probability p';
  if(axisMode==='bit_flip'){const note=el('div',{class:'axis-note small'});katex.render('p_{\\mathrm{bit\\ flip}}=\\frac{2}{3}p_{\\mathrm{depolarizing}}',note,{throwOnError:true});figure.append(note,el('p',{class:'small muted'},'Depolarizing coordinates are converted automatically; X-only coordinates are unchanged. Depolarizing noise has X, Y, Z each with probability p/3. The channels remain distinct.'));}
  if(log&&scaleRows.some(({p})=>bound(p)))figure.append(el('p',{class:'small muted'},'Zero failures: the error bar runs from zero to the reported upper confidence limit. Zero is below the logarithmic plot; these bounds are not joined by a curve.'));

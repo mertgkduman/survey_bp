@@ -32,8 +32,24 @@ function views(catalog,display){
      label:(figure.code_ids.length>1?(inputs.get(curve.circuit_id||curve.code_id)||curve.code_id)+' · ':'')+curve.label});
    }
   }
-  return {...figure,curves};
+  const original=new Map(members.map(s=>[s.series_id,s]));
+  const reference_curves=(figure.reference_curves||[]).map(({matches,...reference})=>{
+   const eligible=curves.filter(s=>s.code_id===reference.code_id&&s.channel_kind===reference.channel_kind);
+   const curve_ids=matches.flatMap(match=>eligible.filter(s=>s.provenance_members.some(member=>{
+    const source=original.get(member.series_id);
+    return source?.dataset_id===match.dataset_id&&source.source_decoder_id===match.source_decoder_id;
+   })).map(s=>s.series_id));
+   return {...reference,curve_ids};
+  });
+  return {...figure,curves,reference_curves};
  }).filter(figure=>figure.curves.length);
 }
-globalThis.ResearchFigures={views,reproduction};
+function overlays(figure,curves){
+ const chosen=new Set(curves.map(s=>s.series_id));
+ return (figure?.reference_curves||[]).flatMap(({curve_ids,...reference})=>{
+  const curve_id=curve_ids.find(id=>chosen.has(id));
+  return curve_id?[{...reference,curve_id}]:[];
+ });
+}
+globalThis.ResearchFigures={views,reproduction,overlays};
 })();

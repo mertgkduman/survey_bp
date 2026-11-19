@@ -243659,6 +243659,22 @@
     {
       "path": "research/catalog/paper-figures.json",
       "sha256": "bc1f2646f28b00cdcfa1dcb09904a8fd7be05403c8f0133c10677bd8163c4d1b"
+    },
+    {
+      "path": "data/reproductions/mackay-0304161-paper-rates/source_points.json",
+      "sha256": "d4d0b390943a5654d914a0a801bc7794a8c91615a128aa934dc6f414dae91c35"
+    },
+    {
+      "path": "data/reproductions/priortilt-2611-13373/source-figure1.csv",
+      "sha256": "06eb16faf57d96fdce459d2847a3f7ee1b290c2a67ac902ea8c9027a604e9221"
+    },
+    {
+      "path": "data/reproductions/roffe-2005-07016-bp/source_points.json",
+      "sha256": "5966c842a485cd76368879c024750442221de80323cc21de4e5f4460ffa97b4f"
+    },
+    {
+      "path": "data/reproductions/yao-2312-10950-non-osd/source_points.json",
+      "sha256": "f42c214770997ae514a4fb0347b52776cb93a8fa800483a4a2215905711aada9"
     }
   ],
   "limitations": [
@@ -243674,6 +243690,144 @@
       "label": "Figure 2 \"different decimation orders\" \u00b7 BPGD on B1",
       "note": "Canonical reproductions of the plotted BP/BPGD configurations; published sample counts and some numerical safeguards are unavailable. Additional curves include tuning and channel adaptations. BP-OSD and BP-SI source curves are outside this reproduced set.",
       "paper_id": "yao-2312-10950-v2",
+      "reference_curves": [
+        {
+          "channel_kind": "x_only",
+          "code_id": "b1",
+          "matches": [
+            {
+              "dataset_id": "yao-non-osd-results",
+              "source_decoder_id": "bp"
+            }
+          ],
+          "metric": "Block failure rate",
+          "points": [
+            {
+              "x": 0.04,
+              "y": 0.0434
+            },
+            {
+              "x": 0.05,
+              "y": 0.0867
+            },
+            {
+              "x": 0.06,
+              "y": 0.1449
+            },
+            {
+              "x": 0.07,
+              "y": 0.2505
+            },
+            {
+              "x": 0.08,
+              "y": 0.4448
+            },
+            {
+              "x": 0.09,
+              "y": 0.7141
+            },
+            {
+              "x": 0.1,
+              "y": 0.9139
+            }
+          ],
+          "source_kind": "published",
+          "source_paper_id": "yao-2312-10950-v2",
+          "source_path": "data/reproductions/yao-2312-10950-non-osd/source_points.json"
+        },
+        {
+          "channel_kind": "x_only",
+          "code_id": "b1",
+          "matches": [
+            {
+              "dataset_id": "yao-non-osd-results",
+              "source_decoder_id": "bpgd_random_t100"
+            }
+          ],
+          "metric": "Block failure rate",
+          "points": [
+            {
+              "x": 0.04,
+              "y": 2.3e-05
+            },
+            {
+              "x": 0.05,
+              "y": 0.000365
+            },
+            {
+              "x": 0.06,
+              "y": 0.005857
+            },
+            {
+              "x": 0.07,
+              "y": 0.061631
+            },
+            {
+              "x": 0.08,
+              "y": 0.268817
+            },
+            {
+              "x": 0.09,
+              "y": 0.578035
+            },
+            {
+              "x": 0.1,
+              "y": 0.862069
+            }
+          ],
+          "source_kind": "published",
+          "source_paper_id": "yao-2312-10950-v2",
+          "source_path": "data/reproductions/yao-2312-10950-non-osd/source_points.json"
+        },
+        {
+          "channel_kind": "x_only",
+          "code_id": "b1",
+          "matches": [
+            {
+              "dataset_id": "yao-bpgd-completion",
+              "source_decoder_id": "bpgd_t100_r882"
+            },
+            {
+              "dataset_id": "yao-non-osd-results",
+              "source_decoder_id": "bpgd_t100"
+            }
+          ],
+          "metric": "Block failure rate",
+          "points": [
+            {
+              "x": 0.04,
+              "y": 1e-06
+            },
+            {
+              "x": 0.05,
+              "y": 9.5e-05
+            },
+            {
+              "x": 0.06,
+              "y": 0.003031
+            },
+            {
+              "x": 0.07,
+              "y": 0.036055
+            },
+            {
+              "x": 0.08,
+              "y": 0.247002
+            },
+            {
+              "x": 0.09,
+              "y": 0.517766
+            },
+            {
+              "x": 0.1,
+              "y": 0.814516
+            }
+          ],
+          "source_kind": "published",
+          "source_paper_id": "yao-2312-10950-v2",
+          "source_path": "data/reproductions/yao-2312-10950-non-osd/source_points.json"
+        }
+      ],
       "reproduction_rules": [
         {
           "dataset_id": "yao-non-osd-results",
@@ -243706,6 +243860,244 @@
       "label": "Figure 3 \"different BP iterations per round\" \u00b7 BPGD on B1",
       "note": "Canonical reproductions of the plotted BP/BPGD configurations; published sample counts and some numerical safeguards are unavailable. Additional curves include tuning and channel adaptations. BP-OSD and BP-SI source curves are outside this reproduced set. The paper reports conflicting ordinates for the nominally identical T=10 curves in Figs. 3 and 4; their source scopes stay separate.",
       "paper_id": "yao-2312-10950-v2",
+      "reference_curves": [
+        {
+          "channel_kind": "x_only",
+          "code_id": "b1",
+          "matches": [
+            {
+              "dataset_id": "yao-non-osd-results",
+              "source_decoder_id": "bp"
+            }
+          ],
+          "metric": "Block failure rate",
+          "points": [
+            {
+              "x": 0.04,
+              "y": 0.0434
+            },
+            {
+              "x": 0.05,
+              "y": 0.0867
+            },
+            {
+              "x": 0.06,
+              "y": 0.1449
+            },
+            {
+              "x": 0.07,
+              "y": 0.2505
+            },
+            {
+              "x": 0.08,
+              "y": 0.4448
+            },
+            {
+              "x": 0.09,
+              "y": 0.7141
+            },
+            {
+              "x": 0.1,
+              "y": 0.9139
+            }
+          ],
+          "source_kind": "published",
+          "source_paper_id": "yao-2312-10950-v2",
+          "source_path": "data/reproductions/yao-2312-10950-non-osd/source_points.json"
+        },
+        {
+          "channel_kind": "x_only",
+          "code_id": "b1",
+          "matches": [
+            {
+              "dataset_id": "yao-bpgd-completion",
+              "source_decoder_id": "bpgd_t1_r882"
+            },
+            {
+              "dataset_id": "yao-non-osd-results",
+              "source_decoder_id": "bpgd_t1"
+            }
+          ],
+          "metric": "Block failure rate",
+          "points": [
+            {
+              "x": 0.04,
+              "y": 2.9e-05
+            },
+            {
+              "x": 0.05,
+              "y": 0.000391
+            },
+            {
+              "x": 0.06,
+              "y": 0.00606
+            },
+            {
+              "x": 0.07,
+              "y": 0.053763
+            },
+            {
+              "x": 0.08,
+              "y": 0.248768
+            },
+            {
+              "x": 0.09,
+              "y": 0.534759
+            },
+            {
+              "x": 0.1,
+              "y": 0.855932
+            }
+          ],
+          "source_kind": "published",
+          "source_paper_id": "yao-2312-10950-v2",
+          "source_path": "data/reproductions/yao-2312-10950-non-osd/source_points.json"
+        },
+        {
+          "channel_kind": "x_only",
+          "code_id": "b1",
+          "matches": [
+            {
+              "dataset_id": "yao-bpgd-completion",
+              "source_decoder_id": "bpgd_t10_r882"
+            },
+            {
+              "dataset_id": "yao-non-osd-results",
+              "source_decoder_id": "bpgd_t10"
+            }
+          ],
+          "metric": "Block failure rate",
+          "points": [
+            {
+              "x": 0.04,
+              "y": 6e-06
+            },
+            {
+              "x": 0.05,
+              "y": 0.000179
+            },
+            {
+              "x": 0.06,
+              "y": 0.003891
+            },
+            {
+              "x": 0.07,
+              "y": 0.038801
+            },
+            {
+              "x": 0.08,
+              "y": 0.216942
+            },
+            {
+              "x": 0.09,
+              "y": 0.595376
+            },
+            {
+              "x": 0.1,
+              "y": 0.863248
+            }
+          ],
+          "source_kind": "published",
+          "source_paper_id": "yao-2312-10950-v2",
+          "source_path": "data/reproductions/yao-2312-10950-non-osd/source_points.json"
+        },
+        {
+          "channel_kind": "x_only",
+          "code_id": "b1",
+          "matches": [
+            {
+              "dataset_id": "yao-bpgd-completion",
+              "source_decoder_id": "bpgd_t100_r882"
+            },
+            {
+              "dataset_id": "yao-non-osd-results",
+              "source_decoder_id": "bpgd_t100"
+            }
+          ],
+          "metric": "Block failure rate",
+          "points": [
+            {
+              "x": 0.04,
+              "y": 1e-06
+            },
+            {
+              "x": 0.05,
+              "y": 9.5e-05
+            },
+            {
+              "x": 0.06,
+              "y": 0.003031
+            },
+            {
+              "x": 0.07,
+              "y": 0.036055
+            },
+            {
+              "x": 0.08,
+              "y": 0.247002
+            },
+            {
+              "x": 0.09,
+              "y": 0.517766
+            },
+            {
+              "x": 0.1,
+              "y": 0.814516
+            }
+          ],
+          "source_kind": "published",
+          "source_paper_id": "yao-2312-10950-v2",
+          "source_path": "data/reproductions/yao-2312-10950-non-osd/source_points.json"
+        },
+        {
+          "channel_kind": "x_only",
+          "code_id": "b1",
+          "matches": [
+            {
+              "dataset_id": "yao-bpgd-completion",
+              "source_decoder_id": "bpgd_t70_r882"
+            },
+            {
+              "dataset_id": "yao-non-osd-results",
+              "source_decoder_id": "bpgd_t70"
+            }
+          ],
+          "metric": "Block failure rate",
+          "points": [
+            {
+              "x": 0.04,
+              "y": 2e-06
+            },
+            {
+              "x": 0.05,
+              "y": 0.000116
+            },
+            {
+              "x": 0.06,
+              "y": 0.003703
+            },
+            {
+              "x": 0.07,
+              "y": 0.042721
+            },
+            {
+              "x": 0.08,
+              "y": 0.213836
+            },
+            {
+              "x": 0.09,
+              "y": 0.507538
+            },
+            {
+              "x": 0.1,
+              "y": 0.834711
+            }
+          ],
+          "source_kind": "published",
+          "source_paper_id": "yao-2312-10950-v2",
+          "source_path": "data/reproductions/yao-2312-10950-non-osd/source_points.json"
+        }
+      ],
       "reproduction_rules": [
         {
           "dataset_id": "yao-non-osd-results",
@@ -243743,6 +244135,100 @@
       "label": "Figure 4 \"various decoders\" \u00b7 B1 under bit-flip noise",
       "note": "Canonical reproductions of the plotted BP/BPGD configurations; published sample counts and some numerical safeguards are unavailable. Additional curves include tuning and channel adaptations. BP-OSD and BP-SI source curves are outside this reproduced set. The paper reports conflicting ordinates for the nominally identical T=10 curves in Figs. 3 and 4; their source scopes stay separate.",
       "paper_id": "yao-2312-10950-v2",
+      "reference_curves": [
+        {
+          "channel_kind": "x_only",
+          "code_id": "b1",
+          "matches": [
+            {
+              "dataset_id": "yao-non-osd-results",
+              "source_decoder_id": "bp"
+            }
+          ],
+          "metric": "Block failure rate",
+          "points": [
+            {
+              "x": 0.04,
+              "y": 0.0434
+            },
+            {
+              "x": 0.05,
+              "y": 0.0867
+            },
+            {
+              "x": 0.06,
+              "y": 0.1449
+            },
+            {
+              "x": 0.07,
+              "y": 0.2505
+            },
+            {
+              "x": 0.08,
+              "y": 0.4448
+            },
+            {
+              "x": 0.09,
+              "y": 0.7141
+            },
+            {
+              "x": 0.1,
+              "y": 0.9139
+            }
+          ],
+          "source_kind": "published",
+          "source_paper_id": "yao-2312-10950-v2",
+          "source_path": "data/reproductions/yao-2312-10950-non-osd/source_points.json"
+        },
+        {
+          "channel_kind": "x_only",
+          "code_id": "b1",
+          "matches": [
+            {
+              "dataset_id": "yao-bpgd-completion",
+              "source_decoder_id": "bpgd_t10_r882"
+            },
+            {
+              "dataset_id": "yao-non-osd-results",
+              "source_decoder_id": "bpgd_t10"
+            }
+          ],
+          "metric": "Block failure rate",
+          "points": [
+            {
+              "x": 0.04,
+              "y": 3.21835e-06
+            },
+            {
+              "x": 0.05,
+              "y": 0.00016846279
+            },
+            {
+              "x": 0.06,
+              "y": 0.00367352876
+            },
+            {
+              "x": 0.07,
+              "y": 0.04541446208
+            },
+            {
+              "x": 0.08,
+              "y": 0.24343675417
+            },
+            {
+              "x": 0.09,
+              "y": 0.54594594594
+            },
+            {
+              "x": 0.1,
+              "y": 0.87179487179
+            }
+          ],
+          "source_kind": "published",
+          "source_paper_id": "yao-2312-10950-v2",
+          "source_path": "data/reproductions/yao-2312-10950-non-osd/source_points.json"
+        }
+      ],
       "reproduction_rules": [
         {
           "dataset_id": "yao-non-osd-results",
@@ -243774,6 +244260,100 @@
       "label": "Figure 5 \"various decoders\" \u00b7 C2 under bit-flip noise",
       "note": "Canonical reproductions of the plotted BP/BPGD configurations; published sample counts and some numerical safeguards are unavailable. Additional curves include tuning and channel adaptations. BP-OSD and BP-SI source curves are outside this reproduced set.",
       "paper_id": "yao-2312-10950-v2",
+      "reference_curves": [
+        {
+          "channel_kind": "x_only",
+          "code_id": "c2",
+          "matches": [
+            {
+              "dataset_id": "yao-non-osd-results",
+              "source_decoder_id": "bp"
+            }
+          ],
+          "metric": "Block failure rate",
+          "points": [
+            {
+              "x": 0.04,
+              "y": 0.080058
+            },
+            {
+              "x": 0.05,
+              "y": 0.157581
+            },
+            {
+              "x": 0.06,
+              "y": 0.268469
+            },
+            {
+              "x": 0.07,
+              "y": 0.400398
+            },
+            {
+              "x": 0.08,
+              "y": 0.636991
+            },
+            {
+              "x": 0.09,
+              "y": 0.872285
+            },
+            {
+              "x": 0.1,
+              "y": 0.983284
+            }
+          ],
+          "source_kind": "published",
+          "source_paper_id": "yao-2312-10950-v2",
+          "source_path": "data/reproductions/yao-2312-10950-non-osd/source_points.json"
+        },
+        {
+          "channel_kind": "x_only",
+          "code_id": "c2",
+          "matches": [
+            {
+              "dataset_id": "yao-bpgd-completion",
+              "source_decoder_id": "bpgd_t10_r1922"
+            },
+            {
+              "dataset_id": "yao-non-osd-results",
+              "source_decoder_id": "bpgd_t10"
+            }
+          ],
+          "metric": "Block failure rate",
+          "points": [
+            {
+              "x": 0.04,
+              "y": 0.000144
+            },
+            {
+              "x": 0.05,
+              "y": 0.00085
+            },
+            {
+              "x": 0.06,
+              "y": 0.0058
+            },
+            {
+              "x": 0.07,
+              "y": 0.035
+            },
+            {
+              "x": 0.08,
+              "y": 0.209
+            },
+            {
+              "x": 0.09,
+              "y": 0.628
+            },
+            {
+              "x": 0.1,
+              "y": 0.925
+            }
+          ],
+          "source_kind": "published",
+          "source_paper_id": "yao-2312-10950-v2",
+          "source_path": "data/reproductions/yao-2312-10950-non-osd/source_points.json"
+        }
+      ],
       "reproduction_rules": [
         {
           "dataset_id": "yao-non-osd-results",
@@ -243805,6 +244385,292 @@
       "label": "Figure 6 \"different decimation round limits\" \u00b7 BPGD on B1",
       "note": "Canonical reproductions of the plotted BP/BPGD configurations; published sample counts and some numerical safeguards are unavailable. Additional curves include tuning and channel adaptations. BP-OSD and BP-SI source curves are outside this reproduced set.",
       "paper_id": "yao-2312-10950-v2",
+      "reference_curves": [
+        {
+          "channel_kind": "x_only",
+          "code_id": "b1",
+          "matches": [
+            {
+              "dataset_id": "yao-non-osd-results",
+              "source_decoder_id": "bp"
+            }
+          ],
+          "metric": "Block failure rate",
+          "points": [
+            {
+              "x": 0.04,
+              "y": 0.0434
+            },
+            {
+              "x": 0.05,
+              "y": 0.0867
+            },
+            {
+              "x": 0.06,
+              "y": 0.1449
+            },
+            {
+              "x": 0.07,
+              "y": 0.2505
+            },
+            {
+              "x": 0.08,
+              "y": 0.4448
+            },
+            {
+              "x": 0.09,
+              "y": 0.7141
+            },
+            {
+              "x": 0.1,
+              "y": 0.9139
+            }
+          ],
+          "source_kind": "published",
+          "source_paper_id": "yao-2312-10950-v2",
+          "source_path": "data/reproductions/yao-2312-10950-non-osd/source_points.json"
+        },
+        {
+          "channel_kind": "x_only",
+          "code_id": "b1",
+          "matches": [
+            {
+              "dataset_id": "yao-bpgd-completion",
+              "source_decoder_id": "bpgd_t100_r10"
+            },
+            {
+              "dataset_id": "yao-non-osd-results",
+              "source_decoder_id": "bpgd_t100_r10"
+            }
+          ],
+          "metric": "Block failure rate",
+          "points": [
+            {
+              "x": 0.04,
+              "y": 0.000124
+            },
+            {
+              "x": 0.05,
+              "y": 0.00094
+            },
+            {
+              "x": 0.06,
+              "y": 0.01062
+            },
+            {
+              "x": 0.07,
+              "y": 0.081
+            },
+            {
+              "x": 0.08,
+              "y": 0.32
+            },
+            {
+              "x": 0.09,
+              "y": 0.675
+            },
+            {
+              "x": 0.1,
+              "y": 0.91
+            }
+          ],
+          "source_kind": "published",
+          "source_paper_id": "yao-2312-10950-v2",
+          "source_path": "data/reproductions/yao-2312-10950-non-osd/source_points.json"
+        },
+        {
+          "channel_kind": "x_only",
+          "code_id": "b1",
+          "matches": [
+            {
+              "dataset_id": "yao-bpgd-completion",
+              "source_decoder_id": "bpgd_t100_r2"
+            },
+            {
+              "dataset_id": "yao-non-osd-results",
+              "source_decoder_id": "bpgd_t100_r2"
+            }
+          ],
+          "metric": "Block failure rate",
+          "points": [
+            {
+              "x": 0.04,
+              "y": 0.00944
+            },
+            {
+              "x": 0.05,
+              "y": 0.0233
+            },
+            {
+              "x": 0.06,
+              "y": 0.0656
+            },
+            {
+              "x": 0.07,
+              "y": 0.1501
+            },
+            {
+              "x": 0.08,
+              "y": 0.3708
+            },
+            {
+              "x": 0.09,
+              "y": 0.6801
+            },
+            {
+              "x": 0.1,
+              "y": 0.9048
+            }
+          ],
+          "source_kind": "published",
+          "source_paper_id": "yao-2312-10950-v2",
+          "source_path": "data/reproductions/yao-2312-10950-non-osd/source_points.json"
+        },
+        {
+          "channel_kind": "x_only",
+          "code_id": "b1",
+          "matches": [
+            {
+              "dataset_id": "yao-bpgd-completion",
+              "source_decoder_id": "bpgd_t100_r5"
+            },
+            {
+              "dataset_id": "yao-non-osd-results",
+              "source_decoder_id": "bpgd_t100_r5"
+            }
+          ],
+          "metric": "Block failure rate",
+          "points": [
+            {
+              "x": 0.04,
+              "y": 0.000588
+            },
+            {
+              "x": 0.05,
+              "y": 0.003396
+            },
+            {
+              "x": 0.06,
+              "y": 0.022356
+            },
+            {
+              "x": 0.07,
+              "y": 0.091491
+            },
+            {
+              "x": 0.08,
+              "y": 0.31348
+            },
+            {
+              "x": 0.09,
+              "y": 0.694444
+            },
+            {
+              "x": 0.1,
+              "y": 0.877193
+            }
+          ],
+          "source_kind": "published",
+          "source_paper_id": "yao-2312-10950-v2",
+          "source_path": "data/reproductions/yao-2312-10950-non-osd/source_points.json"
+        },
+        {
+          "channel_kind": "x_only",
+          "code_id": "b1",
+          "matches": [
+            {
+              "dataset_id": "yao-bpgd-completion",
+              "source_decoder_id": "bpgd_t100_r50"
+            },
+            {
+              "dataset_id": "yao-non-osd-results",
+              "source_decoder_id": "bpgd_t100_r50"
+            }
+          ],
+          "metric": "Block failure rate",
+          "points": [
+            {
+              "x": 0.04,
+              "y": 6.9e-05
+            },
+            {
+              "x": 0.05,
+              "y": 0.00034
+            },
+            {
+              "x": 0.06,
+              "y": 0.006838
+            },
+            {
+              "x": 0.07,
+              "y": 0.060241
+            },
+            {
+              "x": 0.08,
+              "y": 0.263852
+            },
+            {
+              "x": 0.09,
+              "y": 0.625
+            },
+            {
+              "x": 0.1,
+              "y": 0.900901
+            }
+          ],
+          "source_kind": "published",
+          "source_paper_id": "yao-2312-10950-v2",
+          "source_path": "data/reproductions/yao-2312-10950-non-osd/source_points.json"
+        },
+        {
+          "channel_kind": "x_only",
+          "code_id": "b1",
+          "matches": [
+            {
+              "dataset_id": "yao-bpgd-completion",
+              "source_decoder_id": "bpgd_t100_r882"
+            },
+            {
+              "dataset_id": "yao-non-osd-results",
+              "source_decoder_id": "bpgd_t100_r882"
+            }
+          ],
+          "metric": "Block failure rate",
+          "points": [
+            {
+              "x": 0.04,
+              "y": 1e-06
+            },
+            {
+              "x": 0.05,
+              "y": 9.5e-05
+            },
+            {
+              "x": 0.06,
+              "y": 0.003031
+            },
+            {
+              "x": 0.07,
+              "y": 0.036055
+            },
+            {
+              "x": 0.08,
+              "y": 0.247002
+            },
+            {
+              "x": 0.09,
+              "y": 0.517766
+            },
+            {
+              "x": 0.1,
+              "y": 0.814516
+            }
+          ],
+          "source_kind": "published",
+          "source_paper_id": "yao-2312-10950-v2",
+          "source_path": "data/reproductions/yao-2312-10950-non-osd/source_points.json"
+        }
+      ],
       "reproduction_rules": [
         {
           "dataset_id": "yao-non-osd-results",
@@ -243844,6 +244710,96 @@
       "label": "Figure 7 \"over depolarizing noise\" \u00b7 Decoder comparison on A5",
       "note": "Canonical reproductions of the plotted BP/BPGD configurations; published sample counts and some numerical safeguards are unavailable. Additional curves include tuning and channel adaptations. BP-OSD and BP-SI source curves are outside this reproduced set.",
       "paper_id": "yao-2312-10950-v2",
+      "reference_curves": [
+        {
+          "channel_kind": "depolarizing",
+          "code_id": "a5",
+          "matches": [
+            {
+              "dataset_id": "yao-non-osd-results",
+              "source_decoder_id": "bpgd_t10"
+            }
+          ],
+          "metric": "Block failure rate",
+          "points": [
+            {
+              "x": 0.04,
+              "y": 5.8e-05
+            },
+            {
+              "x": 0.05,
+              "y": 0.000295
+            },
+            {
+              "x": 0.06,
+              "y": 0.001608
+            },
+            {
+              "x": 0.07,
+              "y": 0.00614
+            },
+            {
+              "x": 0.08,
+              "y": 0.02159
+            },
+            {
+              "x": 0.09,
+              "y": 0.055219
+            },
+            {
+              "x": 0.1,
+              "y": 0.124226
+            }
+          ],
+          "source_kind": "published",
+          "source_paper_id": "yao-2312-10950-v2",
+          "source_path": "data/reproductions/yao-2312-10950-non-osd/source_points.json"
+        },
+        {
+          "channel_kind": "depolarizing",
+          "code_id": "a5",
+          "matches": [
+            {
+              "dataset_id": "yao-non-osd-results",
+              "source_decoder_id": "qbp"
+            }
+          ],
+          "metric": "Block failure rate",
+          "points": [
+            {
+              "x": 0.04,
+              "y": 0.000236
+            },
+            {
+              "x": 0.05,
+              "y": 0.000876
+            },
+            {
+              "x": 0.06,
+              "y": 0.003159
+            },
+            {
+              "x": 0.07,
+              "y": 0.011972
+            },
+            {
+              "x": 0.08,
+              "y": 0.039651
+            },
+            {
+              "x": 0.09,
+              "y": 0.093809
+            },
+            {
+              "x": 0.1,
+              "y": 0.1443
+            }
+          ],
+          "source_kind": "published",
+          "source_paper_id": "yao-2312-10950-v2",
+          "source_path": "data/reproductions/yao-2312-10950-non-osd/source_points.json"
+        }
+      ],
       "reproduction_rules": [
         {
           "dataset_id": "yao-non-osd-results",
@@ -243869,6 +244825,96 @@
       "label": "Figure 8 \"over depolarizing noise\" \u00b7 Decoder comparison on B2",
       "note": "Canonical reproductions of the plotted BP/BPGD configurations; published sample counts and some numerical safeguards are unavailable. Additional curves include tuning and channel adaptations. BP-OSD and BP-SI source curves are outside this reproduced set.",
       "paper_id": "yao-2312-10950-v2",
+      "reference_curves": [
+        {
+          "channel_kind": "depolarizing",
+          "code_id": "b2",
+          "matches": [
+            {
+              "dataset_id": "yao-non-osd-results",
+              "source_decoder_id": "bpgd_t10"
+            }
+          ],
+          "metric": "Block failure rate",
+          "points": [
+            {
+              "x": 0.04,
+              "y": 8.4e-05
+            },
+            {
+              "x": 0.05,
+              "y": 0.00021
+            },
+            {
+              "x": 0.06,
+              "y": 0.000455
+            },
+            {
+              "x": 0.07,
+              "y": 0.000905
+            },
+            {
+              "x": 0.08,
+              "y": 0.001895
+            },
+            {
+              "x": 0.09,
+              "y": 0.004651
+            },
+            {
+              "x": 0.1,
+              "y": 0.009561
+            }
+          ],
+          "source_kind": "published",
+          "source_paper_id": "yao-2312-10950-v2",
+          "source_path": "data/reproductions/yao-2312-10950-non-osd/source_points.json"
+        },
+        {
+          "channel_kind": "depolarizing",
+          "code_id": "b2",
+          "matches": [
+            {
+              "dataset_id": "yao-non-osd-results",
+              "source_decoder_id": "qbp"
+            }
+          ],
+          "metric": "Block failure rate",
+          "points": [
+            {
+              "x": 0.04,
+              "y": 0.000406
+            },
+            {
+              "x": 0.05,
+              "y": 0.001265
+            },
+            {
+              "x": 0.06,
+              "y": 0.002569
+            },
+            {
+              "x": 0.07,
+              "y": 0.006755
+            },
+            {
+              "x": 0.08,
+              "y": 0.015077
+            },
+            {
+              "x": 0.09,
+              "y": 0.02978
+            },
+            {
+              "x": 0.1,
+              "y": 0.060326
+            }
+          ],
+          "source_kind": "published",
+          "source_paper_id": "yao-2312-10950-v2",
+          "source_path": "data/reproductions/yao-2312-10950-non-osd/source_points.json"
+        }
+      ],
       "reproduction_rules": [
         {
           "dataset_id": "yao-non-osd-results",
@@ -243897,6 +244943,524 @@
       "label": "Figure 3 \"Toric code threshold plot comparing the BP decoder (dashed lines) versus the BP+OSD-CS decoder (solid lines).\"",
       "note": "The default curves reproduce regular BP with the paper\u2019s codes, rate grids, min-sum schedule and T=n. Canonical floating-point and row-order conventions are documented adaptations. CS-10 and OSD-0 differ from the paper\u2019s CS-60 and belong to Additional curves, alongside Q-BP and tuning.",
       "paper_id": "roffe-2005-07016-v2",
+      "reference_curves": [
+        {
+          "channel_kind": "x_only",
+          "code_id": "toric11",
+          "matches": [
+            {
+              "dataset_id": "roffe-2020-figure3-canonical-bp",
+              "source_decoder_id": "binary_ms"
+            },
+            {
+              "dataset_id": "roffe-damping-confirmation",
+              "source_decoder_id": "binary_ms_baseline"
+            }
+          ],
+          "metric": "Block failure rate",
+          "points": [
+            {
+              "x": 0.01,
+              "y": 0.06553286834614931
+            },
+            {
+              "x": 0.02,
+              "y": 0.22415175820535796
+            },
+            {
+              "x": 0.03,
+              "y": 0.4155033422918876
+            },
+            {
+              "x": 0.04,
+              "y": 0.5936944617164118
+            },
+            {
+              "x": 0.05,
+              "y": 0.7355022745293188
+            },
+            {
+              "x": 0.06,
+              "y": 0.8379484056013935
+            },
+            {
+              "x": 0.07,
+              "y": 0.9056669116754571
+            },
+            {
+              "x": 0.08,
+              "y": 0.9474849527494775
+            },
+            {
+              "x": 0.09,
+              "y": 0.9714580393548005
+            },
+            {
+              "x": 0.091,
+              "y": 0.9736672604797408
+            },
+            {
+              "x": 0.092,
+              "y": 0.9748913319548882
+            },
+            {
+              "x": 0.093,
+              "y": 0.9767745035981831
+            },
+            {
+              "x": 0.094,
+              "y": 0.9783170918637185
+            },
+            {
+              "x": 0.095,
+              "y": 0.9795174728842225
+            },
+            {
+              "x": 0.096,
+              "y": 0.9807981883450878
+            },
+            {
+              "x": 0.097,
+              "y": 0.9819029166871883
+            },
+            {
+              "x": 0.098,
+              "y": 0.9832065155111466
+            },
+            {
+              "x": 0.099,
+              "y": 0.9841358908129948
+            },
+            {
+              "x": 0.1,
+              "y": 0.9851453557325777
+            },
+            {
+              "x": 0.101,
+              "y": 0.9861261207097846
+            },
+            {
+              "x": 0.102,
+              "y": 0.9869392107584342
+            },
+            {
+              "x": 0.103,
+              "y": 0.9878721143879707
+            },
+            {
+              "x": 0.105,
+              "y": 0.9893825056162023
+            },
+            {
+              "x": 0.106,
+              "y": 0.9900390522330276
+            },
+            {
+              "x": 0.107,
+              "y": 0.9907159498878527
+            },
+            {
+              "x": 0.108,
+              "y": 0.9913235606831721
+            },
+            {
+              "x": 0.109,
+              "y": 0.9919016345875211
+            },
+            {
+              "x": 0.11,
+              "y": 0.992200770591141
+            }
+          ],
+          "source_kind": "digitized",
+          "source_paper_id": "roffe-2005-07016-v2",
+          "source_path": "data/reproductions/roffe-2005-07016-bp/source_points.json"
+        },
+        {
+          "channel_kind": "x_only",
+          "code_id": "toric13",
+          "matches": [
+            {
+              "dataset_id": "roffe-2020-figure3-canonical-bp",
+              "source_decoder_id": "binary_ms"
+            },
+            {
+              "dataset_id": "roffe-damping-confirmation",
+              "source_decoder_id": "binary_ms_baseline"
+            }
+          ],
+          "metric": "Block failure rate",
+          "points": [
+            {
+              "x": 0.01,
+              "y": 0.09034575955276175
+            },
+            {
+              "x": 0.02,
+              "y": 0.2984248593864388
+            },
+            {
+              "x": 0.03,
+              "y": 0.5276405213711574
+            },
+            {
+              "x": 0.04,
+              "y": 0.7152784424732423
+            },
+            {
+              "x": 0.05,
+              "y": 0.844696425758181
+            },
+            {
+              "x": 0.06,
+              "y": 0.9215990322936434
+            },
+            {
+              "x": 0.07,
+              "y": 0.9633971337935971
+            },
+            {
+              "x": 0.08,
+              "y": 0.9838391862687912
+            },
+            {
+              "x": 0.09,
+              "y": 0.9932185079589627
+            },
+            {
+              "x": 0.091,
+              "y": 0.9937577326564823
+            },
+            {
+              "x": 0.092,
+              "y": 0.9944071877096496
+            },
+            {
+              "x": 0.093,
+              "y": 0.9947470717162937
+            },
+            {
+              "x": 0.094,
+              "y": 0.9952871262808799
+            },
+            {
+              "x": 0.095,
+              "y": 0.9956773480239668
+            },
+            {
+              "x": 0.096,
+              "y": 0.9961077698486068
+            },
+            {
+              "x": 0.098,
+              "y": 0.9966285285289058
+            },
+            {
+              "x": 0.099,
+              "y": 0.997069383127849
+            },
+            {
+              "x": 0.1,
+              "y": 0.997299907455823
+            },
+            {
+              "x": 0.101,
+              "y": 0.9975806177060715
+            },
+            {
+              "x": 0.102,
+              "y": 0.9977611160170716
+            },
+            {
+              "x": 0.103,
+              "y": 0.9979817694157083
+            },
+            {
+              "x": 0.104,
+              "y": 0.9981723729837587
+            },
+            {
+              "x": 0.105,
+              "y": 0.9982626715898104
+            },
+            {
+              "x": 0.106,
+              "y": 0.9984232226152848
+            },
+            {
+              "x": 0.107,
+              "y": 0.998563725944123
+            },
+            {
+              "x": 0.108,
+              "y": 0.9986942110251792
+            },
+            {
+              "x": 0.109,
+              "y": 0.9987945957669837
+            },
+            {
+              "x": 0.11,
+              "y": 0.9989351513573952
+            }
+          ],
+          "source_kind": "digitized",
+          "source_paper_id": "roffe-2005-07016-v2",
+          "source_path": "data/reproductions/roffe-2005-07016-bp/source_points.json"
+        },
+        {
+          "channel_kind": "x_only",
+          "code_id": "toric15",
+          "matches": [
+            {
+              "dataset_id": "roffe-2020-figure3-canonical-bp",
+              "source_decoder_id": "binary_ms"
+            },
+            {
+              "dataset_id": "roffe-damping-confirmation",
+              "source_decoder_id": "binary_ms_baseline"
+            }
+          ],
+          "metric": "Block failure rate",
+          "points": [
+            {
+              "x": 0.01,
+              "y": 0.11819311852185366
+            },
+            {
+              "x": 0.02,
+              "y": 0.3762508985289493
+            },
+            {
+              "x": 0.03,
+              "y": 0.6314242745136835
+            },
+            {
+              "x": 0.04,
+              "y": 0.8119561607126745
+            },
+            {
+              "x": 0.05,
+              "y": 0.9159750474046486
+            },
+            {
+              "x": 0.06,
+              "y": 0.966325901605824
+            },
+            {
+              "x": 0.07,
+              "y": 0.9877926840151711
+            },
+            {
+              "x": 0.08,
+              "y": 0.9960476998211157
+            },
+            {
+              "x": 0.09,
+              "y": 0.9987745180114352
+            },
+            {
+              "x": 0.091,
+              "y": 0.9988548314553312
+            },
+            {
+              "x": 0.092,
+              "y": 0.9990556433206796
+            },
+            {
+              "x": 0.093,
+              "y": 0.999095810538087
+            },
+            {
+              "x": 0.094,
+              "y": 0.9991861926819385
+            },
+            {
+              "x": 0.096,
+              "y": 0.9994071612341726
+            },
+            {
+              "x": 0.097,
+              "y": 0.9994573881744012
+            },
+            {
+              "x": 0.098,
+              "y": 0.9995478030279905
+            },
+            {
+              "x": 0.099,
+              "y": 0.9995678963284209
+            },
+            {
+              "x": 0.1,
+              "y": 0.9996382260608683
+            },
+            {
+              "x": 0.101,
+              "y": 0.9996683688895724
+            },
+            {
+              "x": 0.102,
+              "y": 0.9996985126271958
+            },
+            {
+              "x": 0.103,
+              "y": 0.9997487542097939
+            },
+            {
+              "x": 0.104,
+              "y": 0.9997688515498235
+            },
+            {
+              "x": 0.105,
+              "y": 0.9998090474418955
+            },
+            {
+              "x": 0.106,
+              "y": 0.9998492449500553
+            },
+            {
+              "x": 0.107,
+              "y": 0.9998391954215029
+            },
+            {
+              "x": 0.108,
+              "y": 0.9998793941417679
+            },
+            {
+              "x": 0.109,
+              "y": 0.9998994941079679
+            },
+            {
+              "x": 0.11,
+              "y": 0.9998894440743634
+            }
+          ],
+          "source_kind": "digitized",
+          "source_paper_id": "roffe-2005-07016-v2",
+          "source_path": "data/reproductions/roffe-2005-07016-bp/source_points.json"
+        },
+        {
+          "channel_kind": "x_only",
+          "code_id": "toric9",
+          "matches": [
+            {
+              "dataset_id": "roffe-2020-figure3-canonical-bp",
+              "source_decoder_id": "binary_ms"
+            },
+            {
+              "dataset_id": "roffe-damping-confirmation",
+              "source_decoder_id": "binary_ms_baseline"
+            }
+          ],
+          "metric": "Block failure rate",
+          "points": [
+            {
+              "x": 0.01,
+              "y": 0.044341278743843714
+            },
+            {
+              "x": 0.02,
+              "y": 0.1563005115822941
+            },
+            {
+              "x": 0.03,
+              "y": 0.30162738646826653
+            },
+            {
+              "x": 0.04,
+              "y": 0.45273042063247426
+            },
+            {
+              "x": 0.05,
+              "y": 0.5897038893935926
+            },
+            {
+              "x": 0.06,
+              "y": 0.7042921188788798
+            },
+            {
+              "x": 0.07,
+              "y": 0.7945182735119215
+            },
+            {
+              "x": 0.08,
+              "y": 0.8601523093683351
+            },
+            {
+              "x": 0.09,
+              "y": 0.9075349389517001
+            },
+            {
+              "x": 0.091,
+              "y": 0.9114474443026566
+            },
+            {
+              "x": 0.093,
+              "y": 0.918574977843835
+            },
+            {
+              "x": 0.094,
+              "y": 0.922331106126116
+            },
+            {
+              "x": 0.095,
+              "y": 0.9253396237339796
+            },
+            {
+              "x": 0.099,
+              "y": 0.9374250365849229
+            },
+            {
+              "x": 0.1,
+              "y": 0.9398685519149397
+            },
+            {
+              "x": 0.101,
+              "y": 0.9424889359620002
+            },
+            {
+              "x": 0.102,
+              "y": 0.9450881277855288
+            },
+            {
+              "x": 0.103,
+              "y": 0.9473897249291143
+            },
+            {
+              "x": 0.104,
+              "y": 0.949563299705351
+            },
+            {
+              "x": 0.105,
+              "y": 0.9518853627903485
+            },
+            {
+              "x": 0.106,
+              "y": 0.953877482281696
+            },
+            {
+              "x": 0.107,
+              "y": 0.9556912443678243
+            },
+            {
+              "x": 0.108,
+              "y": 0.9576335755296055
+            },
+            {
+              "x": 0.109,
+              "y": 0.9596377249639291
+            },
+            {
+              "x": 0.11,
+              "y": 0.9614044591848252
+            }
+          ],
+          "source_kind": "digitized",
+          "source_paper_id": "roffe-2005-07016-v2",
+          "source_path": "data/reproductions/roffe-2005-07016-bp/source_points.json"
+        }
+      ],
       "reproduction_rules": [
         {
           "dataset_id": "roffe-2020-figure3-canonical-bp",
@@ -243926,6 +245490,44 @@
       "label": "Figure 16 \"Performance of the construction-U code\" \u00b7 274 bits and 82 checks on a binary symmetric channel",
       "note": "No exact paper configuration is established: the iteration cap is unstated and T=100 is inferred. The source reports classical block errors; these curves report quantum block failures. All local runs are Additional curves. Length 74 has no source ordinate at the retained five rates.",
       "paper_id": "mackay-0304161-v3",
+      "reference_curves": [
+        {
+          "channel_kind": "x_only",
+          "code_id": "unicycle274",
+          "matches": [
+            {
+              "dataset_id": "mackay-inferred-t100-baseline",
+              "source_decoder_id": "unicycle_sp"
+            }
+          ],
+          "metric": "Classical block error rate",
+          "points": [
+            {
+              "x": 0.01,
+              "y": 6.6987415854056715e-06
+            },
+            {
+              "x": 0.013,
+              "y": 7.074690124032609e-05
+            },
+            {
+              "x": 0.02,
+              "y": 0.002230085570009857
+            },
+            {
+              "x": 0.03,
+              "y": 0.048341930691786106
+            },
+            {
+              "x": 0.04,
+              "y": 0.18078419336055465
+            }
+          ],
+          "source_kind": "digitized",
+          "source_paper_id": "mackay-0304161-v3",
+          "source_path": "data/reproductions/mackay-0304161-paper-rates/source_points.json"
+        }
+      ],
       "reproduction_rules": [],
       "source_caption": {
         "context": "274 bits and 82 checks on a binary symmetric channel",
@@ -244005,6 +245607,308 @@
       "label": "Figure 1 \"Logical error rates of PriorTilt, Relay-BP, and beam search decoders for the three benchmark codes.\"",
       "note": "Local confidence intervals use separately sampled X and Z memories.",
       "paper_id": "priortilt-2611-13373-v1",
+      "reference_curves": [
+        {
+          "channel_kind": "embedded_circuit",
+          "code_id": "priortilt-bb144-memory-x",
+          "matches": [
+            {
+              "dataset_id": "priortilt-figure-1-canonical",
+              "source_decoder_id": "priortilt-paper-beam"
+            }
+          ],
+          "metric": "Logical error rate per cycle",
+          "points": [
+            {
+              "x": 0.001,
+              "y": 6.5e-08
+            },
+            {
+              "x": 0.002,
+              "y": 5.441166691720201e-06
+            },
+            {
+              "x": 0.003,
+              "y": 0.00011014153457726738
+            },
+            {
+              "x": 0.004,
+              "y": 0.0013240820474950843
+            },
+            {
+              "x": 0.005,
+              "y": 0.011173111565604544
+            }
+          ],
+          "source_kind": "published",
+          "source_paper_id": "priortilt-2611-13373-v1",
+          "source_path": "data/reproductions/priortilt-2611-13373/source-figure1.csv"
+        },
+        {
+          "channel_kind": "embedded_circuit",
+          "code_id": "priortilt-bb144-memory-x",
+          "matches": [
+            {
+              "dataset_id": "priortilt-figure-1-canonical",
+              "source_decoder_id": "priortilt-paper-priortilt"
+            }
+          ],
+          "metric": "Logical error rate per cycle",
+          "points": [
+            {
+              "x": 0.001,
+              "y": 2.0822853284576558e-08
+            },
+            {
+              "x": 0.002,
+              "y": 2.466731055052689e-06
+            },
+            {
+              "x": 0.003,
+              "y": 5.740602031388392e-05
+            },
+            {
+              "x": 0.004,
+              "y": 0.0006761113644340866
+            },
+            {
+              "x": 0.005,
+              "y": 0.00439469945387781
+            }
+          ],
+          "source_kind": "published",
+          "source_paper_id": "priortilt-2611-13373-v1",
+          "source_path": "data/reproductions/priortilt-2611-13373/source-figure1.csv"
+        },
+        {
+          "channel_kind": "embedded_circuit",
+          "code_id": "priortilt-bb144-memory-x",
+          "matches": [
+            {
+              "dataset_id": "priortilt-figure-1-canonical",
+              "source_decoder_id": "priortilt-paper-relay"
+            }
+          ],
+          "metric": "Logical error rate per cycle",
+          "points": [
+            {
+              "x": 0.001,
+              "y": 8.966822110399222e-08
+            },
+            {
+              "x": 0.002,
+              "y": 5.4952897290183425e-06
+            },
+            {
+              "x": 0.003,
+              "y": 0.00010848123593886951
+            },
+            {
+              "x": 0.004,
+              "y": 0.0011181121796664932
+            },
+            {
+              "x": 0.005,
+              "y": 0.007860099786113831
+            }
+          ],
+          "source_kind": "published",
+          "source_paper_id": "priortilt-2611-13373-v1",
+          "source_path": "data/reproductions/priortilt-2611-13373/source-figure1.csv"
+        },
+        {
+          "channel_kind": "embedded_circuit",
+          "code_id": "priortilt-bb70-memory-x",
+          "matches": [
+            {
+              "dataset_id": "priortilt-figure-1-canonical",
+              "source_decoder_id": "priortilt-paper-beam"
+            }
+          ],
+          "metric": "Logical error rate per cycle",
+          "points": [
+            {
+              "x": 0.0005,
+              "y": 6.972222222222221e-08
+            },
+            {
+              "x": 0.0008,
+              "y": 3.763888888888889e-07
+            },
+            {
+              "x": 0.001,
+              "y": 9.80952380952381e-07
+            },
+            {
+              "x": 0.002,
+              "y": 2.8486966820419017e-05
+            }
+          ],
+          "source_kind": "published",
+          "source_paper_id": "priortilt-2611-13373-v1",
+          "source_path": "data/reproductions/priortilt-2611-13373/source-figure1.csv"
+        },
+        {
+          "channel_kind": "embedded_circuit",
+          "code_id": "priortilt-bb70-memory-x",
+          "matches": [
+            {
+              "dataset_id": "priortilt-figure-1-canonical",
+              "source_decoder_id": "priortilt-paper-priortilt"
+            }
+          ],
+          "metric": "Logical error rate per cycle",
+          "points": [
+            {
+              "x": 0.0005,
+              "y": 2.5427617873185898e-08
+            },
+            {
+              "x": 0.0008,
+              "y": 1.5657799418802937e-07
+            },
+            {
+              "x": 0.001,
+              "y": 4.6778764699367433e-07
+            },
+            {
+              "x": 0.002,
+              "y": 1.5085533154519537e-05
+            }
+          ],
+          "source_kind": "published",
+          "source_paper_id": "priortilt-2611-13373-v1",
+          "source_path": "data/reproductions/priortilt-2611-13373/source-figure1.csv"
+        },
+        {
+          "channel_kind": "embedded_circuit",
+          "code_id": "priortilt-bb70-memory-x",
+          "matches": [
+            {
+              "dataset_id": "priortilt-figure-1-canonical",
+              "source_decoder_id": "priortilt-paper-relay"
+            }
+          ],
+          "metric": "Logical error rate per cycle",
+          "points": [
+            {
+              "x": 0.0005,
+              "y": 8.986883756324493e-08
+            },
+            {
+              "x": 0.0008,
+              "y": 4.816781071295067e-07
+            },
+            {
+              "x": 0.001,
+              "y": 1.1130911166357822e-06
+            },
+            {
+              "x": 0.002,
+              "y": 2.428477297730926e-05
+            }
+          ],
+          "source_kind": "published",
+          "source_paper_id": "priortilt-2611-13373-v1",
+          "source_path": "data/reproductions/priortilt-2611-13373/source-figure1.csv"
+        },
+        {
+          "channel_kind": "embedded_circuit",
+          "code_id": "priortilt-gb102-memory-x",
+          "matches": [
+            {
+              "dataset_id": "priortilt-figure-1-canonical",
+              "source_decoder_id": "priortilt-paper-beam"
+            }
+          ],
+          "metric": "Logical error rate per cycle",
+          "points": [
+            {
+              "x": 0.0005,
+              "y": 2.3055555555555558e-08
+            },
+            {
+              "x": 0.0008,
+              "y": 1.911111111111111e-07
+            },
+            {
+              "x": 0.001,
+              "y": 5.8e-07
+            },
+            {
+              "x": 0.002,
+              "y": 2.8600900806211423e-05
+            }
+          ],
+          "source_kind": "published",
+          "source_paper_id": "priortilt-2611-13373-v1",
+          "source_path": "data/reproductions/priortilt-2611-13373/source-figure1.csv"
+        },
+        {
+          "channel_kind": "embedded_circuit",
+          "code_id": "priortilt-gb102-memory-x",
+          "matches": [
+            {
+              "dataset_id": "priortilt-figure-1-canonical",
+              "source_decoder_id": "priortilt-paper-priortilt"
+            }
+          ],
+          "metric": "Logical error rate per cycle",
+          "points": [
+            {
+              "x": 0.0005,
+              "y": 1.1666666666666667e-08
+            },
+            {
+              "x": 0.0008,
+              "y": 1.1244776224975803e-07
+            },
+            {
+              "x": 0.001,
+              "y": 3.6369821759844206e-07
+            },
+            {
+              "x": 0.002,
+              "y": 2.098878265545429e-05
+            }
+          ],
+          "source_kind": "published",
+          "source_paper_id": "priortilt-2611-13373-v1",
+          "source_path": "data/reproductions/priortilt-2611-13373/source-figure1.csv"
+        },
+        {
+          "channel_kind": "embedded_circuit",
+          "code_id": "priortilt-gb102-memory-x",
+          "matches": [
+            {
+              "dataset_id": "priortilt-figure-1-canonical",
+              "source_decoder_id": "priortilt-paper-relay"
+            }
+          ],
+          "metric": "Logical error rate per cycle",
+          "points": [
+            {
+              "x": 0.0005,
+              "y": 1.511111111111111e-08
+            },
+            {
+              "x": 0.0008,
+              "y": 1.760230863746578e-07
+            },
+            {
+              "x": 0.001,
+              "y": 4.86348004894521e-07
+            },
+            {
+              "x": 0.002,
+              "y": 2.455242688017085e-05
+            }
+          ],
+          "source_kind": "published",
+          "source_paper_id": "priortilt-2611-13373-v1",
+          "source_path": "data/reproductions/priortilt-2611-13373/source-figure1.csv"
+        }
+      ],
       "reproduction_rules": [
         {
           "dataset_id": "priortilt-figure-1-canonical",
@@ -244041,6 +245945,108 @@
       "label": "Figure 1 \"Logical error rates of PriorTilt, Relay-BP, and beam search decoders for the three benchmark codes.\"",
       "note": "This is the canonical circuit-level adaptation of the comparison in PriorTilt Figure 1, with separately sampled X and Z memories. It uses the PriorTilt paper's configuration and is attributed to that paper.",
       "paper_id": "relaybp-2506-01779-v2",
+      "reference_curves": [
+        {
+          "channel_kind": "embedded_circuit",
+          "code_id": "priortilt-bb144-memory-x",
+          "matches": [
+            {
+              "dataset_id": "priortilt-figure-1-canonical",
+              "source_decoder_id": "priortilt-paper-relay"
+            }
+          ],
+          "metric": "Logical error rate per cycle",
+          "points": [
+            {
+              "x": 0.001,
+              "y": 8.966822110399222e-08
+            },
+            {
+              "x": 0.002,
+              "y": 5.4952897290183425e-06
+            },
+            {
+              "x": 0.003,
+              "y": 0.00010848123593886951
+            },
+            {
+              "x": 0.004,
+              "y": 0.0011181121796664932
+            },
+            {
+              "x": 0.005,
+              "y": 0.007860099786113831
+            }
+          ],
+          "source_kind": "published",
+          "source_paper_id": "priortilt-2611-13373-v1",
+          "source_path": "data/reproductions/priortilt-2611-13373/source-figure1.csv"
+        },
+        {
+          "channel_kind": "embedded_circuit",
+          "code_id": "priortilt-bb70-memory-x",
+          "matches": [
+            {
+              "dataset_id": "priortilt-figure-1-canonical",
+              "source_decoder_id": "priortilt-paper-relay"
+            }
+          ],
+          "metric": "Logical error rate per cycle",
+          "points": [
+            {
+              "x": 0.0005,
+              "y": 8.986883756324493e-08
+            },
+            {
+              "x": 0.0008,
+              "y": 4.816781071295067e-07
+            },
+            {
+              "x": 0.001,
+              "y": 1.1130911166357822e-06
+            },
+            {
+              "x": 0.002,
+              "y": 2.428477297730926e-05
+            }
+          ],
+          "source_kind": "published",
+          "source_paper_id": "priortilt-2611-13373-v1",
+          "source_path": "data/reproductions/priortilt-2611-13373/source-figure1.csv"
+        },
+        {
+          "channel_kind": "embedded_circuit",
+          "code_id": "priortilt-gb102-memory-x",
+          "matches": [
+            {
+              "dataset_id": "priortilt-figure-1-canonical",
+              "source_decoder_id": "priortilt-paper-relay"
+            }
+          ],
+          "metric": "Logical error rate per cycle",
+          "points": [
+            {
+              "x": 0.0005,
+              "y": 1.511111111111111e-08
+            },
+            {
+              "x": 0.0008,
+              "y": 1.760230863746578e-07
+            },
+            {
+              "x": 0.001,
+              "y": 4.86348004894521e-07
+            },
+            {
+              "x": 0.002,
+              "y": 2.455242688017085e-05
+            }
+          ],
+          "source_kind": "published",
+          "source_paper_id": "priortilt-2611-13373-v1",
+          "source_path": "data/reproductions/priortilt-2611-13373/source-figure1.csv"
+        }
+      ],
       "reproduction_rules": [],
       "source_caption": {
         "quote": "Logical error rates of PriorTilt, Relay-BP, and beam search decoders for the three benchmark codes."
@@ -244067,6 +246073,108 @@
       "label": "Figure 1 \"Logical error rates of PriorTilt, Relay-BP, and beam search decoders for the three benchmark codes.\"",
       "note": "This is the canonical circuit-level adaptation of the comparison in PriorTilt Figure 1, with separately sampled X and Z memories. It uses the PriorTilt paper's configuration and is attributed to that paper.",
       "paper_id": "beamsearch-2512-07057-v2",
+      "reference_curves": [
+        {
+          "channel_kind": "embedded_circuit",
+          "code_id": "priortilt-bb144-memory-x",
+          "matches": [
+            {
+              "dataset_id": "priortilt-figure-1-canonical",
+              "source_decoder_id": "priortilt-paper-beam"
+            }
+          ],
+          "metric": "Logical error rate per cycle",
+          "points": [
+            {
+              "x": 0.001,
+              "y": 6.5e-08
+            },
+            {
+              "x": 0.002,
+              "y": 5.441166691720201e-06
+            },
+            {
+              "x": 0.003,
+              "y": 0.00011014153457726738
+            },
+            {
+              "x": 0.004,
+              "y": 0.0013240820474950843
+            },
+            {
+              "x": 0.005,
+              "y": 0.011173111565604544
+            }
+          ],
+          "source_kind": "published",
+          "source_paper_id": "priortilt-2611-13373-v1",
+          "source_path": "data/reproductions/priortilt-2611-13373/source-figure1.csv"
+        },
+        {
+          "channel_kind": "embedded_circuit",
+          "code_id": "priortilt-bb70-memory-x",
+          "matches": [
+            {
+              "dataset_id": "priortilt-figure-1-canonical",
+              "source_decoder_id": "priortilt-paper-beam"
+            }
+          ],
+          "metric": "Logical error rate per cycle",
+          "points": [
+            {
+              "x": 0.0005,
+              "y": 6.972222222222221e-08
+            },
+            {
+              "x": 0.0008,
+              "y": 3.763888888888889e-07
+            },
+            {
+              "x": 0.001,
+              "y": 9.80952380952381e-07
+            },
+            {
+              "x": 0.002,
+              "y": 2.8486966820419017e-05
+            }
+          ],
+          "source_kind": "published",
+          "source_paper_id": "priortilt-2611-13373-v1",
+          "source_path": "data/reproductions/priortilt-2611-13373/source-figure1.csv"
+        },
+        {
+          "channel_kind": "embedded_circuit",
+          "code_id": "priortilt-gb102-memory-x",
+          "matches": [
+            {
+              "dataset_id": "priortilt-figure-1-canonical",
+              "source_decoder_id": "priortilt-paper-beam"
+            }
+          ],
+          "metric": "Logical error rate per cycle",
+          "points": [
+            {
+              "x": 0.0005,
+              "y": 2.3055555555555558e-08
+            },
+            {
+              "x": 0.0008,
+              "y": 1.911111111111111e-07
+            },
+            {
+              "x": 0.001,
+              "y": 5.8e-07
+            },
+            {
+              "x": 0.002,
+              "y": 2.8600900806211423e-05
+            }
+          ],
+          "source_kind": "published",
+          "source_paper_id": "priortilt-2611-13373-v1",
+          "source_path": "data/reproductions/priortilt-2611-13373/source-figure1.csv"
+        }
+      ],
       "reproduction_rules": [],
       "source_caption": {
         "quote": "Logical error rates of PriorTilt, Relay-BP, and beam search decoders for the three benchmark codes."
