@@ -478,6 +478,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 | 261119-ksp | Display recorded PriorTilt work and timing by memory basis | 2026-11-19 | 02dfe835 | Verified 39 rows, guest panels, and CSV export | [261119-ksp-display-recorded-priortilt-work-and-timi](./quick/261119-ksp-display-recorded-priortilt-work-and-timi/) |
 | 261119-kxq | Plot 307 paper-reported points as matching stars on reproduced figures | 2026-11-19 | d105c23f | — | [261119-kxq-plot-paper-reported-points-as-matching-s](./quick/261119-kxq-plot-paper-reported-points-as-matching-s/) |
 | 261119-l5k | Constrain all results cells and publish audited failure counts | 2026-11-19 | 54d52adf | Verified 39 points, 29 tests, and Chromium | [261119-l5k](./quick/261119-l5k-fix-all-research-result-table-rows-and-c/) |
+| 261119-n2q | Match source panel layouts in available results | 2026-11-19 | 92391dfa | 29 tests and Chromium layout checks passed | [261119-n2q](./quick/261119-n2q-match-paper-figure-panel-layouts-in-avai/) |
 
 ### Roadmap Evolution
 
