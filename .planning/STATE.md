@@ -477,6 +477,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 | 261119-jgk | Constrain Construction U table cells and show full hover text | 2026-11-19 | 843cbf10 | Verified at desktop, comparison, and mobile widths | [261119-jgk-constrain-construction-u-table-cells-and](./quick/261119-jgk-constrain-construction-u-table-cells-and/) |
 | 261119-ksp | Display recorded PriorTilt work and timing by memory basis | 2026-11-19 | 02dfe835 | Verified 39 rows, guest panels, and CSV export | [261119-ksp-display-recorded-priortilt-work-and-timi](./quick/261119-ksp-display-recorded-priortilt-work-and-timi/) |
 | 261119-kxq | Plot 307 paper-reported points as matching stars on reproduced figures | 2026-11-19 | d105c23f | — | [261119-kxq-plot-paper-reported-points-as-matching-s](./quick/261119-kxq-plot-paper-reported-points-as-matching-s/) |
+| 261119-l5k | Constrain all results cells and publish audited failure counts | 2026-11-19 | 54d52adf | Verified 39 points, 29 tests, and Chromium | [261119-l5k](./quick/261119-l5k-fix-all-research-result-table-rows-and-c/) |
 
 ### Roadmap Evolution
 
