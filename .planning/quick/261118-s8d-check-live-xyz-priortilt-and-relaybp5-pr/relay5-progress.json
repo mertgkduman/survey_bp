@@ -1,0 +1,37 @@
+{
+  "bases": {
+    "x": {
+      "biased_node_updates": 287515043517,
+      "decode_ns": 48100200400962,
+      "directed_edge_updates": 3324374139312,
+      "errors": 0,
+      "iterations": 4246079,
+      "joint_counts": [
+        6848,
+        0,
+        0,
+        0
+      ],
+      "nonconvergence": 0,
+      "random_draws": 5325269184,
+      "shots": 6848
+    },
+    "z": {
+      "biased_node_updates": 291546791393,
+      "decode_ns": 49627326964546,
+      "directed_edge_updates": 3373197183360,
+      "errors": 1,
+      "iterations": 4310024,
+      "joint_counts": [
+        6783,
+        0,
+        0,
+        1
+      ],
+      "nonconvergence": 1,
+      "random_draws": 5386419504,
+      "shots": 6784
+    }
+  },
+  "job": "bb144-p003000-xyz-relay5"
+}

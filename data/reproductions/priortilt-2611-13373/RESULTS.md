@@ -1,6 +1,6 @@
 # PriorTilt Fig. 1 — canonical reproduction campaign
 
-28/39 complete plotted points passed the fresh-process full-ledger audit. The original workers used one CPU; remaining points continue under the ten-CPU resource amendment, sharing one process pool across the X/Z memory runs.
+39/39 complete plotted points passed the fresh-process full-ledger audit. The original workers used one CPU; remaining points continue under the ten-CPU resource amendment, sharing one process pool across the X/Z memory runs.
 
 Source: [Ye and Delfosse, arXiv:2611.13373v1](https://arxiv.org/html/2611.13373v1), Fig. 1; exact released circuits, rates and full-precision three-phase schedules. This is a canonical float64 adaptation; native prefix/suffix arithmetic and RNG are separate references.
 
@@ -10,6 +10,9 @@ The CSV retains both denominators, errors, nonconvergence, mean all-path BP swee
 
 | Code | p | Decoder | X errors / shots | Z errors / shots | Local LER/cycle (95%) | Paper LER/cycle | Local/paper | Paper inside local interval |
 |---|---:|---|---:|---:|---:|---:|---:|---|
+| BB144 | 0.001 | priortilt | 19/100000000 | 16/100000000 | 2.917e-08 [1.583e-08, 4.907e-08] | 2.082e-08 | 1.4 | True |
+| BB144 | 0.001 | relay | 20/37143730 | 20/41669172 | 8.487e-08 [4.811e-08, 1.33e-07] | 8.967e-08 | 0.946 | True |
+| BB144 | 0.001 | beam | 20/53664836 | 20/68213472 | 5.549e-08 [3.146e-08, 8.693e-08] | 6.5e-08 | 0.854 | True |
 | BB144 | 0.002 | priortilt | 20/1256803 | 20/1192846 | 2.723e-06 [1.544e-06, 4.266e-06] | 2.467e-06 | 1.1 | True |
 | BB144 | 0.002 | relay | 20/719387 | 20/477417 | 5.808e-06 [3.293e-06, 9.099e-06] | 5.495e-06 | 1.06 | True |
 | BB144 | 0.002 | beam | 20/690348 | 20/888778 | 4.289e-06 [2.432e-06, 6.72e-06] | 5.441e-06 | 0.788 | True |
@@ -22,7 +25,9 @@ The CSV retains both denominators, errors, nonconvergence, mean all-path BP swee
 | BB144 | 0.005 | priortilt | 20/650 | 20/566 | 0.005509 [0.003143, 0.008556] | 0.004395 | 1.25 | True |
 | BB144 | 0.005 | relay | 20/315 | 20/393 | 0.009532 [0.005465, 0.01471] | 0.00786 | 1.21 | True |
 | BB144 | 0.005 | beam | 20/280 | 20/338 | 0.01088 [0.00625, 0.01676] | 0.01117 | 0.974 | True |
+| BB70 | 0.0005 | priortilt | 8/100000000 | 18/100000000 | 2.889e-08 [1.431e-08, 5.232e-08] | 2.543e-08 | 1.14 | True |
 | BB70 | 0.0005 | relay | 20/62610970 | 20/59078786 | 7.311e-08 [4.145e-08, 1.145e-07] | 8.987e-08 | 0.813 | True |
+| BB70 | 0.0005 | beam | 18/100000000 | 20/41011040 | 7.419e-08 [4.167e-08, 1.183e-07] | 6.972e-08 | 1.06 | True |
 | BB70 | 0.0008 | priortilt | 20/50216098 | 20/17759307 | 1.694e-07 [9.603e-08, 2.654e-07] | 1.566e-07 | 1.08 | True |
 | BB70 | 0.0008 | relay | 20/13234136 | 20/8569842 | 4.272e-07 [2.422e-07, 6.693e-07] | 4.817e-07 | 0.887 | True |
 | BB70 | 0.0008 | beam | 20/16307665 | 20/9612294 | 3.675e-07 [2.083e-07, 5.757e-07] | 3.764e-07 | 0.976 | True |
@@ -32,6 +37,12 @@ The CSV retains both denominators, errors, nonconvergence, mean all-path BP swee
 | BB70 | 0.002 | priortilt | 20/398510 | 20/366703 | 1.164e-05 [6.597e-06, 1.823e-05] | 1.509e-05 | 0.771 | True |
 | BB70 | 0.002 | relay | 20/170875 | 20/248101 | 2.196e-05 [1.245e-05, 3.441e-05] | 2.428e-05 | 0.904 | True |
 | BB70 | 0.002 | beam | 20/117935 | 20/156889 | 3.301e-05 [1.871e-05, 5.171e-05] | 2.849e-05 | 1.16 | True |
+| GB102 | 0.0005 | priortilt | 6/100000000 | 5/100000000 | 1.222e-08 [3.589e-09, 2.997e-08] | 1.167e-08 | 1.05 | True |
+| GB102 | 0.0005 | relay | 9/100000000 | 8/100000000 | 1.889e-08 [7.41e-09, 3.933e-08] | 1.511e-08 | 1.25 | True |
+| GB102 | 0.0005 | beam | 7/100000000 | 6/100000000 | 1.444e-08 [4.792e-09, 3.315e-08] | 2.306e-08 | 0.627 | True |
+| GB102 | 0.0008 | priortilt | 20/33064976 | 20/35932181 | 1.291e-07 [7.316e-08, 2.022e-07] | 1.124e-07 | 1.15 | True |
+| GB102 | 0.0008 | relay | 20/25499672 | 20/35250303 | 1.502e-07 [8.514e-08, 2.353e-07] | 1.76e-07 | 0.853 | True |
+| GB102 | 0.0008 | beam | 20/21541473 | 20/22323309 | 2.027e-07 [1.149e-07, 3.176e-07] | 1.911e-07 | 1.06 | True |
 | GB102 | 0.001 | priortilt | 20/10442982 | 20/12928582 | 3.847e-07 [2.181e-07, 6.026e-07] | 3.637e-07 | 1.06 | True |
 | GB102 | 0.001 | relay | 20/8178778 | 20/13101473 | 4.413e-07 [2.502e-07, 6.914e-07] | 4.863e-07 | 0.907 | True |
 | GB102 | 0.001 | beam | 20/7643051 | 20/6864264 | 6.145e-07 [3.484e-07, 9.627e-07] | 5.8e-07 | 1.06 | True |

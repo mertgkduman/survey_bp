@@ -1,0 +1,37 @@
+{
+  "bases": {
+    "x": {
+      "biased_node_updates": 111118429,
+      "decode_ns": 38804016530928,
+      "directed_edge_updates": 4488052552560,
+      "errors": 1,
+      "iterations": 5732395,
+      "joint_counts": [
+        28671,
+        1,
+        0,
+        0
+      ],
+      "nonconvergence": 0,
+      "random_draws": 44036617,
+      "shots": 28672
+    },
+    "z": {
+      "biased_node_updates": 113278722,
+      "decode_ns": 39191840819877,
+      "directed_edge_updates": 4565003723280,
+      "errors": 2,
+      "iterations": 5832827,
+      "joint_counts": [
+        28606,
+        1,
+        0,
+        1
+      ],
+      "nonconvergence": 1,
+      "random_draws": 45034257,
+      "shots": 28608
+    }
+  },
+  "job": "bb144-p003000-xyz-priortilt"
+}
