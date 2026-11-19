@@ -140,13 +140,19 @@ def verify(output,url):
         assert figure.locator('tbody tr').count()==39
         assert figure.locator('.paper-star').count()==39
         table=figure.locator('.table-wrap table')
+        assert table.evaluate('n => getComputedStyle(n).tableLayout')=='fixed'
+        assert table.locator('tbody td').evaluate_all('cells => cells.every(cell => cell.title===cell.textContent)')
+        assert table.locator('tbody td:first-child').evaluate_all('cells => cells.some(cell => cell.scrollWidth>cell.clientWidth)')
         columns=table.locator('thead th').all_text_contents()
         first=dict(zip(columns,table.locator('tbody tr').first.locator('td').all_text_contents()))
+        assert first['Type I / II']=='X 2 / 17 · Z 2 / 14'
+        split_column=columns.index('Type I / II')+1
+        assert all(value.startswith('X ') and ' · Z ' in value for value in table.locator(f'tbody td:nth-child({split_column})').all_text_contents())
         assert first['Mean iterations / shot']=='X 9.4872 sweeps / Z 10.686 sweeps'
         assert first['Mean directed edge updates / shot']=='X 581980 / Z 655510'
         assert first['Time']=='X 4.234 ms / Z 4.6831 ms'
         assert 'decoder instrumentation' in figure.inner_text()
-        checks.append('PriorTilt Figure 1 shows the recorded work and instrumented timing separately for X and Z')
+        checks.append('PriorTilt Figure 1 contains all cells within their columns and shows failure counts, work and timing separately for X and Z')
         prior=page.locator('[data-paper=priortilt-2611-13373-v1]')
         caption=prior.locator('[data-figure=priortilt-figure-1] .card-heading q').text_content()
         assert caption=='Logical error rates of PriorTilt, Relay-BP, and beam search decoders for the three benchmark codes.'

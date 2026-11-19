@@ -1168,6 +1168,8 @@ def _add_priortilt_results(catalog: dict[str, Any], repository: Path) -> None:
     path = f"{base}/comparison.csv"
     if not (repository / path).is_file():
         return
+    split_path = f"{base}/failure-types.csv"
+    splits = {row["point"]: row for row in _csv_rows(repository / split_path)} if (repository / split_path).is_file() else {}
     paper_id = "priortilt-2611-13373-v1"
     dataset_id = "priortilt-figure-1-canonical"
     catalog["papers"].append({"paper_id": paper_id, "title": "PriorTilt: Decoding quantum LDPC codes with sparse perturbations of belief propagation priors", "identity": "arXiv:2611.13373v1", "kind": "paper", "source_url": "https://arxiv.org/abs/2611.13373v1", "evidence_path": f"{base}/RESULTS.md"})
@@ -1181,6 +1183,9 @@ def _add_priortilt_results(catalog: dict[str, Any], repository: Path) -> None:
     points = []
     grouped = {}
     for row in _csv_rows(repository / path):
+        split = splits.get(row["point"])
+        if split is not None and split["audit_sha256"] != row["audit_sha256"]:
+            raise ValueError(f"PriorTilt failure counts refer to a different audit for {row['point']}")
         metadata = {
             "source_figure": "1",
             "source_evidence_path": path,
@@ -1195,6 +1200,13 @@ def _add_priortilt_results(catalog: dict[str, Any], repository: Path) -> None:
             for field in ("shots", "errors", "nonconvergence"):
                 key = f"{basis}_{field}"
                 metadata[key] = _integer(row[key])
+            if split is not None:
+                type_i = int(split[f"{basis}_type_i"])
+                type_ii = int(split[f"{basis}_type_ii"])
+                if min(type_i, type_ii) < 0 or type_i + type_ii != metadata[f"{basis}_errors"] or type_i > metadata[f"{basis}_nonconvergence"]:
+                    raise ValueError(f"PriorTilt Type I/II counts disagree with {row['point']} {basis} totals")
+                metadata[f"{basis}_type_i"] = type_i
+                metadata[f"{basis}_type_ii"] = type_ii
             for field in ("mean_iterations", "mean_directed_edge_updates", "mean_decode_ms"):
                 key = f"{basis}_{field}"
                 metadata[key] = _number(row[key])
@@ -1205,7 +1217,11 @@ def _add_priortilt_results(catalog: dict[str, Any], repository: Path) -> None:
         )
         points.append(point)
         grouped.setdefault((row["code"], row["method"]), []).append(point)
-    catalog["datasets"].append(_dataset(dataset_id, label="PriorTilt Figure 1 canonical X/Z comparison", paper_id=paper_id, evidence_status="canonical_adaptation", source_path=path, points=points, assets=[_asset(repository, path, label="Audited comparison", kind="csv"), _asset(repository, f"{base}/RESULTS.md", label="Reproduction report", kind="report")], caveat="Separate X/Z samples with 20-error or 100-million-shot per-basis stopping; local bounds and paper uncertainty use different conventions."))
+    assets = [_asset(repository, path, label="Audited comparison", kind="csv"),
+              _asset(repository, f"{base}/RESULTS.md", label="Reproduction report", kind="report")]
+    if splits:
+        assets.append(_asset(repository, split_path, label="Audited Type I and II counts by memory basis", kind="csv"))
+    catalog["datasets"].append(_dataset(dataset_id, label="PriorTilt Figure 1 canonical X/Z comparison", paper_id=paper_id, evidence_status="canonical_adaptation", source_path=path, points=points, assets=assets, caveat="Separate X/Z samples with 20-error or 100-million-shot per-basis stopping; local bounds and paper uncertainty use different conventions."))
     for (code, method), members in grouped.items():
         decoder_id = f"priortilt-paper-{method}"
         catalog["result_series"].append({"dataset_id": dataset_id, "code_id": code_ids[code], "decoder_id": decoder_id, "source_decoder_id": decoder_id, "label": names[method], "channel_kind": "embedded_circuit", "points": members, "series_id": f"{dataset_id}-{code.lower()}-{method}"})

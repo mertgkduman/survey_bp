@@ -54,7 +54,7 @@ textarea[readonly] { background:#f7faf9; }
 .request-panel .actions { align-items:center; }
 #request-summary { overflow-wrap:anywhere; }
 
-.table-wrap .work-average { width:8rem; min-width:8rem; max-width:8rem; white-space:normal; }
+.table-wrap .work-average { width:8rem; }
 .paper-heading { margin-bottom:1rem; }
 .paper-heading:empty { display:none; }
 .paper-heading a { font-size:inherit; }
@@ -88,7 +88,7 @@ textarea[readonly] { background:#f7faf9; }
 .mackay-results { margin:1rem 0; }
 @media(max-width:480px) { .policy-glossary { grid-template-columns:minmax(0,1fr); } }
 .mackay-results .table-wrap { max-height:30rem; overflow:auto; }
-.mackay-results table { table-layout:fixed; min-width:46rem; }
-.mackay-results thead th { position:sticky; top:0; z-index:1; white-space:normal; overflow-wrap:anywhere; }
-.mackay-results .table-wrap th:first-child { width:15rem; min-width:0; }
-.mackay-results tbody :is(th,td) { overflow:hidden; text-overflow:ellipsis; }
+.results-table { table-layout:fixed; min-width:46rem; }
+.results-table thead th { position:sticky; top:0; z-index:1; white-space:normal; overflow-wrap:anywhere; }
+.table-wrap .results-table :is(th,td):first-child { width:15rem; min-width:0; }
+.table-wrap .results-table tbody :is(th,td) { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }

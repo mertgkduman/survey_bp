@@ -401,6 +401,13 @@ function memoryBasisMeans(point,field,unit=''){
  if(!means.some(known))return null;
  return means.map((mean,index)=>`${index===0?'X':'Z'} ${known(mean)?fmt(mean)+unit:'Unavailable'}`).join(' / ');
 }
+function failureTypes(point){
+ const pair=(typeI,typeII)=>`${count(typeI)} / ${count(typeII)}`;
+ if(known(point.x_type_i)&&known(point.z_type_i)){
+  return `X ${pair(point.x_type_i,point.x_type_ii)} · Z ${pair(point.z_type_i,point.z_type_ii)}`;
+ }
+ return pair(point.type_i,point.type_ii);
+}
 function headers(card){return [...tableStart,...(pairedMemory(card)?['Paper LER / cycle']:[]),...(showOtherWork(card)?['Other recorded work / shot']:[]),...(showOsdWork(card)?['OSD calls / shot','Mean OSD candidates / shot','Mean OSD time / shot']:[]),...(showRuntimeBudget(card)?['Time / BP+OSD-0']:[]),'Time','Evidence','Availability'];}
 function tableRows(card){
  const paired=pairedMemory(card),includeOther=showOtherWork(card),includeOsd=showOsdWork(card),includeBudget=showRuntimeBudget(card);
@@ -415,7 +422,7 @@ function tableRows(card){
    s.label,noise,metric,(bound(p)&&card.metric==='rate'?'≤ ':'')+fmt(plotValue(card,p)),
    known(p.x_shots)?`X ${count(p.x_shots)} / Z ${count(p.z_shots)}`:weighted?`${count(p.raw_samples)} raw draws`:count(p.n),
    known(p.x_errors)?`X ${count(p.x_errors)} / Z ${count(p.z_errors)}`:weighted?`${count(p.raw_failures)} raw events`:count(p.failures),
-   `${count(p.type_i)} / ${count(p.type_ii)}`,
+   failureTypes(p),
    `${ci}${known(p.confidence_level)?' · '+100*p.confidence_level+'%':''} · ${p.uncertainty_method||p.ci_method||'method not reported'}`,
    memoryBasisMeans(p,'mean_iterations',' sweeps')??(known(p.mean_iterations)?`${fmt(p.mean_iterations)} ${p.iteration_unit||'sweeps'}`:'Unavailable'),
    memoryBasisMeans(p,'mean_directed_edge_updates')??fmt(p.mean_directed_edge_updates),
@@ -433,7 +440,7 @@ function drawMacKayTable(card,box){
  const section=el('section',{class:'mackay-results','aria-label':'Construction U block error results'});
  section.append(el('h4',{},'Block error results by decoder and noise rate'),
   el('p',{class:'small muted'},'The paper distinguishes detected and undetected classical block errors. Here the measured quantum outcomes are syndrome-inconsistent failures and syndrome-consistent logical failures.'));
- const wrap=el('div',{class:'table-wrap',tabindex:'0'}),table=el('table');
+ const wrap=el('div',{class:'table-wrap',tabindex:'0'}),table=el('table',{class:'results-table'});
  const head=el('thead'),header=el('tr');
  for(const name of ['Decoder and code','Channel','Component bit-flip probability','Blocks tested','Total block failures','Detected (Type I)','Undetected (Type II)']){
   header.append(el('th',{scope:'col',title:name},name));
@@ -457,17 +464,24 @@ function drawTable(card,box){
  if(points(card).some(({p})=>known(p.x_mean_decode_ms)||known(p.z_mean_decode_ms))){
   box.append(el('p',{class:'small muted'},'X and Z work and timing are means per shot for each memory basis. Times include decoder instrumentation and reflect the CPU allocation used for each run.'));
  }
- const wrap=el('div',{class:'table-wrap',tabindex:'0','aria-label':`Results table for plot ${card.id}`}),table=el('table'),head=el('thead'),tr=el('tr');
+ const columns=headers(card);
+ const wrap=el('div',{class:'table-wrap',tabindex:'0','aria-label':`Results table for plot ${card.id}`});
+ const table=el('table',{class:'results-table',style:`min-width:${15+8*(columns.length-1)}rem`}),head=el('thead'),tr=el('tr');
  const definitions={
   [metricNames.iterations]:'Executed sweeps summed across decoder components and rounds, averaged over all sampled shots.',
   [metricNames.edge_updates]:'Variable-to-check plus check-to-variable updates, averaged over all sampled shots.',
  };
- for(const heading of headers(card))tr.append(el('th',{scope:'col',...(definitions[heading]?{title:definitions[heading],class:'work-average'}:{})},heading));
+ for(const heading of columns){
+  const description=heading==='Type I / II'&&pairedMemory(card)
+   ?'Type I counts observable errors with a detector mismatch. Type II counts observable errors with all detectors matched.'
+   :definitions[heading];
+  tr.append(el('th',{scope:'col',title:description?`${heading}. ${description}`:heading,...(definitions[heading]?{class:'work-average'}:{})},heading));
+ }
  head.append(tr);table.append(head);
  const body=el('tbody');
  for(const row of tableRows(card)){
   const tr=el('tr');
-  row.forEach((cell,index)=>tr.append(el('td',index===8||index===9?{class:'work-average'}:{},cell)));
+  row.forEach((cell,index)=>tr.append(el('td',{title:cell,...(definitions[columns[index]]?{class:'work-average'}:{})},cell)));
   body.append(tr);
  }
  table.append(body);wrap.append(table);box.append(wrap);
