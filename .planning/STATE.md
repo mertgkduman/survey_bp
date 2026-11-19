@@ -6,10 +6,10 @@ current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
 stopped_at: Advanced BP kernel tuning running. Confirmation jobs and collector 62150056 depend on training.
-last_updated: "2026-11-19T18:28:51.786Z"
+last_updated: "2026-11-19T20:24:05.587Z"
 last_activity: 2026-11-19
 last_activity_desc: Launched 11 advanced decoder anchor pairs at 20 CPUs per point. XZ PriorTilt, RelayBP-1 and BeamSearch on BB144/.003 and BB70, GB102/.001, plus XYZ PriorTilt and RelayBP-5 on BB144/.003. Original 18060/18080 XZ and 36060/36080 XYZ caps and Beam340 per-path cap and width32 verified. Screen difficult syndromes using neutral BP40, then nine damping settings, scale/offset refinement, held-out selection and unfiltered confirmation. Passed 72 neutral equivalence checks, non-neutral trace audits, range guard, end-to-end pilot and 95 regressions. Screen 62150027/28/30/31, tuning arrays 62150032/36/48/52, collector 62150056. Verified running screens and tuning tasks. Original XYZ/XZ and ordinary follow-up runs preserved.
-state_head: 71eb5309029e82cfbe4e2df9d592cbb0580c0e35
+state_head: d105c23f8c6f14c0e31e964716e187ea46b3258a
 progress:
   total_phases: 15
   completed_phases: 9
@@ -476,6 +476,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 | 261119-ibq | Launch damping-first advanced circuit BP tuning on 11 anchors | 2026-11-19 | 71eb5309 | — | [261119-ibq-tune-priortilt-relaybp-and-beamsearch-bp](./quick/261119-ibq-tune-priortilt-relaybp-and-beamsearch-bp/) |
 | 261119-jgk | Constrain Construction U table cells and show full hover text | 2026-11-19 | 843cbf10 | Verified at desktop, comparison, and mobile widths | [261119-jgk-constrain-construction-u-table-cells-and](./quick/261119-jgk-constrain-construction-u-table-cells-and/) |
 | 261119-ksp | Display recorded PriorTilt work and timing by memory basis | 2026-11-19 | 02dfe835 | Verified 39 rows, guest panels, and CSV export | [261119-ksp-display-recorded-priortilt-work-and-timi](./quick/261119-ksp-display-recorded-priortilt-work-and-timi/) |
+| 261119-kxq | Plot 307 paper-reported points as matching stars on reproduced figures | 2026-11-19 | d105c23f | — | [261119-kxq-plot-paper-reported-points-as-matching-s](./quick/261119-kxq-plot-paper-reported-points-as-matching-s/) |
 
 ### Roadmap Evolution
 
