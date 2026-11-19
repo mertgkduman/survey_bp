@@ -41,3 +41,13 @@ iterations per shot.
 The training-only circuits are modifications of the released PriorTilt circuits.
 The original circuit attribution and license apply.
 [Source license](../priortilt-2611-13373/SOURCE-LICENSE)
+
+An ordinary BP shot in the initial dispatch overflowed float64 on a long
+nonconverging trajectory. The resumed study uses a versioned numeric profile
+that reduces the exponent of all messages, priors and the offset together by
+400 when message magnitude reaches 2^480. Min-sum with the declared damping
+and check rules is homogeneous under this common scaling. This preserves the
+iteration cap and detector and observable tests, with usual floating-point
+limits for values below the representable range. Per-shot rescale counters
+and aggregate counts are retained. Initial dispatch ledgers are archived
+separately, and the replacement starts from the same sealed evaluation inputs.

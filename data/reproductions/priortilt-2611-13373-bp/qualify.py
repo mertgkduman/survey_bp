@@ -5,8 +5,10 @@ from pathlib import Path
 import tempfile
 
 import numpy as np
+import stim
 
 from bp_registry.canonical.prior_tilt import PriorTiltDecoder, PriorTiltSpec
+from bp_registry.circuit.dem import DemBinaryModel
 from bp_registry.circuit.tuned_minsum import MinSumSpec, TunableMinSum
 import evaluate
 import report
@@ -14,7 +16,31 @@ import run
 import tune
 
 
+def range_stress():
+    # Four mutually reinforcing parity checks and one impossible detector.
+    # The exact all-positive messages diverge in magnitude without changing sign.
+    dem = stim.DetectorErrorModel("\n".join(["error(.2) D0 D1 D2 D3"] * 4 + ["detector D4"]))
+    model = DemBinaryModel.from_dem(dem)
+    syndrome = np.array([0, 0, 0, 0, 1], np.uint8)
+    native_range = PriorTiltDecoder(model.table, model.prior_llrs,
+                                    PriorTiltSpec(initial=18080, round_len=1, rounds=0))
+    try:
+        native_range.decode(syndrome, shot=0)
+    except ValueError as exc:
+        assert "nonfinite" in str(exc)
+    else:
+        raise AssertionError("overflow fixture failed to reproduce the original error")
+    for spec in (MinSumSpec(), MinSumSpec(damping=.25, alpha=.8, beta=.5)):
+        result = TunableMinSum(model, spec).decode(syndrome, shot=0)
+        assert result.lineage > 0 and np.isfinite(result.posterior).all()
+        assert not result.converged and result.iterations == 18080
+        assert result.directed_edge_updates == 18080 * 2 * model.table.edge_count
+        assert np.array_equal(result.candidate, np.zeros(model.table.variable_count, np.uint8))
+    print("PASS full-cap float64 overflow fixture for ordinary and tuned min-sum")
+
+
 def main():
+    range_stress()
     original = run.ROOT
     plan = run.load()
     assert len(plan["jobs"]) == 28

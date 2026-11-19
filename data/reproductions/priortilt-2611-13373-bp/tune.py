@@ -82,6 +82,7 @@ def measure(task):
             candidate[i] = np.packbits(result.candidate, bitorder="little")
             prediction[i] = np.packbits((model.observable_matrix @ result.candidate) % 2 ^ model.observable_bias, bitorder="little")
             stats[i, :3] = result.iterations, result.directed_edge_updates, result.converged
+            stats[i, 5] = result.lineage
         data = {"candidate": candidate, "prediction": prediction, "stats": stats,
                 "decode_ns": latency, "trace": np.empty((0, 8), np.int64),
                 "trace_ptr": np.zeros(n + 1, np.int64)}

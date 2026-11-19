@@ -13,7 +13,7 @@ from sources import ROOT, REPO, PARENTS, circuit, evaluation_points, parent_plan
 
 BASES = ("x", "z")
 WORKERS = 20
-VERSION = "circuit-bp-ordered-v1"
+VERSION = "circuit-bp-ordered-v2"
 
 
 def import_parent(path, name):
@@ -29,7 +29,17 @@ PARENT_RUN = {mode: import_parent(path / "run.py", f"parent_{mode}")
 shared = PARENT_RUN["xyz"]
 sha, write_json, write_npz, lock = shared.sha, shared.write_json, shared.write_npz, shared.lock
 identity = shared.identity
-software, empty_summary, add = shared.software, shared.empty_summary, shared.add
+software = shared.software
+def empty_summary():
+    return {**shared.empty_summary(), "rescaled_shots": 0, "llr_rescales": 0}
+
+
+def add(summary, row):
+    shared.add(summary, row)
+    for key in ("rescaled_shots", "llr_rescales"):
+        summary[key] += row[key]
+
+
 finished, terminal = shared.finished, shared.terminal
 source_masks, audit_candidates = shared.source_masks, shared.audit_candidates
 
@@ -52,7 +62,8 @@ def design(write_training=False):
             "training_points": training_points(write=write_training),
             "protocol": {"target_errors": 20, "max_shots": 100_000_000,
                          "minimum_free_bytes": 20 * 1024**3, "iterations": 18080,
-                         "evaluation_batch": {"xz": 512, "xyz": 32}},
+                         "evaluation_batch": {"xz": 512, "xyz": 32},
+                         "llr_range": "power-of-two scale-down of messages, prior and offset at 2^480; no clipping"},
             "tuning": {"seed": 20261119071, "candidates": coarse,
                        "shots_per_basis": [128, 512, 2048], "advance": [6, 3],
                        "final_error_tie": 1,
@@ -205,13 +216,15 @@ def chunk_summary(data, det, obs, model, dmasks, omasks, method, spec):
     iters, edges, converged = stats[:, 0], stats[:, 1], stats[:, 2]
     if (np.any(iters < 1) or np.any(iters > spec.iterations) or np.any(converged > 1)
             or np.any((converged == 0) & (iters != spec.iterations))
-            or np.any(edges != iters * (2 * model.table.edge_count)) or np.any(stats[:, 3:])):
+            or np.any(edges != iters * (2 * model.table.edge_count)) or np.any(stats[:, 3:5])
+            or np.any(stats[:, 5] >= iters)):
         raise ValueError("invalid single-attempt BP stopping or work")
     counts = audit_candidates(candidate, det, obs, prediction, stats, dmasks, omasks)
     return {"shots": n, "errors": int(counts[1]), "iterations": int(iters.sum()),
             "directed_edge_updates": int(edges.sum()), "decode_ns": int(data["decode_ns"].sum()),
             "nonconvergence": int(n - converged.sum()), "joint_counts": counts[2:].tolist(),
-            "random_draws": 0, "biased_node_updates": 0}
+            "random_draws": 0, "biased_node_updates": 0,
+            "rescaled_shots": int(np.count_nonzero(stats[:, 5])), "llr_rescales": int(stats[:, 5].sum())}
 
 
 if __name__ == "__main__":

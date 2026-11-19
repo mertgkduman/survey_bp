@@ -1,0 +1,35 @@
+concurrent.futures.process._RemoteTraceback:
+"""
+Traceback (most recent call last):
+  File "/hpc/home/mg551/miniconda3/lib/python3.12/concurrent/futures/process.py", line 263, in _process_worker
+    r = call_item.fn(*call_item.args, **call_item.kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/priortilt-2611-13373-xyz/parallel.py", line 84, in unit
+    begin=time.perf_counter_ns();r=decoder.decode(syn if job['method']!='priortilt' else syn^m.syndrome_bias,shot=int(start+i));ns[i]=time.perf_counter_ns()-begin
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/hpc/group/pfisterlab/mg551/storage/survey_bp/src/bp_registry/circuit/tuned_minsum.py", line 61, in decode
+    candidate, posterior, converged, iterations = decode(
+                                                  ^^^^^^^
+  File "/hpc/group/pfisterlab/mg551/storage/survey_bp/src/bp_registry/resolution.py", line 33, in round_message
+    raise ValueError("nonfinite BP message or coefficient")
+ValueError: nonfinite BP message or coefficient
+"""
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/priortilt-2611-13373-bp/evaluate.py", line 85, in <module>
+    main()
+  File "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/priortilt-2611-13373-bp/evaluate.py", line 81, in main
+    run_point(plan, run.resolve_job(plan, args.index), args.audit, workers)
+  File "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/priortilt-2611-13373-bp/evaluate.py", line 52, in run_point
+    parallel.continue_point(pool, plan, job, summaries, models, plan_hash, workers)
+  File "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/priortilt-2611-13373-xyz/parallel.py", line 142, in continue_point
+    basis,start,stage=f.result();pending.pop(f)
+                      ^^^^^^^^^^
+  File "/hpc/home/mg551/miniconda3/lib/python3.12/concurrent/futures/_base.py", line 449, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/hpc/home/mg551/miniconda3/lib/python3.12/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+ValueError: nonfinite BP message or coefficient

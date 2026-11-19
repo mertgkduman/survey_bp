@@ -41,7 +41,7 @@ def checked_row(plan, index):
             if run.sha(marker.with_suffix(".npz")) != meta["sha256"]:
                 raise ValueError("audited ledger bytes changed")
             run.verify_noise_binding(plan, resolved, basis, meta["start"], meta)
-        for k in ("shots", "errors", "nonconvergence", "stop_reason"):
+        for k in ("shots", "errors", "nonconvergence", "rescaled_shots", "llr_rescales", "stop_reason"):
             row[f"{basis}_{k}"] = summary[k]
         row[f"{basis}_mean_iterations"] = summary["iterations"] / shots
         row[f"{basis}_mean_directed_edge_updates"] = summary["directed_edge_updates"] / shots

@@ -1,0 +1,14 @@
+PASS full-cap float64 overflow fixture for ordinary and tuned min-sum
+xz-bb144 round 0 6 / 6
+xz-bb144 round 1 6 / 6
+xz-bb144 round 2 4 / 4
+Selected xz-bb144 {'damping': 0.25, 'alpha': 0.8, 'beta': 0.5} errors 8
+xz-bb144-p003000-bp x 1 1
+xz-bb144-p003000-bp z 1 1
+Audited xz-bb144-p003000-bp
+xz-bb144-p003000-tuned-bp x 16 0
+xz-bb144-p003000-tuned-bp z 2 1
+xz-bb144-p003000-tuned-bp x 19 1
+Audited xz-bb144-p003000-tuned-bp
+Published 2/2 audited BP points
+PASS 24 canonical neutral checks, training selection and two spawned-process end-to-end audits
