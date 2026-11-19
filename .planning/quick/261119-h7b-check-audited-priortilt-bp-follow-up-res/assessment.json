@@ -1,0 +1,380 @@
+{
+  "utc": "2026-11-19T17:27:53.999424+00:00",
+  "frozen_plan_sha256": "cded9f2ce50c66d988cf216fdcb60da8732da490577589c4afd29a705727e3db",
+  "frozen_files": 100,
+  "audited_rows": 25,
+  "audit_count_by_mode_method": {
+    "xz bp": 12,
+    "xz tuned-bp": 12,
+    "xyz bp": 1
+  },
+  "audited_shots": 77735259,
+  "audited_errors": 1000,
+  "sampled_bound_chunks": 134,
+  "training": {
+    "xyz-bb144": {
+      "sealed_training_blocks": {
+        "round-0": 384,
+        "round-1": 172
+      }
+    },
+    "xz-bb144": {
+      "controls": {
+        "alpha": 1.0,
+        "beta": 0.0,
+        "damping": 0.25
+      },
+      "final_shots_per_basis": 2048,
+      "final_scores": [
+        {
+          "controls": {
+            "alpha": 1.0,
+            "beta": 0.0,
+            "damping": 0.25
+          },
+          "errors": 49,
+          "iterations": 1375134
+        },
+        {
+          "controls": {
+            "alpha": 1.0,
+            "beta": 0.0,
+            "damping": 0.0
+          },
+          "errors": 59,
+          "iterations": 1865201
+        },
+        {
+          "controls": {
+            "alpha": 1.0,
+            "beta": 0.0,
+            "damping": 0.5
+          },
+          "errors": 79,
+          "iterations": 2259195
+        }
+      ],
+      "receipt_sha256": "a085cd2318a8d4812bc5e1e739d01d687588369f5dcb0c0d8f32d27b0046838e"
+    },
+    "xz-bb70": {
+      "controls": {
+        "alpha": 1.0,
+        "beta": 0.0,
+        "damping": 0.25
+      },
+      "final_shots_per_basis": 2048,
+      "final_scores": [
+        {
+          "controls": {
+            "alpha": 1.0,
+            "beta": 0.0,
+            "damping": 0.25
+          },
+          "errors": 32,
+          "iterations": 800495
+        },
+        {
+          "controls": {
+            "alpha": 1.0,
+            "beta": 0.0,
+            "damping": 0.0
+          },
+          "errors": 33,
+          "iterations": 989438
+        },
+        {
+          "controls": {
+            "alpha": 1.0,
+            "beta": 0.0,
+            "damping": 0.5
+          },
+          "errors": 42,
+          "iterations": 1067610
+        }
+      ],
+      "receipt_sha256": "92a1605754338f1a9b8458d7e9a95fe0bc38eb0ee02338ba36b381d04152751c"
+    },
+    "xz-gb102": {
+      "controls": {
+        "alpha": 1.0,
+        "beta": 0.0,
+        "damping": 0.0
+      },
+      "final_shots_per_basis": 2048,
+      "final_scores": [
+        {
+          "controls": {
+            "alpha": 1.0,
+            "beta": 0.0,
+            "damping": 0.0
+          },
+          "errors": 20,
+          "iterations": 670259
+        },
+        {
+          "controls": {
+            "alpha": 1.0,
+            "beta": 0.0,
+            "damping": 0.5
+          },
+          "errors": 22,
+          "iterations": 745502
+        },
+        {
+          "controls": {
+            "alpha": 0.8,
+            "beta": 0.0,
+            "damping": 0.0
+          },
+          "errors": 23,
+          "iterations": 1134245
+        }
+      ],
+      "receipt_sha256": "7b83d04aacbee0e3ae8b93081bc948410213116d9800dcc1130f142b7e0eef91"
+    }
+  },
+  "progress": {
+    "xz-gb102-p000500-bp": {
+      "file": "progress.json",
+      "bases": {
+        "x": {
+          "shots": 51914240,
+          "errors": 13,
+          "rescaled_shots": 7
+        },
+        "z": {
+          "shots": 51913728,
+          "errors": 8,
+          "rescaled_shots": 13
+        }
+      }
+    },
+    "xz-gb102-p000500-tuned-bp": {
+      "file": "progress.json",
+      "bases": {
+        "x": {
+          "shots": 51902464,
+          "errors": 13,
+          "rescaled_shots": 7
+        },
+        "z": {
+          "shots": 51901952,
+          "errors": 8,
+          "rescaled_shots": 13
+        }
+      }
+    },
+    "xyz-bb144-p003000-tuned-bp": {
+      "file": null
+    }
+  },
+  "xyz_paper_runs": {
+    "priortilt": {
+      "receipt": "progress.json",
+      "bases": {
+        "x": {
+          "shots": 466304,
+          "errors": 18,
+          "iterations": 94176276,
+          "directed_edge_updates": 73733243416128
+        },
+        "z": {
+          "shots": 297260,
+          "errors": 20,
+          "iterations": 60300855,
+          "directed_edge_updates": 47193861157200
+        }
+      }
+    },
+    "relay5": {
+      "receipt": "progress.json",
+      "bases": {
+        "x": {
+          "shots": 162432,
+          "errors": 7,
+          "iterations": 102699712,
+          "directed_edge_updates": 80406480116736
+        },
+        "z": {
+          "shots": 162432,
+          "errors": 12,
+          "iterations": 101530351,
+          "directed_edge_updates": 79461713906640
+        }
+      }
+    }
+  },
+  "xyz_source_ler_per_cycle": {
+    "PriorTilt_3phase": 1.0393921324477514e-05,
+    "RelayBP-5": 1.0956976636968136e-05
+  },
+  "comparisons": [
+    {
+      "mode": "xz",
+      "code": "BB144",
+      "p": 0.001,
+      "bp_ler": 1.2863475559042362e-05,
+      "tuned_ler": 7.194521946219168e-05,
+      "bp_mean_iterations": 13.015348011284884,
+      "tuned_mean_iterations": 11.398984963783606,
+      "local_xz_prior_tilt_ler": 2.916666666666667e-08,
+      "tuned_over_bp_ler": 5.592984503446885,
+      "tuned_over_bp_mean_iterations": 0.8758110005126395,
+      "pointwise_intervals_overlap": false
+    },
+    {
+      "mode": "xz",
+      "code": "BB144",
+      "p": 0.002,
+      "bp_ler": 0.00029160918010757286,
+      "tuned_ler": 0.0002965075402814866,
+      "bp_mean_iterations": 83.53068050255135,
+      "tuned_mean_iterations": 70.63307273963291,
+      "local_xz_prior_tilt_ler": 2.7233347198690894e-06,
+      "tuned_over_bp_ler": 1.0167976885093493,
+      "tuned_over_bp_mean_iterations": 0.845594365024663,
+      "pointwise_intervals_overlap": true
+    },
+    {
+      "mode": "xz",
+      "code": "BB144",
+      "p": 0.003,
+      "bp_ler": 0.0020320999145545388,
+      "tuned_ler": 0.0015212566359944924,
+      "bp_mean_iterations": 416.64798545895184,
+      "tuned_mean_iterations": 273.2887989203779,
+      "local_xz_prior_tilt_ler": 5.5735983685614126e-05,
+      "tuned_over_bp_ler": 0.7486131095714211,
+      "tuned_over_bp_mean_iterations": 0.6559225256287775,
+      "pointwise_intervals_overlap": true
+    },
+    {
+      "mode": "xz",
+      "code": "BB144",
+      "p": 0.004,
+      "bp_ler": 0.014678230169998849,
+      "tuned_ler": 0.011096340607806211,
+      "bp_mean_iterations": 1935.1220043572985,
+      "tuned_mean_iterations": 1359.9317803660565,
+      "local_xz_prior_tilt_ler": 0.0006415944122111914,
+      "tuned_over_bp_ler": 0.7559726533302538,
+      "tuned_over_bp_mean_iterations": 0.7027628114940088,
+      "pointwise_intervals_overlap": true
+    },
+    {
+      "mode": "xz",
+      "code": "BB144",
+      "p": 0.005,
+      "bp_ler": 0.04339414040906578,
+      "tuned_ler": 0.027836241428474438,
+      "bp_mean_iterations": 5549.713375796178,
+      "tuned_mean_iterations": 3693.5365853658536,
+      "local_xz_prior_tilt_ler": 0.005508743317930598,
+      "tuned_over_bp_ler": 0.6414746591606403,
+      "tuned_over_bp_mean_iterations": 0.6655364584186239,
+      "pointwise_intervals_overlap": true
+    },
+    {
+      "mode": "xz",
+      "code": "BB70",
+      "p": 0.0005,
+      "bp_ler": 1.1947637766263308e-06,
+      "tuned_ler": 3.200117207760724e-06,
+      "bp_mean_iterations": 4.0819662527086225,
+      "tuned_mean_iterations": 2.5196262132850378,
+      "local_xz_prior_tilt_ler": 2.8888888888888887e-08,
+      "tuned_over_bp_ler": 2.6784518164728217,
+      "tuned_over_bp_mean_iterations": 0.6172579725795427,
+      "pointwise_intervals_overlap": true
+    },
+    {
+      "mode": "xz",
+      "code": "BB70",
+      "p": 0.0008,
+      "bp_ler": 6.680414462043997e-06,
+      "tuned_ler": 1.6468551569611032e-05,
+      "bp_mean_iterations": 6.568413663663664,
+      "tuned_mean_iterations": 4.665882497822256,
+      "local_xz_prior_tilt_ler": 1.693831916853704e-07,
+      "tuned_over_bp_ler": 2.465199077569234,
+      "tuned_over_bp_mean_iterations": 0.7103514998809876,
+      "pointwise_intervals_overlap": true
+    },
+    {
+      "mode": "xz",
+      "code": "BB70",
+      "p": 0.001,
+      "bp_ler": 1.9718630846964483e-05,
+      "tuned_ler": 2.4251624506658174e-05,
+      "bp_mean_iterations": 9.009042599313753,
+      "tuned_mean_iterations": 6.050031510111881,
+      "local_xz_prior_tilt_ler": 3.9583625594848494e-07,
+      "tuned_over_bp_ler": 1.2298837933969187,
+      "tuned_over_bp_mean_iterations": 0.6715509937285379,
+      "pointwise_intervals_overlap": true
+    },
+    {
+      "mode": "xz",
+      "code": "BB70",
+      "p": 0.002,
+      "bp_ler": 0.0003831284131487531,
+      "tuned_ler": 0.000372512113421387,
+      "bp_mean_iterations": 60.73920144410538,
+      "tuned_mean_iterations": 47.42104160556417,
+      "local_xz_prior_tilt_ler": 1.163633294417265e-05,
+      "tuned_over_bp_ler": 0.9722904922657244,
+      "tuned_over_bp_mean_iterations": 0.7807320557087483,
+      "pointwise_intervals_overlap": true
+    },
+    {
+      "mode": "xz",
+      "code": "GB102",
+      "p": 0.0008,
+      "bp_ler": 3.936470682063562e-07,
+      "tuned_ler": 3.936470682063562e-07,
+      "bp_mean_iterations": 8.261767282686634,
+      "tuned_mean_iterations": 8.261767282686634,
+      "local_xz_prior_tilt_ler": 1.2905263960987097e-07,
+      "tuned_over_bp_ler": 1.0,
+      "tuned_over_bp_mean_iterations": 1.0,
+      "pointwise_intervals_overlap": true
+    },
+    {
+      "mode": "xz",
+      "code": "GB102",
+      "p": 0.001,
+      "bp_ler": 1.1308510926403443e-06,
+      "tuned_ler": 1.1308510926403443e-06,
+      "bp_mean_iterations": 9.598562635941605,
+      "tuned_mean_iterations": 9.598562635941605,
+      "local_xz_prior_tilt_ler": 3.8468020460754335e-07,
+      "tuned_over_bp_ler": 1.0,
+      "tuned_over_bp_mean_iterations": 1.0,
+      "pointwise_intervals_overlap": true
+    },
+    {
+      "mode": "xz",
+      "code": "GB102",
+      "p": 0.002,
+      "bp_ler": 6.38055329889718e-05,
+      "tuned_ler": 6.38055329889718e-05,
+      "bp_mean_iterations": 24.285255906355854,
+      "tuned_mean_iterations": 24.285255906355854,
+      "local_xz_prior_tilt_ler": 1.906919763377626e-05,
+      "tuned_over_bp_ler": 1.0,
+      "tuned_over_bp_mean_iterations": 1.0,
+      "pointwise_intervals_overlap": true
+    },
+    {
+      "mode": "xyz",
+      "code": "BB144",
+      "p": 0.003,
+      "bp_ler": 0.0028769679645729352,
+      "tuned_ler": null,
+      "bp_mean_iterations": 3027.3423423423424,
+      "tuned_mean_iterations": null,
+      "local_xz_prior_tilt_ler": null
+    }
+  ],
+  "scope": "Fresh receipt and aggregate reconciliation with first/middle/last bound chunks per basis. Final worker audits cover all retained and speculative ledgers. Scheduled collector repeats full publication rehash."
+}

@@ -1,0 +1,8 @@
+62119938|ptbp-tune-xyz-bb144|RUNNING|20|10:57:36|dcc-dhvimdcore-gpu-ferc-s-o15-3
+62119937_18|ptbp-baseline|RUNNING|20|11:00:56|dcc-dhvimdcore-gpu-ferc-s-p15-2
+62119945_19|ptbp-eval-xz-gb102|RUNNING|20|10:44:18|dcc-dhvimdcore-gpu-ferc-s-p15-6
+62119946|ptbp-collect|PENDING|1|0:00|(Dependency)
+62119939_27|ptbp-eval-xyz-bb144|PENDING|20|0:00|(Dependency)
+62102102|priortilt-xyz-collect|PENDING|2|0:00|(Dependency)
+62102101_0|priortilt-xyz-50|RUNNING|50|17:00:20|dcc-barthellab-ferc-u-ab25-4-1
+62102101_1|priortilt-xyz-50|RUNNING|50|17:00:20|dcc-cagpm-ferc-u-ac39-5-5
