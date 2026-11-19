@@ -1,0 +1,249 @@
+{
+  "plan_sha256": "7ec6b6fafc09649671f534ed0bcb05d4e138508d200bd29e12aecf7f7ac868f1",
+  "frozen_files": 99,
+  "scheduler": {
+    "62150056": {
+      "name": "ptadv-collect",
+      "state": "PENDING",
+      "cpus": 1,
+      "elapsed": "0:00",
+      "node_or_reason": "(Dependency)"
+    },
+    "62150055_8": {
+      "name": "ptadv-confirm-8",
+      "state": "PENDING",
+      "cpus": 20,
+      "elapsed": "0:00",
+      "node_or_reason": "(Dependency)"
+    },
+    "62150054_7": {
+      "name": "ptadv-confirm-7",
+      "state": "PENDING",
+      "cpus": 20,
+      "elapsed": "0:00",
+      "node_or_reason": "(Dependency)"
+    },
+    "62150053_6": {
+      "name": "ptadv-confirm-6",
+      "state": "PENDING",
+      "cpus": 20,
+      "elapsed": "0:00",
+      "node_or_reason": "(Dependency)"
+    },
+    "62150052_6": {
+      "name": "ptadv-tune-xz-gb102",
+      "state": "PENDING",
+      "cpus": 20,
+      "elapsed": "0:00",
+      "node_or_reason": "(Dependency)"
+    },
+    "62150052_7": {
+      "name": "ptadv-tune-xz-gb102",
+      "state": "PENDING",
+      "cpus": 20,
+      "elapsed": "0:00",
+      "node_or_reason": "(Dependency)"
+    },
+    "62150052_8": {
+      "name": "ptadv-tune-xz-gb102",
+      "state": "PENDING",
+      "cpus": 20,
+      "elapsed": "0:00",
+      "node_or_reason": "(Dependency)"
+    },
+    "62150051_5": {
+      "name": "ptadv-confirm-5",
+      "state": "PENDING",
+      "cpus": 20,
+      "elapsed": "0:00",
+      "node_or_reason": "(Dependency)"
+    },
+    "62150050_4": {
+      "name": "ptadv-confirm-4",
+      "state": "PENDING",
+      "cpus": 20,
+      "elapsed": "0:00",
+      "node_or_reason": "(Dependency)"
+    },
+    "62150045_2": {
+      "name": "ptadv-confirm-2",
+      "state": "PENDING",
+      "cpus": 20,
+      "elapsed": "0:00",
+      "node_or_reason": "(Dependency)"
+    },
+    "62150044_1": {
+      "name": "ptadv-confirm-1",
+      "state": "PENDING",
+      "cpus": 20,
+      "elapsed": "0:00",
+      "node_or_reason": "(Dependency)"
+    },
+    "62150043_0": {
+      "name": "ptadv-confirm-0",
+      "state": "PENDING",
+      "cpus": 20,
+      "elapsed": "0:00",
+      "node_or_reason": "(Dependency)"
+    },
+    "62150035_10": {
+      "name": "ptadv-confirm-10",
+      "state": "PENDING",
+      "cpus": 20,
+      "elapsed": "0:00",
+      "node_or_reason": "(Dependency)"
+    },
+    "62150034_9": {
+      "name": "ptadv-confirm-9",
+      "state": "PENDING",
+      "cpus": 20,
+      "elapsed": "0:00",
+      "node_or_reason": "(Dependency)"
+    },
+    "62150032_9": {
+      "name": "ptadv-tune-xyz-bb144",
+      "state": "PENDING",
+      "cpus": 20,
+      "elapsed": "0:00",
+      "node_or_reason": "(Dependency)"
+    },
+    "62150032_10": {
+      "name": "ptadv-tune-xyz-bb144",
+      "state": "PENDING",
+      "cpus": 20,
+      "elapsed": "0:00",
+      "node_or_reason": "(Dependency)"
+    },
+    "62150049_3": {
+      "name": "ptadv-confirm-3",
+      "state": "RUNNING",
+      "cpus": 20,
+      "elapsed": "0:06",
+      "node_or_reason": "dcc-katzlab-ferc-u-q18-5-6"
+    },
+    "62150036_0": {
+      "name": "ptadv-tune-xz-bb144",
+      "state": "RUNNING",
+      "cpus": 20,
+      "elapsed": "0:24",
+      "node_or_reason": "dcc-allenlab-ferc-u-ac39-1-5"
+    },
+    "62150036_1": {
+      "name": "ptadv-tune-xz-bb144",
+      "state": "RUNNING",
+      "cpus": 20,
+      "elapsed": "0:24",
+      "node_or_reason": "dcc-schmidler-ferc-u-ab25-1-8"
+    },
+    "62150036_2": {
+      "name": "ptadv-tune-xz-bb144",
+      "state": "RUNNING",
+      "cpus": 20,
+      "elapsed": "0:24",
+      "node_or_reason": "dcc-schmidler-ferc-u-ab25-1-8"
+    },
+    "62150048_4": {
+      "name": "ptadv-tune-xz-bb70",
+      "state": "RUNNING",
+      "cpus": 20,
+      "elapsed": "0:45",
+      "node_or_reason": "dcc-schmidler-ferc-u-ab25-1-8"
+    },
+    "62150048_5": {
+      "name": "ptadv-tune-xz-bb70",
+      "state": "RUNNING",
+      "cpus": 20,
+      "elapsed": "0:45",
+      "node_or_reason": "dcc-schmidler-ferc-u-ab25-1-8"
+    },
+    "62150031": {
+      "name": "ptadv-screen-xz-gb102",
+      "state": "RUNNING",
+      "cpus": 20,
+      "elapsed": "1:40",
+      "node_or_reason": "dcc-qcd-ferc-u-ab39-3-1"
+    },
+    "62150027": {
+      "name": "ptadv-screen-xyz-bb144",
+      "state": "RUNNING",
+      "cpus": 20,
+      "elapsed": "1:41",
+      "node_or_reason": "dcc-allenlab-ferc-u-ac39-1-5"
+    }
+  },
+  "points": {
+    "xyz-bb144-priortilt-tuned": {
+      "p": 0.003,
+      "training": "62150032_9",
+      "confirmation": "62150034_9",
+      "cpus": 20
+    },
+    "xyz-bb144-relay5-tuned": {
+      "p": 0.003,
+      "training": "62150032_10",
+      "confirmation": "62150035_10",
+      "cpus": 20
+    },
+    "xz-bb144-priortilt-tuned": {
+      "p": 0.003,
+      "training": "62150036_0",
+      "confirmation": "62150043_0",
+      "cpus": 20
+    },
+    "xz-bb144-relay-tuned": {
+      "p": 0.003,
+      "training": "62150036_1",
+      "confirmation": "62150044_1",
+      "cpus": 20
+    },
+    "xz-bb144-beam-tuned": {
+      "p": 0.003,
+      "training": "62150036_2",
+      "confirmation": "62150045_2",
+      "cpus": 20
+    },
+    "xz-bb70-priortilt-tuned": {
+      "p": 0.001,
+      "training": "62150048_3",
+      "confirmation": "62150049_3",
+      "cpus": 20
+    },
+    "xz-bb70-relay-tuned": {
+      "p": 0.001,
+      "training": "62150048_4",
+      "confirmation": "62150050_4",
+      "cpus": 20
+    },
+    "xz-bb70-beam-tuned": {
+      "p": 0.001,
+      "training": "62150048_5",
+      "confirmation": "62150051_5",
+      "cpus": 20
+    },
+    "xz-gb102-priortilt-tuned": {
+      "p": 0.001,
+      "training": "62150052_6",
+      "confirmation": "62150053_6",
+      "cpus": 20
+    },
+    "xz-gb102-relay-tuned": {
+      "p": 0.001,
+      "training": "62150052_7",
+      "confirmation": "62150054_7",
+      "cpus": 20
+    },
+    "xz-gb102-beam-tuned": {
+      "p": 0.001,
+      "training": "62150052_8",
+      "confirmation": "62150055_8",
+      "cpus": 20
+    }
+  },
+  "screen_groups": [
+    "xyz-bb144",
+    "xz-bb144",
+    "xz-bb70",
+    "xz-gb102"
+  ],
+  "collector": "62150056"
+}
