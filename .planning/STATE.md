@@ -472,6 +472,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 | 261118-ui1 | Expand decoder policies and research workbench | 2026-11-19 | a297e53d | Verified workbench and portable routes covered here. aSCED and Unicycle use registered studies. | [261118-ui1](./quick/261118-ui1-update-canonical-policy-support-and-rese/) |
 | 261119-1m4 | Run ordinary and tuned BP on the full PriorTilt circuit grid with 20 CPUs per point | 2026-11-19 | a6fc2cf4 | — | [261119-1m4-run-ordinary-and-tuned-min-sum-bp-on-pri](./quick/261119-1m4-run-ordinary-and-tuned-min-sum-bp-on-pri/) |
 | 261119-h7b | Check 25 audited BP follow-up results and XYZ progress | 2026-11-19 | d73405dd | — | [261119-h7b-check-audited-priortilt-bp-follow-up-res](./quick/261119-h7b-check-audited-priortilt-bp-follow-up-res/) |
+| 261119-i4j | Show source captions and compare papers | 2026-11-19 | 33d71574 | 38 tests and eight browser checks passed | [261119-i4j-use-source-captions-and-compare-paper-re](./quick/261119-i4j-use-source-captions-and-compare-paper-re/) |
 
 ### Roadmap Evolution
 
