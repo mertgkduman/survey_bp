@@ -1,0 +1,269 @@
+{
+  "plan_sha256": "2fd79930cd8ff5e040fd69bfe29105fec3650dbda477b26a016637c8b7324c60",
+  "frozen_files": 100,
+  "grid_counts": {
+    "xz-bp": 13,
+    "xz-tuned-bp": 13,
+    "xyz-bp": 1,
+    "xyz-tuned-bp": 1
+  },
+  "evaluation_states": {
+    "RUNNING": 13,
+    "PENDING": 15
+  },
+  "evaluations": 28,
+  "cpus_per_evaluation": 20,
+  "tuning_groups": [
+    "xyz-bb144",
+    "xz-bb144",
+    "xz-bb70",
+    "xz-gb102"
+  ],
+  "scheduler": {
+    "62119759_12": {
+      "name": "ptbp-baseline",
+      "state": "RUNNING",
+      "cpus": 20,
+      "elapsed": "0:18",
+      "reason_or_node": "dcc-dhvimdcore-gpu-ferc-s-i11-10"
+    },
+    "62119759_14": {
+      "name": "ptbp-baseline",
+      "state": "RUNNING",
+      "cpus": 20,
+      "elapsed": "0:18",
+      "reason_or_node": "dcc-dhvimdcore-gpu-ferc-s-i11-11"
+    },
+    "62119759_16": {
+      "name": "ptbp-baseline",
+      "state": "RUNNING",
+      "cpus": 20,
+      "elapsed": "0:18",
+      "reason_or_node": "dcc-dhvimdcore-gpu-ferc-s-i11-11"
+    },
+    "62119759_18": {
+      "name": "ptbp-baseline",
+      "state": "RUNNING",
+      "cpus": 20,
+      "elapsed": "0:18",
+      "reason_or_node": "dcc-dhvimdcore-gpu-ferc-s-p15-1"
+    },
+    "62119759_20": {
+      "name": "ptbp-baseline",
+      "state": "RUNNING",
+      "cpus": 20,
+      "elapsed": "0:18",
+      "reason_or_node": "dcc-dhvimdcore-gpu-ferc-s-p15-2"
+    },
+    "62119759_22": {
+      "name": "ptbp-baseline",
+      "state": "RUNNING",
+      "cpus": 20,
+      "elapsed": "0:18",
+      "reason_or_node": "dcc-dhvimdcore-gpu-ferc-s-p15-3"
+    },
+    "62119759_24": {
+      "name": "ptbp-baseline",
+      "state": "RUNNING",
+      "cpus": 20,
+      "elapsed": "0:18",
+      "reason_or_node": "dcc-dhvimdcore-gpu-ferc-s-i11-16"
+    },
+    "62119759_0": {
+      "name": "ptbp-baseline",
+      "state": "RUNNING",
+      "cpus": 20,
+      "elapsed": "0:19",
+      "reason_or_node": "dcc-core-ferc-u-ab39-6-5"
+    },
+    "62119759_2": {
+      "name": "ptbp-baseline",
+      "state": "RUNNING",
+      "cpus": 20,
+      "elapsed": "0:19",
+      "reason_or_node": "dcc-core-ferc-u-ac39-4-7"
+    },
+    "62119759_4": {
+      "name": "ptbp-baseline",
+      "state": "RUNNING",
+      "cpus": 20,
+      "elapsed": "0:19",
+      "reason_or_node": "dcc-dhvimdcore-gpu-ferc-s-i11-7"
+    },
+    "62119759_6": {
+      "name": "ptbp-baseline",
+      "state": "RUNNING",
+      "cpus": 20,
+      "elapsed": "0:19",
+      "reason_or_node": "dcc-dhvimdcore-gpu-ferc-s-i11-13"
+    },
+    "62119759_8": {
+      "name": "ptbp-baseline",
+      "state": "RUNNING",
+      "cpus": 20,
+      "elapsed": "0:19",
+      "reason_or_node": "dcc-dhvimdcore-gpu-ferc-s-o15-3"
+    },
+    "62119759_10": {
+      "name": "ptbp-baseline",
+      "state": "RUNNING",
+      "cpus": 20,
+      "elapsed": "0:19",
+      "reason_or_node": "dcc-dhvimdcore-gpu-ferc-s-o15-5"
+    },
+    "62119759_26": {
+      "name": "ptbp-baseline",
+      "state": "PENDING",
+      "cpus": 20,
+      "elapsed": "0:00",
+      "reason_or_node": "(AssocGrpCpuLimit)"
+    },
+    "62119768": {
+      "name": "ptbp-collect",
+      "state": "PENDING",
+      "cpus": 1,
+      "elapsed": "0:00",
+      "reason_or_node": "(Dependency)"
+    },
+    "62119767_19": {
+      "name": "ptbp-eval-xz-gb102",
+      "state": "PENDING",
+      "cpus": 20,
+      "elapsed": "0:00",
+      "reason_or_node": "(Dependency)"
+    },
+    "62119767_21": {
+      "name": "ptbp-eval-xz-gb102",
+      "state": "PENDING",
+      "cpus": 20,
+      "elapsed": "0:00",
+      "reason_or_node": "(Dependency)"
+    },
+    "62119767_23": {
+      "name": "ptbp-eval-xz-gb102",
+      "state": "PENDING",
+      "cpus": 20,
+      "elapsed": "0:00",
+      "reason_or_node": "(Dependency)"
+    },
+    "62119767_25": {
+      "name": "ptbp-eval-xz-gb102",
+      "state": "PENDING",
+      "cpus": 20,
+      "elapsed": "0:00",
+      "reason_or_node": "(Dependency)"
+    },
+    "62119766": {
+      "name": "ptbp-tune-xz-gb102",
+      "state": "PENDING",
+      "cpus": 20,
+      "elapsed": "0:00",
+      "reason_or_node": "(AssocGrpCpuLimit)"
+    },
+    "62119765_11": {
+      "name": "ptbp-eval-xz-bb70",
+      "state": "PENDING",
+      "cpus": 20,
+      "elapsed": "0:00",
+      "reason_or_node": "(Dependency)"
+    },
+    "62119765_13": {
+      "name": "ptbp-eval-xz-bb70",
+      "state": "PENDING",
+      "cpus": 20,
+      "elapsed": "0:00",
+      "reason_or_node": "(Dependency)"
+    },
+    "62119765_15": {
+      "name": "ptbp-eval-xz-bb70",
+      "state": "PENDING",
+      "cpus": 20,
+      "elapsed": "0:00",
+      "reason_or_node": "(Dependency)"
+    },
+    "62119765_17": {
+      "name": "ptbp-eval-xz-bb70",
+      "state": "PENDING",
+      "cpus": 20,
+      "elapsed": "0:00",
+      "reason_or_node": "(Dependency)"
+    },
+    "62119764": {
+      "name": "ptbp-tune-xz-bb70",
+      "state": "PENDING",
+      "cpus": 20,
+      "elapsed": "0:00",
+      "reason_or_node": "(AssocGrpCpuLimit)"
+    },
+    "62119763_1": {
+      "name": "ptbp-eval-xz-bb144",
+      "state": "PENDING",
+      "cpus": 20,
+      "elapsed": "0:00",
+      "reason_or_node": "(Dependency)"
+    },
+    "62119763_3": {
+      "name": "ptbp-eval-xz-bb144",
+      "state": "PENDING",
+      "cpus": 20,
+      "elapsed": "0:00",
+      "reason_or_node": "(Dependency)"
+    },
+    "62119763_5": {
+      "name": "ptbp-eval-xz-bb144",
+      "state": "PENDING",
+      "cpus": 20,
+      "elapsed": "0:00",
+      "reason_or_node": "(Dependency)"
+    },
+    "62119763_7": {
+      "name": "ptbp-eval-xz-bb144",
+      "state": "PENDING",
+      "cpus": 20,
+      "elapsed": "0:00",
+      "reason_or_node": "(Dependency)"
+    },
+    "62119763_9": {
+      "name": "ptbp-eval-xz-bb144",
+      "state": "PENDING",
+      "cpus": 20,
+      "elapsed": "0:00",
+      "reason_or_node": "(Dependency)"
+    },
+    "62119762": {
+      "name": "ptbp-tune-xz-bb144",
+      "state": "PENDING",
+      "cpus": 20,
+      "elapsed": "0:00",
+      "reason_or_node": "(AssocGrpCpuLimit)"
+    },
+    "62119761_27": {
+      "name": "ptbp-eval-xyz-bb144",
+      "state": "PENDING",
+      "cpus": 20,
+      "elapsed": "0:00",
+      "reason_or_node": "(Dependency)"
+    },
+    "62119760": {
+      "name": "ptbp-tune-xyz-bb144",
+      "state": "PENDING",
+      "cpus": 20,
+      "elapsed": "0:00",
+      "reason_or_node": "(AssocGrpCpuLimit)"
+    },
+    "62102101_0": {
+      "name": "priortilt-xyz-50",
+      "state": "RUNNING",
+      "cpus": 50,
+      "elapsed": "5:52:56",
+      "reason_or_node": "dcc-barthellab-ferc-u-ab25-4-1"
+    },
+    "62102101_1": {
+      "name": "priortilt-xyz-50",
+      "state": "RUNNING",
+      "cpus": 50,
+      "elapsed": "5:52:56",
+      "reason_or_node": "dcc-cagpm-ferc-u-ac39-5-5"
+    }
+  }
+}
