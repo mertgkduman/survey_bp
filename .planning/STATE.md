@@ -469,6 +469,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 | 261118-ogi | Check 38 audited Fig1 results; all 13 PriorTilt points complete | 2026-11-18 | 30275791 | — | [261118-ogi-check-completed-priortilt-fig1-results-a](./quick/261118-ogi-check-completed-priortilt-fig1-results-a/) |
 | 261118-p8c | Qualify and launch paper XYZ comparison with 50 CPUs per point | 2026-11-19 | 1d816528 | — | [261118-p8c-qualify-and-launch-paper-xyz-priortilt-a](./quick/261118-p8c-qualify-and-launch-paper-xyz-priortilt-a/) |
 | 261118-s8d | Check XYZ progress and final 39-point XZ publication | 2026-11-19 | 9d141231 | — | [261118-s8d-check-live-xyz-priortilt-and-relaybp5-pr](./quick/261118-s8d-check-live-xyz-priortilt-and-relaybp5-pr/) |
+| 261118-ui1 | Expand decoder policies and research workbench | 2026-11-19 | a297e53d | Verified workbench and portable routes covered here. aSCED and Unicycle use registered studies. | [261118-ui1](./quick/261118-ui1-update-canonical-policy-support-and-rese/) |
 
 ### Roadmap Evolution
 
