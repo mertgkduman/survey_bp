@@ -474,6 +474,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 | 261119-h7b | Check 25 audited BP follow-up results and XYZ progress | 2026-11-19 | d73405dd | — | [261119-h7b-check-audited-priortilt-bp-follow-up-res](./quick/261119-h7b-check-audited-priortilt-bp-follow-up-res/) |
 | 261119-i4j | Show source captions and compare papers | 2026-11-19 | 33d71574 | 38 tests and eight browser checks passed | [261119-i4j-use-source-captions-and-compare-paper-re](./quick/261119-i4j-use-source-captions-and-compare-paper-re/) |
 | 261119-ibq | Launch damping-first advanced circuit BP tuning on 11 anchors | 2026-11-19 | 71eb5309 | — | [261119-ibq-tune-priortilt-relaybp-and-beamsearch-bp](./quick/261119-ibq-tune-priortilt-relaybp-and-beamsearch-bp/) |
+| 261119-jgk | Constrain Construction U table cells and show full hover text | 2026-11-19 | 843cbf10 | Verified at desktop, comparison, and mobile widths | [261119-jgk-constrain-construction-u-table-cells-and](./quick/261119-jgk-constrain-construction-u-table-cells-and/) |
 
 ### Roadmap Evolution
 
