@@ -1,0 +1,12 @@
+xz-bb144-priortilt-tuned 0.003 18060
+xz-bb144-relay-tuned 0.003 18080
+xz-bb144-beam-tuned 0.003 340
+xz-bb70-priortilt-tuned 0.001 18060
+xz-bb70-relay-tuned 0.001 18080
+xz-bb70-beam-tuned 0.001 340
+xz-gb102-priortilt-tuned 0.001 18060
+xz-gb102-relay-tuned 0.001 18080
+xz-gb102-beam-tuned 0.001 340
+xyz-bb144-priortilt-tuned 0.003 36060
+xyz-bb144-relay5-tuned 0.003 36080
+PASS all budgets and original controller loop operation order

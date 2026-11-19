@@ -1,0 +1,15 @@
+Qualified priortilt
+Qualified relay
+Qualified beam
+Qualified relay5
+72 bitwise neutral controller comparisons and non-neutral original-DEM audits
+xz-bb144 hard syndromes {'x': 6, 'z': 6} sampled blocks {'x': 1, 'z': 1}
+xz-bb144-priortilt-tuned round 1 4 / 4
+xz-bb144-priortilt-tuned round 2 8 / 8
+xz-bb144-priortilt-tuned round 3 4 / 4
+Selected xz-bb144-priortilt-tuned {'damping': 0.0, 'alpha': 1.0, 'beta': 0.0} training errors 4
+xz-bb144-priortilt-tuned x 1 1
+xz-bb144-priortilt-tuned z 1 1
+Audited xz-bb144-priortilt-tuned
+Published 1/1 audited confirmations
+PASS screening, tuning, unfiltered confirmation, full ledger audit and publication
