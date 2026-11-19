@@ -388,6 +388,15 @@
       }
     }
   },
+  "source_panels": {
+    "priortilt-2611-13373-v1": {
+      "1": [
+        {"input_id": "priortilt-bb144-memory-x", "label": "BB144 [[144,12,12]] · 12 cycles"},
+        {"input_id": "priortilt-bb70-memory-x", "label": "BB70 [[70,6,9]] · 9 cycles"},
+        {"input_id": "priortilt-gb102-memory-x", "label": "GB102 [[102,22,9]] · 9 cycles"}
+      ]
+    }
+  },
   "source_captions": {
     "yao-2312-10950-v2": {
       "2": {

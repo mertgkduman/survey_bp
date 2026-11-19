@@ -188,6 +188,18 @@
               "null"
             ]
           },
+          "panels": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["input_id", "label"],
+              "properties": {
+                "input_id": {"type": "string", "minLength": 1},
+                "label": {"type": "string", "minLength": 1}
+              }
+            }
+          },
           "reference_curves": {
             "type": "array",
             "items": {

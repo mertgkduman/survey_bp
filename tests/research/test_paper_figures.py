@@ -168,25 +168,33 @@ def test_catalog_rebuild_loads_and_hashes_the_figure_registry(tmp_path):
         extend_catalog(c,{'paper_figures_path':'figures.json'},tmp_path)
 
 
-def test_paper_views_use_guest_caption_and_preserve_evidence_scope():
+def test_paper_views_use_guest_caption_and_panel_order_and_preserve_evidence_scope():
     catalog = fixture()
     figure = catalog["paper_figures"][0]
+    catalog["codes"].append({"code_id": "b", "label": "Code B"})
+    figure["code_ids"].append("b")
     guest = deepcopy(figure)
     guest.update(figure_id="guest", paper_id="unrelated", guest_paper_id="paper",
                  guest_rules=guest["reproduction_rules"], reproduction_rules=[])
     catalog["paper_figures"].append(guest)
     caption = {"figure_number": "4", "quote": "Source caption"}
+    panels = [{"input_id": "b", "label": "First"}, {"input_id": "c", "label": "Second"}]
     coverage = {"summary": "Partial coverage.", "remaining_experiments": ["Run the baseline."]}
     apply_paper_view_metadata(catalog, {
         "paper_views": {"unrelated": {"title": "Full paper title", "coverage": coverage}},
         "source_captions": {"paper": {"3": caption}},
+        "source_panels": {"paper": {"3": panels}},
     })
     assert catalog["papers"][1]["title"] == "Full paper title"
     assert catalog["papers"][1]["coverage"] == coverage
     assert all(entry["source_figure"] == "3" for entry in catalog["paper_figures"])
     assert all(entry["label"] == 'Figure 4 "Source caption"' for entry in catalog["paper_figures"])
     assert all(entry["source_caption"] == caption for entry in catalog["paper_figures"])
+    assert all(entry["panels"] == panels for entry in catalog["paper_figures"])
     validate_catalog(catalog)
+    guest["panels"] = panels[:1]
+    with pytest.raises(ValueError, match="one labeled panel per input"):
+        validate_catalog(catalog)
 
 
 def test_missing_comparison_context_does_not_invent_a_runnable_recipe(tmp_path):

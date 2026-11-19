@@ -243823,7 +243823,7 @@
     },
     {
       "path": "research/catalog/paper-figures.json",
-      "sha256": "bc1f2646f28b00cdcfa1dcb09904a8fd7be05403c8f0133c10677bd8163c4d1b"
+      "sha256": "e12b9b8ed18fd800f3e0ef956fc368c9cb68b503ec548e6613e352ec8e353c08"
     },
     {
       "path": "data/reproductions/mackay-0304161-paper-rates/source_points.json",
@@ -245771,6 +245771,20 @@
       "figure_id": "priortilt-figure-1",
       "label": "Figure 1 \"Logical error rates of PriorTilt, Relay-BP, and beam search decoders for the three benchmark codes.\"",
       "note": "Local confidence intervals use separately sampled X and Z memories.",
+      "panels": [
+        {
+          "input_id": "priortilt-bb144-memory-x",
+          "label": "BB144 [[144,12,12]] \u00b7 12 cycles"
+        },
+        {
+          "input_id": "priortilt-bb70-memory-x",
+          "label": "BB70 [[70,6,9]] \u00b7 9 cycles"
+        },
+        {
+          "input_id": "priortilt-gb102-memory-x",
+          "label": "GB102 [[102,22,9]] \u00b7 9 cycles"
+        }
+      ],
       "paper_id": "priortilt-2611-13373-v1",
       "reference_curves": [
         {
@@ -246109,6 +246123,20 @@
       ],
       "label": "Figure 1 \"Logical error rates of PriorTilt, Relay-BP, and beam search decoders for the three benchmark codes.\"",
       "note": "This is the canonical circuit-level adaptation of the comparison in PriorTilt Figure 1, with separately sampled X and Z memories. It uses the PriorTilt paper's configuration and is attributed to that paper.",
+      "panels": [
+        {
+          "input_id": "priortilt-bb144-memory-x",
+          "label": "BB144 [[144,12,12]] \u00b7 12 cycles"
+        },
+        {
+          "input_id": "priortilt-bb70-memory-x",
+          "label": "BB70 [[70,6,9]] \u00b7 9 cycles"
+        },
+        {
+          "input_id": "priortilt-gb102-memory-x",
+          "label": "GB102 [[102,22,9]] \u00b7 9 cycles"
+        }
+      ],
       "paper_id": "relaybp-2506-01779-v2",
       "reference_curves": [
         {
@@ -246237,6 +246265,20 @@
       ],
       "label": "Figure 1 \"Logical error rates of PriorTilt, Relay-BP, and beam search decoders for the three benchmark codes.\"",
       "note": "This is the canonical circuit-level adaptation of the comparison in PriorTilt Figure 1, with separately sampled X and Z memories. It uses the PriorTilt paper's configuration and is attributed to that paper.",
+      "panels": [
+        {
+          "input_id": "priortilt-bb144-memory-x",
+          "label": "BB144 [[144,12,12]] \u00b7 12 cycles"
+        },
+        {
+          "input_id": "priortilt-bb70-memory-x",
+          "label": "BB70 [[70,6,9]] \u00b7 9 cycles"
+        },
+        {
+          "input_id": "priortilt-gb102-memory-x",
+          "label": "GB102 [[102,22,9]] \u00b7 9 cycles"
+        }
+      ],
       "paper_id": "beamsearch-2512-07057-v2",
       "reference_curves": [
         {

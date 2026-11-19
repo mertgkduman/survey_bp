@@ -111,6 +111,7 @@ def verify(output,url):
         assert card.locator('[data-select=input]').input_value()=='__figure__'
         assert card.locator('[data-group=paper]').is_checked()
         assert not card.locator('[data-group=additional]').is_checked()
+        assert card.locator('.chart svg').count()==1
         page.evaluate('c=>testRefreshCatalog(c)',catalog)
         checks.append('Roffe Fig. 3 includes four labelled toric codes; canonical regular BP is default while CS10/OSD0 and tuning stay additional')
 
@@ -139,6 +140,27 @@ def verify(output,url):
         figure=page.locator('[data-figure=priortilt-figure-1]')
         assert figure.locator('tbody tr').count()==39
         assert figure.locator('.paper-star').count()==39
+        panels=figure.locator('.figure-panel')
+        assert panels.locator('h4').all_text_contents()==[
+            'BB144 [[144,12,12]] · 12 cycles', 'BB70 [[70,6,9]] · 9 cycles', 'GB102 [[102,22,9]] · 9 cycles',
+        ]
+        charts=[panel.bounding_box() for panel in panels.all()]
+        assert all(abs(box['y']-charts[0]['y'])<1 for box in charts)
+        assert all(a['x']+a['width']<=b['x'] for a,b in zip(charts,charts[1:]))
+        assert [panel.locator('.point').count() for panel in panels.all()]==[15,12,12]
+        assert [panel.locator('.paper-star').count() for panel in panels.all()]==[15,12,12]
+        assert panels.nth(0).locator('.x-tick').all_text_contents()==['0.001','0.002','0.003','0.004','0.005']
+        assert panels.nth(1).locator('.x-tick').all_text_contents()==['0.0005','0.0008','0.001','0.002']
+        assert len(set(panels.locator('clipPath').evaluate_all('clips => clips.map(clip => clip.id)')))==3
+        assert panels.locator('.curve-group').evaluate_all("""curves => curves.every(curve => curves
+            .filter(other => other.dataset.decoder===curve.dataset.decoder)
+            .every(other => other.querySelector('.line').getAttribute('stroke')===curve.querySelector('.line').getAttribute('stroke')))""")
+        figure.locator('[data-select=input]').select_option('priortilt-bb70-memory-x')
+        assert panels.count()==1 and panels.first.locator('.point').count()==12
+        assert figure.locator('tbody tr').count()==12
+        figure.locator('[data-select=input]').select_option('__figure__')
+        assert panels.count()==3 and figure.locator('tbody tr').count()==39
+        checks.append('PriorTilt Figure 1 uses three independently scaled plots in paper order with consistent decoder colors')
         table=figure.locator('.table-wrap table')
         assert table.evaluate('n => getComputedStyle(n).tableLayout')=='fixed'
         assert table.locator('tbody td').evaluate_all('cells => cells.every(cell => cell.title===cell.textContent)')
@@ -162,6 +184,7 @@ def verify(output,url):
         page.locator('#select-additional-paper').select_option('relaybp-2506-01779-v2')
         assert page.locator('[data-figure=relay-priortilt-figure-1] tbody tr').count()==13
         assert page.locator('[data-figure=relay-priortilt-figure-1] .paper-star').count()==13
+        assert page.locator('[data-figure=relay-priortilt-figure-1] .figure-panel').count()==3
         relay=page.locator('[data-paper=relaybp-2506-01779-v2]')
         assert relay.locator('.paper-heading h3').inner_text()=='Improved belief propagation is sufficient for real-time decoding of quantum memory'
         assert 'Figure 2' in relay.locator('.paper-coverage').inner_text()
@@ -173,6 +196,9 @@ def verify(output,url):
         top,bottom=prior.bounding_box(),relay.bounding_box()
         assert abs(top['x']-bottom['x'])<1 and bottom['y']>=top['y']+top['height']
         assert page.evaluate('document.documentElement.scrollWidth<=innerWidth+1')
+        charts=[panel.bounding_box() for panel in panels.all()]
+        assert all(abs(box['x']-charts[0]['x'])<1 for box in charts)
+        assert all(a['y']+a['height']<=b['y'] for a,b in zip(charts,charts[1:]))
         page.set_viewport_size({'width':1500,'height':1100})
         page.locator('#add-paper').click()
         search=page.locator('#additional-paper-search input')
@@ -180,6 +206,7 @@ def verify(output,url):
         search.press('ArrowDown');search.press('Enter')
         assert page.locator('[data-figure=beam-priortilt-figure-1] tbody tr').count()==13
         assert page.locator('[data-figure=beam-priortilt-figure-1] .paper-star').count()==13
+        assert page.locator('[data-figure=beam-priortilt-figure-1] .figure-panel').count()==3
         assert page.locator('[data-paper=beamsearch-2512-07057-v2] h3').first.inner_text()=='Beam search decoder for quantum LDPC codes'
         page.locator('[data-paper=beamsearch-2512-07057-v2]').locator('.paper-heading button').click()
         assert page.locator('[data-figure=beam-priortilt-figure-1]').count()==0

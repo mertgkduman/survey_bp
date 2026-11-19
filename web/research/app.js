@@ -186,7 +186,13 @@ function reconcileCard(card){
 }
 function visible(card){return selected(card).filter(s=>!card.hidden.has(s.series_id));}
 function available(card){const collection=card.figureId?(figureFor(card)?.curves||[]):series();return collection.filter(s=>card.figureId&&card.input==='__figure__'||s.code_id===card.input||s.circuit_id===card.input);}
-function colorFor(card,s){return colors[Math.max(0,available(card).findIndex(x=>x.series_id===s.series_id))%colors.length];}
+function colorFor(card,s){
+ const figure=figureFor(card);
+ const index=figure?.panels
+  ?[...new Set(figure.curves.map(curve=>curve.decoder_id))].indexOf(s.decoder_id)
+  :available(card).findIndex(curve=>curve.series_id===s.series_id);
+ return colors[Math.max(0,index)%colors.length];
+}
 function toggleCurve(card,s){if(card.hidden.has(s.series_id))card.hidden.delete(s.series_id);else card.hidden.add(s.series_id);renderCards();const next=[...document.querySelectorAll(`[data-plot="${card.id}"] .curve-list input`)].find(n=>n.dataset.curve===s.series_id);next?.focus({preventScroll:true});}
 function previewCurve(card,s,on){const box=document.querySelector(`[data-plot="${card.id}"]`);if(!box)return;const group=[...box.querySelectorAll('.curve-group')].find(g=>g.dataset.curve===s.series_id);if(group){group.classList.toggle('preview',on);group.setAttribute('opacity',on?'0.25':card.hidden.has(s.series_id)?'0':'1');}}
 function curvePicker(card){
@@ -244,7 +250,7 @@ function renderCards(){
   metric.onchange=()=>{card.metric=metric.value;renderCards();};
   metricLabel.append(metric);box.append(metricLabel);
   if(figure?.paper_id==='mackay-0304161-v3')drawMacKayTable(card,box);
-  drawPlot(card,box);drawTable(card,box);
+  drawFigurePlots(card,box,figure?.panels);drawTable(card,box);
   const actions=el('div',{class:'actions'}),csv=el('button',{type:'button',class:'secondary'},'Export visible table');csv.disabled=!visiblePoints.length;csv.onclick=()=>exportTable(card);actions.append(csv);
   const receipt=el('button',{type:'button',class:'secondary'},'Download run settings');receipt.disabled=!visible(card).length;receipt.onclick=()=>{const shown=visible(card);save(`plot-${card.id}-settings.json`,JSON.stringify({schema:'research-plot-receipt-v2',...(figure?{paper_id:figure.paper_id,figure_id:figure.figure_id,figure_label:figure.label,reproduction_note:figure.note,paper_references:paperOverlays(card,shown)}:{}),axis:{mode:ResearchPlot.axis(shown,card.axis||'auto'),depolarizing_to_bit_flip_factor:2/3},series:shown,decoders:[...new Set(shown.flatMap(s=>evidenceMembers(s).map(m=>m.decoder_id)))].map(id=>record('decoders',id)),experiments:S.catalog.experiments.filter(e=>e.dataset_ids?.some(id=>shown.some(s=>evidenceMembers(s).some(m=>m.dataset_id===id))))},null,2)+'\n');};actions.append(receipt);
   if(visible(card).length===1){const reproduce=el('button',{type:'button',class:'secondary'},'Reproduce / extend');reproduce.onclick=()=>{const d=record('decoders',visible(card)[0].decoder_id),cfg=d.configuration||{};if(cfg.effective_policy?.schema==='vanilla-bp-decoder-v1'||cfg.experiment||cfg.portable_experiment||cfg.builder_preset||d.decoder_id==='priortilt-paper-priortilt')useSaved(d,card.input);else{const detail=box.querySelector('.run-details');detail.open=true;detail.scrollIntoView({block:'start'});}};actions.append(reproduce);}box.append(actions);runDetails(card,box);container.append(box);
@@ -263,14 +269,28 @@ function paperStar(x,y,color,description){
   'stroke-width':1,'stroke-linejoin':'round',role:'img',tabindex:0,'aria-label':description});
  star.append(svg('title',{},description));return star;
 }
-function drawPlot(card,box){
+function drawFigurePlots(card,box,panels){
  const curves=selected(card);
+ if(!panels){drawPlot(card,box,curves);return;}
+ const plots=panels.map(panel=>({panel,curves:curves.filter(s=>(s.circuit_id||s.code_id)===panel.input_id)}))
+  .filter(plot=>plot.curves.length);
+ const row=el('div',{class:'figure-panels',style:`--panel-count:${plots.length}`,role:'group','aria-label':'Figure panels',tabindex:'0'});
+ for(const plot of plots){
+  const section=el('section',{class:'figure-panel','data-panel':plot.panel.input_id,'aria-label':plot.panel.label});
+  section.append(el('h4',{},plot.panel.label));
+  drawPlot(card,section,plot.curves,plot.panel);
+  row.append(section);
+ }
+ box.append(row);
+ if(paperOverlays(card,visible(card)).length)box.append(el('p',{class:'small muted'},'★ Paper-reported points share the color of the corresponding local curve.'));
+}
+function drawPlot(card,box,curves,panel){
  const shown=curves.filter(s=>!card.hidden.has(s.series_id));
  const scaleCurves=shown.length?shown:curves;
  const figure=el('figure',{class:'chart'});
- const chart=svg('svg',{viewBox:'0 0 640 310',role:'group','aria-label':`Measured results for plot ${card.id}`});
+ const chart=svg('svg',{viewBox:`0 0 ${panel?400:640} 310`,role:'group','aria-label':`Measured results for ${panel?.label||`plot ${card.id}`}`});
  const caption=el('figcaption',{},shown.length
-  ?'Click a curve to hide it; use Show curves to restore it. Hover a name to preview.'
+  ?(panel?'':'Click a curve to hide it; use Show curves to restore it. Hover a name to preview.')
   :'All curves are hidden. Hover or focus a curve name for a faint preview.');
  figure.append(chart,caption);
  box.append(figure);
@@ -309,7 +329,7 @@ function drawPlot(card,box){
   ymin=0;
   ymax=ymax||1;
  }
- const left=log?64:96,right=619,top=23,bottom=258;
+ const left=log?64:96,right=panel?378:619,top=23,bottom=258;
  const X=x=>left+(x-xmin)/(xmax-xmin)*(right-left);
  const axisY=y=>bottom-(y-ymin)/(ymax-ymin)*(bottom-top);
  const Y=y=>axisY(log?Math.log10(y):y);
@@ -317,10 +337,13 @@ function drawPlot(card,box){
   const y=axisY(position);
   chart.append(svg('line',{x1:left,x2:right,y1:y,y2:y,class:style}));
  };
- for(let i=0;i<=4;i++){
-  const x=xmin+(xmax-xmin)*i/4;
+ const measuredTicks=panel?[...new Set(coordinates)].sort((a,b)=>a-b):[];
+ const separated=measuredTicks.slice(1).every((x,i)=>X(x)-X(measuredTicks[i])>=40);
+ const ticks=measuredTicks.length>=2&&measuredTicks.length<=5&&separated?measuredTicks:Array.from({length:5},(_,i)=>xmin+(xmax-xmin)*i/4);
+ for(const x of ticks){
+  const label=panel&&x>=.0001&&x<.001?Number(x.toPrecision(5)).toString():fmt(x);
   chart.append(svg('line',{x1:X(x),x2:X(x),y1:top,y2:bottom,class:'grid'}),
-   svg('text',{x:X(x),y:279,'text-anchor':'middle',class:'x-tick'},fmt(x)));
+   svg('text',{x:X(x),y:279,'text-anchor':'middle',class:'x-tick'},label));
  }
  if(log){
   for(let exponent=ymin;exponent<=ymax;exponent++){
@@ -344,7 +367,7 @@ function drawPlot(card,box){
  }
 
  // A hidden curve may extend beyond the axes fitted to the displayed curves.
- const clipId=`plot-area-${card.id}`;
+ const clipId=`plot-area-${card.id}${panel?'-'+panel.input_id:''}`;
  const clip=svg('clipPath',{id:clipId});
  clip.append(svg('rect',{x:left,y:top,width:right-left,height:bottom-top}));
  const defs=svg('defs');
@@ -385,11 +408,13 @@ function drawPlot(card,box){
   }
   chart.append(group);
  }
- if(overlays.length)figure.append(el('p',{class:'small muted'},'★ Paper-reported points share the color of the corresponding local curve.'));
+ if(overlays.length&&!panel)figure.append(el('p',{class:'small muted'},'★ Paper-reported points share the color of the corresponding local curve.'));
  const axisKinds=new Set(scaleRows.map(({p})=>p.x_semantics||'physical_error_probability'));const xlabel=axisMode==='bit_flip'?'Component bit-flip probability p_bit flip':axisKinds.size>1?'Probability p / p₀ (see run settings)':axisKinds.has('circuit_setting_index')?'Circuit setting index':axisKinds.has('decoder_prior_probability')?'Decoder prior probability p₀':'Physical error probability p';
  if(axisMode==='bit_flip'){const note=el('div',{class:'axis-note small'});katex.render('p_{\\mathrm{bit\\ flip}}=\\frac{2}{3}p_{\\mathrm{depolarizing}}',note,{throwOnError:true});figure.append(note,el('p',{class:'small muted'},'Depolarizing coordinates are converted automatically; X-only coordinates are unchanged. Depolarizing noise has X, Y, Z each with probability p/3. The channels remain distinct.'));}
  if(log&&scaleRows.some(({p})=>bound(p)))figure.append(el('p',{class:'small muted'},'Zero failures: the error bar runs from zero to the reported upper confidence limit. Zero is below the logarithmic plot; these bounds are not joined by a curve.'));
- chart.append(svg('text',{x:340,y:304,'text-anchor':'middle'},xlabel),svg('text',{x:16,y:144,transform:'rotate(-90 16 144)','text-anchor':'middle'},log?'Failure probability · log scale':metricNames[card.metric]));
+ const rateLabels=new Set(scaleRows.map(({p})=>p.metric));
+ const ylabel=log?(panel&&rateLabels.size===1&&scaleRows[0].p.metric||'Failure probability · log scale'):metricNames[card.metric];
+ chart.append(svg('text',{x:(left+right)/2,y:304,'text-anchor':'middle'},xlabel),svg('text',{x:16,y:144,transform:'rotate(-90 16 144)','text-anchor':'middle'},ylabel));
 }
 const tableStart=['Series','Noise','Metric','Observed value','Samples','Failures','Type I / II','CI',metricNames.iterations,metricNames.edge_updates];
 const showOtherWork=card=>points(card).some(({p})=>otherWork(p));
