@@ -137,3 +137,24 @@ See [XYZ campaign](../../../data/reproductions/priortilt-2611-13373-xyz/README.m
 [launch/qualification summary](../../quick/261118-p8c-qualify-and-launch-paper-xyz-priortilt-a/SUMMARY.md)
 and [launch verification](../../quick/261118-p8c-qualify-and-launch-paper-xyz-priortilt-a/launch-verification.json).
 Future XYZ refreshes use that study's report.py; the XZ publisher is unchanged.
+
+## Final XZ publication and live XYZ check — quick261118-s8d
+
+The original XZ collector61971020 completed0:0 and published all39 full-audited
+points (1,861,754,800 decoded memory-basis shots/1460 observable errors).
+Independent source/count/stopping/CI/work checks pass and all38 earlier full
+CSV rows are unchanged. All39 paper ordinates fall within local pointwise95%
+intervals; PriorTilt is lowest in all13 fully compared strata, with precision
+and unmatched-latency limits explicit. The final three-panel figure was inspected.
+The last GB102 Beam/.0005 estimate is1.444e-8 versus source2.306e-8, within its
+local interval. This completes the original XZ publication at local precision;
+no fresh1.86-billion-shot raw rehash was duplicated after the collector.
+
+XYZ remains0/2 complete/audited, both50-CPU jobs RUNNING. The checked snapshot
+has PriorTilt X1/28,672 and Z2/28,608 errors/shots;RelayBP-5 X0/6,848 and Z1/6,784.
+Only progress counts are reported; the20-error/100M per-basis target is not met.
+Frozen identities, manifest/policies, committed prefix marker arithmetic and
+sampled NPZ/noise bindings pass. No worker errors, new simulations, source/kernel
+or public/v1/model/phase-gate changes. The paper extension remains running.
+See [check summary](../../quick/261118-s8d-check-live-xyz-priortilt-and-relaybp5-pr/SUMMARY.md)
+and [final XZ report](../../../data/reproductions/priortilt-2611-13373/RESULTS.md).
