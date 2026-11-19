@@ -400,15 +400,17 @@ function drawMacKayTable(card,box){
  const wrap=el('div',{class:'table-wrap',tabindex:'0'}),table=el('table');
  const head=el('thead'),header=el('tr');
  for(const name of ['Decoder and code','Channel','Component bit-flip probability','Blocks tested','Total block failures','Detected (Type I)','Undetected (Type II)']){
-  header.append(el('th',{scope:'col'},name));
+  header.append(el('th',{scope:'col',title:name},name));
  }
  head.append(header);table.append(head);
  const body=el('tbody');
  const rate=(errors,n,estimate)=>known(errors)&&known(n)&&n>0?`${count(errors)} · ${fmt(estimate??errors/n)}`:'Unavailable';
  for(const {s,p} of rows.sort((a,b)=>a.s.label.localeCompare(b.s.label)||a.p.x-b.p.x)){
   const row=el('tr'),depolarizing=ResearchPlot.channel(s,p)==='depolarizing';
-  row.append(el('th',{scope:'row'},s.label));
-  for(const val of [depolarizing?'Depolarizing':'X-only',fmt(p.x*(depolarizing?2/3:1)),count(p.n),rate(p.failures,p.n,p.y),rate(p.type_i,p.n),rate(p.type_ii,p.n)])row.append(el('td',{},val));
+  row.append(el('th',{scope:'row',title:s.label},s.label));
+  for(const val of [depolarizing?'Depolarizing':'X-only',fmt(p.x*(depolarizing?2/3:1)),count(p.n),rate(p.failures,p.n,p.y),rate(p.type_i,p.n),rate(p.type_ii,p.n)]){
+   row.append(el('td',{title:val},val));
+  }
   body.append(row);
  }
  table.append(body);wrap.append(table);section.append(wrap);box.append(section);

@@ -93,6 +93,11 @@ def verify(output,url):
         assert card.locator('[data-group=paper]').is_disabled()
         assert card.locator('.mackay-results tbody tr').count()>0
         assert card.locator('.mackay-results').evaluate('(n)=>!!(n.compareDocumentPosition(n.parentElement.querySelector("svg")) & Node.DOCUMENT_POSITION_FOLLOWING)')
+        table=card.locator('.mackay-results table')
+        assert table.evaluate('n => getComputedStyle(n).tableLayout')=='fixed'
+        assert table.locator('tbody th').evaluate_all('cells => cells.some(cell => cell.scrollWidth>cell.clientWidth)')
+        assert table.locator('th, td').evaluate_all('cells => cells.every(cell => cell.title===cell.textContent)')
+        checks.append('Construction U cells clip long labels and expose their entire text on hover')
         page.locator('#select-paper').select_option('panteleev-2012-04068-v2')
         card=page.locator('[data-figure=lp1054-example-4]')
         assert 'no LER figure' in card.locator('.figure-note').inner_text()

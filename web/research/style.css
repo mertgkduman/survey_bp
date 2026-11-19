@@ -88,4 +88,7 @@ textarea[readonly] { background:#f7faf9; }
 .mackay-results { margin:1rem 0; }
 @media(max-width:480px) { .policy-glossary { grid-template-columns:minmax(0,1fr); } }
 .mackay-results .table-wrap { max-height:30rem; overflow:auto; }
-.mackay-results thead th { position:sticky; top:0; z-index:1; }
+.mackay-results table { table-layout:fixed; min-width:46rem; }
+.mackay-results thead th { position:sticky; top:0; z-index:1; white-space:normal; overflow-wrap:anywhere; }
+.mackay-results .table-wrap th:first-child { width:15rem; min-width:0; }
+.mackay-results tbody :is(th,td) { overflow:hidden; text-overflow:ellipsis; }
