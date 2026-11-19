@@ -1,0 +1,42 @@
+{
+  "priortilt": {
+    "bases": {
+      "x": {
+        "biased_node_updates": 10350398,
+        "decode_ns": 4688166690189,
+        "directed_edge_updates": 424393168752,
+        "errors": 0,
+        "iterations": 542059,
+        "joint_counts": [
+          2816,
+          0,
+          0,
+          0
+        ],
+        "nonconvergence": 0,
+        "random_draws": 4089043,
+        "shots": 2816
+      },
+      "z": {
+        "biased_node_updates": 16115595,
+        "decode_ns": 7113791393607,
+        "directed_edge_updates": 654009202800,
+        "errors": 0,
+        "iterations": 835645,
+        "joint_counts": [
+          4224,
+          0,
+          0,
+          0
+        ],
+        "nonconvergence": 0,
+        "random_draws": 6398861,
+        "shots": 4224
+      }
+    },
+    "job": "bb144-p003000-xyz-priortilt"
+  },
+  "relay5": {
+    "stage": "first sealed batch computing"
+  }
+}

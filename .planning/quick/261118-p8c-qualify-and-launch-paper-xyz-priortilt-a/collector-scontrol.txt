@@ -25,4 +25,3 @@ JobId=62102102 JobName=priortilt-xyz-collect
    StdIn=/dev/null
    StdOut=/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/priortilt-2611-13373-xyz/results/collect-62102102.log
    TresPerTask=cpu=1
-

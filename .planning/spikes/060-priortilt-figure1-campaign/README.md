@@ -109,3 +109,31 @@ Verdict remainsPARTIAL until the last audit completes. See the
 [check summary](../../quick/261118-ogi-check-completed-priortilt-fig1-results-a/SUMMARY.md),
 [all PriorTilt rates](../../quick/261118-ogi-check-completed-priortilt-fig1-results-a/PRIORTILT-TABLE.md)
 and [status CSV](../../quick/261118-ogi-check-completed-priortilt-fig1-results-a/comparison-snapshot.csv).
+
+## Separate XYZ Table4 extension — quick261118-p8c
+
+The user additionally requested XYZ reproduction with50 processors per point.
+A separate immutable study now runs the published BB144/p=.003 Table4 comparison
+with full joint detector models:PriorTilt60+6000x6 and RelayBP-5 80+600x60,
+five converged candidates and first minimum original-prior LLR score. Both
+RUNNING array62102101 tasks0/1 allocate50 CPUs/96GiB each; collector62102102
+is dependency-pending. All100 production decoder processes initialized with
+matching source-model identities. New relay-list policy reuses the unchanged
+canonical sweep; no frozen XZ controller or original plan changed.
+
+95 regression cases pass.50-CPU qualification62100693 passes24 matched native
+Relay cases and128 actual full-budget XYZ pilot events, full original-DEM audits,
+all-shot serial candidate/work/trace replay and unchanged resume receipts.
+Initial62100295 stopped before simulation on node-local reference availability;
+identical pinned native builds are now staged in a shared licensed archive.
+Sparse author H/A/priors match exactly for the1728-check,67824/67752-fault
+joint models. Paper source LERs are1.039392e-5 and1.095698e-5; no local XYZ
+agreement claim yet.20-error/100M per-basis stopping and audited-only publication
+apply. All63 original frozen files are unchanged. The original XZ campaign is
+now39/39 worker-audited; its independent collector61971020 continues the large
+publication refresh. This extension does not close the parent scientific gates.
+
+See [XYZ campaign](../../../data/reproductions/priortilt-2611-13373-xyz/README.md),
+[launch/qualification summary](../../quick/261118-p8c-qualify-and-launch-paper-xyz-priortilt-a/SUMMARY.md)
+and [launch verification](../../quick/261118-p8c-qualify-and-launch-paper-xyz-priortilt-a/launch-verification.json).
+Future XYZ refreshes use that study's report.py; the XZ publisher is unchanged.
